@@ -65,6 +65,7 @@ model users {
   role                        String                        @default("default")
   suspended                   Int                           @default(0)
   seen_recovery_codes         Boolean?                      @default(false)
+  supabase_id                 String?                       @unique
   createdAt                   DateTime                      @default(now())
   lastUpdatedAt               DateTime                      @default(now())
   dailyMessageLimit           Int?

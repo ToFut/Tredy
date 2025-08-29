@@ -328,6 +328,101 @@ const User = {
 
     return currentChatCount < user.dailyMessageLimit;
   },
+
+  /**
+   * Create or sync a user from Supabase authentication
+   * @param {object} supabaseUser - Supabase user object
+   * @returns {Promise<{user: object|null, error: string|null}>}
+   */
+  createFromSupabase: async function (supabaseUser) {
+    if (!supabaseUser || !supabaseUser.id) {
+      return { user: null, error: "Invalid Supabase user data" };
+    }
+
+    try {
+      // Check if user already exists
+      let existingUser = await this.get({ supabase_id: supabaseUser.id });
+      
+      if (existingUser) {
+        return { user: existingUser, error: null };
+      }
+
+      // Extract user data from Supabase
+      const userData = {
+        username: supabaseUser.email || `user_${supabaseUser.id.slice(0, 8)}`,
+        password: 'supabase_managed', // Placeholder since auth is handled by Supabase
+        supabase_id: supabaseUser.id,
+        role: supabaseUser.app_metadata?.role || 'default',
+        bio: supabaseUser.user_metadata?.bio || '',
+      };
+
+      // Create new user
+      const user = await prisma.users.create({
+        data: {
+          username: this.validations.username(userData.username),
+          password: userData.password,
+          supabase_id: userData.supabase_id,
+          role: this.validations.role(userData.role),
+          bio: this.validations.bio(userData.bio),
+        },
+      });
+
+      return { user: this.filterFields(user), error: null };
+    } catch (error) {
+      console.error("FAILED TO CREATE USER FROM SUPABASE.", error.message);
+      return { user: null, error: error.message };
+    }
+  },
+
+  /**
+   * Find user by Supabase ID
+   * @param {string} supabaseId - Supabase user ID
+   * @returns {Promise<object|null>} User object or null
+   */
+  getBySupabaseId: async function (supabaseId) {
+    if (!supabaseId) return null;
+    return await this.get({ supabase_id: supabaseId });
+  },
+
+  /**
+   * Update user's Supabase metadata sync
+   * @param {string} supabaseId - Supabase user ID
+   * @param {object} supabaseUser - Updated Supabase user object
+   * @returns {Promise<{success: boolean, error: string|null}>}
+   */
+  syncFromSupabase: async function (supabaseId, supabaseUser) {
+    try {
+      const user = await this.get({ supabase_id: supabaseId });
+      if (!user) {
+        return { success: false, error: "User not found" };
+      }
+
+      const updates = {};
+      
+      // Sync role if changed
+      const newRole = supabaseUser.app_metadata?.role || 'default';
+      if (user.role !== newRole) {
+        updates.role = newRole;
+      }
+
+      // Sync username if changed
+      const newUsername = supabaseUser.email || user.username;
+      if (user.username !== newUsername && newUsername) {
+        updates.username = newUsername;
+      }
+
+      // Only update if there are changes
+      if (Object.keys(updates).length === 0) {
+        return { success: true, error: null };
+      }
+
+      const result = await this.update(user.id, updates);
+      return result;
+    } catch (error) {
+      console.error("FAILED TO SYNC USER FROM SUPABASE.", error.message);
+      return { success: false, error: error.message };
+    }
+  },
 };
 
 module.exports = { User };

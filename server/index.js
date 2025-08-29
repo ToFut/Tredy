@@ -29,6 +29,7 @@ const { communityHubEndpoints } = require("./endpoints/communityHub");
 const { agentFlowEndpoints } = require("./endpoints/agentFlows");
 const { mcpServersEndpoints } = require("./endpoints/mcpServers");
 const { mobileEndpoints } = require("./endpoints/mobile");
+const { supabaseIntegrationEndpoints } = require("./endpoints/supabaseIntegration");
 const app = express();
 const apiRouter = express.Router();
 const FILE_LIMIT = "3GB";
@@ -67,6 +68,7 @@ communityHubEndpoints(apiRouter);
 agentFlowEndpoints(apiRouter);
 mcpServersEndpoints(apiRouter);
 mobileEndpoints(apiRouter);
+supabaseIntegrationEndpoints(apiRouter);
 
 // Externally facing embedder endpoints
 embeddedEndpoints(apiRouter);

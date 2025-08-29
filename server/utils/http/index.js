@@ -5,6 +5,7 @@ const JWT = require("jsonwebtoken");
 const { User } = require("../../models/user");
 const { jsonrepair } = require("jsonrepair");
 const extract = require("extract-json-from-string");
+const { validateSupabaseJWT } = require("../supabase");
 
 function reqBody(request) {
   return typeof request.body === "string"
@@ -42,6 +43,17 @@ async function userFromSession(request, response = null) {
     return null;
   }
 
+  // Try Supabase JWT validation first
+  const { user: supabaseUser, error: supabaseError } = await validateSupabaseJWT(token);
+  if (supabaseUser && !supabaseError) {
+    // Sync or create local user from Supabase user
+    const { user: localUser } = await User.createFromSupabase(supabaseUser);
+    if (localUser) {
+      return localUser;
+    }
+  }
+
+  // Fallback to local JWT validation for backward compatibility
   const valid = decodeJWT(token);
   if (!valid || !valid.id) {
     return null;

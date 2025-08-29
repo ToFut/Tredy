@@ -214,6 +214,105 @@ function communityHubEndpoints(app) {
       }
     }
   );
+
+  /**
+   * GET /community-hub/installed
+   * Get all installed community hub items (agent skills)
+   */
+  app.get(
+    "/community-hub/installed",
+    [validatedRequest, flexUserRoleValid([ROLES.admin])],
+    async (_, response) => {
+      try {
+        const ImportedPlugin = require("../utils/agents/imported");
+        const installedPlugins = ImportedPlugin.listImportedPlugins();
+        
+        // Add additional metadata
+        const items = installedPlugins.map(plugin => ({
+          ...plugin,
+          itemType: 'agent-skill',
+          isInstalled: true
+        }));
+
+        response.status(200).json({ success: true, items });
+      } catch (error) {
+        console.error(error);
+        response.status(500).json({ success: false, error: error.message });
+      }
+    }
+  );
+
+  /**
+   * POST /community-hub/toggle/:itemId
+   * Enable or disable an installed item
+   */
+  app.post(
+    "/community-hub/toggle/:itemId",
+    [validatedRequest, flexUserRoleValid([ROLES.admin])],
+    async (request, response) => {
+      try {
+        const { itemId } = request.params;
+        const { active } = reqBody(request);
+        const ImportedPlugin = require("../utils/agents/imported");
+        
+        const result = ImportedPlugin.updateImportedPlugin(itemId, { active });
+        
+        if (!result) {
+          throw new Error('Failed to update item status');
+        }
+
+        response.status(200).json({ 
+          success: true, 
+          message: `Item ${active ? 'enabled' : 'disabled'} successfully`,
+          config: result
+        });
+      } catch (error) {
+        console.error('Toggle failed:', error);
+        response.status(500).json({ 
+          success: false, 
+          error: error.message 
+        });
+      }
+    }
+  );
+
+  /**
+   * DELETE /community-hub/uninstall/:itemId
+   * Uninstall a community hub item
+   */
+  app.delete(
+    "/community-hub/uninstall/:itemId",
+    [validatedRequest, flexUserRoleValid([ROLES.admin])],
+    async (request, response) => {
+      try {
+        const { itemId } = request.params;
+        const ImportedPlugin = require("../utils/agents/imported");
+        
+        const result = ImportedPlugin.deletePlugin(itemId);
+        
+        if (!result) {
+          throw new Error('Failed to uninstall item');
+        }
+
+        await EventLogs.logEvent(
+          "community_hub_item_uninstalled",
+          { itemId },
+          response.locals?.user?.id
+        );
+
+        response.status(200).json({ 
+          success: true, 
+          message: 'Item uninstalled successfully'
+        });
+      } catch (error) {
+        console.error('Uninstallation failed:', error);
+        response.status(500).json({ 
+          success: false, 
+          error: error.message 
+        });
+      }
+    }
+  );
 }
 
 module.exports = { communityHubEndpoints };

@@ -196,6 +196,9 @@ export default {
     trending: () => {
       return `/settings/community-hub/trending`;
     },
+    marketplace: () => {
+      return `/settings/community-hub/marketplace`;
+    },
     authentication: () => {
       return `/settings/community-hub/authentication`;
     },

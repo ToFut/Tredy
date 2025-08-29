@@ -18,8 +18,25 @@ export default defineConfig({
     format: 'es'
   },
   server: {
-    port: 3000,
-    host: "localhost"
+    port: 8123,
+    host: "localhost",
+    proxy: {
+      "/api": {
+        target: "http://localhost:8124",
+        changeOrigin: true,
+        secure: false
+      },
+      "/system": {
+        target: "http://localhost:8124",
+        changeOrigin: true,
+        secure: false
+      },
+      "/auth": {
+        target: "http://localhost:8124",
+        changeOrigin: true,
+        secure: false
+      }
+    }
   },
   define: {
     "process.env": process.env

@@ -9,6 +9,9 @@ const Workspace = {
   workspaceOrderStorageKey: "anythingllm-workspace-order",
   /** The maximum percentage of the context window that can be used for attachments */
   maxContextWindowLimit: 0.8,
+  /** Simple cache to avoid redundant API calls */
+  _cache: new Map(),
+  _getCacheKey: (method, ...args) => `${method}:${args.join(':')}`,
 
   new: async function (data = {}) {
     const { workspace, message } = await fetch(`${API_BASE}/workspace/new`, {
@@ -216,12 +219,28 @@ const Workspace = {
     return workspaces;
   },
   bySlug: async function (slug = "") {
+    const cacheKey = this._getCacheKey('bySlug', slug);
+    
+    // Return cached result if available and less than 5 minutes old
+    if (this._cache.has(cacheKey)) {
+      const { data, timestamp } = this._cache.get(cacheKey);
+      if (Date.now() - timestamp < 300000) { // 5 minutes
+        return data;
+      }
+    }
+    
     const workspace = await fetch(`${API_BASE}/workspace/${slug}`, {
       headers: baseHeaders(),
     })
       .then((res) => res.json())
       .then((res) => res.workspace)
       .catch(() => null);
+    
+    // Cache the result
+    if (workspace) {
+      this._cache.set(cacheKey, { data: workspace, timestamp: Date.now() });
+    }
+    
     return workspace;
   },
   delete: async function (slug) {

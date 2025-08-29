@@ -1,8 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, Suspense, lazy } from "react";
 import { List, Plus } from "@phosphor-icons/react";
-import NewWorkspaceModal, {
-  useNewWorkspaceModal,
-} from "../Modals/NewWorkspace";
+import { useNewWorkspaceModal } from "../Modals/NewWorkspace";
 import ActiveWorkspaces from "./ActiveWorkspaces";
 import useLogo from "@/hooks/useLogo";
 import useUser from "@/hooks/useUser";
@@ -13,6 +11,9 @@ import paths from "@/utils/paths";
 import { useTranslation } from "react-i18next";
 import { useSidebarToggle, ToggleSidebarButton } from "./SidebarToggle";
 import SearchBox from "./SearchBox";
+
+// Lazy load the modal since it's only needed when creating a workspace
+const NewWorkspaceModal = lazy(() => import("../Modals/NewWorkspace").then(module => ({ default: module.default })));
 
 export default function Sidebar() {
   const { user } = useUser();
@@ -70,7 +71,11 @@ export default function Sidebar() {
             </div>
           </div>
         </div>
-        {showingNewWsModal && <NewWorkspaceModal hideModal={hideNewWsModal} />}
+        {showingNewWsModal && (
+          <Suspense fallback={<div>Loading...</div>}>
+            <NewWorkspaceModal hideModal={hideNewWsModal} />
+          </Suspense>
+        )}
       </div>
     </>
   );
@@ -179,7 +184,11 @@ export function SidebarMobileHeader() {
             </div>
           </div>
         </div>
-        {showingNewWsModal && <NewWorkspaceModal hideModal={hideNewWsModal} />}
+        {showingNewWsModal && (
+          <Suspense fallback={<div>Loading...</div>}>
+            <NewWorkspaceModal hideModal={hideNewWsModal} />
+          </Suspense>
+        )}
       </div>
     </>
   );

@@ -228,6 +228,70 @@ const CommunityHub = {
         error: e.message,
       }));
   },
+
+  /**
+   * Get all installed community hub items
+   * @returns {Promise<{success: boolean, items: Array}>}
+   */
+  getInstalledItems: async () => {
+    return await fetch(`${API_BASE}/community-hub/installed`, {
+      method: "GET",
+      headers: baseHeaders(),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (!res.success) throw new Error(res.error || "Failed to fetch installed items");
+        return res.items;
+      })
+      .catch((e) => {
+        console.error("Failed to fetch installed items:", e);
+        return [];
+      });
+  },
+
+  /**
+   * Toggle an installed item's active status
+   * @param {string} itemId - The ID of the item to toggle
+   * @param {boolean} active - Whether the item should be active
+   * @returns {Promise<{success: boolean, error: string | null}>}
+   */
+  toggleItem: async (itemId, active) => {
+    return await fetch(`${API_BASE}/community-hub/toggle/${itemId}`, {
+      method: "POST",
+      headers: baseHeaders(),
+      body: JSON.stringify({ active }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (!res.success) throw new Error(res.error || "Toggle failed");
+        return res;
+      })
+      .catch((e) => ({
+        success: false,
+        error: e.message,
+      }));
+  },
+
+  /**
+   * Uninstall a community hub item
+   * @param {string} itemId - The ID of the item to uninstall
+   * @returns {Promise<{success: boolean, error: string | null}>}
+   */
+  uninstallItem: async (itemId) => {
+    return await fetch(`${API_BASE}/community-hub/uninstall/${itemId}`, {
+      method: "DELETE",
+      headers: baseHeaders(),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (!res.success) throw new Error(res.error || "Uninstallation failed");
+        return res;
+      })
+      .catch((e) => ({
+        success: false,
+        error: e.message,
+      }));
+  },
 };
 
 export default CommunityHub;

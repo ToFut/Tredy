@@ -80,6 +80,9 @@ const AgentBuilder = lazy(() => import("@/pages/Admin/AgentBuilder"));
 const CommunityHubTrending = lazy(
   () => import("@/pages/GeneralSettings/CommunityHub/Trending")
 );
+const CommunityHubMarketplace = lazy(
+  () => import("@/pages/GeneralSettings/CommunityHub/MarketplaceView")
+);
 const CommunityHubAuthentication = lazy(
   () => import("@/pages/GeneralSettings/CommunityHub/Authentication")
 );
@@ -256,6 +259,10 @@ export default function App() {
                   <Route
                     path="/settings/community-hub/trending"
                     element={<AdminRoute Component={CommunityHubTrending} />}
+                  />
+                  <Route
+                    path="/settings/community-hub/marketplace"
+                    element={<AdminRoute Component={CommunityHubMarketplace} />}
                   />
                   <Route
                     path="/settings/community-hub/authentication"

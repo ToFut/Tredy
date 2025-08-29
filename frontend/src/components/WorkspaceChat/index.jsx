@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense, lazy } from "react";
 import Workspace from "@/models/workspace";
 import LoadingChat from "./LoadingChat";
-import ChatContainer from "./ChatContainer";
 import paths from "@/utils/paths";
 import ModalWrapper from "../ModalWrapper";
 import { useParams } from "react-router-dom";
@@ -11,6 +10,9 @@ import {
   TTSProvider,
   useWatchForAutoPlayAssistantTTSResponse,
 } from "../contexts/TTSProvider";
+
+// Lazy load the heavy ChatContainer component
+const ChatContainer = lazy(() => import("./ChatContainer"));
 
 export default function WorkspaceChat({ loading, workspace }) {
   useWatchForAutoPlayAssistantTTSResponse();
@@ -80,7 +82,9 @@ export default function WorkspaceChat({ loading, workspace }) {
   return (
     <TTSProvider>
       <DnDFileUploaderProvider workspace={workspace} threadSlug={threadSlug}>
-        <ChatContainer workspace={workspace} knownHistory={history} />
+        <Suspense fallback={<LoadingChat />}>
+          <ChatContainer workspace={workspace} knownHistory={history} />
+        </Suspense>
       </DnDFileUploaderProvider>
     </TTSProvider>
   );

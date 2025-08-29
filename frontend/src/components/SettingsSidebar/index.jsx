@@ -306,6 +306,12 @@ const SidebarOptions = ({ user = null, t }) => (
               roles: ["admin"],
             },
             {
+              btnText: "Marketplace",
+              href: paths.communityHub.marketplace(),
+              flex: true,
+              roles: ["admin"],
+            },
+            {
               btnText: "Your Account",
               href: paths.communityHub.authentication(),
               flex: true,

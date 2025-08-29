@@ -8,6 +8,7 @@ import {
   Browser,
   ChartBar,
   FileMagnifyingGlass,
+  ChartLine,
 } from "@phosphor-icons/react";
 import RAGImage from "@/media/agents/rag-memory.png";
 import SummarizeImage from "@/media/agents/view-summarize.png";
@@ -61,6 +62,15 @@ export const configurableSkills = {
     component: GenericSkillPanel,
     skill: "create-chart",
     icon: ChartBar,
+    image: GenerateChartsImage,
+  },
+  "stock-market": {
+    title: "Stock Market Analyzer",
+    description:
+      "Enable real-time stock market data analysis including prices, company fundamentals, technical indicators (RSI, moving averages), and market insights.",
+    component: GenericSkillPanel,
+    skill: "stock-market",
+    icon: ChartLine,
     image: GenerateChartsImage,
   },
   "web-browsing": {

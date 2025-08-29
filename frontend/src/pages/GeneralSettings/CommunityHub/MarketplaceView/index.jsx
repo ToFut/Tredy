@@ -51,7 +51,14 @@ export default function MarketplaceView() {
       
       if (item.itemType === "agent-skill") {
         await CommunityHub.importBundleItem(importId);
+      } else if (item.itemType === "system-prompt") {
+        // System prompts require workspace-specific installation
+        alert("System prompts must be installed per workspace. Go to a specific workspace and use the 'Import Item' feature to install this system prompt.");
+        return;
+      } else if (item.itemType === "slash-command") {
+        await CommunityHub.applyItem(importId, {});
       } else {
+        // For other item types, try to apply them
         await CommunityHub.applyItem(importId, {});
       }
       
@@ -59,6 +66,7 @@ export default function MarketplaceView() {
       await loadData();
     } catch (error) {
       console.error("Failed to install item:", error);
+      alert("Failed to install item: " + error.message);
     }
   };
 

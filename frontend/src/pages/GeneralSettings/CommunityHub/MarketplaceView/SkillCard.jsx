@@ -52,17 +52,25 @@ export default function SkillCard({ item, viewMode, onInstall, isInstalled }) {
           </div>
           <button
             onClick={onInstall}
-            disabled={isInstalled}
+            disabled={isInstalled || item.itemType === "system-prompt"}
             className={`px-4 py-2 rounded transition-colors flex items-center gap-2 ${
               isInstalled
                 ? "bg-green-500/20 text-green-500 cursor-not-allowed"
+                : item.itemType === "system-prompt"
+                ? "bg-orange-500/20 text-orange-500 cursor-not-allowed"
                 : "bg-primary-button text-white hover:bg-primary-button-hover"
             }`}
+            title={item.itemType === "system-prompt" ? "System prompts must be installed per workspace" : ""}
           >
             {isInstalled ? (
               <>
                 <CheckCircle className="w-4 h-4" />
                 Installed
+              </>
+            ) : item.itemType === "system-prompt" ? (
+              <>
+                <FileText className="w-4 h-4" />
+                Workspace Only
               </>
             ) : (
               <>
@@ -108,17 +116,25 @@ export default function SkillCard({ item, viewMode, onInstall, isInstalled }) {
       
       <button
         onClick={onInstall}
-        disabled={isInstalled}
+        disabled={isInstalled || item.itemType === "system-prompt"}
         className={`w-full py-2 rounded transition-colors flex items-center justify-center gap-2 ${
           isInstalled
             ? "bg-green-500/20 text-green-500 cursor-not-allowed"
+            : item.itemType === "system-prompt"
+            ? "bg-orange-500/20 text-orange-500 cursor-not-allowed"
             : "bg-primary-button text-white hover:bg-primary-button-hover"
         }`}
+        title={item.itemType === "system-prompt" ? "System prompts must be installed per workspace" : ""}
       >
         {isInstalled ? (
           <>
             <CheckCircle className="w-4 h-4" />
             Installed
+          </>
+        ) : item.itemType === "system-prompt" ? (
+          <>
+            <FileText className="w-4 h-4" />
+            Workspace Only
           </>
         ) : (
           <>

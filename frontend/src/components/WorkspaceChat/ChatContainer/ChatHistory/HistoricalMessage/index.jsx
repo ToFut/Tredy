@@ -37,6 +37,7 @@ const HistoricalMessage = ({
   forkThread,
   metrics = {},
   alignmentCls = "",
+  username = null,
 }) => {
   const { t } = useTranslation();
   const { isEditing } = useEditMessage({ chatId, role });
@@ -61,7 +62,7 @@ const HistoricalMessage = ({
       >
         <div className="py-8 px-4 w-full flex gap-x-5 md:max-w-[80%] flex-col">
           <div className={`flex gap-x-5 ${alignmentCls}`}>
-            <ProfileImage role={role} workspace={workspace} />
+            <ProfileImage role={role} workspace={workspace} username={username} />
             <div className="p-2 rounded-lg bg-red-50 text-red-500">
               <span className="inline-block">
                 <Warning className="h-4 w-4 mb-1 inline-block" /> Could not
@@ -90,7 +91,7 @@ const HistoricalMessage = ({
       <div className="py-8 px-4 w-full flex gap-x-5 md:max-w-[80%] flex-col">
         <div className={`flex gap-x-5 ${alignmentCls}`}>
           <div className="flex flex-col items-center">
-            <ProfileImage role={role} workspace={workspace} />
+            <ProfileImage role={role} workspace={workspace} username={username} />
             <div className="mt-1 -mb-10">
               {role === "assistant" && (
                 <TTSMessage
@@ -158,26 +159,38 @@ const HistoricalMessage = ({
   );
 };
 
-function ProfileImage({ role, workspace }) {
+function ProfileImage({ role, workspace, username }) {
   if (role === "assistant" && workspace.pfpUrl) {
     return (
-      <div className="relative w-[35px] h-[35px] rounded-full flex-shrink-0 overflow-hidden">
-        <img
-          src={workspace.pfpUrl}
-          alt="Workspace profile picture"
-          className="absolute top-0 left-0 w-full h-full object-cover rounded-full bg-white"
-        />
+      <div className="flex flex-col items-center">
+        <div className="relative w-[35px] h-[35px] rounded-full flex-shrink-0 overflow-hidden">
+          <img
+            src={workspace.pfpUrl}
+            alt="Workspace profile picture"
+            className="absolute top-0 left-0 w-full h-full object-cover rounded-full bg-white"
+          />
+        </div>
       </div>
     );
   }
 
+  // For user messages, show the username if available
+  const displayName = role === "user" && username ? username : (role === "user" ? userFromStorage()?.username : workspace.slug);
+  
   return (
-    <UserIcon
-      user={{
-        uid: role === "user" ? userFromStorage()?.username : workspace.slug,
-      }}
-      role={role}
-    />
+    <div className="flex flex-col items-center">
+      <UserIcon
+        user={{
+          uid: displayName,
+        }}
+        role={role}
+      />
+      {role === "user" && username && (
+        <span className="text-xs text-theme-text-secondary mt-1 truncate max-w-[60px]">
+          {username}
+        </span>
+      )}
+    </div>
   );
 }
 

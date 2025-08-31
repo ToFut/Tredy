@@ -371,8 +371,8 @@ RUN mkdir -p /app/server/storage/documents \
     chown -R anythingllm:anythingllm /app/server/storage && \
     chmod -R 755 /app/server/storage
 
-# Volume mount points for persistent data
-VOLUME ["/app/server/storage"]
+# Note: Railway manages volumes through their dashboard
+# Mount a Railway volume to /app/server/storage for persistent data
 
 # Set working directory
 WORKDIR /app

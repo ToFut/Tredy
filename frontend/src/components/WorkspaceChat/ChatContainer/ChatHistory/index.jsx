@@ -353,6 +353,7 @@ function buildMessages({
           forkThread={forkThread}
           metrics={props.metrics}
           alignmentCls={getMessageAlignment?.(props.role)}
+          username={props.username}
         />
       );
     }

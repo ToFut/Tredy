@@ -95,6 +95,14 @@ const WorkspaceChats = {
           api_session_id: null, // do not include api-session chats in the frontend for anyone.
           include: true,
         },
+        include: {
+          users: {
+            select: {
+              id: true,
+              username: true,
+            }
+          }
+        },
         ...(limit !== null ? { take: limit } : {}),
         ...(orderBy !== null ? { orderBy } : { orderBy: { id: "asc" } }),
       });
@@ -205,11 +213,22 @@ const WorkspaceChats = {
     clause = {},
     limit = null,
     orderBy = null,
-    offset = null
+    offset = null,
+    includeUser = true
   ) {
     try {
       const chats = await prisma.workspace_chats.findMany({
         where: clause,
+        ...(includeUser ? {
+          include: {
+            users: {
+              select: {
+                id: true,
+                username: true,
+              }
+            }
+          }
+        } : {}),
         ...(limit !== null ? { take: limit } : {}),
         ...(offset !== null ? { skip: offset } : {}),
         ...(orderBy !== null ? { orderBy } : {}),

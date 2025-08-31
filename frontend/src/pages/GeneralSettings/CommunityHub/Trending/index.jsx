@@ -1,6 +1,6 @@
 import Sidebar from "@/components/SettingsSidebar";
 import { isMobile } from "react-device-detect";
-import { Package, TrendingUp } from "@phosphor-icons/react";
+import { Package, TrendUp } from "@phosphor-icons/react";
 import HubItems from "./HubItems";
 import paths from "@/utils/paths";
 
@@ -38,7 +38,7 @@ export default function CommunityHub() {
           {/* Navigation Tabs */}
           <div className="flex gap-4 mb-6">
             <div className="flex items-center gap-2 px-3 py-2 bg-primary-button/20 text-primary-button rounded">
-              <TrendingUp className="w-4 h-4" />
+              <TrendUp className="w-4 h-4" />
               Trending Items
             </div>
             <a

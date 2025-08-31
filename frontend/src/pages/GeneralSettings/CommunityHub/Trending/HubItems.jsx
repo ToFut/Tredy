@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Package, Download, TrendingUp } from "@phosphor-icons/react";
+import { Package, Download, TrendUp } from "@phosphor-icons/react";
 import CommunityHub from "@/models/communityHub";
 import * as Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -87,7 +87,7 @@ export default function HubItems() {
   if (trendingItems.length === 0) {
     return (
       <div className="text-center py-12">
-        <TrendingUp className="w-16 h-16 mx-auto text-theme-text-secondary mb-4" />
+        <TrendUp className="w-16 h-16 mx-auto text-theme-text-secondary mb-4" />
         <h3 className="text-lg font-semibold text-theme-text-primary mb-2">
           No Trending Items
         </h3>

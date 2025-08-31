@@ -173,6 +173,8 @@ ENV NODE_ENV=production
 ENV ANYTHING_LLM_RUNTIME=docker
 ENV DEPLOYMENT_VERSION=1.8.5
 ENV STORAGE_DIR=/app/server/storage
+ENV PORT=3001
+ENV SERVER_PORT=3001
 
 # Default AI Configuration (can be overridden by Railway variables)
 ENV LLM_PROVIDER=togetherai
@@ -180,6 +182,9 @@ ENV EMBEDDING_ENGINE=native
 ENV EMBEDDING_MODEL_PREF=Xenova/all-MiniLM-L6-v2
 ENV VECTOR_DB=lancedb
 ENV DISABLE_TELEMETRY=true
+
+# Expose the port
+EXPOSE 3001
 
 # Healthcheck disabled for Railway (Railway has its own health monitoring)
 # HEALTHCHECK --interval=1m --timeout=10s --start-period=1m \

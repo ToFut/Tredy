@@ -32,6 +32,7 @@ const { mcpServersEndpoints } = require("./endpoints/mcpServers");
 const { mobileEndpoints } = require("./endpoints/mobile");
 const { supabaseIntegrationEndpoints } = require("./endpoints/supabaseIntegration");
 const { supabaseAuthEndpoints } = require("./endpoints/supabaseAuth");
+const { threadSharingEndpoints } = require("./endpoints/threadSharing");
 const { WelcomeMessages } = require("./models/welcomeMessages");
 const app = express();
 const apiRouter = express.Router();
@@ -74,6 +75,7 @@ mcpServersEndpoints(apiRouter);
 mobileEndpoints(apiRouter);
 supabaseIntegrationEndpoints(apiRouter);
 supabaseAuthEndpoints(apiRouter);
+threadSharingEndpoints(apiRouter);
 
 // Externally facing embedder endpoints
 embeddedEndpoints(apiRouter);

@@ -4,7 +4,7 @@ import {
   Play,
   Pause,
   Trash,
-  Edit,
+  PencilSimple,
   CheckCircle,
   XCircle,
   Timer,
@@ -245,7 +245,7 @@ export default function ScheduleList({ workspace }) {
                     className="p-1.5 rounded hover:bg-theme-bg-secondary transition-colors"
                     title="Edit"
                   >
-                    <Edit className="w-4 h-4 text-theme-text-secondary" />
+                    <PencilSimple className="w-4 h-4 text-theme-text-secondary" />
                   </button>
                   <button
                     onClick={() => handleDelete(schedule.id)}

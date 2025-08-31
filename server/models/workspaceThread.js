@@ -147,6 +147,138 @@ const WorkspaceThread = {
     onRename?.(updatedThread);
     return true;
   },
+
+  /**
+   * Share a thread with users
+   */
+  shareThread: async function (threadId, userId, participants = []) {
+    try {
+      // Verify the user owns the thread or has permission to share
+      const thread = await this.get({ id: Number(threadId) });
+      if (!thread) {
+        return { success: false, error: "Thread not found" };
+      }
+
+      // Check if user is the thread owner or has permission
+      const isOwner = thread.user_id === Number(userId);
+      const canShare = isOwner || (await ThreadParticipants.canEdit(threadId, userId));
+
+      if (!canShare) {
+        return { success: false, error: "You don't have permission to share this thread" };
+      }
+
+      // Add the owner as a participant if not already
+      if (isOwner) {
+        await ThreadParticipants.add({
+          threadId,
+          userId,
+          role: ThreadParticipants.ROLES.OWNER,
+          canEdit: true,
+          canDelete: true,
+        });
+      }
+
+      // Add new participants
+      const { count, error } = await ThreadParticipants.bulkAdd(threadId, participants);
+
+      if (error) {
+        return { success: false, error };
+      }
+
+      return { success: true, count };
+    } catch (error) {
+      console.error("Failed to share thread:", error.message);
+      return { success: false, error: error.message };
+    }
+  },
+
+  /**
+   * Unshare a thread with a user
+   */
+  unshareThread: async function (threadId, requestingUserId, targetUserId) {
+    try {
+      // Check if requesting user has permission to unshare
+      const canDelete = await ThreadParticipants.canDelete(threadId, requestingUserId);
+      const thread = await this.get({ id: Number(threadId) });
+      const isOwner = thread?.user_id === Number(requestingUserId);
+
+      if (!canDelete && !isOwner) {
+        return { success: false, error: "You don't have permission to remove participants" };
+      }
+
+      // Don't allow removing the owner
+      if (Number(targetUserId) === thread.user_id) {
+        return { success: false, error: "Cannot remove the thread owner" };
+      }
+
+      const { success, error } = await ThreadParticipants.remove(threadId, targetUserId);
+      return { success, error };
+    } catch (error) {
+      console.error("Failed to unshare thread:", error.message);
+      return { success: false, error: error.message };
+    }
+  },
+
+  /**
+   * Get all shared threads for a user in a workspace
+   */
+  getSharedThreads: async function (userId, workspaceId) {
+    try {
+      const sharedThreads = await ThreadParticipants.getUserThreads(userId, workspaceId);
+      return sharedThreads;
+    } catch (error) {
+      console.error("Failed to get shared threads:", error.message);
+      return [];
+    }
+  },
+
+  /**
+   * Check if a user has access to a thread
+   */
+  userHasAccess: async function (threadId, userId) {
+    try {
+      const thread = await this.get({ id: Number(threadId) });
+      if (!thread) return false;
+
+      // Check if user is the owner
+      if (thread.user_id === Number(userId)) return true;
+
+      // Check if user is a participant
+      return await ThreadParticipants.hasAccess(threadId, userId);
+    } catch (error) {
+      console.error("Failed to check thread access:", error.message);
+      return false;
+    }
+  },
+
+  /**
+   * Get thread with participants
+   */
+  getWithParticipants: async function (threadId) {
+    try {
+      const thread = await prisma.workspace_threads.findFirst({
+        where: { id: Number(threadId) },
+        include: {
+          thread_participants: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  username: true,
+                  pfpFilename: true,
+                  role: true,
+                },
+              },
+            },
+          },
+        },
+      });
+      return thread;
+    } catch (error) {
+      console.error("Failed to get thread with participants:", error.message);
+      return null;
+    }
+  },
 };
 
 module.exports = { WorkspaceThread };

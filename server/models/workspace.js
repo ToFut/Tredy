@@ -601,6 +601,23 @@ const Workspace = {
       return false;
     }
   },
+
+  /**
+   * Check if a user has access to a workspace
+   */
+  userHasAccess: async function (workspaceId, userId) {
+    try {
+      const { WorkspaceUsers } = require("./workspaceUsers");
+      const hasAccess = await WorkspaceUsers.get({
+        workspace_id: Number(workspaceId),
+        user_id: Number(userId),
+      });
+      return !!hasAccess;
+    } catch (error) {
+      console.error("Failed to check workspace access:", error.message);
+      return false;
+    }
+  },
 };
 
 module.exports = { Workspace };

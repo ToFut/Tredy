@@ -86,6 +86,7 @@ model users {
   desktop_mobile_devices      desktop_mobile_devices[]
   workspace_parsed_files      workspace_parsed_files[]
   agent_schedules             agent_schedules[]
+  thread_participants         thread_participants[]
 }
 
 model recovery_codes {
@@ -167,6 +168,7 @@ model workspace_threads {
   workspace              workspaces               @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
   user                   users?                   @relation(fields: [user_id], references: [id], onDelete: Cascade)
   workspace_parsed_files workspace_parsed_files[]
+  thread_participants    thread_participants[]
 
   @@index([workspace_id])
   @@index([user_id])
@@ -432,4 +434,21 @@ model schedule_executions {
 
   @@index([schedule_id])
   @@index([started_at])
+}
+
+model thread_participants {
+  id           Int               @id @default(autoincrement())
+  thread_id    Int
+  user_id      Int
+  role         String            @default("viewer") // viewer, contributor, owner
+  can_edit     Boolean           @default(false)
+  can_delete   Boolean           @default(false)
+  joined_at    DateTime          @default(now())
+  last_seen_at DateTime?
+  thread       workspace_threads @relation(fields: [thread_id], references: [id], onDelete: Cascade)
+  user         users             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([thread_id, user_id])
+  @@index([thread_id])
+  @@index([user_id])
 }

@@ -2,6 +2,8 @@ const prisma = require("../utils/prisma");
 const slugifyModule = require("slugify");
 const { v4: uuidv4 } = require("uuid");
 
+const { ThreadParticipants } = require("./threadParticipants");
+
 const WorkspaceThread = {
   defaultName: "Thread",
   writable: ["name"],

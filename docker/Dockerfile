@@ -176,12 +176,17 @@ ENV STORAGE_DIR=/app/server/storage
 ENV PORT=3001
 ENV SERVER_PORT=3001
 
+# Authentication Configuration (Railway will override these)
+ENV AUTH_TOKEN=""
+ENV JWT_SECRET="anything-llm-jwt-secret-changeme123"
+ENV JWT_EXPIRY="30d"
+ENV DISABLE_TELEMETRY=true
+
 # Default AI Configuration (can be overridden by Railway variables)
 ENV LLM_PROVIDER=togetherai
 ENV EMBEDDING_ENGINE=native
 ENV EMBEDDING_MODEL_PREF=Xenova/all-MiniLM-L6-v2
 ENV VECTOR_DB=lancedb
-ENV DISABLE_TELEMETRY=true
 
 # Expose the port
 EXPOSE 3001

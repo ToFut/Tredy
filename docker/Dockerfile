@@ -162,14 +162,24 @@ FROM backend-build AS production-build
 WORKDIR /app
 COPY --chown=anythingllm:anythingllm --from=frontend-build /app/frontend/dist /app/server/public
 USER root
-RUN chown -R anythingllm:anythingllm /app/server && \
-    chown -R anythingllm:anythingllm /app/collector
+RUN mkdir -p /app/server/storage && \
+    chown -R anythingllm:anythingllm /app/server && \
+    chown -R anythingllm:anythingllm /app/collector && \
+    chmod -R 755 /app/server/storage
 USER anythingllm
 
 # Setup the environment
 ENV NODE_ENV=production
 ENV ANYTHING_LLM_RUNTIME=docker
 ENV DEPLOYMENT_VERSION=1.8.5
+ENV STORAGE_DIR=/app/server/storage
+
+# Default AI Configuration (can be overridden by Railway variables)
+ENV LLM_PROVIDER=togetherai
+ENV EMBEDDING_ENGINE=native
+ENV EMBEDDING_MODEL_PREF=Xenova/all-MiniLM-L6-v2
+ENV VECTOR_DB=lancedb
+ENV DISABLE_TELEMETRY=true
 
 # Setup the healthcheck
 HEALTHCHECK --interval=1m --timeout=10s --start-period=1m \

@@ -135,10 +135,10 @@ function workspaceThreadEndpoints(app) {
         const user = await userFromSession(request, response);
         const workspace = response.locals.workspace;
         const thread = response.locals.thread;
+        // For shared threads, show all messages from all participants
         const history = await WorkspaceChats.where(
           {
             workspaceId: workspace.id,
-            user_id: user?.id || null,
             thread_id: thread.id,
             api_session_id: null, // Do not include API session chats.
             include: true,

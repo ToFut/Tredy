@@ -172,29 +172,232 @@ USER anythingllm
 ENV NODE_ENV=production
 ENV ANYTHING_LLM_RUNTIME=docker
 ENV DEPLOYMENT_VERSION=1.8.5
+
+# Core Configuration
 ENV STORAGE_DIR=/app/server/storage
 ENV PORT=3001
 ENV SERVER_PORT=3001
+ENV UID=1000
+ENV GID=1000
 
-# Authentication Configuration (Railway will override these)
+# Authentication & Security
 ENV AUTH_TOKEN=""
-ENV JWT_SECRET="anything-llm-jwt-secret-changeme123"
+ENV JWT_SECRET="anything-llm-jwt-secret-changeme-in-production"
 ENV JWT_EXPIRY="30d"
+ENV SIG_KEY="anythingllm-signing-key-changeme-in-production"
+ENV SIG_SALT="anythingllm-signing-salt-changeme-in-production"
 ENV DISABLE_TELEMETRY=true
 
-# Default AI Configuration (can be overridden by Railway variables)
-ENV LLM_PROVIDER=togetherai
-ENV EMBEDDING_ENGINE=native
-ENV EMBEDDING_MODEL_PREF=Xenova/all-MiniLM-L6-v2
+# Database Configuration
+ENV DATABASE_CONNECTION_STRING=""
 ENV VECTOR_DB=lancedb
+ENV PINECONE_API_KEY=""
+ENV PINECONE_INDEX=""
+ENV CHROMA_ENDPOINT=""
+ENV CHROMA_API_HEADER=""
+ENV CHROMA_API_KEY=""
+ENV WEAVIATE_ENDPOINT=""
+ENV WEAVIATE_API_KEY=""
+ENV QDRANT_ENDPOINT=""
+ENV QDRANT_API_KEY=""
+ENV MILVUS_ADDRESS=""
+ENV MILVUS_USERNAME=""
+ENV MILVUS_PASSWORD=""
+ENV ZILLIZ_ENDPOINT=""
+ENV ZILLIZ_API_TOKEN=""
+ENV ASTRA_DB_APPLICATION_TOKEN=""
+ENV ASTRA_DB_ENDPOINT=""
+
+# LLM Provider Configuration
+ENV LLM_PROVIDER=togetherai
+ENV TOGETHER_AI_API_KEY=""
+ENV TOGETHER_AI_MODEL_PREF="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"
+ENV OPEN_AI_KEY=""
+ENV OPEN_MODEL_PREF="gpt-4o"
+ENV AZURE_OPENAI_ENDPOINT=""
+ENV AZURE_OPENAI_KEY=""
+ENV ANTHROPIC_API_KEY=""
+ENV ANTHROPIC_MODEL_PREF="claude-3-sonnet-20240229"
+ENV GEMINI_API_KEY=""
+ENV GEMINI_LLM_MODEL_PREF="gemini-2.0-flash-lite"
+ENV OLLAMA_BASE_PATH=""
+ENV OLLAMA_MODEL_PREF=""
+ENV GROQ_API_KEY=""
+ENV GROQ_MODEL_PREF="llama-3.1-70b-versatile"
+ENV HUGGING_FACE_LLM_ENDPOINT=""
+ENV HUGGING_FACE_LLM_API_KEY=""
+ENV GENERIC_OPEN_AI_BASE_PATH=""
+ENV GENERIC_OPEN_AI_API_KEY=""
+ENV GENERIC_OPEN_AI_MODEL_PREF=""
+ENV COHERE_API_KEY=""
+ENV COHERE_MODEL_PREF="command-r-plus"
+ENV PERPLEXITY_API_KEY=""
+ENV PERPLEXITY_MODEL_PREF="llama-3.1-sonar-large-128k-online"
+
+# Embedding Configuration
+ENV EMBEDDING_ENGINE=native
+ENV EMBEDDING_MODEL_PREF="Xenova/all-MiniLM-L6-v2"
+ENV EMBEDDING_BASE_PATH=""
+ENV EMBEDDING_MODEL_MAX_CHUNK_LENGTH=8192
+ENV OPEN_AI_KEY_EMBEDDING=""
+ENV AZURE_OPENAI_EMBEDDING_ENDPOINT=""
+ENV AZURE_OPENAI_EMBEDDING_KEY=""
+ENV AZURE_OPENAI_EMBEDDING_MODEL_PREF=""
+ENV COHERE_API_KEY_EMBEDDING=""
+ENV VOYAGE_AI_API_KEY=""
+ENV OLLAMA_BASE_PATH_EMBEDDING=""
+
+# Transcription Configuration
+ENV WHISPER_PROVIDER=local
+ENV OPENAI_WHISPER_API_KEY=""
+ENV ASSEMBLYAI_API_KEY=""
+ENV DEEPGRAM_API_KEY=""
+
+# TTS Configuration
+ENV TTS_PROVIDER=""
+ENV TTS_VOICE_PREF=""
+ENV TTS_OPEN_AI_KEY=""
+ENV TTS_OPEN_AI_VOICE_MODEL="alloy"
+ENV TTS_ELEVEN_LABS_KEY=""
+ENV TTS_ELEVEN_LABS_VOICE=""
+ENV GENERIC_TTS_BASE_PATH=""
+ENV GENERIC_TTS_VOICE=""
+
+# STT Configuration
+ENV STT_PROVIDER=""
+ENV STT_OPEN_AI_KEY=""
+ENV STT_ENGINE=""
+
+# Agent Configuration
+ENV AGENT_LLM_PROVIDER=""
+ENV AGENT_LLM_MODEL=""
+ENV AGENT_SEARCH_PROVIDER="none"
+ENV AGENT_SERPER_DEV_KEY=""
+ENV AGENT_BING_SEARCH_API_KEY=""
+ENV AGENT_SERPLY_API_KEY=""
+ENV AGENT_SEARXNG_API_URL=""
+ENV AGENT_GOOGLE_SEARCH_API_KEY=""
+ENV AGENT_GOOGLE_SEARCH_ENGINE_ID=""
+ENV AGENT_TAVILY_API_KEY=""
+ENV AGENT_USE_OPENAI_FUNCTIONS=false
+ENV AGENT_SQL_CONNECTIONS=""
+ENV DEFAULT_AGENT_SKILLS=""
+ENV DISABLED_AGENT_SKILLS=""
+ENV AGENT_GSE_CTX=""
+ENV AGENT_GSE_KEY=""
+
+# Browser Extension Configuration
+ENV BROWSER_EXTENSION_API_KEY=""
+
+# Community Hub Configuration
+ENV HUB_API_KEY=""
+
+# Supabase Configuration (Optional)
+ENV SUPABASE_URL=""
+ENV SUPABASE_ANON_KEY=""
+ENV SUPABASE_SERVICE_ROLE_KEY=""
+
+# Email Configuration (Optional)
+ENV GMAIL_CLIENT_ID=""
+ENV GMAIL_CLIENT_SECRET=""
+ENV EMAIL_TEMPLATES_PATH="/app/server/storage/email-templates"
+
+# Logging Configuration
+ENV LOG_LEVEL="info"
+ENV LOG_FORMAT="json"
+
+# Rate Limiting
+ENV RATE_LIMIT_ENABLED=true
+ENV RATE_LIMIT_WINDOW_MS=60000
+ENV RATE_LIMIT_MAX_REQUESTS=100
+
+# File Upload Limits
+ENV FILE_UPLOAD_LIMIT="3GB"
+ENV MAX_CONCURRENT_UPLOADS=5
+ENV MAX_DOCUMENT_COUNT_PER_WORKSPACE=500
+
+# Performance Tuning
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV WORKERS_COUNT=2
+
+# Custom Branding
+ENV CUSTOM_APP_NAME="Tredy"
+ENV META_PAGE_TITLE="Tredy - AI Assistant"
+ENV META_PAGE_FAVICON="/favicon.png"
+ENV LOGO_FILENAME="tredy-logo.png"
+ENV SUPPORT_EMAIL="support@tredy.ai"
+ENV FOOTER_DATA=""
+
+# Text Processing Configuration
+ENV TEXT_SPLITTER_CHUNK_SIZE=1000
+ENV TEXT_SPLITTER_CHUNK_OVERLAP=100
+ENV MAX_EMBED_CHUNK_SIZE=1000
+
+# Feature Flags
+ENV FEATURE_FLAGS=""
+ENV EXPERIMENTAL_FEATURES=false
+
+# Mobile App Configuration
+ENV MOBILE_APP_ENABLED=false
+
+# MCP (Model Context Protocol) Configuration
+ENV MCP_ENABLED=false
+ENV MCP_SERVERS=""
+
+# Together AI Specific Configuration (Default Provider)
+ENV TOGETHER_AI_API_KEY="e9e5022a483835887a9a3bc18a7647aaaea5af2936efe5898b6cd0f7a350c282"
+ENV TOGETHER_AI_MODEL_PREF="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"
+ENV TOGETHER_AI_COMPLETION_MODEL_PREF="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"
+ENV TOGETHER_AI_EMBEDDING_MODEL_PREF=""
 
 # Expose the port
 EXPOSE 3001
 
-# Healthcheck disabled for Railway (Railway has its own health monitoring)
-# HEALTHCHECK --interval=1m --timeout=10s --start-period=1m \
-#   CMD /bin/bash /usr/local/bin/docker-healthcheck.sh || exit 1
+# Create necessary directories and set permissions
+RUN mkdir -p /app/server/storage/documents \
+    /app/server/storage/vector-cache \
+    /app/server/storage/lancedb \
+    /app/server/storage/outputs \
+    /app/server/storage/logs \
+    /app/server/storage/tmp \
+    /app/server/storage/email-templates \
+    /app/server/storage/models \
+    /app/server/storage/imports \
+    /app/server/storage/exports \
+    /app/server/storage/comkey \
+    /app/server/storage/workspace-chats \
+    /app/server/storage/workspace-settings \
+    /app/server/storage/workspace-documents && \
+    chown -R anythingllm:anythingllm /app/server/storage && \
+    chmod -R 755 /app/server/storage
 
-# Run the server
-# CMD ["sh", "-c", "tail -f /dev/null"] # For development: keep container open
+# Volume mount points for persistent data
+VOLUME ["/app/server/storage"]
+
+# Set working directory
+WORKDIR /app
+
+# Labels for container metadata
+LABEL maintainer="Tredy AI <support@tredy.ai>"
+LABEL version="1.8.5"
+LABEL description="Tredy AI - Enterprise AI Assistant Platform"
+LABEL org.opencontainers.image.source="https://github.com/ToFut/Tredy"
+LABEL org.opencontainers.image.documentation="https://docs.tredy.ai"
+LABEL org.opencontainers.image.licenses="MIT"
+
+# Healthcheck configuration (can be enabled if needed)
+# For local/standard Docker deployments
+# HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+#   CMD curl -f http://localhost:3001/api/ping || exit 1
+
+# For Railway deployment (disabled as Railway has its own monitoring)
+# Railway uses its own health monitoring system
+
+# Security: Run as non-root user
+USER anythingllm
+
+# Entry point script handles database migrations and service startup
 ENTRYPOINT ["/bin/bash", "/usr/local/bin/docker-entrypoint.sh"]
+
+# Default command (can be overridden)
+CMD []

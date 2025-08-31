@@ -1,0 +1,174 @@
+version: '3.8'
+
+services:
+  tredy:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        ARG_UID: ${UID:-1000}
+        ARG_GID: ${GID:-1000}
+    image: tredy:latest
+    container_name: tredy-app
+    restart: unless-stopped
+    cap_add:
+      - SYS_ADMIN  # Required for Puppeteer/Chrome
+    security_opt:
+      - seccomp:unconfined  # Required for Chrome sandboxing
+    ports:
+      - "${SERVER_PORT:-3001}:3001"
+    volumes:
+      # Persistent storage for documents, vectors, and settings
+      - tredy_storage:/app/server/storage
+      # Optional: Mount local storage for development
+      # - ./server/storage:/app/server/storage
+    environment:
+      # Core Configuration
+      - NODE_ENV=production
+      - SERVER_PORT=3001
+      - STORAGE_DIR=/app/server/storage
+      
+      # Authentication (Change these in production!)
+      - AUTH_TOKEN=${AUTH_TOKEN:-}
+      - JWT_SECRET=${JWT_SECRET:-anything-llm-jwt-secret-changeme-in-production}
+      - JWT_EXPIRY=${JWT_EXPIRY:-30d}
+      - SIG_KEY=${SIG_KEY:-anythingllm-signing-key-changeme-in-production}
+      - SIG_SALT=${SIG_SALT:-anythingllm-signing-salt-changeme-in-production}
+      
+      # Database Configuration
+      - DATABASE_CONNECTION_STRING=${DATABASE_CONNECTION_STRING:-}
+      - VECTOR_DB=${VECTOR_DB:-lancedb}
+      
+      # Default LLM Provider (Together AI)
+      - LLM_PROVIDER=${LLM_PROVIDER:-togetherai}
+      - TOGETHER_AI_API_KEY=${TOGETHER_AI_API_KEY:-}
+      - TOGETHER_AI_MODEL_PREF=${TOGETHER_AI_MODEL_PREF:-meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo}
+      
+      # Alternative LLM Providers (uncomment and configure as needed)
+      # - OPEN_AI_KEY=${OPEN_AI_KEY:-}
+      # - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      # - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      # - GROQ_API_KEY=${GROQ_API_KEY:-}
+      
+      # Embedding Configuration
+      - EMBEDDING_ENGINE=${EMBEDDING_ENGINE:-native}
+      - EMBEDDING_MODEL_PREF=${EMBEDDING_MODEL_PREF:-Xenova/all-MiniLM-L6-v2}
+      
+      # Agent Configuration
+      - AGENT_SEARCH_PROVIDER=${AGENT_SEARCH_PROVIDER:-none}
+      - AGENT_SERPER_DEV_KEY=${AGENT_SERPER_DEV_KEY:-}
+      - AGENT_TAVILY_API_KEY=${AGENT_TAVILY_API_KEY:-}
+      
+      # Supabase Configuration (Optional)
+      - SUPABASE_URL=${SUPABASE_URL:-}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
+      
+      # Custom Branding
+      - CUSTOM_APP_NAME=${CUSTOM_APP_NAME:-Tredy}
+      - META_PAGE_TITLE=${META_PAGE_TITLE:-Tredy - AI Assistant}
+      - SUPPORT_EMAIL=${SUPPORT_EMAIL:-support@tredy.ai}
+      
+      # Performance & Limits
+      - FILE_UPLOAD_LIMIT=${FILE_UPLOAD_LIMIT:-3GB}
+      - MAX_DOCUMENT_COUNT_PER_WORKSPACE=${MAX_DOCUMENT_COUNT_PER_WORKSPACE:-500}
+      - TEXT_SPLITTER_CHUNK_SIZE=${TEXT_SPLITTER_CHUNK_SIZE:-1000}
+      - TEXT_SPLITTER_CHUNK_OVERLAP=${TEXT_SPLITTER_CHUNK_OVERLAP:-100}
+      
+      # Telemetry
+      - DISABLE_TELEMETRY=${DISABLE_TELEMETRY:-true}
+      
+    networks:
+      - tredy-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Optional: PostgreSQL for production database
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: tredy-postgres
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     - POSTGRES_USER=tredy
+  #     - POSTGRES_PASSWORD=changeme
+  #     - POSTGRES_DB=tredy
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - tredy-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U tredy"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # Optional: Redis for caching and session management
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: tredy-redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6379:6379"
+  #   command: redis-server --appendonly yes
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - tredy-network
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # Optional: Qdrant vector database
+  # qdrant:
+  #   image: qdrant/qdrant:latest
+  #   container_name: tredy-qdrant
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6333:6333"
+  #   volumes:
+  #     - qdrant_data:/qdrant/storage
+  #   networks:
+  #     - tredy-network
+
+  # Optional: ChromaDB vector database
+  # chroma:
+  #   image: chromadb/chroma:latest
+  #   container_name: tredy-chroma
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - chroma_data:/chroma/chroma
+  #   environment:
+  #     - IS_PERSISTENT=TRUE
+  #   networks:
+  #     - tredy-network
+
+networks:
+  tredy-network:
+    driver: bridge
+
+volumes:
+  tredy_storage:
+    driver: local
+  # postgres_data:
+  #   driver: local
+  # redis_data:
+  #   driver: local
+  # qdrant_data:
+  #   driver: local
+  # chroma_data:
+  #   driver: local

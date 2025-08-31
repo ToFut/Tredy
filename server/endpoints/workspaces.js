@@ -386,9 +386,9 @@ function workspaceEndpoints(app) {
           return;
         }
 
-        const history = multiUserMode(response)
-          ? await WorkspaceChats.forWorkspaceByUser(workspace.id, user.id)
-          : await WorkspaceChats.forWorkspace(workspace.id);
+        // In multi-user mode, show all messages for shared workspaces
+        // This allows users to see each other's messages in the same workspace
+        const history = await WorkspaceChats.forWorkspace(workspace.id);
         response.status(200).json({ history: convertToChatHistory(history) });
       } catch (e) {
         console.error(e.message, e);

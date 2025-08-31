@@ -42,7 +42,7 @@ export default function Sidebar() {
               <img
                 src={logo}
                 alt="Logo"
-                className={`rounded max-h-[24px] object-contain transition-opacity duration-500 ${showSidebar ? "opacity-100" : "opacity-0"}`}
+                className={`rounded max-h-[48px] object-contain transition-opacity duration-500 ${showSidebar ? "opacity-100" : "opacity-0"}`}
               />
             </Link>
             {canToggleSidebar && (
@@ -125,8 +125,8 @@ export function SidebarMobileHeader() {
           <img
             src={logo}
             alt="Logo"
-            className="block mx-auto h-6 w-auto"
-            style={{ maxHeight: "40px", objectFit: "contain" }}
+            className="block mx-auto h-12 w-auto"
+            style={{ maxHeight: "60px", objectFit: "contain" }}
           />
         </div>
         <div className="w-12"></div>
@@ -156,7 +156,7 @@ export function SidebarMobileHeader() {
                 <img
                   src={logo}
                   alt="Logo"
-                  className="rounded w-full max-h-[40px]"
+                  className="rounded w-full max-h-[60px]"
                   style={{ objectFit: "contain" }}
                 />
               </div>

@@ -15,6 +15,11 @@ class BackgroundService {
       timeout: "1m",
       interval: "12hr",
     },
+    {
+      name: "agent-scheduler",
+      timeout: false, // Runs continuously
+      interval: false, // Not interval-based, runs as a persistent worker
+    },
   ];
 
   #documentSyncJobs = [

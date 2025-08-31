@@ -9,6 +9,7 @@ import PrivateRoute, {
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Login from "@/pages/Login";
+import SupabaseLogin from "@/pages/Login/SupabaseLogin";
 import SimpleSSOPassthrough from "@/pages/Login/SSO/simple";
 import OnboardingFlow from "@/pages/OnboardingFlow";
 import i18n from "./i18n";
@@ -107,6 +108,7 @@ export default function App() {
                 <Routes>
                   <Route path="/" element={<PrivateRoute Component={Main} />} />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/login/password" element={<Login />} />
                   <Route
                     path="/sso/simple"
                     element={<SimpleSSOPassthrough />}

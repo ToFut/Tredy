@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Force Login</title>
+</head>
+<body>
+    <h1>Force Login Tool</h1>
+    <p>This will log you in directly using the test user account.</p>
+    <button onclick="forceLogin()">Force Login Now</button>
+    <div id="status"></div>
+    
+    <script>
+        function forceLogin() {
+            const statusDiv = document.getElementById('status');
+            
+            // Token for testuser@example.com that we created earlier
+            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJ0ZXN0dXNlckBleGFtcGxlLmNvbSIsImlhdCI6MTc1NjQ5NDYwNywiZXhwIjoxNzU5MDg2NjA3fQ.eHKd_P7gpwJWNWF6mjb_3i2lidlrJKT_5zcGs94KJ_w';
+            
+            const user = {
+                id: 3,
+                username: "testuser@example.com",
+                role: "default",
+                pfpFilename: null,
+                suspended: 0
+            };
+            
+            // Set all the required localStorage items
+            localStorage.setItem('anythingllm_authToken', token);
+            localStorage.setItem('anythingllm_authTimestamp', String(Date.now()));
+            localStorage.setItem('anythingllm_user', JSON.stringify(user));
+            
+            statusDiv.innerHTML = '<strong>Success!</strong> Redirecting to app...';
+            statusDiv.style.color = 'green';
+            
+            // Redirect after 1 second
+            setTimeout(() => {
+                window.location.href = 'http://localhost:8126/';
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

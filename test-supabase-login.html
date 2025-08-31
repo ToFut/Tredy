@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Supabase Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Test Supabase Connection</h1>
+    <div id="status">Testing...</div>
+    
+    <script>
+        const { createClient } = supabase;
+        
+        const supabaseUrl = 'https://xyprfcyluvmqtipjlopj.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5cHJmY3lsdXZtcXRpcGpsb3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzNTU0OTAsImV4cCI6MjA3MTkzMTQ5MH0.Eh4Oa4Aca6nzdHoC1Tpk0UcEuc6-a4SymRLzU9p4YAk';
+        
+        const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+        
+        async function testConnection() {
+            const statusDiv = document.getElementById('status');
+            
+            try {
+                // Test connection
+                const { data, error } = await supabaseClient.auth.getSession();
+                
+                if (error) {
+                    statusDiv.innerHTML = `Error: ${error.message}`;
+                } else {
+                    statusDiv.innerHTML = `Connection successful! Session: ${data.session ? 'Active' : 'None'}`;
+                    
+                    // Try to sign up a test user with a unique email
+                    const timestamp = Date.now();
+                    const testEmail = `testuser${timestamp}@gmail.com`;
+                    const testPassword = 'TestPassword123!';
+                    
+                    statusDiv.innerHTML += `<br>Attempting to create test user: ${testEmail}...`;
+                    
+                    const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
+                        email: testEmail,
+                        password: testPassword,
+                        options: {
+                            emailRedirectTo: window.location.origin,
+                            data: {
+                                test_user: true
+                            }
+                        }
+                    });
+                    
+                    if (signUpError) {
+                        statusDiv.innerHTML += `<br>Sign up error: ${signUpError.message}`;
+                        
+                        // Try to sign in instead
+                        const { data: signInData, error: signInError } = await supabaseClient.auth.signInWithPassword({
+                            email: testEmail,
+                            password: testPassword,
+                        });
+                        
+                        if (signInError) {
+                            statusDiv.innerHTML += `<br>Sign in error: ${signInError.message}`;
+                        } else {
+                            statusDiv.innerHTML += `<br>Sign in successful! Token: ${signInData.session?.access_token?.substring(0, 20)}...`;
+                        }
+                    } else {
+                        statusDiv.innerHTML += `<br>Sign up successful! User ID: ${signUpData.user?.id}`;
+                    }
+                }
+            } catch (err) {
+                statusDiv.innerHTML = `Connection error: ${err.message}`;
+            }
+        }
+        
+        testConnection();
+    </script>
+</body>
+</html>

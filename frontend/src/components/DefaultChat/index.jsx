@@ -179,6 +179,93 @@ export default function DefaultChatContainer() {
 
   useEffect(() => {
     function processMsgs() {
+      // If we have custom welcome messages, animate them
+      if (fetchedMessages.length > 0) {
+        if (!!window.localStorage.getItem("anythingllm_intro")) {
+          // Show all messages immediately if user has seen intro
+          const allMessages = [];
+          fetchedMessages.forEach((fetchedMessage, index) => {
+            if (fetchedMessage.user && fetchedMessage.user !== "") {
+              allMessages.push(
+                <React.Fragment key={`user-${index}`}>
+                  <MessageContainer>
+                    <MessageContent alignmentCls={getMessageAlignment("user")}>
+                      <UserIcon user={{ uid: userFromStorage()?.username }} role={"user"} />
+                      <MessageText>{fetchedMessage.user}</MessageText>
+                    </MessageContent>
+                  </MessageContainer>
+                </React.Fragment>
+              );
+            }
+            if (fetchedMessage.response && fetchedMessage.response !== "") {
+              allMessages.push(
+                <React.Fragment key={`system-${index}`}>
+                  <MessageContainer>
+                    <MessageContent alignmentCls={getMessageAlignment("assistant")}>
+                      <UserIcon user={{ uid: "system" }} role={"assistant"} />
+                      <MessageText style={{ whiteSpace: 'pre-line' }}>
+                        {fetchedMessage.response}
+                      </MessageText>
+                    </MessageContent>
+                  </MessageContainer>
+                </React.Fragment>
+              );
+            }
+          });
+          setMockMessages(allMessages);
+          return false;
+        }
+
+        var timer = 500;
+        var messages = [];
+
+        fetchedMessages.forEach((fetchedMessage, index) => {
+          // Add user message if it exists
+          if (fetchedMessage.user && fetchedMessage.user !== "") {
+            setTimeout(() => {
+              const userMsg = (
+                <React.Fragment key={`user-${index}`}>
+                  <MessageContainer>
+                    <MessageContent alignmentCls={getMessageAlignment("user")}>
+                      <UserIcon user={{ uid: userFromStorage()?.username }} role={"user"} />
+                      <MessageText>{fetchedMessage.user}</MessageText>
+                    </MessageContent>
+                  </MessageContainer>
+                </React.Fragment>
+              );
+              messages.push(userMsg);
+              setMockMessages([...messages]);
+            }, timer);
+            timer += 1_500;
+          }
+
+          // Add system response if it exists
+          if (fetchedMessage.response && fetchedMessage.response !== "") {
+            setTimeout(() => {
+              const systemMsg = (
+                <React.Fragment key={`system-${index}`}>
+                  <MessageContainer>
+                    <MessageContent alignmentCls={getMessageAlignment("assistant")}>
+                      <UserIcon user={{ uid: "system" }} role={"assistant"} />
+                      <MessageText style={{ whiteSpace: 'pre-line' }}>
+                        {fetchedMessage.response}
+                      </MessageText>
+                    </MessageContent>
+                  </MessageContainer>
+                </React.Fragment>
+              );
+              messages.push(systemMsg);
+              setMockMessages([...messages]);
+            }, timer);
+            timer += 3_000;
+          }
+        });
+
+        window.localStorage.setItem("anythingllm_intro", 1);
+        return;
+      }
+
+      // Fallback to original MESSAGES if no custom messages
       if (!!window.localStorage.getItem("anythingllm_intro")) {
         setMockMessages([...MESSAGES]);
         return false;
@@ -200,7 +287,7 @@ export default function DefaultChatContainer() {
     }
 
     processMsgs();
-  }, []);
+  }, [fetchedMessages]);
 
   return (
     <div
@@ -210,25 +297,9 @@ export default function DefaultChatContainer() {
       }`}
     >
       {isMobile && <SidebarMobileHeader />}
-      {fetchedMessages.length === 0
-        ? mockMsgs.map((content, i) => {
-            return <React.Fragment key={i}>{content}</React.Fragment>;
-          })
-        : fetchedMessages.map((fetchedMessage, i) => {
-            return (
-              <React.Fragment key={i}>
-                <ChatBubble
-                  message={
-                    fetchedMessage.user === ""
-                      ? fetchedMessage.response
-                      : fetchedMessage.user
-                  }
-                  type={fetchedMessage.user === "" ? "response" : "user"}
-                  popMsg={popMsg}
-                />
-              </React.Fragment>
-            );
-          })}
+      {mockMsgs.map((content, i) => {
+        return <React.Fragment key={i}>{content}</React.Fragment>;
+      })}
       {showingNewWsModal && <NewWorkspaceModal hideModal={hideNewWsModal} />}
     </div>
   );

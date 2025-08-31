@@ -1,7 +1,7 @@
 import paths from "@/utils/paths";
 import HubItemCard from "../../Trending/HubItems/HubItemCard";
 import { useUserItems } from "../useUserItems";
-import { HubItemCardSkeleton } from "../../Trending/HubItems";
+import { HubItemCardSkeleton } from "../../Trending/HubItems/index";
 import { readableType } from "../../utils";
 
 export default function UserItems({ connectionKey }) {

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Login</title>
+</head>
+<body>
+    <h1>Quick Login Tool</h1>
+    <button onclick="loginDirectly()">Login as Test User</button>
+    <div id="status"></div>
+    
+    <script>
+        async function loginDirectly() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = 'Logging in...';
+            
+            try {
+                // Call the backend to get a token
+                const response = await fetch('http://localhost:8124/api/request-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: 'testuser@example.com',
+                        password: 'TestPassword123!'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.valid && data.token) {
+                    // Store the token and user info
+                    localStorage.setItem('anythingllm_authToken', data.token);
+                    localStorage.setItem('anythingllm_authTimestamp', String(Date.now()));
+                    localStorage.setItem('anythingllm_user', JSON.stringify(data.user));
+                    
+                    statusDiv.innerHTML = 'Login successful! Redirecting...';
+                    
+                    // Redirect to the app
+                    setTimeout(() => {
+                        window.location.href = 'http://localhost:8126/';
+                    }, 1000);
+                } else {
+                    statusDiv.innerHTML = 'Login failed: ' + (data.message || 'Unknown error');
+                }
+            } catch (error) {
+                statusDiv.innerHTML = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

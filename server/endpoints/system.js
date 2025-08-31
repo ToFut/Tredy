@@ -69,6 +69,20 @@ function systemEndpoints(app) {
     response.status(200).json({ online: true });
   });
 
+  app.get("/system/check-token", async (request, response) => {
+    try {
+      const user = await userFromSession(request, response);
+      if (user) {
+        response.status(200).json({ online: true, valid: true });
+      } else {
+        response.status(401).json({ online: true, valid: false, error: "Invalid or expired token" });
+      }
+    } catch (e) {
+      console.error("Token validation error:", e.message);
+      response.status(401).json({ online: true, valid: false, error: "Token validation failed" });
+    }
+  });
+
   app.get("/migrate", async (_, response) => {
     response.sendStatus(200);
   });
@@ -264,6 +278,59 @@ function systemEndpoints(app) {
     } catch (e) {
       console.error(e.message, e);
       response.sendStatus(500).end();
+    }
+  });
+
+  app.post("/auth/supabase", async (request, response) => {
+    try {
+      const { supabaseToken, email, id } = reqBody(request);
+      
+      if (!supabaseToken || !email || !id) {
+        return response.status(400).json({
+          valid: false,
+          message: "Missing required fields",
+        });
+      }
+
+      // Create or get user from Supabase ID
+      const { user, error } = await User.createFromSupabase({
+        id,
+        email,
+        user_metadata: {},
+        app_metadata: { role: 'default' }
+      });
+
+      if (error || !user) {
+        return response.status(400).json({
+          valid: false,
+          message: error || "Failed to create user",
+        });
+      }
+
+      // Generate JWT for this user
+      const sessionToken = makeJWT(
+        { id: user.id, username: user.username },
+        process.env.JWT_EXPIRY || "30d"
+      );
+
+      await EventLogs.logEvent("login_event", {
+        ip: request.ip || "Unknown IP",
+        username: user.username || "Unknown user",
+        method: "supabase",
+      });
+
+      return response.status(200).json({
+        valid: true,
+        token: sessionToken,
+        user: User.filterFields(user),
+        message: null,
+      });
+    } catch (e) {
+      console.error("Supabase auth error:", e);
+      return response.status(500).json({
+        valid: false,
+        message: "Internal server error",
+      });
     }
   });
 

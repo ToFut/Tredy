@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Supabase Auth</title>
+</head>
+<body>
+    <h1>Test Supabase Auth Endpoint</h1>
+    <button onclick="testAuth()">Test Auth Endpoint</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testAuth() {
+            const resultEl = document.getElementById('result');
+            resultEl.textContent = 'Testing...';
+            
+            try {
+                const response = await fetch('http://localhost:8124/api/auth/supabase', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        supabaseToken: 'test-token-123',
+                        email: 'test@example.com',
+                        id: 'supabase-user-123'
+                    })
+                });
+                
+                const data = await response.json();
+                resultEl.textContent = JSON.stringify(data, null, 2);
+                
+                if (data.valid && data.token) {
+                    resultEl.textContent += '\n\n✅ Auth successful! Token: ' + data.token.substring(0, 20) + '...';
+                }
+            } catch (error) {
+                resultEl.textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

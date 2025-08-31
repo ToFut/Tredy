@@ -9,11 +9,15 @@ import { useEffect, useRef, useState } from "react";
 import AccountModal from "../AccountModal";
 import { AUTH_TIMESTAMP, AUTH_TOKEN, AUTH_USER } from "@/utils/constants";
 import { useTranslation } from "react-i18next";
+import { supabase } from "@/utils/supabase";
+import { useContext } from "react";
+import { AuthContext } from "@/AuthContext";
 
 export default function UserButton() {
   const { t } = useTranslation();
   const mode = useLoginMode();
   const { user } = useUser();
+  const { actions } = useContext(AuthContext);
   const menuRef = useRef();
   const buttonRef = useRef();
   const [showMenu, setShowMenu] = useState(false);
@@ -87,11 +91,34 @@ export default function UserButton() {
               {t("profile_settings.support")}
             </a>
             <button
-              onClick={() => {
-                window.localStorage.removeItem(AUTH_USER);
-                window.localStorage.removeItem(AUTH_TOKEN);
-                window.localStorage.removeItem(AUTH_TIMESTAMP);
-                window.location.replace(paths.home());
+              onClick={async () => {
+                console.log('[LOGOUT] Starting logout...');
+                
+                // For Supabase users, sign out from Supabase first
+                const user = userFromStorage();
+                if (user?.supabaseId) {
+                  console.log('[LOGOUT] Signing out from Supabase...');
+                  await supabase.auth.signOut();
+                  console.log('[LOGOUT] Supabase signout complete');
+                }
+                
+                // Clear ALL possible auth storage
+                console.log('[LOGOUT] Clearing all storage...');
+                window.localStorage.clear();
+                window.sessionStorage.clear();
+                
+                // Clear IndexedDB (where Supabase might store data)
+                if (window.indexedDB) {
+                  const databases = await window.indexedDB.databases();
+                  databases.forEach(db => {
+                    if (db.name && db.name.includes('supabase')) {
+                      window.indexedDB.deleteDatabase(db.name);
+                    }
+                  });
+                }
+                
+                console.log('[LOGOUT] Redirecting...');
+                window.location.replace('/login');
               }}
               type="button"
               className="text-white hover:bg-theme-action-menu-item-hover w-full text-left px-4 py-1.5 rounded-md"

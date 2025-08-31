@@ -22,17 +22,17 @@ export default defineConfig({
     host: "localhost",
     proxy: {
       "/api": {
-        target: "http://localhost:8124",
+        target: "http://localhost:8125",
         changeOrigin: true,
         secure: false
       },
       "/system": {
-        target: "http://localhost:8124",
+        target: "http://localhost:8125",
         changeOrigin: true,
         secure: false
       },
       "/auth": {
-        target: "http://localhost:8124",
+        target: "http://localhost:8125",
         changeOrigin: true,
         secure: false
       }

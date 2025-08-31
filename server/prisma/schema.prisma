@@ -85,6 +85,7 @@ model users {
   prompt_history              prompt_history[]
   desktop_mobile_devices      desktop_mobile_devices[]
   workspace_parsed_files      workspace_parsed_files[]
+  agent_schedules             agent_schedules[]
 }
 
 model recovery_codes {
@@ -152,6 +153,7 @@ model workspaces {
   workspace_agent_invocations  workspace_agent_invocations[]
   prompt_history               prompt_history[]
   workspace_parsed_files       workspace_parsed_files[]
+  agent_schedules              agent_schedules[]
 }
 
 model workspace_threads {
@@ -391,4 +393,43 @@ model workspace_parsed_files {
 
   @@index([workspaceId])
   @@index([userId])
+}
+
+model agent_schedules {
+  id               Int                   @id @default(autoincrement())
+  agent_id         String
+  agent_type       String
+  workspace_id     Int
+  name             String
+  description      String?
+  cron_expression  String
+  timezone         String                @default("UTC")
+  enabled          Boolean               @default(true)
+  context          String?
+  last_run_at      DateTime?
+  next_run_at      DateTime?
+  created_by       Int?
+  created_at       DateTime              @default(now())
+  updated_at       DateTime              @default(now())
+  workspace        workspaces            @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user             users?                @relation(fields: [created_by], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  executions       schedule_executions[]
+
+  @@index([workspace_id])
+  @@index([next_run_at, enabled])
+}
+
+model schedule_executions {
+  id            Int               @id @default(autoincrement())
+  schedule_id   Int
+  status        String
+  started_at    DateTime          @default(now())
+  completed_at  DateTime?
+  output        String?
+  error         String?
+  tokens_used   Int               @default(0)
+  schedule      agent_schedules   @relation(fields: [schedule_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([schedule_id])
+  @@index([started_at])
 }

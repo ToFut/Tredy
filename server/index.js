@@ -26,10 +26,13 @@ const { agentWebsocket } = require("./endpoints/agentWebsocket");
 const { experimentalEndpoints } = require("./endpoints/experimental");
 const { browserExtensionEndpoints } = require("./endpoints/browserExtension");
 const { communityHubEndpoints } = require("./endpoints/communityHub");
+const { agentScheduleEndpoints } = require("./endpoints/agentSchedule");
 const { agentFlowEndpoints } = require("./endpoints/agentFlows");
 const { mcpServersEndpoints } = require("./endpoints/mcpServers");
 const { mobileEndpoints } = require("./endpoints/mobile");
 const { supabaseIntegrationEndpoints } = require("./endpoints/supabaseIntegration");
+const { supabaseAuthEndpoints } = require("./endpoints/supabaseAuth");
+const { WelcomeMessages } = require("./models/welcomeMessages");
 const app = express();
 const apiRouter = express.Router();
 const FILE_LIMIT = "3GB";
@@ -65,10 +68,12 @@ agentWebsocket(apiRouter);
 experimentalEndpoints(apiRouter);
 developerEndpoints(app, apiRouter);
 communityHubEndpoints(apiRouter);
+agentScheduleEndpoints(apiRouter);
 agentFlowEndpoints(apiRouter);
 mcpServersEndpoints(apiRouter);
 mobileEndpoints(apiRouter);
 supabaseIntegrationEndpoints(apiRouter);
+supabaseAuthEndpoints(apiRouter);
 
 // Externally facing embedder endpoints
 embeddedEndpoints(apiRouter);
@@ -134,6 +139,15 @@ if (process.env.NODE_ENV !== "development") {
 app.all("*", function (_, response) {
   response.sendStatus(404);
 });
+
+// Initialize Tredy default welcome messages
+(async () => {
+  try {
+    await WelcomeMessages.initializeDefaults();
+  } catch (error) {
+    console.error("Failed to initialize welcome messages:", error);
+  }
+})();
 
 // In non-https mode we need to boot at the end since the server has not yet
 // started and is `.listen`ing.

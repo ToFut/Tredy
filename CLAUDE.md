@@ -27,6 +27,8 @@ yarn lint           # ESLint across all services
 npm test           # Jest tests (limited coverage)
 yarn prisma:generate  # Regenerate Prisma client after schema changes
 yarn prisma:migrate   # Apply database migrations
+yarn prisma:reset     # Reset database (truncates and re-migrates)
+yarn verify:translations  # Verify frontend translation files
 ```
 
 ## Architecture Overview
@@ -44,6 +46,8 @@ yarn prisma:migrate   # Apply database migrations
 - **Agent System**: Custom AI agents with tool capabilities in `/server/utils/agents/`
 - **Event-Driven**: WebSocket support for real-time chat and updates
 - **Multi-tenancy**: User/role-based permissions with JWT authentication
+- **MCP Support**: Model Context Protocol (MCP) compatibility for extended tool capabilities
+- **Background Jobs**: Bree scheduler for document processing and agent scheduling
 
 ### Database Schema
 
@@ -60,16 +64,24 @@ server/
 ├── utils/             # Core business logic and integrations
 │   ├── AiProviders/   # LLM provider implementations
 │   ├── vectorDbProviders/  # Vector database integrations
+│   ├── EmbeddingEngines/  # Embedding provider implementations
 │   └── agents/        # AI agent system
 ├── models/            # Database models and business logic
-└── prisma/            # Database schema and migrations
+├── prisma/            # Database schema and migrations
+└── storage/           # File storage, logs, and vector cache
 
 frontend/
 ├── src/
 │   ├── components/    # Reusable React components
 │   ├── pages/         # Route-based page components
 │   ├── hooks/         # Custom React hooks
-│   └── utils/         # Frontend utilities and API client
+│   ├── utils/         # Frontend utilities and API client
+│   └── media/         # Static assets and branding
+
+collector/
+├── processers/        # Document type processors
+├── utils/            # Utility functions and constants
+└── api/              # REST endpoints for document processing
 ```
 
 ## Development Guidelines
@@ -106,9 +118,14 @@ frontend/
 
 ### Environment Variables
 - Copy `.env.example` files in each service directory
-- Required: `JWT_SECRET`, `AUTH_TOKEN`, `STORAGE_DIR`
+- Required: 
+  - `JWT_SECRET` - Random string ≥12 chars for JWT signing
+  - `SIG_KEY` - Passphrase ≥32 chars for signatures
+  - `SIG_SALT` - Salt ≥32 chars for signatures
 - LLM providers need respective API keys
-- See `/server/.env.example` for all options
+- Storage: `STORAGE_DIR` (default: `/server/storage/`)
+- Database: `DATABASE_URL` for PostgreSQL (optional)
+- See `/server/.env.example` for all provider configurations
 
 ## Common Tasks
 
@@ -143,8 +160,31 @@ docker build -t anything-llm -f docker/Dockerfile .
 
 - **File Storage**: Documents stored in `STORAGE_DIR` (default: `/server/storage/`)
 - **Vector Cache**: Cached embeddings in workspace folders
-- **Session Management**: JWT tokens with configurable expiry
+- **Session Management**: JWT tokens with configurable expiry (default 30d)
 - **Rate Limiting**: Implemented on chat endpoints
 - **File Size Limits**: Default 3GB per upload, configurable
 - **Workspace Limits**: Configurable document count and user limits
 - **Background Jobs**: Document processing runs async via collector service
+- **Node Version**: Requires Node.js ≥18
+- **Database Location**: SQLite at `/server/storage/anythingllm.db`
+- **Telemetry**: Anonymous usage tracking (can be disabled with `DISABLE_TELEMETRY`)
+
+## Quick Testing Patterns
+
+### Running a Single Test
+```bash
+# Create test file with pattern *.test.js
+# Run with: node <test-file.js>
+```
+
+### Testing API Endpoints
+```bash
+# Server runs on port 3001
+curl -X GET http://localhost:3001/api/system/settings
+```
+
+### Frontend Development
+```bash
+# Frontend proxies API calls from port 3000 to 3001
+# Hot reload enabled with Vite
+```

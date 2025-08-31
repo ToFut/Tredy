@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Auth State</title>
+</head>
+<body>
+    <h1>Clear Authentication State</h1>
+    <p>This will clear all authentication data and stop any redirect loops.</p>
+    <button onclick="clearAll()">Clear Everything</button>
+    <div id="status"></div>
+    
+    <script>
+        function clearAll() {
+            const statusDiv = document.getElementById('status');
+            
+            // Clear all auth-related items
+            localStorage.removeItem('anythingllm_authToken');
+            localStorage.removeItem('anythingllm_authTimestamp');
+            localStorage.removeItem('anythingllm_user');
+            localStorage.removeItem('anythingllm_supabase_token');
+            
+            // Clear session storage
+            sessionStorage.removeItem('oauth_processing');
+            sessionStorage.clear();
+            
+            // Clear Supabase session
+            localStorage.removeItem('sb-xyprfcyluvmqtipjlopj-auth-token');
+            
+            statusDiv.innerHTML = '<strong>Cleared!</strong> You can now try logging in again.';
+            statusDiv.style.color = 'green';
+            
+            setTimeout(() => {
+                window.location.href = 'http://localhost:8126/login';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

@@ -71,6 +71,16 @@ function systemEndpoints(app) {
 
   app.get("/system/check-token", async (request, response) => {
     try {
+      // In development mode, optionally bypass authentication
+      if (process.env.NODE_ENV === 'development' && !process.env.REQUIRE_AUTH) {
+        return response.status(200).json({ 
+          online: true, 
+          valid: true, 
+          development: true,
+          message: "Development mode - authentication bypassed" 
+        });
+      }
+      
       const user = await userFromSession(request, response);
       if (user) {
         response.status(200).json({ online: true, valid: true });

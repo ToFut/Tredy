@@ -2,6 +2,7 @@ const { reqBody, multiUserMode, makeJWT, userFromSession } = require("../utils/h
 const { User } = require("../models/user");
 const { EventLogs } = require("../models/eventLogs");
 const { getSupabaseUser } = require("../utils/supabase");
+const { authConfig } = require("../utils/config/auth");
 
 function supabaseAuthEndpoints(app) {
   if (!app) return;
@@ -37,6 +38,28 @@ function supabaseAuthEndpoints(app) {
   // Authenticate with Supabase and sync/create local user
   app.post("/auth/supabase", async (request, response) => {
     try {
+      // In development mode without Supabase, return dev user
+      if (process.env.NODE_ENV === 'development' && !authConfig.supabase.enabled) {
+        const devUser = authConfig.devUser;
+        if (devUser) {
+          const token = makeJWT(
+            { 
+              id: devUser.id, 
+              username: devUser.username,
+              role: devUser.role 
+            },
+            "30d"
+          );
+          
+          return response.status(200).json({
+            valid: true,
+            user: devUser,
+            token,
+            message: "Development authentication successful"
+          });
+        }
+      }
+      
       const { supabaseToken, email, id } = reqBody(request);
       
       if (!id || !email) {

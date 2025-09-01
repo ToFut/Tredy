@@ -69,7 +69,7 @@ export default function CustomSiteSettings() {
             }}
             value={
               settings.title ??
-              "AnythingLLM | Your personal LLM trained on anything"
+              "Tredy | Your personal LLM trained on anything"
             }
           />
         </div>

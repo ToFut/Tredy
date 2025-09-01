@@ -347,12 +347,17 @@ const User = {
         return { user: existingUser, error: null };
       }
 
+      // Check if this is the first user
+      const userCount = await prisma.users.count();
+      const isFirstUser = userCount === 0;
+      
       // Extract user data from Supabase
       const userData = {
         username: supabaseUser.email || `user_${supabaseUser.id.slice(0, 8)}`,
         password: 'supabase_managed', // Placeholder since auth is handled by Supabase
         supabase_id: supabaseUser.id,
-        role: supabaseUser.app_metadata?.role || 'default',
+        // First user becomes admin, otherwise check app_metadata or default to admin for all users
+        role: isFirstUser ? 'admin' : (supabaseUser.app_metadata?.role || 'admin'),
         bio: supabaseUser.user_metadata?.bio || '',
       };
 
@@ -399,9 +404,10 @@ const User = {
 
       const updates = {};
       
-      // Sync role if changed
-      const newRole = supabaseUser.app_metadata?.role || 'default';
-      if (user.role !== newRole) {
+      // Sync role if changed (keep existing admin users as admin)
+      const newRole = supabaseUser.app_metadata?.role || user.role || 'admin';
+      // Never downgrade an admin user unless explicitly set in app_metadata
+      if (user.role !== newRole && !(user.role === 'admin' && !supabaseUser.app_metadata?.role)) {
         updates.role = newRole;
       }
 

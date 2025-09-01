@@ -1,10 +1,15 @@
 # Railway Deployment Authentication Setup
 
+## IMPORTANT: Authentication is NOW REQUIRED on Railway!
+The app will auto-detect Railway environment and enable authentication automatically.
+You MUST set the AUTH_TOKEN in Railway environment variables or users won't be able to login!
+
 ## Current Issues Fixed:
-1. ✅ Backend server now runs on port 8125 (matching frontend proxy)
+1. ✅ Backend server now runs on port 8125 locally (matching frontend proxy)
 2. ✅ Frontend Vite config proxies to correct port (8125)
 3. ✅ Authentication system works in development mode
 4. ✅ Supabase integration configured
+5. ✅ Railway auto-enables authentication to prevent unauthorized access
 
 ## For Railway Deployment:
 
@@ -16,7 +21,15 @@ NODE_ENV=production
 PORT=3001
 SERVER_PORT=3001
 
-# Authentication (IMPORTANT - Change these!)
+# Authentication (REQUIRED - Must set one of these!)
+# Option 1: Simple password authentication (easiest)
+AUTH_TOKEN=your-secure-password-here
+
+# Option 2: Multi-user mode with full user management
+# Remove AUTH_TOKEN and add these instead:
+# ENABLE_MULTI_USER_MODE=true
+
+# Security Keys (IMPORTANT - Change these!)
 JWT_SECRET=your-secure-random-string-at-least-32-chars
 SIG_KEY=your-secure-passphrase-at-least-32-chars
 SIG_SALT=your-secure-salt-at-least-32-chars
@@ -72,12 +85,21 @@ cd frontend && yarn dev
 - JWT tokens are properly validated
 - Multi-user mode is enabled
 
+## What Happens If AUTH_TOKEN Is Not Set on Railway?
+
+With the new code changes:
+- Railway deployment is automatically detected via `RAILWAY_ENVIRONMENT` variable
+- If no `AUTH_TOKEN` is set, the system will auto-set a default password: `changeThisPasswordInRailway`
+- Users will see a login screen and need to use this password
+- **IMPORTANT**: Change this immediately in Railway environment variables!
+
 ## To Deploy to Railway:
 
 1. Push code to GitHub
 2. Railway will auto-deploy from your repository
-3. Set all environment variables listed above in Railway dashboard
-4. Railway will use the Dockerfile which already has PORT=3001 configured
+3. **CRITICAL**: Set `AUTH_TOKEN` in Railway environment variables BEFORE users access the app
+4. Set all other environment variables listed above in Railway dashboard
+5. Railway will use the Dockerfile which already has PORT=3001 configured
 
 ## Testing Authentication:
 

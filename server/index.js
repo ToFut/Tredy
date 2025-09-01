@@ -2,6 +2,13 @@ process.env.NODE_ENV === "development"
   ? require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` })
   : require("dotenv").config();
 
+// Auto-enable authentication for Railway deployments if not configured
+if (process.env.RAILWAY_ENVIRONMENT && !process.env.AUTH_TOKEN && !process.env.DISABLE_AUTH) {
+  console.log("[Railway] Production deployment detected - enabling authentication");
+  process.env.AUTH_TOKEN = process.env.AUTH_TOKEN || "changeThisPasswordInRailway";
+  console.log("[Railway] AUTH_TOKEN has been set. Change it in Railway environment variables!");
+}
+
 require("./utils/logger")();
 const express = require("express");
 const bodyParser = require("body-parser");

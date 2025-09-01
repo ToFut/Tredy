@@ -41,12 +41,22 @@ export default function Login() {
   // Don't redirect if we're already authenticated AND not in OAuth callback
   if (requiresAuth === false && !isOAuthCallback) return <Navigate to={paths.home()} />;
 
-  // Use Supabase login by default, unless on legacy route
-  if (useLegacy) {
-    console.log('Rendering PasswordModal for legacy login');
+  // If requiresAuth is true (AUTH_TOKEN is set), use password login by default
+  // Only use Supabase if explicitly accessing /login/supabase or no AUTH_TOKEN
+  const useSupabase = window.location.pathname.includes('/login/supabase') || 
+                     (!requiresAuth && !useLegacy);
+  
+  if (requiresAuth || useLegacy) {
+    console.log('Rendering PasswordModal for password authentication');
     return <PasswordModal mode={mode} />;
   }
 
-  console.log('Rendering SupabaseLogin');
-  return <SupabaseLogin />;
+  if (useSupabase) {
+    console.log('Rendering SupabaseLogin');
+    return <SupabaseLogin />;
+  }
+
+  // Fallback to password login
+  console.log('Fallback to PasswordModal');
+  return <PasswordModal mode={mode} />;
 }

@@ -1,4 +1,5 @@
 const { ConnectorTokens } = require("../../models/connectorTokens");
+const { NangoIntegration } = require("./nango-integration");
 
 /**
  * MCP-Nango Bridge
@@ -7,46 +8,16 @@ const { ConnectorTokens } = require("../../models/connectorTokens");
  */
 class MCPNangoBridge {
   constructor() {
-    this.nango = null;
-    this.initNango();
-  }
-
-  initNango() {
-    // Only initialize if Nango is configured
-    if (process.env.NANGO_SECRET_KEY) {
-      const { Nango } = require("@nangohq/node");
-      this.nango = new Nango({
-        secretKey: process.env.NANGO_SECRET_KEY,
-        host: process.env.NANGO_HOST || "http://localhost:3003",
-      });
-    }
+    this.nango = new NangoIntegration();
   }
 
   /**
-   * Generate OAuth URL for connecting a service
+   * Generate OAuth config for frontend
    */
   async generateAuthUrl(provider, workspaceId) {
-    if (!this.nango) {
-      throw new Error("Nango not configured. Please set NANGO_SECRET_KEY.");
-    }
-
-    const connectionId = `workspace_${workspaceId}_${provider}`;
-    
-    const authUrl = await this.nango.auth.createAuthorizationURL({
-      providerConfigKey: provider,
-      connectionId,
-      redirectUrl: `${process.env.SERVER_URL || "http://localhost:3001"}/api/workspace/connectors/callback`,
-    });
-
-    // Store pending connection
-    await ConnectorTokens.upsert({
-      workspaceId,
-      provider,
-      nangoConnectionId: connectionId,
-      status: "pending",
-    });
-
-    return authUrl;
+    // Use NangoIntegration's getAuthConfig for frontend embed
+    const authConfig = await this.nango.getAuthConfig(provider, workspaceId);
+    return authConfig;
   }
 
   /**
@@ -59,20 +30,13 @@ class MCPNangoBridge {
       return null;
     }
 
-    // Get fresh tokens from Nango (auto-refreshes!)
-    let credentials = {};
-    if (this.nango) {
-      try {
-        const connection = await this.nango.getConnection(
-          provider,
-          connector.nangoConnectionId
-        );
-        credentials = connection.credentials;
-      } catch (error) {
-        console.error(`Failed to get Nango connection for ${provider}:`, error);
-        return null;
-      }
+    // Get connection details from Nango
+    const connection = await this.nango.getConnection(provider, workspaceId);
+    if (!connection) {
+      return null;
     }
+    
+    const credentials = connection.credentials || {};
 
     // Return MCP server config based on provider
     const configs = {
@@ -172,55 +136,29 @@ class MCPNangoBridge {
   }
 
   /**
-   * Handle OAuth callback from Nango
+   * Handle OAuth callback (called after frontend completes OAuth)
    */
-  async handleCallback(provider, connectionId) {
-    if (!this.nango) {
-      throw new Error("Nango not configured");
-    }
-
-    // Extract workspace ID from connection ID
-    const match = connectionId.match(/workspace_(\d+)_/);
-    if (!match) {
-      throw new Error("Invalid connection ID format");
-    }
-    const workspaceId = parseInt(match[1]);
-
-    // Update connection status
-    await ConnectorTokens.upsert({
-      workspaceId,
-      provider,
-      nangoConnectionId: connectionId,
-      status: "connected",
-    });
+  async handleCallback(provider, workspaceId, connectionId) {
+    // Use NangoIntegration to verify and store connection
+    const result = await this.nango.createConnection(provider, workspaceId, connectionId);
 
     // Update MCP servers
     await this.updateMCPServersForWorkspace(workspaceId);
 
-    return { success: true, workspaceId };
+    return result;
   }
 
   /**
    * Disconnect a service
    */
   async disconnect(provider, workspaceId) {
-    const connector = await ConnectorTokens.get({ workspaceId, provider });
+    // Use NangoIntegration to handle disconnection
+    const result = await this.nango.deleteConnection(provider, workspaceId);
     
-    if (connector && connector.nangoConnectionId && this.nango) {
-      try {
-        await this.nango.deleteConnection(
-          provider,
-          connector.nangoConnectionId
-        );
-      } catch (error) {
-        console.error("Failed to delete Nango connection:", error);
-      }
-    }
-
-    await ConnectorTokens.delete({ workspaceId, provider });
+    // Update MCP servers
     await this.updateMCPServersForWorkspace(workspaceId);
 
-    return { success: true };
+    return result;
   }
 
   /**
@@ -237,9 +175,9 @@ class MCPNangoBridge {
         logo: "/icons/shopify.svg",
       },
       {
-        id: "google",
-        name: "Google Workspace",
-        description: "Calendar, Gmail, Drive",
+        id: "google-calendar",
+        name: "Google Calendar",
+        description: "Calendar and events",
         category: "productivity",
         authType: "oauth",
         logo: "/icons/google.svg",

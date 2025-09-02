@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "Zapier": {
+      "type": "sse",
+      "url": "https://mcp.zapier.com/api/mcp/s/NTdlYTE1NGYtYzI5OS00NmVhLTg2N2EtZjA3YWZiZDdjN2E1Ojg3MjNkNGFjLTI2MjItNDU0NS04MmE4LWRmNzg5ZDJhYTgzMQ==/mcp",
+      "headers": {}
+    },
+    "GoogleDrive": {
+      "type": "sse",
+      "url": "https://mcp.zapier.com/api/mcp/s/Y2UwYTJiMTItYThiOS00NTllLWEwNGUtODYxY2I1MjBhZjlhOjU1MWZkZTNhLWFlM2YtNGE1YS04OTdhLTNlODRhNzA2ZmY5OQ==/mcp",
+      "headers": {}
+    },
+    "Facebook": {
+      "type": "sse",
+      "url": "https://mcp.zapier.com/api/mcp/s/NGY2YjM5NzItYWM2YS00ZTgzLTk1ZWItNWZhZjA5NTFkZjYxOmJlM2ZiYWM5LTEyNjUtNGM0Zi1iZjBkLWI3NjdlMTg4NDAxZg==/mcp",
+      "headers": {}
+    }
+  }
+}

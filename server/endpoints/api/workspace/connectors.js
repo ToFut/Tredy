@@ -83,12 +83,12 @@ function apiWorkspaceConnectorEndpoints(app) {
           });
         }
 
-        // Generate OAuth URL via Nango
+        // Generate OAuth config via Nango
         if (process.env.NANGO_SECRET_KEY) {
-          const authUrl = await bridge.generateAuthUrl(provider, workspace.id);
+          const authConfig = await bridge.generateAuthUrl(provider, workspace.id);
           return response.status(200).json({
             success: true,
-            authUrl,
+            authConfig, // Frontend will use Nango.auth() with this config
             message: "Please complete authentication",
           });
         } else {
@@ -122,33 +122,32 @@ function apiWorkspaceConnectorEndpoints(app) {
   );
 
   /**
-   * GET /api/workspace/connectors/callback
-   * OAuth callback handler (Nango redirects here)
+   * POST /api/workspace/:slug/connectors/callback
+   * OAuth callback handler (called after frontend completes OAuth)
    */
-  app.get(
-    "/api/workspace/connectors/callback",
+  app.post(
+    "/api/workspace/:slug/connectors/callback",
+    [validatedRequest],
     async (request, response) => {
       try {
-        const { provider, connectionId } = request.query;
+        const { slug } = request.params;
+        const { provider, connectionId } = reqBody(request);
         
-        if (!provider || !connectionId) {
-          return response.redirect(
-            `${process.env.FRONTEND_URL || "http://localhost:3000"}/workspace?error=invalid_callback`
-          );
+        const workspace = await Workspace.getBySlug(slug);
+        if (!workspace) {
+          return response.status(404).json({ error: "Workspace not found" });
         }
 
-        const result = await bridge.handleCallback(provider, connectionId);
+        const result = await bridge.handleCallback(provider, workspace.id, connectionId);
         
-        // Redirect to workspace settings
-        const workspace = await Workspace.get({ id: result.workspaceId });
-        response.redirect(
-          `${process.env.FRONTEND_URL || "http://localhost:3000"}/workspace/${workspace.slug}/settings/connectors?success=true`
-        );
+        response.status(200).json({
+          success: true,
+          message: "Connected successfully",
+          ...result
+        });
       } catch (error) {
         console.error("OAuth callback failed:", error);
-        response.redirect(
-          `${process.env.FRONTEND_URL || "http://localhost:3000"}/workspace?error=${error.message}`
-        );
+        response.status(500).json({ error: error.message });
       }
     }
   );
@@ -192,33 +191,33 @@ function apiWorkspaceConnectorEndpoints(app) {
     async (request, response) => {
       try {
         const { slug, provider } = request.params;
+        const { syncName } = reqBody(request);
         const workspace = await Workspace.getBySlug(slug);
         
         if (!workspace) {
           return response.status(404).json({ error: "Workspace not found" });
         }
 
-        // Update sync status
-        await ConnectorTokens.updateSyncStatus({
-          workspaceId: workspace.id,
-          provider,
-          status: "syncing",
-        });
-
-        // In production, this would trigger a background job
-        // For now, just update MCP servers
-        await bridge.updateMCPServersForWorkspace(workspace.id);
-
-        await ConnectorTokens.updateSyncStatus({
-          workspaceId: workspace.id,
-          provider,
-          status: "connected",
-        });
-
-        response.status(200).json({
-          success: true,
-          message: "Sync completed",
-        });
+        // Trigger sync via Nango if configured
+        if (process.env.NANGO_SECRET_KEY && syncName) {
+          const { NangoIntegration } = require("../../../utils/connectors/nango-integration");
+          const nango = new NangoIntegration();
+          
+          await nango.triggerSync(provider, workspace.id, syncName);
+          
+          response.status(200).json({
+            success: true,
+            message: "Sync triggered",
+          });
+        } else {
+          // Just update MCP servers
+          await bridge.updateMCPServersForWorkspace(workspace.id);
+          
+          response.status(200).json({
+            success: true,
+            message: "MCP servers updated",
+          });
+        }
       } catch (error) {
         console.error("Failed to sync connector:", error);
         response.status(500).json({ error: error.message });

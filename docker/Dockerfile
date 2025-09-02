@@ -161,8 +161,11 @@ USER anythingllm
 FROM backend-build AS production-build
 WORKDIR /app
 COPY --chown=anythingllm:anythingllm --from=frontend-build /app/frontend/dist /app/server/public
+# Copy MCP server configuration
+COPY --chown=anythingllm:anythingllm ./storage/plugins/anythingllm_mcp_servers.json /app/server/storage/plugins/anythingllm_mcp_servers.json
+
 USER root
-RUN mkdir -p /app/server/storage && \
+RUN mkdir -p /app/server/storage/plugins && \
     chown -R anythingllm:anythingllm /app/server && \
     chown -R anythingllm:anythingllm /app/collector && \
     chmod -R 755 /app/server/storage

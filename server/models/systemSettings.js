@@ -26,6 +26,7 @@ const SystemSettings = {
     "max_embed_chunk_size",
     "agent_search_provider",
     "agent_sql_connections",
+    "agent_connector_providers",
     "default_agent_skills",
     "disabled_agent_skills",
     "imported_agent_skills",
@@ -46,6 +47,8 @@ const SystemSettings = {
     "default_agent_skills",
     "disabled_agent_skills",
     "agent_sql_connections",
+    "agent_connector_providers",
+    "connector_auth_method",
     "custom_app_name",
 
     // Meta page customization

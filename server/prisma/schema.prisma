@@ -155,6 +155,7 @@ model workspaces {
   prompt_history               prompt_history[]
   workspace_parsed_files       workspace_parsed_files[]
   agent_schedules              agent_schedules[]
+  connector_tokens             connector_tokens[]
 }
 
 model workspace_threads {

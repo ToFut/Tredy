@@ -42,15 +42,14 @@ export default function Login() {
   if (requiresAuth === false && !isOAuthCallback) return <Navigate to={paths.home()} />;
 
   // Determine which login method to use based on the URL path
-  // If no specific path is provided, default to Supabase login
-  // This allows both authentication methods to work in production
+  // Always default to Supabase login unless explicitly requesting password login
   if (useLegacy) {
-    console.log('Rendering PasswordModal for password authentication');
+    console.log('[Login] Rendering PasswordModal for password authentication');
     return <PasswordModal mode={mode} />;
   }
 
-  // Default to Supabase login for production
+  // Default to Supabase login for production - FORCE REBUILD
   // Users can still access password login via /login/password if needed
-  console.log('Rendering SupabaseLogin');
+  console.log('[Login] DEFAULT: Rendering SupabaseLogin component');
   return <SupabaseLogin />;
 }

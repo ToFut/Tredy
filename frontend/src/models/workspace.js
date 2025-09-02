@@ -596,6 +596,70 @@ const Workspace = {
   },
 
   threads: WorkspaceThread,
+
+  // Connector management methods
+  connectors: {
+    getAvailable: async function (slug) {
+      return await fetch(`${API_BASE}/workspace/${slug}/connectors/available`, {
+        method: "GET",
+        headers: baseHeaders(),
+      })
+        .then((res) => res.json())
+        .catch((e) => {
+          console.error(e);
+          return { providers: [] };
+        });
+    },
+
+    list: async function (slug) {
+      return await fetch(`${API_BASE}/workspace/${slug}/connectors`, {
+        method: "GET",
+        headers: baseHeaders(),
+      })
+        .then((res) => res.json())
+        .catch((e) => {
+          console.error(e);
+          return { connectors: [] };
+        });
+    },
+
+    connect: async function (slug, data) {
+      return await fetch(`${API_BASE}/workspace/${slug}/connectors/connect`, {
+        method: "POST",
+        headers: baseHeaders(),
+        body: JSON.stringify(data),
+      })
+        .then((res) => res.json())
+        .catch((e) => {
+          console.error(e);
+          return { success: false, error: e.message };
+        });
+    },
+
+    disconnect: async function (slug, provider) {
+      return await fetch(`${API_BASE}/workspace/${slug}/connectors/${provider}`, {
+        method: "DELETE",
+        headers: baseHeaders(),
+      })
+        .then((res) => res.json())
+        .catch((e) => {
+          console.error(e);
+          return { success: false, error: e.message };
+        });
+    },
+
+    sync: async function (slug, provider) {
+      return await fetch(`${API_BASE}/workspace/${slug}/connectors/${provider}/sync`, {
+        method: "POST",
+        headers: baseHeaders(),
+      })
+        .then((res) => res.json())
+        .catch((e) => {
+          console.error(e);
+          return { success: false, error: e.message };
+        });
+    },
+  },
 };
 
 export default Workspace;

@@ -340,6 +340,22 @@ model temporary_auth_tokens {
   @@index([userId])
 }
 
+model connector_tokens {
+  id                Int         @id @default(autoincrement())
+  workspaceId       Int
+  provider          String      // shopify, google, stripe, etc.
+  nangoConnectionId String?     // Nango's connection ID
+  status            String      @default("pending") // pending, connected, error
+  lastSync          DateTime?
+  metadata          String?     // JSON string for provider-specific data
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  workspace         workspaces  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, provider])
+  @@index([workspaceId])
+}
+
 model system_prompt_variables {
   id          Int      @id @default(autoincrement())
   key         String   @unique

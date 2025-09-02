@@ -12,6 +12,7 @@ import {
   Robot,
   User,
   Wrench,
+  Plug,
 } from "@phosphor-icons/react";
 import paths from "@/utils/paths";
 import { Link } from "react-router-dom";
@@ -21,6 +22,7 @@ import ChatSettings from "./ChatSettings";
 import VectorDatabase from "./VectorDatabase";
 import Members from "./Members";
 import WorkspaceAgentConfiguration from "./AgentConfig";
+import WorkspaceConnectors from "./Connectors";
 import useUser from "@/hooks/useUser";
 import { useTranslation } from "react-i18next";
 import System from "@/models/system";
@@ -31,6 +33,7 @@ const TABS = {
   "vector-database": VectorDatabase,
   members: Members,
   "agent-config": WorkspaceAgentConfiguration,
+  connectors: WorkspaceConnectors,
 };
 
 export default function WorkspaceSettings() {
@@ -114,6 +117,11 @@ function ShowWorkspaceChat() {
             title={t("workspaces—settings.agent")}
             icon={<Robot className="h-6 w-6" />}
             to={paths.workspace.settings.agentConfig(slug)}
+          />
+          <TabItem
+            title="Connectors"
+            icon={<Plug className="h-6 w-6" />}
+            to={paths.workspace.settings.connectors(slug)}
           />
         </div>
         <div className="px-16 py-6">

@@ -1,0 +1,56 @@
+{
+  "models": [
+    {
+      "name": "Product",
+      "vectorFields": [
+        "title",
+        "body_html",
+        "product_type"
+      ],
+      "searchableFields": [
+        "title",
+        "vendor",
+        "product_type",
+        "handle"
+      ],
+      "metadata": [
+        "id",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "name": "Order",
+      "vectorFields": [
+        "email"
+      ],
+      "searchableFields": [
+        "order_number",
+        "email",
+        "financial_status"
+      ],
+      "metadata": [
+        "id",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "name": "Customer",
+      "vectorFields": [
+        "first_name",
+        "last_name"
+      ],
+      "searchableFields": [
+        "email",
+        "first_name",
+        "last_name"
+      ],
+      "metadata": [
+        "id",
+        "created_at",
+        "updated_at"
+      ]
+    }
+  ]
+}

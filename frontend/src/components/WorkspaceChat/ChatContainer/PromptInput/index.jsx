@@ -279,9 +279,9 @@ export default function PromptInput({
       {/* Mobile optimized input container */}
       <form
         onSubmit={handleSubmit}
-        className="w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800"
+        className="w-full bg-gradient-to-t from-white/95 via-white/90 to-transparent backdrop-blur-xl dark:from-gray-900/95 dark:via-gray-900/90 border-t border-gray-200/50 dark:border-gray-800/50"
       >
-        <div className="max-w-4xl mx-auto px-4 py-3 md:py-4">
+        <div className="max-w-5xl mx-auto px-6 py-4 md:py-6">
           {/* Response mode indicator */}
           {responseMode === "agent" && (
             <div className="flex items-center gap-2 mb-2 px-2">
@@ -294,17 +294,17 @@ export default function PromptInput({
           )}
           
           <div className="relative">
-            <div className="relative flex items-end bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden"
-                 style={{ minHeight: '56px' }}>
+            <div className="relative flex items-end bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200/30 dark:border-gray-700/30 rounded-3xl shadow-lg hover:shadow-2xl hover:border-purple-300/50 transition-all duration-300 overflow-hidden group"
+                 style={{ minHeight: '64px' }}>
               <AttachmentManager attachments={attachments} />
               
               <div className="flex items-end w-full">
-                {/* Enhanced mobile tools */}
-                <div className="flex items-center gap-0.5 p-2 md:gap-1">
+                {/* Enhanced modern tools */}
+                <div className="flex items-center gap-1 p-3">
                   <button
                     type="button"
-                    className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors touch-manipulation"
-                    style={{ minWidth: '40px', minHeight: '40px' }}
+                    className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation"
+                    style={{ minWidth: '44px', minHeight: '44px' }}
                   >
                     <AttachItem />
                   </button>
@@ -352,9 +352,9 @@ export default function PromptInput({
                   }}
                   value={promptInput}
                   spellCheck={Appearance.get("enableSpellCheck")}
-                  className="flex-1 border-none resize-none bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 text-[16px] md:text-[15px] leading-6 max-h-[200px] focus:outline-none py-3 px-2"
-                  style={{ minHeight: '24px' }}
-                  placeholder={responseMode === "agent" ? "Ask me anything with AI tools..." : "Message AnythingLLM..."}
+                  className="flex-1 border-none resize-none bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500/70 dark:placeholder:text-gray-400/70 text-[16px] md:text-[16px] leading-7 max-h-[160px] focus:outline-none py-4 px-3 font-medium"
+                  style={{ minHeight: '28px' }}
+                  placeholder={responseMode === "agent" ? "Ask me anything with AI tools..." : "Ask me anything..."}
                 />
                 
                 {/* Enhanced send button */}
@@ -367,18 +367,21 @@ export default function PromptInput({
                         ref={formRef}
                         type="submit"
                         disabled={isDisabled || !promptInput.trim()}
-                        className={`relative p-2.5 rounded-xl transition-all transform active:scale-95 ${
+                        className={`relative overflow-hidden rounded-2xl transition-all transform active:scale-95 group ${
                           !isDisabled && promptInput.trim() 
-                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 cursor-pointer shadow-md hover:shadow-lg' 
+                            ? 'bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600 hover:from-blue-600 hover:via-purple-600 hover:to-blue-700 cursor-pointer shadow-lg hover:shadow-xl hover:scale-105' 
                             : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'
                         }`}
-                        style={{ minWidth: '44px', minHeight: '44px' }}
+                        style={{ minWidth: '52px', minHeight: '52px', padding: '14px' }}
                         aria-label="Send message"
                       >
                         {!isDisabled && promptInput.trim() && (
-                          <Sparkle className="absolute -top-1 -right-1 w-3 h-3 text-amber-400 animate-pulse" />
+                          <>
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-400 to-blue-500 animate-pulse opacity-50" />
+                            <Sparkle className="absolute -top-0.5 -right-0.5 w-4 h-4 text-amber-300 animate-pulse z-10" />
+                          </>
                         )}
-                        <ArrowUp className="w-5 h-5 text-white" weight="bold" />
+                        <ArrowUp className="relative z-10 w-6 h-6 text-white drop-shadow-sm" weight="bold" />
                       </button>
                       <Tooltip
                         id="send-prompt"

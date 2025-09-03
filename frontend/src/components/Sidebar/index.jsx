@@ -173,7 +173,7 @@ export function SidebarMobileHeader() {
                     <Brain className="h-6 w-6 text-white" weight="bold" />
                   </div>
                   <div>
-                    <h2 className="font-bold text-gray-900 dark:text-white">AnythingLLM</h2>
+                    <h2 className="font-bold text-gray-900 dark:text-white">Tredy</h2>
                     <p className="text-xs text-gray-600 dark:text-gray-400">AI Workspace</p>
                   </div>
                 </div>

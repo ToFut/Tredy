@@ -1,0 +1,45 @@
+integrations:
+  shopify:
+    syncs:
+      products:
+        runs: every 15 minutes
+        auto_start: true
+        sync_type: incremental
+        track_deletes: false
+        output: Products
+        description: Sync product catalog
+      orders:
+        runs: every 30 minutes
+        auto_start: false
+        sync_type: incremental
+        track_deletes: false
+        output: Orders
+        description: Sync order history
+      customers:
+        runs: every 1 hour
+        auto_start: false
+        sync_type: incremental
+        track_deletes: false
+        output: Customers
+        description: Sync customer data
+    actions:
+      create-product:
+        endpoint: POST /products.json
+        input: CreateProductInput
+        output: Product
+        description: Create a new product in Shopify
+      get-product:
+        endpoint: GET /products/{id}.json
+        input: GetProductInput
+        output: Product
+        description: Get specific product details
+      update-inventory:
+        endpoint: PUT /inventory_levels/set.json
+        input: UpdateInventoryInput
+        output: InventoryLevel
+        description: Update product inventory levels
+      get-orders:
+        endpoint: GET /orders.json
+        input: GetOrdersInput
+        output: OrderList
+        description: Get shop orders with filters

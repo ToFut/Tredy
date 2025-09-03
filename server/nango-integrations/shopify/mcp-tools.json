@@ -1,0 +1,192 @@
+{
+  "tools": [
+    {
+      "name": "shopify_connect",
+      "description": "Connect shopify account directly from chat with intelligent error handling",
+      "parameters": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "initiate",
+            "status"
+          ],
+          "description": "Action to perform: initiate connection or check status",
+          "default": "initiate"
+        }
+      }
+    },
+    {
+      "name": "shopify_search_product",
+      "description": "Search Product records with connection auto-detection",
+      "parameters": {
+        "query": {
+          "type": "string",
+          "description": "Search query"
+        },
+        "limit": {
+          "type": "number",
+          "default": 10,
+          "description": "Maximum results to return"
+        }
+      }
+    },
+    {
+      "name": "shopify_get_product",
+      "description": "Get specific Product record with rich formatting",
+      "parameters": {
+        "id": {
+          "type": "string",
+          "description": "Product ID or identifier"
+        }
+      }
+    },
+    {
+      "name": "shopify_search_order",
+      "description": "Search Order records with connection auto-detection",
+      "parameters": {
+        "query": {
+          "type": "string",
+          "description": "Search query"
+        },
+        "limit": {
+          "type": "number",
+          "default": 10,
+          "description": "Maximum results to return"
+        }
+      }
+    },
+    {
+      "name": "shopify_get_order",
+      "description": "Get specific Order record with rich formatting",
+      "parameters": {
+        "id": {
+          "type": "string",
+          "description": "Order ID or identifier"
+        }
+      }
+    },
+    {
+      "name": "shopify_search_customer",
+      "description": "Search Customer records with connection auto-detection",
+      "parameters": {
+        "query": {
+          "type": "string",
+          "description": "Search query"
+        },
+        "limit": {
+          "type": "number",
+          "default": 10,
+          "description": "Maximum results to return"
+        }
+      }
+    },
+    {
+      "name": "shopify_get_customer",
+      "description": "Get specific Customer record with rich formatting",
+      "parameters": {
+        "id": {
+          "type": "string",
+          "description": "Customer ID or identifier"
+        }
+      }
+    },
+    {
+      "name": "shopify_create_product",
+      "description": "Create a new product in Shopify. Includes connection validation and user-friendly error messages.",
+      "parameters": {
+        "input": {
+          "type": "object",
+          "description": "Input data for Create a new product in Shopify"
+        }
+      }
+    },
+    {
+      "name": "shopify_get_product",
+      "description": "Get specific product details. Includes connection validation and user-friendly error messages.",
+      "parameters": {
+        "input": {
+          "type": "object",
+          "description": "Input data for Get specific product details"
+        }
+      }
+    },
+    {
+      "name": "shopify_update_inventory",
+      "description": "Update product inventory levels. Includes connection validation and user-friendly error messages.",
+      "parameters": {
+        "input": {
+          "type": "object",
+          "description": "Input data for Update product inventory levels"
+        }
+      }
+    },
+    {
+      "name": "shopify_get_orders",
+      "description": "Get shop orders with filters. Includes connection validation and user-friendly error messages.",
+      "parameters": {
+        "input": {
+          "type": "object",
+          "description": "Input data for Get shop orders with filters"
+        }
+      }
+    },
+    {
+      "name": "shopify_sync_products",
+      "description": "Sync product catalog. Shows progress and handles errors gracefully.",
+      "parameters": {
+        "force": {
+          "type": "boolean",
+          "default": false,
+          "description": "Force full sync instead of incremental"
+        },
+        "notify": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show sync progress and results"
+        }
+      }
+    },
+    {
+      "name": "shopify_sync_orders",
+      "description": "Sync order history. Shows progress and handles errors gracefully.",
+      "parameters": {
+        "force": {
+          "type": "boolean",
+          "default": false,
+          "description": "Force full sync instead of incremental"
+        },
+        "notify": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show sync progress and results"
+        }
+      }
+    },
+    {
+      "name": "shopify_sync_customers",
+      "description": "Sync customer data. Shows progress and handles errors gracefully.",
+      "parameters": {
+        "force": {
+          "type": "boolean",
+          "default": false,
+          "description": "Force full sync instead of incremental"
+        },
+        "notify": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show sync progress and results"
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "service": "shopify",
+    "version": "2.0.0",
+    "features": [
+      "connection-detection",
+      "interactive-buttons",
+      "rich-formatting",
+      "error-recovery"
+    ]
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "service": "shopify",
+  "name": "Shopify E-commerce Platform",
+  "baseUrl": "https://{{shop}}.myshopify.com/admin/api/2024-01",
+  "version": "2024-01",
+  "authType": "oauth2",
+  "provider": "shopify",
+  "scopes": [
+    "read_products",
+    "write_products",
+    "read_orders",
+    "read_customers",
+    "write_webhooks",
+    "read_inventory"
+  ],
+  "capabilities": ["sync", "create", "search", "webhook"],
+  "limitations": {
+    "rate_limits": "40 requests per app per store per second",
+    "api_limits": "REST Admin API subject to call limits",
+    "webhooks": "Limited to 20 webhook endpoints per app"
+  },
+  "syncs": {
+    "products": {
+      "runs": "every 15 minutes",
+      "endpoint": "GET /products.json",
+      "auto_start": true,
+      "description": "Sync product catalog"
+    },
+    "orders": {
+      "runs": "every 30 minutes", 
+      "endpoint": "GET /orders.json",
+      "auto_start": false,
+      "description": "Sync order history"
+    },
+    "customers": {
+      "runs": "every 1 hour",
+      "endpoint": "GET /customers.json", 
+      "auto_start": false,
+      "description": "Sync customer data"
+    }
+  },
+  "actions": {
+    "create-product": {
+      "endpoint": "POST /products.json",
+      "description": "Create a new product in Shopify",
+      "input": "CreateProductInput",
+      "output": "Product"
+    },
+    "get-product": {
+      "endpoint": "GET /products/{id}.json", 
+      "description": "Get specific product details",
+      "input": "GetProductInput",
+      "output": "Product"
+    },
+    "update-inventory": {
+      "endpoint": "PUT /inventory_levels/set.json",
+      "description": "Update product inventory levels",
+      "input": "UpdateInventoryInput",
+      "output": "InventoryLevel"
+    },
+    "get-orders": {
+      "endpoint": "GET /orders.json",
+      "description": "Get shop orders with filters",
+      "input": "GetOrdersInput", 
+      "output": "OrderList"
+    }
+  },
+  "models": [
+    {
+      "name": "Product",
+      "description": "Shopify product",
+      "fields": [
+        {"name": "id", "type": "number", "required": true, "description": "Product ID"},
+        {"name": "title", "type": "string", "required": true, "description": "Product title"},
+        {"name": "body_html", "type": "string", "required": false, "description": "Product description"},
+        {"name": "vendor", "type": "string", "required": false, "description": "Product vendor"},
+        {"name": "product_type", "type": "string", "required": false, "description": "Product type"},
+        {"name": "handle", "type": "string", "required": true, "description": "Product handle/slug"},
+        {"name": "status", "type": "string", "required": true, "description": "Product status"},
+        {"name": "variants", "type": "array", "required": true, "description": "Product variants"}
+      ],
+      "vectorFields": ["title", "body_html", "product_type"],
+      "searchableFields": ["title", "vendor", "product_type", "handle"],
+      "primaryKey": "id"
+    },
+    {
+      "name": "Order", 
+      "description": "Shopify order",
+      "fields": [
+        {"name": "id", "type": "number", "required": true, "description": "Order ID"},
+        {"name": "order_number", "type": "number", "required": true, "description": "Order number"},
+        {"name": "email", "type": "string", "required": false, "description": "Customer email"},
+        {"name": "total_price", "type": "string", "required": true, "description": "Total price"},
+        {"name": "financial_status", "type": "string", "required": true, "description": "Payment status"},
+        {"name": "fulfillment_status", "type": "string", "required": false, "description": "Fulfillment status"},
+        {"name": "created_at", "type": "string", "required": true, "description": "Order creation date"}
+      ],
+      "vectorFields": ["email"],
+      "searchableFields": ["order_number", "email", "financial_status"],
+      "primaryKey": "id"
+    },
+    {
+      "name": "Customer",
+      "description": "Shopify customer", 
+      "fields": [
+        {"name": "id", "type": "number", "required": true, "description": "Customer ID"},
+        {"name": "email", "type": "string", "required": true, "description": "Customer email"},
+        {"name": "first_name", "type": "string", "required": false, "description": "First name"},
+        {"name": "last_name", "type": "string", "required": false, "description": "Last name"},
+        {"name": "orders_count", "type": "number", "required": false, "description": "Total orders"},
+        {"name": "total_spent", "type": "string", "required": false, "description": "Total spent"}
+      ],
+      "vectorFields": ["first_name", "last_name"],
+      "searchableFields": ["email", "first_name", "last_name"],
+      "primaryKey": "id"
+    }
+  ],
+  "headers": {
+    "Content-Type": "application/json",
+    "X-Shopify-Access-Token": "{{access_token}}"
+  },
+  "nangoProviderKey": "shopify",
+  "webhooks": {
+    "enabled": true,
+    "events": ["products/create", "products/update", "orders/create", "orders/paid"]
+  },
+  "customization": {
+    "shop_domain_required": true,
+    "shop_domain_field": "shop",
+    "api_version": "2024-01"
+  }
+}

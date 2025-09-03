@@ -1,0 +1,29 @@
+{
+  "name": "shopify-nango-integration",
+  "version": "1.0.0",
+  "description": "Nango integration for Shopify e-commerce platform",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nango dev",
+    "deploy": "nango deploy",
+    "generate": "nango generate",
+    "dry-run": "nango dry-run"
+  },
+  "dependencies": {
+    "@nangohq/node": "^0.40.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "shopify",
+    "ecommerce",
+    "nango",
+    "integration",
+    "oauth",
+    "api"
+  ],
+  "author": "AnythingLLM",
+  "license": "MIT"
+}

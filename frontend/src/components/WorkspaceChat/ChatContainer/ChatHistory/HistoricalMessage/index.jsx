@@ -87,10 +87,10 @@ const HistoricalMessage = ({
       onAnimationEnd={onEndAnimation}
       className={`${
         isDeleted ? "animate-remove" : ""
-      } flex justify-center w-full group bg-white hover:bg-gray-50/50 transition-colors border-b border-gray-100`}
+      } flex justify-center w-full group hover:bg-gradient-to-r hover:from-gray-50/30 hover:to-transparent transition-all duration-300`}
     >
-      <div className="w-full max-w-3xl mx-auto px-4 py-5">
-        <div className="flex gap-x-4">
+      <div className="w-full max-w-4xl mx-auto px-6 py-6">
+        <div className="flex gap-x-5">
           <div className="flex flex-col items-center">
             <ProfileImage role={role} workspace={workspace} username={username} />
             <div className="mt-1 -mb-10">
@@ -114,7 +114,7 @@ const HistoricalMessage = ({
             />
           ) : (
             <div className="flex-1 min-w-0">
-              <div className="text-[15px] leading-[1.5] text-black whitespace-pre-wrap">
+              <div className="text-[15px] leading-[1.7] text-gray-900 whitespace-pre-wrap font-medium">
                 <RenderChatContent
                   role={role}
                   message={message}
@@ -142,26 +142,31 @@ const HistoricalMessage = ({
             </div>
           )}
         </div>
-        {/* Actions - ChatGPT style */}
+        {/* Enhanced Actions - Modern style */}
         {role === "assistant" && (
-          <div className="mt-2 ml-[46px] flex items-center gap-x-3 text-xs text-gray-400">
-            <button 
-              onClick={() => navigator.clipboard.writeText(message)}
-              className="hover:text-gray-600 transition-colors"
-            >
-              Copy
-            </button>
-            {isLastMessage && (
-              <>
-                <span className="text-gray-300">|</span>
+          <div className="mt-3 ml-[50px] opacity-0 group-hover:opacity-100 transition-all duration-200">
+            <div className="flex items-center gap-x-2">
+              <button 
+                onClick={() => navigator.clipboard.writeText(message)}
+                className="px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200 flex items-center gap-x-1.5"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+                Copy
+              </button>
+              {isLastMessage && (
                 <button 
                   onClick={() => regenerateMessage()}
-                  className="hover:text-gray-600 transition-colors flex items-center gap-x-1"
+                  className="px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200 flex items-center gap-x-1.5"
                 >
-                  <span className="text-sm">↻</span> Regenerate
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Regenerate
                 </button>
-              </>
-            )}
+              )}
+            </div>
           </div>
         )}
         {role === "assistant" && sources?.length > 0 && (
@@ -198,14 +203,17 @@ function ProfileImage({ role, workspace, username }) {
   
   return (
     <div className="flex-shrink-0">
-      <div className={`w-[32px] h-[32px] rounded-lg flex items-center justify-center ${
+      <div className={`relative w-[38px] h-[38px] rounded-xl flex items-center justify-center shadow-lg transform transition-all duration-200 hover:scale-105 ${
         role === "user" 
-          ? "bg-gradient-to-br from-emerald-500 to-teal-600" 
-          : "bg-gradient-to-br from-blue-500 to-purple-600"
+          ? "bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700" 
+          : "bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
       }`}>
-        <span className="text-white text-sm font-semibold">
+        <span className="text-white text-sm font-bold drop-shadow-sm">
           {role === "user" ? (displayName?.charAt(0)?.toUpperCase() || "U") : "AI"}
         </span>
+        {role === "assistant" && (
+          <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full animate-pulse" />
+        )}
       </div>
     </div>
   );

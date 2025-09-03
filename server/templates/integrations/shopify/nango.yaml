@@ -1,0 +1,108 @@
+integrations:
+  shopify:
+    provider: shopify
+    syncs:
+      products:
+        runs: every 15 minutes
+        description: 'Sync product catalog from Shopify'
+        output: Product
+        sync_type: incremental
+        track_deletes: true
+        auto_start: true
+      orders:
+        runs: every 30 minutes
+        description: 'Sync order history from Shopify'
+        output: Order
+        sync_type: incremental 
+        track_deletes: false
+        auto_start: false
+      customers:
+        runs: every 1 hour
+        description: 'Sync customer data from Shopify'
+        output: Customer
+        sync_type: incremental
+        track_deletes: false
+        auto_start: false
+    actions:
+      create-product:
+        description: 'Create a new product in Shopify'
+        input: CreateProductInput
+        output: Product
+      get-product:
+        description: 'Get specific product details'
+        input: GetProductInput
+        output: Product
+      update-inventory:
+        description: 'Update product inventory levels'
+        input: UpdateInventoryInput
+        output: InventoryLevel
+      get-orders:
+        description: 'Get shop orders with filters'
+        input: GetOrdersInput
+        output: OrderList
+
+models:
+  Product:
+    id: number
+    title: string
+    body_html: string?
+    vendor: string?
+    product_type: string?
+    handle: string
+    status: string
+    variants: any[]
+    created_at: string
+    updated_at: string
+  
+  Order:
+    id: number
+    order_number: number
+    email: string?
+    total_price: string
+    financial_status: string
+    fulfillment_status: string?
+    created_at: string
+    updated_at: string
+    
+  Customer:
+    id: number
+    email: string
+    first_name: string?
+    last_name: string?
+    orders_count: number?
+    total_spent: string?
+    created_at: string
+    updated_at: string
+
+  CreateProductInput:
+    title: string
+    body_html: string?
+    vendor: string?
+    product_type: string?
+    status: string?
+    variants: any[]?
+    
+  GetProductInput:
+    id: number
+    
+  UpdateInventoryInput:
+    inventory_item_id: number
+    location_id: number
+    available: number
+    
+  GetOrdersInput:
+    status: string?
+    financial_status: string?
+    fulfillment_status: string?
+    created_at_min: string?
+    created_at_max: string?
+    limit: number?
+    
+  OrderList:
+    orders: Order[]
+    
+  InventoryLevel:
+    inventory_item_id: number
+    location_id: number
+    available: number
+    updated_at: string

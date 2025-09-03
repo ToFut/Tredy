@@ -192,46 +192,56 @@ export default function ChatHistory({
 
   if (history.length === 0 && !hasAttachments) {
     return (
-      <div className="flex flex-col h-full md:mt-0 pb-44 md:pb-40 w-full justify-center items-center bg-gradient-to-b from-white via-gray-50/30 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
-        <div className="flex h-full flex-col items-center justify-center px-4 max-w-2xl">
-          {/* Enhanced animated logo */}
-          <div className="relative mb-6">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-3xl blur-2xl opacity-30 animate-pulse" />
-            <div className="relative w-20 h-20 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 rounded-3xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-transform">
-              <Brain className="w-10 h-10 text-white" weight="bold" />
-              <Sparkle className="absolute -top-2 -right-2 w-6 h-6 text-amber-400 animate-pulse" />
+      <div className="flex flex-col h-full md:mt-0 pb-44 md:pb-40 w-full justify-center items-center bg-gradient-to-br from-gray-50/50 via-white to-gray-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+        <div className="flex h-full flex-col items-center justify-center px-6 max-w-4xl">
+          {/* Modern animated logo */}
+          <div className="relative mb-8 group">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-400 rounded-3xl blur-3xl opacity-20 animate-pulse group-hover:opacity-30 transition-opacity" />
+            <div className="relative w-24 h-24 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-3xl flex items-center justify-center shadow-2xl transform hover:scale-110 hover:rotate-3 transition-all duration-300 backdrop-blur-sm border border-white/20">
+              <Brain className="w-12 h-12 text-white drop-shadow-lg" weight="bold" />
+              <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center animate-bounce">
+                <Sparkle className="w-4 h-4 text-white" weight="bold" />
+              </div>
             </div>
           </div>
           
-          {/* Enhanced heading */}
-          <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            {workspace?.slug !== "home" ? "Ready to assist you" : "Welcome to AnythingLLM"}
-          </h3>
+          {/* Modern heading with gradient */}
+          <div className="text-center mb-6">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
+              {workspace?.slug !== "home" ? "Ready to help you" : "Welcome to Tredy AI"}
+            </h1>
+            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl leading-relaxed">
+              {workspace?.slug !== "home"
+                ? "Ask me anything, explore ideas, and get insights powered by advanced AI"
+                : "Your intelligent AI workspace for conversations, research, and analysis"}
+            </p>
+          </div>
           
-          {/* Enhanced description */}
-          <p className="text-gray-600 dark:text-gray-400 text-center max-w-md mb-8 leading-relaxed">
-            {workspace?.slug !== "home"
-              ? "I'm here to help with questions, ideas, and documents. Let's explore together."
-              : "Your AI workspace for intelligent conversations and document analysis."}
-          </p>
-          
-          {/* Feature highlights */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8 w-full max-w-lg">
-            <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
-              <Lightning className="w-5 h-5 text-purple-500" />
-              <span className="text-xs text-gray-600 dark:text-gray-400">Fast</span>
+          {/* Modern feature highlights */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 w-full max-w-3xl">
+            <div className="group flex flex-col items-center gap-3 p-4 rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl hover:border-purple-300/50 dark:hover:border-purple-500/50 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Lightning className="w-6 h-6 text-white" weight="bold" />
+              </div>
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Lightning Fast</span>
             </div>
-            <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
-              <Brain className="w-5 h-5 text-pink-500" />
-              <span className="text-xs text-gray-600 dark:text-gray-400">Smart</span>
+            <div className="group flex flex-col items-center gap-3 p-4 rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl hover:border-blue-300/50 dark:hover:border-blue-500/50 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Brain className="w-6 h-6 text-white" weight="bold" />
+              </div>
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">AI Powered</span>
             </div>
-            <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
-              <ChatsCircle className="w-5 h-5 text-blue-500" />
-              <span className="text-xs text-gray-600 dark:text-gray-400">Interactive</span>
+            <div className="group flex flex-col items-center gap-3 p-4 rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl hover:border-green-300/50 dark:hover:border-green-500/50 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <ChatsCircle className="w-6 h-6 text-white" weight="bold" />
+              </div>
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Interactive</span>
             </div>
-            <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
-              <Sparkle className="w-5 h-5 text-amber-500" />
-              <span className="text-xs text-gray-600 dark:text-gray-400">Creative</span>
+            <div className="group flex flex-col items-center gap-3 p-4 rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl hover:border-amber-300/50 dark:hover:border-amber-500/50 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Sparkle className="w-6 h-6 text-white" weight="bold" />
+              </div>
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Creative</span>
             </div>
           </div>
         </div>

@@ -39,21 +39,27 @@ export default function ChatHistory({
   const { getMessageAlignment } = useChatMessageAlignment();
 
   useEffect(() => {
-    if (!isUserScrolling && (isAtBottom || isStreaming)) {
-      scrollToBottom(false); // Use instant scroll for auto-scrolling
+    // Always scroll to bottom when streaming or when new messages arrive and we're near bottom
+    if (isStreaming || (!isUserScrolling && isAtBottom)) {
+      scrollToBottom(false);
+    }
+    // Force scroll to bottom when history changes and we're not streaming
+    else if (history.length > 0 && !isStreaming && !isUserScrolling) {
+      scrollToBottom(true);
     }
   }, [history, isAtBottom, isStreaming, isUserScrolling]);
 
   const handleScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
-    const isBottom = scrollHeight - scrollTop === clientHeight;
-
-    // Detect if this is a user-initiated scroll
+    // Consider "near bottom" if within 100px of the bottom
+    const isNearBottom = scrollHeight - scrollTop - clientHeight <= 100;
+    
+    // Only consider user scrolling if they've moved more than 100px from bottom
     if (Math.abs(scrollTop - lastScrollTopRef.current) > 10) {
-      setIsUserScrolling(!isBottom);
+      setIsUserScrolling(!isNearBottom);
     }
 
-    setIsAtBottom(isBottom);
+    setIsAtBottom(isNearBottom);
     lastScrollTopRef.current = scrollTop;
   };
 
@@ -212,7 +218,8 @@ export default function ChatHistory({
 
   return (
     <div
-      className={`markdown text-white/80 light:text-theme-text-primary font-light ${textSizeClass} h-full md:h-[83%] pb-[100px] pt-6 md:pt-0 md:pb-20 md:mx-0 overflow-y-scroll flex flex-col justify-start ${showScrollbar ? "show-scrollbar" : "no-scroll"}`}
+      className="h-full overflow-y-auto pb-32 bg-white"
+      style={{ scrollBehavior: isStreaming ? 'auto' : 'smooth' }}
       id="chat-history"
       ref={chatHistoryRef}
       onScroll={handleScroll}

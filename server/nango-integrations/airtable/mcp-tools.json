@@ -1,0 +1,176 @@
+{
+  "tools": [
+    {
+      "name": "airtable_connect",
+      "description": "Connect airtable account directly from chat with intelligent error handling",
+      "parameters": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "initiate",
+            "status"
+          ],
+          "description": "Action to perform: initiate connection or check status",
+          "default": "initiate"
+        }
+      }
+    },
+    {
+      "name": "airtable_search_record",
+      "description": "Search Record records with connection auto-detection",
+      "parameters": {
+        "query": {
+          "type": "string",
+          "description": "Search query"
+        },
+        "limit": {
+          "type": "number",
+          "default": 10,
+          "description": "Maximum results to return"
+        }
+      }
+    },
+    {
+      "name": "airtable_get_record",
+      "description": "Get specific Record record with rich formatting",
+      "parameters": {
+        "id": {
+          "type": "string",
+          "description": "Record ID or identifier"
+        }
+      }
+    },
+    {
+      "name": "airtable_search_base",
+      "description": "Search Base records with connection auto-detection",
+      "parameters": {
+        "query": {
+          "type": "string",
+          "description": "Search query"
+        },
+        "limit": {
+          "type": "number",
+          "default": 10,
+          "description": "Maximum results to return"
+        }
+      }
+    },
+    {
+      "name": "airtable_get_base",
+      "description": "Get specific Base record with rich formatting",
+      "parameters": {
+        "id": {
+          "type": "string",
+          "description": "Base ID or identifier"
+        }
+      }
+    },
+    {
+      "name": "airtable_search_table",
+      "description": "Search Table records with connection auto-detection",
+      "parameters": {
+        "query": {
+          "type": "string",
+          "description": "Search query"
+        },
+        "limit": {
+          "type": "number",
+          "default": 10,
+          "description": "Maximum results to return"
+        }
+      }
+    },
+    {
+      "name": "airtable_get_table",
+      "description": "Get specific Table record with rich formatting",
+      "parameters": {
+        "id": {
+          "type": "string",
+          "description": "Table ID or identifier"
+        }
+      }
+    },
+    {
+      "name": "airtable_create_record",
+      "description": "Create a new record in Airtable. Includes connection validation and user-friendly error messages.",
+      "parameters": {
+        "input": {
+          "type": "object",
+          "description": "Input data for Create a new record in Airtable"
+        }
+      }
+    },
+    {
+      "name": "airtable_get_record",
+      "description": "Get specific record details. Includes connection validation and user-friendly error messages.",
+      "parameters": {
+        "input": {
+          "type": "object",
+          "description": "Input data for Get specific record details"
+        }
+      }
+    },
+    {
+      "name": "airtable_update_record",
+      "description": "Update existing record. Includes connection validation and user-friendly error messages.",
+      "parameters": {
+        "input": {
+          "type": "object",
+          "description": "Input data for Update existing record"
+        }
+      }
+    },
+    {
+      "name": "airtable_list_records",
+      "description": "List records with filtering. Includes connection validation and user-friendly error messages.",
+      "parameters": {
+        "input": {
+          "type": "object",
+          "description": "Input data for List records with filtering"
+        }
+      }
+    },
+    {
+      "name": "airtable_sync_records",
+      "description": "Sync records from all accessible bases. Shows progress and handles errors gracefully.",
+      "parameters": {
+        "force": {
+          "type": "boolean",
+          "default": false,
+          "description": "Force full sync instead of incremental"
+        },
+        "notify": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show sync progress and results"
+        }
+      }
+    },
+    {
+      "name": "airtable_sync_bases",
+      "description": "Sync base metadata and structure. Shows progress and handles errors gracefully.",
+      "parameters": {
+        "force": {
+          "type": "boolean",
+          "default": false,
+          "description": "Force full sync instead of incremental"
+        },
+        "notify": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show sync progress and results"
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "service": "airtable",
+    "version": "2.0.0",
+    "features": [
+      "connection-detection",
+      "interactive-buttons",
+      "rich-formatting",
+      "error-recovery"
+    ]
+  }
+}

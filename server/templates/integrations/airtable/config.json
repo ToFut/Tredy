@@ -1,0 +1,112 @@
+{
+  "service": "airtable",
+  "name": "Airtable Database Platform",
+  "baseUrl": "https://api.airtable.com/v0",
+  "version": "v0",
+  "authType": "oauth2",
+  "provider": "airtable",
+  "scopes": [
+    "data.records:read",
+    "data.records:write",
+    "schema.bases:read",
+    "webhook:manage"
+  ],
+  "capabilities": ["sync", "create", "search", "webhook"],
+  "limitations": {
+    "rate_limits": "5 requests per second per base",
+    "api_limits": "API usage subject to plan limits",
+    "webhooks": "100 webhook endpoints per workspace"
+  },
+  "syncs": {
+    "records": {
+      "runs": "every 15 minutes",
+      "endpoint": "GET /{baseId}/{tableId}",
+      "auto_start": true,
+      "description": "Sync records from all accessible bases"
+    },
+    "bases": {
+      "runs": "every 1 hour", 
+      "endpoint": "GET /meta/bases",
+      "auto_start": true,
+      "description": "Sync base metadata and structure"
+    }
+  },
+  "actions": {
+    "create-record": {
+      "endpoint": "POST /{baseId}/{tableId}",
+      "description": "Create a new record in Airtable",
+      "input": "CreateRecordInput",
+      "output": "Record"
+    },
+    "get-record": {
+      "endpoint": "GET /{baseId}/{tableId}/{recordId}",
+      "description": "Get specific record details",
+      "input": "GetRecordInput", 
+      "output": "Record"
+    },
+    "update-record": {
+      "endpoint": "PATCH /{baseId}/{tableId}/{recordId}",
+      "description": "Update existing record",
+      "input": "UpdateRecordInput",
+      "output": "Record"
+    },
+    "list-records": {
+      "endpoint": "GET /{baseId}/{tableId}",
+      "description": "List records with filtering",
+      "input": "ListRecordsInput",
+      "output": "RecordList"
+    }
+  },
+  "models": [
+    {
+      "name": "Record",
+      "description": "Airtable record",
+      "fields": [
+        {"name": "id", "type": "string", "required": true, "description": "Record ID"},
+        {"name": "fields", "type": "object", "required": true, "description": "Record data"},
+        {"name": "createdTime", "type": "string", "required": true, "description": "Creation timestamp"}
+      ],
+      "vectorFields": ["fields"],
+      "searchableFields": ["id", "fields"],
+      "primaryKey": "id"
+    },
+    {
+      "name": "Base",
+      "description": "Airtable base",
+      "fields": [
+        {"name": "id", "type": "string", "required": true, "description": "Base ID"},
+        {"name": "name", "type": "string", "required": true, "description": "Base name"},
+        {"name": "permissionLevel", "type": "string", "required": true, "description": "Permission level"}
+      ],
+      "vectorFields": ["name"],
+      "searchableFields": ["name", "id"],
+      "primaryKey": "id"
+    },
+    {
+      "name": "Table", 
+      "description": "Airtable table",
+      "fields": [
+        {"name": "id", "type": "string", "required": true, "description": "Table ID"},
+        {"name": "name", "type": "string", "required": true, "description": "Table name"},
+        {"name": "fields", "type": "array", "required": true, "description": "Table schema"}
+      ],
+      "vectorFields": ["name"],
+      "searchableFields": ["name", "id"],
+      "primaryKey": "id"
+    }
+  ],
+  "headers": {
+    "Authorization": "Bearer {{access_token}}",
+    "Content-Type": "application/json"
+  },
+  "nangoProviderKey": "airtable",
+  "webhooks": {
+    "enabled": true,
+    "events": ["records.created", "records.updated", "records.deleted"]
+  },
+  "customization": {
+    "base_id_required": true,
+    "table_id_required": true,
+    "api_version": "v0"
+  }
+}

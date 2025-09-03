@@ -1,0 +1,14 @@
+name: shopify-prod
+provider: shopify
+auth_mode: oauth2
+oauth2:
+  client_id: ${SHOPIFY_PROD_CLIENT_ID}
+  client_secret: ${SHOPIFY_PROD_CLIENT_SECRET}
+  auth_url: https://accounts.shopify.com/oauth/authorize
+  token_url: https://accounts.shopify.com/oauth/access_token
+  scopes:
+    - read_products
+    - write_products
+    - read_orders
+    - read_customers
+  redirect_uri: https://your-production-domain.com/api/oauth/callback/shopify

@@ -1,0 +1,72 @@
+integrations:
+  airtable:
+    provider: airtable
+    syncs:
+      records:
+        runs: every 15 minutes
+        description: 'Sync records from accessible Airtable bases'
+        output: Record
+        sync_type: incremental
+        track_deletes: false
+        auto_start: true
+      bases:
+        runs: every 1 hour
+        description: 'Sync base metadata and structure'
+        output: Base
+        sync_type: full
+        track_deletes: false
+        auto_start: true
+    actions:
+      create-record:
+        description: 'Create a new record in Airtable'
+        input: CreateRecordInput
+        output: Record
+      get-record:
+        description: 'Get specific record details'
+        input: GetRecordInput
+        output: Record
+      update-record:
+        description: 'Update existing record'
+        input: UpdateRecordInput
+        output: Record
+      list-records:
+        description: 'List records with filtering'
+        input: ListRecordsInput
+        output: RecordList
+
+models:
+  Record:
+    id: string
+    fields: any
+    createdTime: string
+  
+  Base:
+    id: string
+    name: string
+    permissionLevel: string
+    
+  CreateRecordInput:
+    baseId: string
+    tableId: string
+    fields: any
+    
+  GetRecordInput:
+    baseId: string
+    tableId: string
+    recordId: string
+    
+  UpdateRecordInput:
+    baseId: string
+    tableId: string
+    recordId: string
+    fields: any
+    
+  ListRecordsInput:
+    baseId: string
+    tableId: string
+    filterByFormula: string?
+    maxRecords: number?
+    sort: any[]?
+    
+  RecordList:
+    records: Record[]

@@ -1,0 +1,12 @@
+name: google-mail-prod
+provider: google
+auth_mode: oauth2
+oauth2:
+  client_id: ${GMAIL_PROD_CLIENT_ID}
+  client_secret: ${GMAIL_PROD_CLIENT_SECRET}
+  auth_url: https://accounts.google.com/o/oauth2/v2/auth
+  token_url: https://oauth2.googleapis.com/token
+  scopes:
+    - https://www.googleapis.com/auth/gmail.readonly
+    - https://www.googleapis.com/auth/gmail.send
+  redirect_uri: https://your-production-domain.com/api/oauth/callback/gmail

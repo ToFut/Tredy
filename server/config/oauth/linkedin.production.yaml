@@ -1,0 +1,13 @@
+name: linkedin-prod
+provider: linkedin
+auth_mode: oauth2
+oauth2:
+  client_id: ${LINKEDIN_PROD_CLIENT_ID}
+  client_secret: ${LINKEDIN_PROD_CLIENT_SECRET}
+  auth_url: https://www.linkedin.com/oauth/v2/authorization
+  token_url: https://www.linkedin.com/oauth/v2/accessToken
+  scopes:
+    - r_liteprofile
+    - r_emailaddress
+    - w_member_social
+  redirect_uri: https://your-production-domain.com/api/oauth/callback/linkedin

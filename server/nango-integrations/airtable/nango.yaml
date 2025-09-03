@@ -1,0 +1,38 @@
+integrations:
+  airtable:
+    syncs:
+      records:
+        runs: every 15 minutes
+        auto_start: true
+        sync_type: incremental
+        track_deletes: false
+        output: Records
+        description: Sync records from all accessible bases
+      bases:
+        runs: every 1 hour
+        auto_start: true
+        sync_type: incremental
+        track_deletes: false
+        output: Bases
+        description: Sync base metadata and structure
+    actions:
+      create-record:
+        endpoint: POST /{baseId}/{tableId}
+        input: CreateRecordInput
+        output: Record
+        description: Create a new record in Airtable
+      get-record:
+        endpoint: GET /{baseId}/{tableId}/{recordId}
+        input: GetRecordInput
+        output: Record
+        description: Get specific record details
+      update-record:
+        endpoint: PATCH /{baseId}/{tableId}/{recordId}
+        input: UpdateRecordInput
+        output: Record
+        description: Update existing record
+      list-records:
+        endpoint: GET /{baseId}/{tableId}
+        input: ListRecordsInput
+        output: RecordList
+        description: List records with filtering

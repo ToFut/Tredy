@@ -35,8 +35,12 @@ class NangoService {
         host: config.host || 'https://api.nango.dev'
       });
       
+      // Store environment info
+      this.environment = config.environment || 'development';
+      this.isProduction = this.environment === 'production';
+      
       this.initialized = true;
-      console.log('[NangoService] Initialized successfully');
+      console.log(`[NangoService] Initialized successfully in ${this.environment.toUpperCase()} mode`);
     } catch (error) {
       console.error('[NangoService] Failed to initialize:', error);
       throw error;

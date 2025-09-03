@@ -1,0 +1,49 @@
+{
+  "models": [
+    {
+      "name": "Record",
+      "vectorFields": [
+        "fields"
+      ],
+      "searchableFields": [
+        "id",
+        "fields"
+      ],
+      "metadata": [
+        "id",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "name": "Base",
+      "vectorFields": [
+        "name"
+      ],
+      "searchableFields": [
+        "name",
+        "id"
+      ],
+      "metadata": [
+        "id",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "name": "Table",
+      "vectorFields": [
+        "name"
+      ],
+      "searchableFields": [
+        "name",
+        "id"
+      ],
+      "metadata": [
+        "id",
+        "created_at",
+        "updated_at"
+      ]
+    }
+  ]
+}

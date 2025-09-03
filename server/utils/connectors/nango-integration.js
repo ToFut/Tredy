@@ -12,12 +12,32 @@ class NangoIntegration {
   }
 
   initNango() {
-    if (process.env.NANGO_SECRET_KEY) {
+    // Load production config if available
+    let nangoConfig;
+    try {
+      nangoConfig = require('../../config/nango.production.js');
+    } catch (error) {
+      console.log('[Nango] Production config not found, using development mode');
+    }
+
+    const isProduction = process.env.NODE_ENV === 'production';
+    
+    if (isProduction && nangoConfig) {
+      // Use production credentials
+      this.nango = new Nango({
+        secretKey: nangoConfig.NANGO_SECRET_KEY,
+        host: nangoConfig.NANGO_HOST,
+      });
+      console.log("[Nango] Initialized in PRODUCTION mode");
+    } else if (process.env.NANGO_SECRET_KEY) {
+      // Use development credentials
       this.nango = new Nango({
         secretKey: process.env.NANGO_SECRET_KEY,
         host: process.env.NANGO_HOST || "https://api.nango.dev",
       });
-      console.log("[Nango] Initialized with cloud service");
+      console.log("[Nango] Initialized in DEVELOPMENT mode");
+    } else {
+      console.warn("[Nango] No credentials found for any environment");
     }
   }
 
@@ -29,6 +49,15 @@ class NangoIntegration {
     if (!this.nango) throw new Error("Nango not configured");
 
     const connectionId = `workspace_${workspaceId}`;
+    const isProduction = process.env.NODE_ENV === 'production';
+    
+    // Load production config if in production mode
+    let nangoConfig;
+    try {
+      nangoConfig = isProduction ? require('../../config/nango.production.js') : null;
+    } catch (error) {
+      console.log('[Nango] Production config not found');
+    }
     
     // Check what provider configs actually exist in Nango
     let providerConfigKey;
@@ -41,25 +70,48 @@ class NangoIntegration {
       if (Array.isArray(integrations)) {
         availableKeys = integrations.map(i => i.unique_key || i.id || i.name).filter(Boolean);
       } else if (integrations && integrations.configs && Array.isArray(integrations.configs)) {
-        // This is the correct format: {configs: [...]}
         availableKeys = integrations.configs.map(i => i.unique_key || i.id || i.name).filter(Boolean);
       } else if (integrations && integrations.integrations) {
         availableKeys = integrations.integrations.map(i => i.unique_key || i.id || i.name).filter(Boolean);
       } else if (integrations && typeof integrations === 'object' && !integrations.configs) {
-        // Only use Object.keys as last resort and not when there's a 'configs' property
         availableKeys = Object.keys(integrations);
       }
       
       console.log('[Nango] Available provider configs:', availableKeys);
       
-      // Try common patterns for this provider
+      // Try production config first if available
+      if (isProduction && nangoConfig && nangoConfig.providers[provider]) {
+        providerConfigKey = nangoConfig.providers[provider].configKey;
+        if (availableKeys.includes(providerConfigKey)) {
+          console.log(`[Nango] Using production config key: ${providerConfigKey}`);
+          // Found production config, use it
+          const config = {
+            publicKey: nangoConfig.NANGO_PUBLIC_KEY,
+            host: nangoConfig.NANGO_HOST,
+            connectionId,
+            providerConfigKey,
+            authUrl: `${nangoConfig.NANGO_HOST}/oauth/connect`,
+          };
+          
+          console.log('[Nango] Production auth config generated:', {
+            provider,
+            providerConfigKey,
+            connectionId,
+            publicKey: config.publicKey ? config.publicKey.substring(0, 8) + '...' : 'MISSING'
+          });
+          
+          return config;
+        }
+      }
+      
+      // Fall back to development config patterns
       const possibleKeys = [
         provider, // exact match
         `${provider}-getting-started`,
         `${provider}_getting_started`,
         // Special mappings based on your actual Nango configs
-        provider === 'gmail' ? 'google-mail' : null, // Use specific gmail config first
-        provider === 'gmail' ? 'google' : null, // Fallback to general google
+        provider === 'gmail' ? 'google-mail' : null,
+        provider === 'gmail' ? 'google' : null,
         provider === 'google-calendar' ? 'google-calendar-getting-started' : null,
         provider === 'google-calendar' ? 'google' : null,
       ].filter(Boolean);
@@ -69,9 +121,6 @@ class NangoIntegration {
       
       if (!providerConfigKey) {
         console.warn(`[Nango] No matching provider config found for ${provider}. Available: ${availableKeys.join(', ')}`);
-        
-        // For unsupported providers, don't use a random fallback
-        // This will cause a cleaner error message
         throw new Error(`Provider ${provider} is not configured in Nango. Please add a provider config for ${provider} in your Nango dashboard. Available providers: ${availableKeys.join(', ')}`);
       }
       
@@ -79,32 +128,32 @@ class NangoIntegration {
       console.error('[Nango] Failed to list integrations:', error);
       // Fall back to simple mapping
       const providerConfigKeyMap = {
-        'gmail': 'google',
-        'google-calendar': 'google',  
-        'linkedin': 'linkedin',
-        'shopify': 'shopify',
-        'github': 'github',
-        'stripe': 'stripe',
-        'slack': 'slack',
+        'gmail': isProduction ? 'google-mail-prod' : 'google',
+        'google-calendar': isProduction ? 'google-calendar-prod' : 'google',  
+        'linkedin': isProduction ? 'linkedin-prod' : 'linkedin',
+        'shopify': isProduction ? 'shopify-prod' : 'shopify',
+        'github': isProduction ? 'github-prod' : 'github',
+        'stripe': isProduction ? 'stripe-prod' : 'stripe',
+        'slack': isProduction ? 'slack-prod' : 'slack',
       };
-      providerConfigKey = providerConfigKeyMap[provider] || provider;
+      providerConfigKey = providerConfigKeyMap[provider] || (isProduction ? `${provider}-prod` : provider);
     }
     
     // Return config for frontend Nango.auth() method
     const config = {
-      publicKey: process.env.NANGO_PUBLIC_KEY,
-      host: process.env.NANGO_HOST || "https://api.nango.dev",
+      publicKey: isProduction ? nangoConfig?.NANGO_PUBLIC_KEY : process.env.NANGO_PUBLIC_KEY,
+      host: isProduction ? nangoConfig?.NANGO_HOST : (process.env.NANGO_HOST || "https://api.nango.dev"),
       connectionId,
       providerConfigKey,
-      // These will be used by frontend
-      authUrl: `${process.env.NANGO_HOST || "https://api.nango.dev"}/oauth/connect`,
+      authUrl: `${isProduction ? nangoConfig?.NANGO_HOST : (process.env.NANGO_HOST || "https://api.nango.dev")}/oauth/connect`,
     };
     
     console.log('[Nango] Auth config generated:', {
       provider,
       providerConfigKey,
       connectionId,
-      publicKey: config.publicKey ? config.publicKey.substring(0, 8) + '...' : 'MISSING'
+      publicKey: config.publicKey ? config.publicKey.substring(0, 8) + '...' : 'MISSING',
+      environment: isProduction ? 'production' : 'development'
     });
     
     return config;

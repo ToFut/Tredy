@@ -17,18 +17,110 @@ const universalIntegrator = {
       setup(aibitat) {
         const integrationSystem = getUniversalIntegrationSystem();
 
-        // Tool 1: Integrate any service
+        // Tool 1: Suggest integrations (as required by system prompt)
         aibitat.function({
           super: aibitat,
-          name: "integrate_service",
+          name: "suggest_integrations",
           controller: new AbortController(),
-          description: "Connect and integrate any external service like Slack, GitHub, Shopify, Salesforce, etc. Use when user wants to connect a new service.",
+          description: "Show interactive connection button when user wants to connect to a service. Use when user says 'integrate [service]' or 'connect to [service]'.",
           parameters: {
             type: "object",
             properties: {
               service: {
                 type: "string",
-                description: "Service name (e.g., slack, github, shopify, salesforce)"
+                description: "Name of service to connect (airtable, slack, github, shopify, etc.)"
+              }
+            },
+            required: ["service"]
+          },
+          handler: async function({ service }) {
+            try {
+              console.log('[UniversalIntegrator] suggest_integrations called for:', service);
+              this.super.introspect(`🔗 Setting up ${service} integration...`);
+              
+              const workspaceId = this.super.handlerProps.invocation?.workspace_id;
+              if (!workspaceId) {
+                return `⚠️ Workspace context required for integration. Please ensure you're in a workspace.`;
+              }
+
+              // Check if already connected
+              const existing = await ConnectorTokens.get({ 
+                workspaceId, 
+                provider: service.toLowerCase() 
+              });
+              
+              if (existing && existing.status === 'connected') {
+                return `✅ ${service} is already connected!
+
+Current status: Connected
+Last sync: ${existing.lastSyncAt || 'Never'}
+
+To manage connection: Go to Workspace Settings → Data Connectors`;
+              }
+
+              // Generate integration with OAuth button
+              this.super.introspect(`Preparing ${service} integration with OAuth...`);
+              
+              const result = await integrationSystem.integrate({
+                service: service.toLowerCase(),
+                workspaceId,
+                capabilities: ['sync', 'create'],
+                syncFrequency: '15m',
+                discoveryMethod: 'template'
+              });
+
+              if (result.success) {
+                return `🚀 ${service} Integration Ready!
+
+📋 Integration Prepared:
+• Service: ${result.service}
+• Endpoints: ${result.endpoints} API endpoints
+• Data Models: ${result.models} models
+• Capabilities: ${result.capabilities.join(', ')}
+
+🔐 **Connect Your ${service} Account:**
+
+[connect:${service.toLowerCase()}]
+
+Once connected, you can use ${service} features with natural language commands!`;
+              } else {
+                return `⚠️ ${service} Integration Setup Incomplete
+
+You can try connecting directly:
+
+[connect:${service.toLowerCase()}]
+
+**Alternative Options:**
+• Check [Data Connectors](/workspace/settings/connectors) for manual setup
+• Ensure ${service} OAuth app is configured in Nango dashboard`;
+              }
+            } catch (error) {
+              console.error('[UniversalIntegrator] Error in suggest_integrations:', error);
+              return `❌ Integration setup failed for ${service}
+
+Error: ${error.message}
+
+You can try connecting directly:
+
+[connect:${service.toLowerCase()}]
+
+Or check [Data Connectors](/workspace/settings/connectors) for manual setup.`;
+            }
+          }
+        });
+
+        // Tool 2: Direct integration service (backup)
+        aibitat.function({
+          super: aibitat,
+          name: "integrate_service_now",
+          controller: new AbortController(),
+          description: "INTEGRATION: Call this when user says 'integrate [service]' like 'integrate airtable'. Creates OAuth and integrations.",
+          parameters: {
+            type: "object",
+            properties: {
+              service: {
+                type: "string",
+                description: "Name of service to integrate (airtable, slack, github, shopify, notion, stripe, etc.)"
               },
               capabilities: {
                 type: "array",
@@ -52,7 +144,9 @@ const universalIntegrator = {
           },
           handler: async function({ service, capabilities, syncFrequency, syncData }) {
             try {
-              this.super.introspect(`Starting ${service} integration following Nango best practices...`);
+              // Debug logging
+              console.log('[UniversalIntegrator] PLUGIN CALLED!', { service, capabilities });
+              this.super.introspect(`🎉 Universal Integrator Plugin Called! Starting ${service} integration...`);
               
               const workspaceId = this.super.handlerProps.invocation?.workspace_id;
               if (!workspaceId) {

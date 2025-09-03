@@ -69,6 +69,12 @@ class MCPNangoBridge {
    * This integrates with the existing MCP system
    */
   async updateMCPServersForWorkspace(workspaceId) {
+    // Validate workspaceId - skip if invalid or test data
+    if (!workspaceId || workspaceId.toString().includes('test-')) {
+      console.log(`[MCPBridge] Skipping MCP update for test/invalid workspace: ${workspaceId}`);
+      return {};
+    }
+    
     const connectors = await ConnectorTokens.forWorkspace(workspaceId);
     const mcpConfigs = {};
 

@@ -9,6 +9,7 @@ import {
   ChartBar,
   FileMagnifyingGlass,
   ChartLine,
+  Plugs,
 } from "@phosphor-icons/react";
 import RAGImage from "@/media/agents/rag-memory.png";
 import SummarizeImage from "@/media/agents/view-summarize.png";
@@ -82,5 +83,14 @@ export const configurableSkills = {
     title: "SQL Connector",
     component: AgentSQLConnectorSelection,
     skill: "sql-agent",
+  },
+  "universal-integrator": {
+    title: "Universal Integrations",
+    description:
+      "Connect ANY external service through natural language. Automatically handles OAuth, syncs data, and provides tools for popular services like Slack, GitHub, Shopify, Salesforce, and more.",
+    component: GenericSkillPanel,
+    skill: "universal-integrator",
+    icon: Plugs,
+    image: ScrapeWebsitesImage,
   },
 };

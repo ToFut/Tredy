@@ -75,6 +75,13 @@ class SimpleCalendarMCP {
               location: {
                 type: 'string',
                 description: 'Event location (optional)'
+              },
+              attendees: {
+                type: 'array',
+                description: 'List of attendee email addresses to invite (optional)',
+                items: {
+                  type: 'string'
+                }
               }
             },
             required: ['summary', 'startTime', 'endTime']
@@ -185,14 +192,17 @@ class SimpleCalendarMCP {
       host: process.env.NANGO_HOST || 'https://api.nango.dev'
     });
 
-    const { summary, startTime, endTime, description, location } = args;
+    const { summary, startTime, endTime, description, location, attendees } = args;
 
     const eventData = {
       summary,
       start: { dateTime: startTime },
       end: { dateTime: endTime },
       ...(description && { description }),
-      ...(location && { location })
+      ...(location && { location }),
+      ...(attendees && attendees.length > 0 && { 
+        attendees: attendees.map(email => ({ email }))
+      })
     };
 
     // Use Nango's proxy to create the event

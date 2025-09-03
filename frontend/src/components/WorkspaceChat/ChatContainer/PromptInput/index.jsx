@@ -94,17 +94,14 @@ export default function PromptInput({
     setFocused(false);
     
     // Modify the textarea value to include @agent prefix if in agent mode
+    // This needs to happen BEFORE the parent's submit handler reads the value
     if (responseMode === "agent" && !promptInput.startsWith("@agent")) {
-      // Update both the textarea value and state to include @agent prefix
       const messageWithAgent = "@agent " + promptInput;
       textareaRef.current.value = messageWithAgent;
       setPromptInput(messageWithAgent);
     }
     
-    // Use setTimeout to ensure the value is set before submitting
-    setTimeout(() => {
-      submit(e);
-    }, 0);
+    submit(e);
   }
 
   function resetTextAreaHeight() {
@@ -137,6 +134,14 @@ export default function PromptInput({
     if (event.keyCode === 13 && !event.shiftKey) {
       event.preventDefault();
       if (isStreaming || isDisabled) return; // Prevent submission if streaming or disabled
+      
+      // Add @agent prefix if in agent mode before submitting
+      if (responseMode === "agent" && !promptInput.startsWith("@agent")) {
+        const messageWithAgent = "@agent " + promptInput;
+        textareaRef.current.value = messageWithAgent;
+        setPromptInput(messageWithAgent);
+      }
+      
       return submit(event);
     }
 

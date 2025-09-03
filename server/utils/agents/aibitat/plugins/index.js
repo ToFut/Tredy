@@ -9,6 +9,7 @@ const { rechart } = require("./rechart.js");
 const { sqlAgent } = require("./sql-agent/index.js");
 const { stockMarket } = require("./stock-market.js");
 const { nangoCalendar } = require("./nango-calendar.js");
+const { universalIntegrator } = require("./universal-integrator.js");
 
 module.exports = {
   webScraping,
@@ -22,6 +23,7 @@ module.exports = {
   sqlAgent,
   stockMarket,
   nangoCalendar,
+  universalIntegrator,
 
   // Plugin name aliases so they can be pulled by slug as well.
   [webScraping.name]: webScraping,
@@ -35,4 +37,5 @@ module.exports = {
   [sqlAgent.name]: sqlAgent,
   [stockMarket.name]: stockMarket,
   [nangoCalendar.name]: nangoCalendar,
+  [universalIntegrator.name]: universalIntegrator,
 };

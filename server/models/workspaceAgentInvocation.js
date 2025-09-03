@@ -92,6 +92,22 @@ const WorkspaceAgentInvocation = {
       return [];
     }
   },
+
+  update: async function ({ uuid, prompt }) {
+    try {
+      const invocation = await prisma.workspace_agent_invocations.update({
+        where: { uuid: String(uuid) },
+        data: { 
+          prompt: String(prompt),
+          lastUpdatedAt: new Date(),
+        },
+      });
+      return invocation;
+    } catch (error) {
+      console.error(error.message);
+      return null;
+    }
+  },
 };
 
 module.exports = { WorkspaceAgentInvocation };

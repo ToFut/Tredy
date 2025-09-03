@@ -9,6 +9,8 @@ import {
   Flag,
   Info,
   BracketsCurly,
+  Plugs,
+  Wrench,
 } from "@phosphor-icons/react";
 import { Tooltip } from "react-tooltip";
 import StartNode from "../nodes/StartNode";
@@ -20,6 +22,8 @@ import LLMInstructionNode from "../nodes/LLMInstructionNode";
 import FinishNode from "../nodes/FinishNode";
 import WebScrapingNode from "../nodes/WebScrapingNode";
 import FlowInfoNode from "../nodes/FlowInfoNode";
+import ConnectorNode from "../nodes/ConnectorNode";
+import SkillNode from "../nodes/SkillNode";
 
 const BLOCK_TYPES = {
   FLOW_INFO: "flowInfo",
@@ -30,6 +34,8 @@ const BLOCK_TYPES = {
   // CODE: "code", // Temporarily disabled
   LLM_INSTRUCTION: "llmInstruction",
   WEB_SCRAPING: "webScraping",
+  CONNECTOR: "connector",
+  SKILL: "skill",
   FINISH: "finish",
 };
 
@@ -134,6 +140,32 @@ const BLOCK_INFO = {
     },
     getSummary: (config) => config.url || "No URL specified",
   },
+  [BLOCK_TYPES.CONNECTOR]: {
+    label: "Connector",
+    icon: <Plugs className="w-5 h-5 text-theme-text-primary" />,
+    description: "Connect to external services and APIs",
+    defaultConfig: {
+      connectorType: "",
+      connectionId: "",
+      action: "",
+      parameters: "",
+      resultVariable: "",
+      directOutput: false,
+    },
+    getSummary: (config) => config.connectorType || "No connector selected",
+  },
+  [BLOCK_TYPES.SKILL]: {
+    label: "Skill",
+    icon: <Wrench className="w-5 h-5 text-theme-text-primary" />,
+    description: "Use agent skills and capabilities",
+    defaultConfig: {
+      skillType: "",
+      parameters: "",
+      resultVariable: "",
+      directOutput: false,
+    },
+    getSummary: (config) => config.skillType || "No skill selected",
+  },
   [BLOCK_TYPES.FINISH]: {
     label: "Flow Complete",
     icon: <Flag className="w-4 h-4" />,
@@ -224,6 +256,10 @@ export default function BlockList({
         return <LLMInstructionNode {...props} />;
       case BLOCK_TYPES.WEB_SCRAPING:
         return <WebScrapingNode {...props} />;
+      case BLOCK_TYPES.CONNECTOR:
+        return <ConnectorNode {...props} />;
+      case BLOCK_TYPES.SKILL:
+        return <SkillNode {...props} />;
       case BLOCK_TYPES.FINISH:
         return <FinishNode />;
       default:

@@ -87,6 +87,7 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
       endSTTSession();
     }
     setChatHistory(prevChatHistory);
+    setMessage(actualMessage); // Update the message state with the actual message including @agent prefix
     setMessageEmit("");
     setLoadingResponse(true);
   };

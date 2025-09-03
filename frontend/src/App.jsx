@@ -19,6 +19,7 @@ import { LogoProvider } from "./LogoContext";
 import { FullScreenLoader } from "./components/Preloader";
 import { ThemeProvider } from "./ThemeContext";
 import KeyboardShortcutsHelp from "@/components/KeyboardShortcutsHelp";
+// import DarkModeToggle from "@/components/DarkModeToggle";
 
 const Main = lazy(() => import("@/pages/Main"));
 const InvitePage = lazy(() => import("@/pages/Invite"));
@@ -105,6 +106,7 @@ export default function App() {
           <LogoProvider>
             <PfpProvider>
               <I18nextProvider i18n={i18n}>
+                {/* <DarkModeToggle /> */}
                 <Routes>
                   <Route path="/" element={<PrivateRoute Component={Main} />} />
                   <Route path="/login" element={<Login />} />

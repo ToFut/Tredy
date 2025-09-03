@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Super simple OAuth injection command
+# Usage: ./inject-oauth gmail
+# or: ./inject-oauth all
+
+SERVICE=$1
+
+if [ -z "$SERVICE" ]; then
+  echo "🚀 OAuth Injector - Add any service in seconds!"
+  echo ""
+  echo "Usage: ./inject-oauth <service>"
+  echo ""
+  echo "Available services:"
+  echo "  • gmail"
+  echo "  • slack"
+  echo "  • github"
+  echo "  • notion"
+  echo "  • discord"
+  echo "  • google-calendar"
+  echo "  • all (inject all services)"
+  echo ""
+  echo "Example: ./inject-oauth gmail"
+  exit 0
+fi
+
+echo "🔧 Injecting OAuth for $SERVICE..."
+node oauth-injector.js $SERVICE
+
+echo ""
+echo "✅ Done! Now:"
+echo "1. Click the OAuth URL above to authorize"
+echo "2. Restart AnythingLLM: yarn dev:server"
+echo "3. Test: @agent use $SERVICE"

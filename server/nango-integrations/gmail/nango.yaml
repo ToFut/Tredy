@@ -1,0 +1,50 @@
+integrations:
+  gmail-integration:
+    provider: google
+    auth_mode: OAUTH2
+    authorization_url: https://accounts.google.com/o/oauth2/auth
+    token_url: https://oauth2.googleapis.com/token
+    scope_separator: ' '
+    default_scopes:
+      - https://www.googleapis.com/auth/gmail.readonly
+      - https://www.googleapis.com/auth/gmail.send  
+      - https://www.googleapis.com/auth/gmail.modify
+      - https://www.googleapis.com/auth/userinfo.email
+    
+    # Optional: Sync configuration for automatic data syncing
+    syncs:
+      gmail-emails:
+        runs: every 15 minutes
+        auto_start: true
+        endpoint: GET /gmail/v1/users/me/messages
+        scopes:
+          - https://www.googleapis.com/auth/gmail.readonly
+        sync_type: incremental
+        track_deletes: true
+        
+    # Action endpoints for direct API calls  
+    actions:
+      send-email:
+        endpoint: POST /gmail/v1/users/me/messages/send
+        scopes:
+          - https://www.googleapis.com/auth/gmail.send
+      
+      get-messages:
+        endpoint: GET /gmail/v1/users/me/messages
+        scopes:
+          - https://www.googleapis.com/auth/gmail.readonly
+          
+      get-message-details:
+        endpoint: GET /gmail/v1/users/me/messages/{messageId}
+        scopes:
+          - https://www.googleapis.com/auth/gmail.readonly
+          
+      modify-message:
+        endpoint: POST /gmail/v1/users/me/messages/{messageId}/modify
+        scopes:
+          - https://www.googleapis.com/auth/gmail.modify
+          
+      delete-message:
+        endpoint: DELETE /gmail/v1/users/me/messages/{messageId}
+        scopes:
+          - https://www.googleapis.com/auth/gmail.modify

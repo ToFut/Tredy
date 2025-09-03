@@ -52,7 +52,7 @@ class SimpleCalendarMCP {
         },
         {
           name: 'book_meeting',
-          description: 'Book a meeting, create calendar event, schedule appointment in Google Calendar. Use this when user asks to book, create, or schedule any meeting or event.',
+          description: 'Book a meeting, create calendar event, schedule appointment, send meeting invite in Google Calendar. Use this when user asks to: book meeting, schedule event, send calendar invite, create appointment, invite someone to meeting.',
           inputSchema: {
             type: 'object',
             properties: {
@@ -124,11 +124,52 @@ class SimpleCalendarMCP {
       host: process.env.NANGO_HOST || 'https://api.nango.dev'
     });
 
-    const {
-      timeMin = new Date().toISOString().split('T')[0] + 'T00:00:00Z',
+    // Parse natural language dates
+    const parseDate = (dateStr) => {
+      if (!dateStr) return null;
+      
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      if (dateStr === 'today') {
+        return today.toISOString();
+      } else if (dateStr === 'tomorrow') {
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return tomorrow.toISOString();
+      } else if (dateStr === 'yesterday') {
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        return yesterday.toISOString();
+      } else if (dateStr.includes('T')) {
+        // Already ISO format
+        return dateStr;
+      } else {
+        // Try to parse as date
+        const parsed = new Date(dateStr);
+        return isNaN(parsed) ? null : parsed.toISOString();
+      }
+    };
+
+    // Better date handling with proper ISO format
+    const now = new Date();
+    const defaultTimeMin = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    
+    let {
+      timeMin = defaultTimeMin,
       timeMax,
       maxResults = 10
     } = args;
+
+    // Parse dates if they're natural language
+    if (timeMin) {
+      const parsed = parseDate(timeMin);
+      if (parsed) timeMin = parsed;
+    }
+    if (timeMax) {
+      const parsed = parseDate(timeMax);
+      if (parsed) timeMax = parsed;
+    }
 
     const params = new URLSearchParams({
       timeMin,
@@ -143,12 +184,13 @@ class SimpleCalendarMCP {
 
     const endpoint = `/calendar/v3/calendars/primary/events?${params}`;
     
-    // Use Nango's proxy to make the API call
-    const response = await nango.get({
-      endpoint,
-      connectionId: process.env.NANGO_CONNECTION_ID || 'workspace_3',
-      providerConfigKey: 'google-calendar-getting-started'
-    });
+    try {
+      // Use Nango's proxy to make the API call
+      const response = await nango.get({
+        endpoint,
+        connectionId: process.env.NANGO_CONNECTION_ID || 'workspace_3',
+        providerConfigKey: 'google-calendar-getting-started'
+      });
 
     const data = response.data;
     const events = data?.items || [];
@@ -181,6 +223,16 @@ class SimpleCalendarMCP {
         text: JSON.stringify(formattedEvents, null, 2)
       }]
     };
+    } catch (error) {
+      console.error('Calendar API Error:', error.response?.data || error.message);
+      return {
+        content: [{
+          type: 'text',
+          text: `Error fetching calendar events: ${error.response?.data?.error?.message || error.message}`
+        }],
+        isError: true
+      };
+    }
   }
 
   async createCalendarEvent(args) {
@@ -192,12 +244,59 @@ class SimpleCalendarMCP {
       host: process.env.NANGO_HOST || 'https://api.nango.dev'
     });
 
+    // Parse natural language dates
+    const parseDateTime = (dateStr, isEndTime = false) => {
+      if (!dateStr) return null;
+      
+      const now = new Date();
+      
+      // Handle common natural language inputs
+      if (dateStr === 'today' || dateStr === 'now') {
+        return now.toISOString();
+      } else if (dateStr === 'tomorrow') {
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        if (isEndTime) {
+          tomorrow.setHours(tomorrow.getHours() + 1); // Default 1 hour duration
+        }
+        return tomorrow.toISOString();
+      } else if (dateStr.includes('T')) {
+        // Already ISO format
+        return dateStr;
+      } else {
+        // Try to parse as date
+        const parsed = new Date(dateStr);
+        if (!isNaN(parsed)) {
+          return parsed.toISOString();
+        }
+        // Default to tomorrow at 3pm if can't parse
+        const defaultDate = new Date(now);
+        defaultDate.setDate(defaultDate.getDate() + 1);
+        defaultDate.setHours(15, 0, 0, 0); // 3pm
+        if (isEndTime) {
+          defaultDate.setHours(16, 0, 0, 0); // 4pm
+        }
+        return defaultDate.toISOString();
+      }
+    };
+
     const { summary, startTime, endTime, description, location, attendees } = args;
+    
+    // Parse and validate times
+    const parsedStartTime = parseDateTime(startTime);
+    const parsedEndTime = parseDateTime(endTime || startTime, true);
+    
+    console.error('[Calendar MCP] Creating event:', { 
+      summary, 
+      startTime: parsedStartTime, 
+      endTime: parsedEndTime,
+      attendees 
+    });
 
     const eventData = {
-      summary,
-      start: { dateTime: startTime },
-      end: { dateTime: endTime },
+      summary: summary || 'Meeting',
+      start: { dateTime: parsedStartTime },
+      end: { dateTime: parsedEndTime },
       ...(description && { description }),
       ...(location && { location }),
       ...(attendees && attendees.length > 0 && { 
@@ -206,21 +305,35 @@ class SimpleCalendarMCP {
     };
 
     // Use Nango's proxy to create the event
-    const response = await nango.post({
-      endpoint: '/calendar/v3/calendars/primary/events',
-      connectionId: process.env.NANGO_CONNECTION_ID || 'workspace_3',
-      providerConfigKey: 'google-calendar-getting-started',
-      data: eventData
-    });
+    try {
+      const response = await nango.post({
+        endpoint: '/calendar/v3/calendars/primary/events',
+        connectionId: process.env.NANGO_CONNECTION_ID || 'workspace_4',
+        providerConfigKey: 'google-calendar-getting-started',
+        data: eventData
+      });
 
-    const event = response.data;
-    
-    return {
-      content: [{
-        type: 'text',
-        text: `✓ Calendar event created successfully: "${summary}" (ID: ${event.id})`
-      }]
-    };
+      const event = response.data;
+      
+      // Build a more informative success message
+      let successMsg = `✓ Calendar event created successfully!\n`;
+      successMsg += `📅 "${eventData.summary}"\n`;
+      successMsg += `⏰ ${new Date(parsedStartTime).toLocaleString()}\n`;
+      if (attendees && attendees.length > 0) {
+        successMsg += `👥 Invited: ${attendees.join(', ')}\n`;
+      }
+      successMsg += `🔗 Event ID: ${event.id}`;
+      
+      return {
+        content: [{
+          type: 'text',
+          text: successMsg
+        }]
+      };
+    } catch (error) {
+      console.error('[Calendar MCP] Error creating event:', error.response?.data || error.message);
+      throw new Error(`Failed to create calendar event: ${error.response?.data?.error?.message || error.message}`);
+    }
   }
 
   async start() {

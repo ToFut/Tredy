@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Brain, Code, Search, FileText, CheckCircle, Warning, Cpu } from "@phosphor-icons/react";
+import { Brain, Code, MagnifyingGlass, FileText, CheckCircle, Warning, Cpu } from "@phosphor-icons/react";
 
 export default function AgentVisualizer({ status = 'idle', operations = [], thinking = false }) {
   const [currentStep, setCurrentStep] = useState(0);
@@ -18,7 +18,7 @@ export default function AgentVisualizer({ status = 'idle', operations = [], thin
     switch (type) {
       case 'thinking': return <Brain className="w-5 h-5" />;
       case 'coding': return <Code className="w-5 h-5" />;
-      case 'searching': return <Search className="w-5 h-5" />;
+      case 'searching': return <MagnifyingGlass className="w-5 h-5" />;
       case 'analyzing': return <FileText className="w-5 h-5" />;
       case 'processing': return <Cpu className="w-5 h-5" />;
       case 'complete': return <CheckCircle className="w-5 h-5" />;

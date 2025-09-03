@@ -11,6 +11,7 @@ import {
 } from "../ThoughtContainer";
 import StructuredResponse from "../../StructuredResponse";
 import ProcessingIndicator from "../../ProcessingIndicator";
+// import VisualSummary from "@/components/VisualSummary";
 
 const PromptReply = ({
   uuid,
@@ -150,10 +151,28 @@ function RenderAssistantChatContent({ message }) {
       {useStructured ? (
         <StructuredResponse content={contentRef.current} />
       ) : (
-        <span
-          className="break-words"
-          dangerouslySetInnerHTML={{ __html: renderMarkdown(contentRef.current) }}
-        />
+        <>
+          <span
+            className="break-words"
+            dangerouslySetInnerHTML={{ __html: renderMarkdown(contentRef.current) }}
+          />
+          {/* Auto-generate visual summary for long responses */}
+          {false && contentRef.current.length > 500 && (
+            <VisualSummary 
+              content={contentRef.current}
+              type="auto"
+              onExport={() => {
+                const blob = new Blob([contentRef.current], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `summary-${Date.now()}.txt`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+            />
+          )}
+        </>
       )}
     </div>
   );

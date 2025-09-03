@@ -113,13 +113,15 @@ export function SidebarMobileHeader() {
     <>
       <div
         aria-label="Show sidebar"
-        className="fixed top-0 left-0 right-0 z-10 flex justify-between items-center px-4 py-2 bg-theme-bg-sidebar light:bg-white text-slate-200 shadow-lg h-16"
+        className="fixed top-0 left-0 right-0 z-10 flex justify-between items-center px-4 py-3 bg-theme-bg-sidebar/95 light:bg-white/95 text-slate-200 app-backdrop-blur border-b border-white/10 app-safe-area"
+        style={{ height: 'var(--app-header-height)' }}
       >
         <button
           onClick={() => setShowSidebar(true)}
-          className="rounded-md p-2 flex items-center justify-center text-theme-text-secondary"
+          className="app-button rounded-xl p-3 flex items-center justify-center text-theme-text-secondary hover:bg-white/10 active:bg-white/20 transition-colors"
+          style={{ minWidth: 'var(--app-touch-target)', minHeight: 'var(--app-touch-target)' }}
         >
-          <List className="h-6 w-6" />
+          <List className="h-5 w-5" />
         </button>
         <div className="flex items-center justify-center flex-grow">
           <img

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { CaretDown, At, ChatCircle } from "@phosphor-icons/react";
+import { CaretDown, At, ChatCircle, Sparkle, Brain } from "@phosphor-icons/react";
 import { Tooltip } from "react-tooltip";
 import { useTranslation } from "react-i18next";
 
@@ -15,38 +15,43 @@ export default function ResponseModeSelector({
   const modes = [
     {
       id: "agent",
-      label: "Agent",
-      icon: At,
-      description: "AI agent with tools and enhanced capabilities",
-      color: "text-blue-400"
+      label: "Intelligence",
+      icon: Brain,
+      description: "Advanced reasoning with visual intelligence",
+      color: "text-purple-400",
+      gradient: "from-purple-500 to-pink-500"
     },
     {
       id: "regular", 
-      label: "Regular",
+      label: "Standard",
       icon: ChatCircle,
-      description: "Standard chat response",
-      color: "text-gray-400"
+      description: "Direct conversational responses",
+      color: "text-gray-400",
+      gradient: "from-gray-500 to-gray-600"
     }
   ];
 
   const currentMode = modes.find(mode => mode.id === responseMode) || modes[0];
 
   useEffect(() => {
-    function listenForOutsideClick() {
-      if (!showing || !dropdownRef.current) return false;
-      document.addEventListener("click", closeIfOutside);
+    if (!showing || !dropdownRef.current) return;
+    
+    function closeIfOutside(event) {
+      // Check if click is on the button or its children
+      const button = document.getElementById("response-mode-btn");
+      if (button && button.contains(event.target)) return;
+      
+      const isOutside = !dropdownRef?.current?.contains(event.target);
+      if (!isOutside) return;
+      setShowing(false);
     }
-    listenForOutsideClick();
-  }, [showing, dropdownRef.current]);
-
-  const closeIfOutside = ({ target }) => {
-    if (target.id === "response-mode-btn") return;
-    const isOutside = !dropdownRef?.current?.contains(target);
-    if (!isOutside) return;
-    setShowing(false);
-  };
+    
+    document.addEventListener("click", closeIfOutside);
+    return () => document.removeEventListener("click", closeIfOutside);
+  }, [showing]);
 
   const handleModeSelect = (modeId) => {
+    console.log('handleModeSelect called with:', modeId);
     setResponseMode(modeId);
     setShowing(false);
   };
@@ -84,7 +89,7 @@ export default function ResponseModeSelector({
       </div>
 
       {showing && (
-        <div className="absolute bottom-[80px] left-4 z-20">
+        <div className="absolute bottom-[80px] left-4 z-50">
           <div
             ref={dropdownRef}
             className="w-64 p-2 bg-theme-action-menu-bg rounded-lg shadow-lg border border-theme-sidebar-border flex-col justify-start items-start gap-1 inline-flex"

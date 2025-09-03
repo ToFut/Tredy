@@ -1,0 +1,18 @@
+{
+  "integrations": {
+    "gmail-integration": {
+      "provider": "google",
+      "auth_mode": "OAUTH2",
+      "authorization_url": "https://accounts.google.com/o/oauth2/v2/auth",
+      "token_url": "https://oauth2.googleapis.com/token",
+      "scope_separator": " ",
+      "default_scopes": [
+        "https://www.googleapis.com/auth/gmail.readonly",
+        "https://www.googleapis.com/auth/gmail.send",
+        "https://www.googleapis.com/auth/gmail.modify",
+        "https://www.googleapis.com/auth/userinfo.email"
+      ],
+      "credentials": {}
+    }
+  }
+}

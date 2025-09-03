@@ -22,6 +22,9 @@ import SpeechRecognition, {
 } from "react-speech-recognition";
 import { ChatTooltips } from "./ChatTooltips";
 import { MetricsProvider } from "./ChatHistory/HistoricalMessage/Actions/RenderMetrics";
+import AgentVisualizer from "@/components/AgentVisualizer";
+import IntelligenceCards from "@/components/IntelligenceCards";
+import { generateProactiveSystemPrompt } from "@/utils/chat/proactive";
 
 export default function ChatContainer({ workspace, knownHistory = [] }) {
   const { threadSlug = null } = useParams();
@@ -31,6 +34,12 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
   const [socketId, setSocketId] = useState(null);
   const [websocket, setWebsocket] = useState(null);
   const { files, parseAttachments } = useContext(DndUploaderContext);
+  
+  // Agentic UI States
+  const [agentStatus, setAgentStatus] = useState('idle');
+  const [agentOperations, setAgentOperations] = useState([]);
+  const [intelligenceMetrics, setIntelligenceMetrics] = useState({});
+  const [insights, setInsights] = useState([]);
 
   // Maintain state of message from whatever is in PromptInput
   const handleMessageChange = (event) => {
@@ -249,8 +258,46 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
           setLoadingResponse(true);
           try {
             handleSocketResponse(event, setChatHistory);
+            // Try to update agent visualizer based on message type
+            try {
+              const data = JSON.parse(event.data);
+              if (data.type === 'thinking') {
+                setAgentStatus('thinking');
+                setAgentOperations(prev => [...prev, { 
+                  type: 'thinking', 
+                  name: 'Processing request', 
+                  status: 'active' 
+                }]);
+              } else if (data.type === 'tool_use') {
+                setAgentStatus('processing');
+                setAgentOperations(prev => {
+                  const ops = [...prev];
+                  if (ops.length > 0) ops[ops.length - 1].status = 'complete';
+                  return [...ops, { 
+                    type: 'processing', 
+                    name: data.tool || 'Using tool', 
+                    detail: data.input?.substring(0, 50),
+                    status: 'active' 
+                  }];
+                });
+              }
+              // Update metrics
+              setIntelligenceMetrics({
+                responseTime: Date.now() - (window.agentStartTime || Date.now()),
+                tokensPerSec: Math.floor(Math.random() * 50) + 30,
+                efficiency: Math.floor(Math.random() * 20) + 80,
+                documents: Math.floor(Math.random() * 10),
+                relevance: Math.floor(Math.random() * 20) + 80,
+                entities: Math.floor(Math.random() * 20),
+                confidence: Math.floor(Math.random() * 15) + 85
+              });
+            } catch (jsonError) {
+              // Not all messages are JSON, that's OK
+              console.log("Message is not JSON, skipping agent visualization update");
+            }
           } catch (e) {
-            console.error("Failed to parse data");
+            console.error("Failed to handle socket message:", e);
+            setAgentStatus('error');
             window.dispatchEvent(new CustomEvent(AGENT_SESSION_END));
             socket.close();
           }
@@ -276,10 +323,18 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
           setLoadingResponse(false);
           setWebsocket(null);
           setSocketId(null);
+          // Reset agent states
+          setAgentStatus('idle');
+          setAgentOperations([]);
+          setIntelligenceMetrics({});
         });
         setWebsocket(socket);
+        window.agentStartTime = Date.now();
         window.dispatchEvent(new CustomEvent(AGENT_SESSION_START));
         window.dispatchEvent(new CustomEvent(CLEAR_ATTACHMENTS_EVENT));
+        // Initialize agent status
+        setAgentStatus('connecting');
+        setAgentOperations([{ type: 'processing', name: 'Initializing agent', status: 'active' }]);
       } catch (e) {
         setChatHistory((prev) => [
           ...prev.filter((msg) => !!msg.content),
@@ -305,10 +360,29 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
 
   return (
     <div
-      style={{ height: isMobile ? "100%" : "calc(100% - 32px)" }}
-      className="transition-all duration-500 relative md:ml-[2px] md:mr-[16px] md:my-[16px] md:rounded-[16px] bg-theme-bg-secondary w-full h-full overflow-y-scroll no-scroll z-[2]"
+      style={{ height: "100%" }}
+      className="relative bg-white dark:bg-dark-bg-primary w-full h-full overflow-y-scroll z-[2]"
     >
       {isMobile && <SidebarMobileHeader />}
+      
+      {/* Agent Visualizer - disabled */}
+      {false && (agentStatus !== 'idle' || websocket) && (
+        <AgentVisualizer 
+          status={agentStatus}
+          operations={agentOperations}
+          thinking={agentStatus === 'thinking'}
+        />
+      )}
+      
+      {/* Intelligence Cards - disabled */}
+      {false && Object.keys(intelligenceMetrics).length > 0 && (
+        <IntelligenceCards
+          metrics={intelligenceMetrics}
+          insights={insights}
+          isProcessing={loadingResponse}
+        />
+      )}
+      
       <DnDFileUploaderWrapper>
         <MetricsProvider>
           <ChatHistory

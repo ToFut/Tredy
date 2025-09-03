@@ -36,11 +36,20 @@ class MCPNangoBridge {
       return null;
     }
     
-    // Universal config for ALL providers - no more per-provider configs!
+    // Use specific MCP servers for each provider
+    const mcpServerMap = {
+      'gmail': '/Users/segevbin/anything-llm/server/gmail-mcp-server.js',
+      'google-calendar': '/Users/segevbin/anything-llm/server/simple-google-calendar-mcp.js',
+      // Add other providers as needed
+      'default': '/Users/segevbin/anything-llm/server/universal-nango-mcp.js'
+    };
+    
+    const mcpServer = mcpServerMap[provider] || mcpServerMap['default'];
+    
     return {
       type: "stdio",
       command: "node",
-      args: ["/Users/segevbin/anything-llm/server/universal-nango-mcp.js"],
+      args: [mcpServer],
       env: {
         NANGO_PROVIDER: provider,
         NANGO_PROVIDER_CONFIG_KEY: connector.nangoProviderConfigKey || `${provider}-getting-started`,
@@ -145,6 +154,14 @@ class MCPNangoBridge {
         category: "ecommerce",
         authType: "oauth",
         logo: "/icons/shopify.svg",
+      },
+      {
+        id: "gmail",
+        name: "Gmail",
+        description: "Email and communication",
+        category: "communication",
+        authType: "oauth",
+        logo: "/icons/gmail.svg",
       },
       {
         id: "google-calendar",

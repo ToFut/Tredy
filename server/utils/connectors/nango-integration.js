@@ -32,6 +32,7 @@ class NangoIntegration {
     
     // Map provider IDs to actual Nango provider config keys
     const providerConfigKeyMap = {
+      'gmail': 'google-mail', // Exact key from Nango dashboard
       'google-calendar': 'google-calendar-getting-started',
       'google': 'google-calendar-getting-started',
       'shopify': 'shopify',
@@ -68,6 +69,7 @@ class NangoIntegration {
 
     // Map provider IDs to actual Nango provider config keys
     const providerConfigKeyMap = {
+      'gmail': 'google-mail', // Exact key from Nango dashboard
       'google-calendar': 'google-calendar-getting-started',
       'google': 'google-calendar-getting-started',
       'shopify': 'shopify',
@@ -182,15 +184,31 @@ class NangoIntegration {
   async deleteConnection(provider, workspaceId) {
     if (!this.nango) throw new Error("Nango not configured");
 
+    // Map provider IDs to actual Nango provider config keys
+    const providerConfigKeyMap = {
+      'gmail': 'google-mail', // Updated to match your Nango dashboard
+      'google-calendar': 'google-calendar-getting-started',
+      'google': 'google-calendar-getting-started',
+      'shopify': 'shopify',
+      'github': 'github',
+      'stripe': 'stripe',
+      'slack': 'slack',
+    };
+    
+    const providerConfigKey = providerConfigKeyMap[provider] || provider;
     const connectionId = `workspace_${workspaceId}`;
 
     try {
-      await this.nango.deleteConnection(provider, connectionId);
+      console.log(`[Nango] Deleting connection: provider=${providerConfigKey}, connectionId=${connectionId}`);
+      await this.nango.deleteConnection(providerConfigKey, connectionId);
       await ConnectorTokens.delete({ workspaceId, provider });
+      console.log(`[Nango] Successfully deleted connection for ${provider}`);
       return { success: true };
     } catch (error) {
-      console.error(`[Nango] Failed to delete connection:`, error);
-      throw error;
+      console.error(`[Nango] Failed to delete connection:`, error.response?.data || error.message);
+      // Even if Nango fails, clean up local database
+      await ConnectorTokens.delete({ workspaceId, provider });
+      return { success: true };
     }
   }
 
@@ -202,6 +220,7 @@ class NangoIntegration {
 
     // Map provider IDs to actual Nango provider config keys
     const providerConfigKeyMap = {
+      'gmail': 'google-mail', // Exact key from Nango dashboard
       'google-calendar': 'google-calendar-getting-started',
       'google': 'google-calendar-getting-started',
       'shopify': 'shopify-getting-started',

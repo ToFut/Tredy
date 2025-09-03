@@ -86,10 +86,12 @@ const HistoricalMessage = ({
       onAnimationEnd={onEndAnimation}
       className={`${
         isDeleted ? "animate-remove" : ""
-      } flex justify-center items-end w-full group bg-theme-bg-chat`}
+      } flex justify-center w-full group ${
+        role === 'user' ? 'bg-white' : 'bg-[#f7f7f8]'
+      }`}
     >
-      <div className="py-8 px-4 w-full flex gap-x-5 md:max-w-[80%] flex-col">
-        <div className={`flex gap-x-5 ${alignmentCls}`}>
+      <div className="w-full max-w-3xl mx-auto px-4 py-5">
+        <div className="flex gap-x-4">
           <div className="flex flex-col items-center">
             <ProfileImage role={role} workspace={workspace} username={username} />
             <div className="mt-1 -mb-10">
@@ -112,23 +114,25 @@ const HistoricalMessage = ({
               saveChanges={saveEditedMessage}
             />
           ) : (
-            <div className="break-words">
-              <RenderChatContent
-                role={role}
-                message={message}
-                expanded={isLastMessage}
-              />
+            <div className="flex-1 min-w-0">
+              <div className="text-[15px] leading-[1.5] text-black whitespace-pre-wrap">
+                <RenderChatContent
+                  role={role}
+                  message={message}
+                  expanded={isLastMessage}
+                />
+              </div>
               {isRefusalMessage && (
                 <Link
                   data-tooltip-id="query-refusal-info"
                   data-tooltip-content={`${t("chat.refusal.tooltip-description")}`}
-                  className="!no-underline group !flex w-fit"
+                  className="!no-underline group !flex w-fit mt-3"
                   to={paths.chatModes()}
                   target="_blank"
                 >
                   <div className="flex flex-row items-center gap-x-1 group-hover:opacity-100 opacity-60 w-fit">
                     <Info className="text-theme-text-secondary" />
-                    <p className="!m-0 !p-0 text-theme-text-secondary !no-underline text-xs cursor-pointer">
+                    <p className="!m-0 !p-0 !no-underline text-xs cursor-pointer text-theme-text-secondary">
                       {t("chat.refusal.tooltip-title")}
                     </p>
                   </div>
@@ -138,22 +142,33 @@ const HistoricalMessage = ({
             </div>
           )}
         </div>
-        <div className="flex gap-x-5 ml-14">
-          <Actions
-            message={message}
-            feedbackScore={feedbackScore}
-            chatId={chatId}
-            slug={workspace?.slug}
-            isLastMessage={isLastMessage}
-            regenerateMessage={regenerateMessage}
-            isEditing={isEditing}
-            role={role}
-            forkThread={forkThread}
-            metrics={metrics}
-            alignmentCls={alignmentCls}
-          />
-        </div>
-        {role === "assistant" && <Citations sources={sources} />}
+        {/* Actions - ChatGPT style */}
+        {role === "assistant" && (
+          <div className="mt-2 ml-[46px] flex items-center gap-x-3 text-xs text-gray-400">
+            <button 
+              onClick={() => navigator.clipboard.writeText(message)}
+              className="hover:text-gray-600 transition-colors"
+            >
+              Copy
+            </button>
+            {isLastMessage && (
+              <>
+                <span className="text-gray-300">|</span>
+                <button 
+                  onClick={() => regenerateMessage()}
+                  className="hover:text-gray-600 transition-colors flex items-center gap-x-1"
+                >
+                  <span className="text-sm">↻</span> Regenerate
+                </button>
+              </>
+            )}
+          </div>
+        )}
+        {role === "assistant" && sources?.length > 0 && (
+          <div className="mt-3 ml-[46px]">
+            <Citations sources={sources} />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -162,13 +177,17 @@ const HistoricalMessage = ({
 function ProfileImage({ role, workspace, username }) {
   if (role === "assistant" && workspace.pfpUrl) {
     return (
-      <div className="flex flex-col items-center">
-        <div className="relative w-[35px] h-[35px] rounded-full flex-shrink-0 overflow-hidden">
-          <img
-            src={workspace.pfpUrl}
-            alt="Workspace profile picture"
-            className="absolute top-0 left-0 w-full h-full object-cover rounded-full bg-white"
-          />
+      <div className="flex-shrink-0">
+        <div className="relative w-[30px] h-[30px] rounded-full overflow-hidden bg-black flex items-center justify-center">
+          {workspace.pfpUrl ? (
+            <img
+              src={workspace.pfpUrl}
+              alt="AI Assistant"
+              className="absolute top-0 left-0 w-full h-full object-cover"
+            />
+          ) : (
+            <span className="text-white text-xs font-medium">AI</span>
+          )}
         </div>
       </div>
     );
@@ -178,18 +197,12 @@ function ProfileImage({ role, workspace, username }) {
   const displayName = role === "user" && username ? username : (role === "user" ? userFromStorage()?.username : workspace.slug);
   
   return (
-    <div className="flex flex-col items-center">
-      <UserIcon
-        user={{
-          uid: displayName,
-        }}
-        role={role}
-      />
-      {role === "user" && username && (
-        <span className="text-xs text-theme-text-secondary mt-1 truncate max-w-[60px]">
-          {username}
+    <div className="flex-shrink-0">
+      <div className="w-[30px] h-[30px] rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+        <span className="text-white text-xs font-medium">
+          {displayName?.charAt(0)?.toUpperCase() || "U"}
         </span>
-      )}
+      </div>
     </div>
   );
 }

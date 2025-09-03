@@ -262,7 +262,7 @@ export default function PromptInput({
   }
 
   return (
-    <div className="w-full fixed md:absolute bottom-0 left-0 z-10 md:z-0 flex flex-col justify-center items-center">
+    <div className="w-full fixed md:absolute bottom-0 left-0 z-10 md:z-0 flex flex-col justify-center items-center app-safe-area">
       <SlashCommands
         showing={showSlashCommand}
         setShowing={setShowSlashCommand}
@@ -277,12 +277,33 @@ export default function PromptInput({
       />
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-y-1 rounded-t-lg md:w-3/4 w-full mx-auto max-w-xl items-center"
+        className="w-full max-w-3xl mx-auto px-4 pb-6"
       >
-        <div className="flex items-center rounded-lg md:mb-4 md:w-full">
-          <div className="w-[95vw] md:w-[635px] bg-theme-bg-chat-input light:bg-white light:border-solid light:border-[1px] light:border-theme-chat-input-border shadow-sm rounded-2xl flex flex-col px-2 overflow-hidden">
+        <div className="relative">
+          <div className="relative flex items-end bg-white border border-gray-300 rounded-xl shadow-sm overflow-hidden"
+               style={{ minHeight: '52px' }}>
             <AttachmentManager attachments={attachments} />
-            <div className="flex items-center border-b border-theme-chat-input-border mx-3">
+            <div className="flex items-end w-full">
+              {/* Left side tools */}
+              <div className="flex items-center gap-1 p-2">
+                <AttachItem />
+                <SlashCommandsButton
+                  showing={showSlashCommand}
+                  setShowSlashCommand={setShowSlashCommand}
+                />
+                <AvailableAgentsButton
+                  showing={showAgents}
+                  setShowing={setShowAgents}
+                />
+                <ResponseModeSelector
+                  responseMode={responseMode}
+                  setResponseMode={setResponseMode}
+                  showing={showModeSelector}
+                  setShowing={setShowModeSelector}
+                />
+              </div>
+              
+              {/* Textarea */}
               <textarea
                 id={PROMPT_INPUT_ID}
                 ref={textareaRef}
@@ -300,60 +321,46 @@ export default function PromptInput({
                 }}
                 value={promptInput}
                 spellCheck={Appearance.get("enableSpellCheck")}
-                className={`border-none cursor-text max-h-[50vh] md:max-h-[350px] md:min-h-[40px] mx-2 md:mx-0 pt-[12px] w-full leading-5 md:text-md text-white bg-transparent placeholder:text-white/60 light:placeholder:text-theme-text-primary resize-none active:outline-none focus:outline-none flex-grow ${textSizeClass}`}
-                placeholder={t("chat_window.send_message")}
+                className="flex-1 border-none resize-none bg-transparent text-black placeholder:text-gray-400 text-[15px] leading-6 max-h-[200px] focus:outline-none py-3"
+                style={{ minHeight: '24px' }}
+                placeholder="Message ChatGPT..."
               />
-              {isStreaming ? (
-                <StopGenerationButton />
-              ) : (
-                <>
-                  <button
-                    ref={formRef}
-                    type="submit"
-                    disabled={isDisabled}
-                    className="border-none inline-flex justify-center rounded-2xl cursor-pointer opacity-60 hover:opacity-100 light:opacity-100 light:hover:opacity-60 ml-4 disabled:cursor-not-allowed group"
-                    data-tooltip-id="send-prompt"
-                    data-tooltip-content={
-                      isDisabled
-                        ? t("chat_window.attachments_processing")
-                        : t("chat_window.send")
-                    }
-                    aria-label={t("chat_window.send")}
-                  >
-                    <PaperPlaneRight
-                      color="var(--theme-sidebar-footer-icon-fill)"
-                      className="w-[22px] h-[22px] pointer-events-none text-theme-text-primary group-disabled:opacity-[25%]"
-                      weight="fill"
+              
+              {/* Right side - send button */}
+              <div className="p-3 pb-2">
+                {isStreaming ? (
+                  <StopGenerationButton />
+                ) : (
+                  <>
+                    <button
+                      ref={formRef}
+                      type="submit"
+                      disabled={isDisabled || !promptInput.trim()}
+                      className={`p-1.5 rounded-lg transition-colors ${
+                        !isDisabled && promptInput.trim() 
+                          ? 'bg-black hover:bg-gray-800 cursor-pointer' 
+                          : 'bg-gray-300 cursor-not-allowed'
+                      }`}
+                      aria-label="Send message"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path 
+                          d="M7 11L12 6L17 11M12 18V7" 
+                          stroke="white" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                    <Tooltip
+                      id="send-prompt"
+                      place="bottom"
+                      delayShow={300}
+                      className="tooltip !text-xs z-99"
                     />
-                    <span className="sr-only">Send message</span>
-                  </button>
-                  <Tooltip
-                    id="send-prompt"
-                    place="bottom"
-                    delayShow={300}
-                    className="tooltip !text-xs z-99"
-                  />
-                </>
-              )}
-            </div>
-            <div className="flex justify-between py-3.5 mx-3 mb-1">
-              <div className="flex gap-x-2">
-                <AttachItem />
-                <ResponseModeSelector
-                  responseMode={responseMode}
-                  setResponseMode={setResponseMode}
-                  showing={showModeSelector}
-                  setShowing={setShowModeSelector}
-                />
-                <SlashCommandsButton
-                  showing={showSlashCommand}
-                  setShowSlashCommand={setShowSlashCommand}
-                />
-                <TextSizeButton />
-                <LLMSelectorAction />
-              </div>
-              <div className="flex gap-x-2">
-                <SpeechToText sendCommand={sendCommand} />
+                  </>
+                )}
               </div>
             </div>
           </div>

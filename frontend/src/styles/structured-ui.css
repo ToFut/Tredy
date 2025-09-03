@@ -1,0 +1,396 @@
+/* ===========================
+   STRUCTURED UI IMPROVEMENTS
+   Genspark-inspired UI/UX
+   =========================== */
+
+/* 1. TYPOGRAPHY HIERARCHY */
+.structured-response h1 {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #7cd4fd 0%, #46c8ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.structured-response h2 {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 16px;
+  color: var(--theme-text-primary);
+  padding-left: 12px;
+  border-left: 3px solid var(--theme-button-cta);
+}
+
+.structured-response h3 {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  color: var(--theme-text-primary);
+}
+
+.structured-response p {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  color: var(--theme-text-secondary);
+}
+
+/* 2. CONTENT CARDS */
+.content-card {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-sidebar-border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.content-card:hover {
+  border-color: rgba(124, 212, 253, 0.3);
+  box-shadow: 0 0 0 1px rgba(124, 212, 253, 0.1),
+              0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* 3. VISUAL SEPARATORS */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    var(--theme-sidebar-border) 20%, 
+    var(--theme-sidebar-border) 80%, 
+    transparent);
+  margin: 24px 0;
+}
+
+.dot-separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  gap: 8px;
+}
+
+.dot-separator::before,
+.dot-separator::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--theme-sidebar-border);
+}
+
+.dot-separator span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--theme-text-secondary);
+}
+
+/* 4. INTERACTIVE ELEMENTS */
+.interactive-button {
+  padding: 8px 16px;
+  background: rgba(124, 212, 253, 0.1);
+  border: 1px solid rgba(124, 212, 253, 0.3);
+  border-radius: 8px;
+  color: var(--theme-button-cta);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.interactive-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(124, 212, 253, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.interactive-button:hover {
+  background: rgba(124, 212, 253, 0.2);
+  border-color: var(--theme-button-cta);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(124, 212, 253, 0.2);
+}
+
+.interactive-button:hover::before {
+  width: 100%;
+  height: 100%;
+}
+
+.interactive-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(124, 212, 253, 0.2);
+}
+
+/* 5. LOADING SKELETONS */
+.skeleton-loader {
+  position: relative;
+  overflow: hidden;
+  background: var(--theme-bg-secondary);
+  border-radius: 8px;
+}
+
+.skeleton-loader::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(124, 212, 253, 0.05) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.skeleton-line {
+  height: 14px;
+  margin-bottom: 8px;
+  background: var(--theme-bg-chat);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-line.short { width: 60%; }
+.skeleton-line.medium { width: 80%; }
+.skeleton-line.long { width: 100%; }
+
+/* 6. CONTENT TYPE INDICATORS */
+.content-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.content-indicator.research {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8B5CF6;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.content-indicator.code {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.content-indicator.analysis {
+  background: rgba(6, 182, 212, 0.1);
+  color: #06B6D4;
+  border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.content-indicator.creative {
+  background: rgba(236, 72, 153, 0.1);
+  color: #EC4899;
+  border: 1px solid rgba(236, 72, 153, 0.2);
+}
+
+/* 7. COLLAPSIBLE SECTIONS */
+.collapsible-section {
+  border: 1px solid var(--theme-sidebar-border);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.collapsible-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: var(--theme-bg-secondary);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.collapsible-header:hover {
+  background: rgba(124, 212, 253, 0.05);
+}
+
+.collapsible-header.active {
+  background: rgba(124, 212, 253, 0.08);
+  border-bottom: 1px solid var(--theme-sidebar-border);
+}
+
+.collapsible-icon {
+  transition: transform 0.3s ease;
+}
+
+.collapsible-header.active .collapsible-icon {
+  transform: rotate(90deg);
+}
+
+.collapsible-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.collapsible-content.expanded {
+  max-height: 2000px;
+  padding: 18px;
+}
+
+/* 8. PROGRESS INDICATORS */
+.progress-stages {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--theme-bg-secondary);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.progress-stage {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+
+.progress-stage.completed {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+}
+
+.progress-stage.active {
+  background: rgba(124, 212, 253, 0.1);
+  color: var(--theme-button-cta);
+  animation: pulse 1.5s infinite;
+}
+
+.progress-stage.pending {
+  background: transparent;
+  color: var(--theme-text-secondary);
+  opacity: 0.5;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.progress-icon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-icon.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* 9. TASK INPUT MODES - REMOVED */
+
+/* 10. QUICK ACTION CARDS - REMOVED */
+
+/* 11. FLOATING ACTION BUTTONS */
+.fab-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 100;
+}
+
+.fab {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--theme-button-cta);
+  color: var(--theme-bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(124, 212, 253, 0.3);
+  transition: all 0.3s ease;
+}
+
+.fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(124, 212, 253, 0.4);
+}
+
+/* 12. ENHANCED TOOLTIPS */
+.tooltip {
+  position: relative;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  background: var(--theme-bg-primary);
+  border: 1px solid var(--theme-sidebar-border);
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  margin-bottom: 8px;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+/* 13. RESPONSIVE IMPROVEMENTS */
+@media (max-width: 768px) {
+  .content-card {
+    padding: 16px;
+    border-radius: 8px;
+  }
+  
+  
+  .structured-response h1 { font-size: 24px; }
+  .structured-response h2 { font-size: 18px; }
+  .structured-response h3 { font-size: 15px; }
+}

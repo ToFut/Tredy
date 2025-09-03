@@ -291,6 +291,8 @@ const TRANSLATIONS = {
 
   // Chat Settings
   chat: {
+    "begin-conversation": "Begin a conversation to get started.",
+    "begin-conversation-anon": "Begin an anonymous conversation to get started.",
     llm: {
       title: "Workspace LLM Provider",
       description:

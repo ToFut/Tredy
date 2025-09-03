@@ -30,15 +30,34 @@ class NangoIntegration {
 
     const connectionId = `workspace_${workspaceId}`;
     
+    // Map provider IDs to actual Nango provider config keys
+    const providerConfigKeyMap = {
+      'google-calendar': 'google-calendar-getting-started',
+      'google': 'google-calendar-getting-started',
+      'shopify': 'shopify',
+      'github': 'github',
+      'stripe': 'stripe',
+      'slack': 'slack',
+    };
+    
+    const providerConfigKey = providerConfigKeyMap[provider] || provider;
+    
     // Return config for frontend Nango.auth() method
-    return {
+    const config = {
       publicKey: process.env.NANGO_PUBLIC_KEY,
       host: process.env.NANGO_HOST || "https://api.nango.dev",
       connectionId,
-      providerConfigKey: provider,
+      providerConfigKey,
       // These will be used by frontend
-      authUrl: `https://api.nango.dev/oauth/connect`,
+      authUrl: `${process.env.NANGO_HOST || "https://api.nango.dev"}/oauth/connect`,
     };
+    
+    console.log('[Nango] Auth config generated:', {
+      ...config,
+      publicKey: config.publicKey ? config.publicKey.substring(0, 8) + '...' : 'MISSING'
+    });
+    
+    return config;
   }
 
   /**
@@ -47,14 +66,26 @@ class NangoIntegration {
   async createConnection(provider, workspaceId, connectionId) {
     if (!this.nango) throw new Error("Nango not configured");
 
+    // Map provider IDs to actual Nango provider config keys
+    const providerConfigKeyMap = {
+      'google-calendar': 'google-calendar-getting-started',
+      'google': 'google-calendar-getting-started',
+      'shopify': 'shopify',
+      'github': 'github',
+      'stripe': 'stripe',
+      'slack': 'slack',
+    };
+    
+    const providerConfigKey = providerConfigKeyMap[provider] || provider;
+
     try {
       // Get connection to verify it exists
       const connection = await this.nango.getConnection(
-        provider,
+        providerConfigKey,
         connectionId || `workspace_${workspaceId}`
       );
 
-      // Store in database
+      // Store in database with current sync time
       await ConnectorTokens.upsert({
         workspaceId,
         provider,
@@ -63,6 +94,7 @@ class NangoIntegration {
         metadata: {
           provider_config_key: provider,
           created_at: connection.created_at,
+          lastSync: new Date().toISOString(),
         },
       });
 
@@ -168,10 +200,21 @@ class NangoIntegration {
   async getConnection(provider, workspaceId) {
     if (!this.nango) throw new Error("Nango not configured");
 
+    // Map provider IDs to actual Nango provider config keys
+    const providerConfigKeyMap = {
+      'google-calendar': 'google-calendar-getting-started',
+      'google': 'google-calendar-getting-started',
+      'shopify': 'shopify-getting-started',
+      'github': 'github-getting-started',
+      'stripe': 'stripe-getting-started',
+      'slack': 'slack-getting-started',
+    };
+    
+    const providerConfigKey = providerConfigKeyMap[provider] || provider;
     const connectionId = `workspace_${workspaceId}`;
 
     try {
-      const connection = await this.nango.getConnection(provider, connectionId);
+      const connection = await this.nango.getConnection(providerConfigKey, connectionId);
       return connection;
     } catch (error) {
       // Connection doesn't exist

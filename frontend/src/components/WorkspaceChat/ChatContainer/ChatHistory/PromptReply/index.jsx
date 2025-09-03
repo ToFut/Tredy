@@ -1,4 +1,4 @@
-import { memo, useRef, useEffect } from "react";
+import { memo, useRef, useEffect, useState } from "react";
 import { Warning } from "@phosphor-icons/react";
 import UserIcon from "../../../../UserIcon";
 import renderMarkdown from "@/utils/chat/markdown";
@@ -9,6 +9,8 @@ import {
   THOUGHT_REGEX_OPEN,
   ThoughtChainComponent,
 } from "../ThoughtContainer";
+import StructuredResponse from "../../StructuredResponse";
+import ProcessingIndicator from "../../ProcessingIndicator";
 
 const PromptReply = ({
   uuid,
@@ -31,7 +33,14 @@ const PromptReply = ({
         <div className="py-6 px-4 w-full flex gap-x-5 md:max-w-[80%] flex-col">
           <div className="flex gap-x-5">
             <WorkspaceProfileImage workspace={workspace} />
-            <div className="mt-3 ml-5 dot-falling light:invert"></div>
+            <div className="flex-1">
+              <ProcessingIndicator 
+                mode="smart"
+                currentStage={0}
+                visible={true}
+              />
+              <div className="mt-3 ml-5 dot-falling light:invert"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -97,6 +106,7 @@ export function WorkspaceProfileImage({ workspace }) {
 function RenderAssistantChatContent({ message }) {
   const contentRef = useRef("");
   const thoughtChainRef = useRef(null);
+  const [useStructured, setUseStructured] = useState(false);
 
   useEffect(() => {
     const thinking =
@@ -114,6 +124,10 @@ function RenderAssistantChatContent({ message }) {
       thoughtChainRef.current.updateContent(completeThoughtChain);
     }
 
+    // Check if content has markdown headers for structured display
+    const hasStructure = msgToRender.includes('## ') || msgToRender.includes('### ');
+    setUseStructured(hasStructure);
+    
     contentRef.current = msgToRender;
   }, [message]);
 
@@ -133,10 +147,14 @@ function RenderAssistantChatContent({ message }) {
           expanded={true}
         />
       )}
-      <span
-        className="break-words"
-        dangerouslySetInnerHTML={{ __html: renderMarkdown(contentRef.current) }}
-      />
+      {useStructured ? (
+        <StructuredResponse content={contentRef.current} />
+      ) : (
+        <span
+          className="break-words"
+          dangerouslySetInnerHTML={{ __html: renderMarkdown(contentRef.current) }}
+        />
+      )}
     </div>
   );
 }

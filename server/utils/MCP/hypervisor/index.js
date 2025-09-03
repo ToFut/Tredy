@@ -214,14 +214,28 @@ class MCPHypervisor {
     for (const name of Object.keys(this.mcps)) {
       if (!this.mcps[name]) continue;
       const mcp = this.mcps[name];
-      const childProcess = mcp.transport._process;
-      if (childProcess)
-        this.log(`Killing MCP ${name} (PID: ${childProcess.pid})`, {
-          killed: childProcess.kill(1),
-        });
+      
+      try {
+        // Safely access transport and process
+        if (mcp.transport && mcp.transport._process) {
+          const childProcess = mcp.transport._process;
+          this.log(`Killing MCP ${name} (PID: ${childProcess.pid})`, {
+            killed: childProcess.kill(1),
+          });
+        }
 
-      mcp.transport.close();
-      mcp.close();
+        // Close transport if it exists
+        if (mcp.transport && typeof mcp.transport.close === 'function') {
+          mcp.transport.close();
+        }
+        
+        // Close MCP client if it exists
+        if (typeof mcp.close === 'function') {
+          mcp.close();
+        }
+      } catch (error) {
+        this.log(`Error pruning MCP ${name}: ${error.message}`);
+      }
     }
     this.mcps = {};
     this.mcpLoadingResults = {};

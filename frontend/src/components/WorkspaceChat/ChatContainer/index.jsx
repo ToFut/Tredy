@@ -61,11 +61,15 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!message || message === "") return false;
+    // Get the actual value from the textarea element (which may have been modified with @agent prefix)
+    const textareaElement = document.getElementById(PROMPT_INPUT_ID);
+    const actualMessage = textareaElement ? textareaElement.value : message;
+    
+    if (!actualMessage || actualMessage === "") return false;
     const prevChatHistory = [
       ...chatHistory,
       {
-        content: message,
+        content: actualMessage,
         role: "user",
         attachments: parseAttachments(),
       },
@@ -73,7 +77,7 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
         content: "",
         role: "assistant",
         pending: true,
-        userMessage: message,
+        userMessage: actualMessage,
         animate: true,
       },
     ];

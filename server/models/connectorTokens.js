@@ -81,6 +81,29 @@ const ConnectorTokens = {
   },
 
   /**
+   * Update last sync timestamp
+   */
+  updateLastSync: async function (workspaceId, provider) {
+    try {
+      const connector = await prisma.connector_tokens.update({
+        where: {
+          workspaceId_provider: {
+            workspaceId: Number(workspaceId),
+            provider,
+          },
+        },
+        data: {
+          lastSync: new Date(),
+        },
+      });
+      return { connector, error: null };
+    } catch (error) {
+      console.error("Failed to update lastSync:", error);
+      return { connector: null, error: error.message };
+    }
+  },
+
+  /**
    * Delete a connection
    */
   delete: async function ({ workspaceId, provider }) {

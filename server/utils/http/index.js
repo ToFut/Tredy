@@ -116,6 +116,8 @@ function toValidNumber(number = null, fallback = null) {
   return Number(number);
 }
 
+const { validatedRequest } = require("../middleware/validatedRequest");
+
 module.exports = {
   reqBody,
   multiUserMode,
@@ -127,4 +129,5 @@ module.exports = {
   safeJsonParse,
   isValidUrl,
   toValidNumber,
+  validatedRequest,
 };

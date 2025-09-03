@@ -600,7 +600,7 @@ const Workspace = {
   // Connector management methods
   connectors: {
     getAvailable: async function (slug) {
-      return await fetch(`${API_BASE}/workspace/${slug}/connectors/available`, {
+      return await fetch(`${API_BASE}/v1/workspace/${slug}/connectors/available`, {
         method: "GET",
         headers: baseHeaders(),
       })
@@ -612,7 +612,7 @@ const Workspace = {
     },
 
     list: async function (slug) {
-      return await fetch(`${API_BASE}/workspace/${slug}/connectors`, {
+      return await fetch(`${API_BASE}/v1/workspace/${slug}/connectors`, {
         method: "GET",
         headers: baseHeaders(),
       })
@@ -624,7 +624,7 @@ const Workspace = {
     },
 
     connect: async function (slug, data) {
-      return await fetch(`${API_BASE}/workspace/${slug}/connectors/connect`, {
+      return await fetch(`${API_BASE}/v1/workspace/${slug}/connectors/connect`, {
         method: "POST",
         headers: baseHeaders(),
         body: JSON.stringify(data),
@@ -637,7 +637,7 @@ const Workspace = {
     },
 
     disconnect: async function (slug, provider) {
-      return await fetch(`${API_BASE}/workspace/${slug}/connectors/${provider}`, {
+      return await fetch(`${API_BASE}/v1/workspace/${slug}/connectors/${provider}`, {
         method: "DELETE",
         headers: baseHeaders(),
       })
@@ -649,9 +649,22 @@ const Workspace = {
     },
 
     sync: async function (slug, provider) {
-      return await fetch(`${API_BASE}/workspace/${slug}/connectors/${provider}/sync`, {
+      return await fetch(`${API_BASE}/v1/workspace/${slug}/connectors/${provider}/sync`, {
         method: "POST",
         headers: baseHeaders(),
+      })
+        .then((res) => res.json())
+        .catch((e) => {
+          console.error(e);
+          return { success: false, error: e.message };
+        });
+    },
+
+    callback: async function (slug, data) {
+      return await fetch(`${API_BASE}/v1/workspace/${slug}/connectors/callback`, {
+        method: "POST",
+        headers: baseHeaders(),
+        body: JSON.stringify(data),
       })
         .then((res) => res.json())
         .catch((e) => {

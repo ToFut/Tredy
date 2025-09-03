@@ -31,6 +31,31 @@ function apiSystemEndpoints(app) {
     }
   });
 
+  app.get("/v1/system/nango-config", async (_, response) => {
+    /*
+    #swagger.tags = ['System Settings']
+    #swagger.description = 'Get Nango configuration for frontend'
+    #swagger.responses[200] = {
+      description: "Nango configuration",
+      schema: {
+        publicKey: "string",
+        host: "string",
+        configured: "boolean"
+      }
+    }
+    */
+    try {
+      response.status(200).json({
+        publicKey: process.env.NANGO_PUBLIC_KEY || null,
+        host: process.env.NANGO_HOST || "https://api.nango.dev",
+        configured: !!(process.env.NANGO_PUBLIC_KEY && process.env.NANGO_SECRET_KEY)
+      });
+    } catch (error) {
+      console.error("Error in nango-config endpoint:", error);
+      response.status(500).json({ error: error.message });
+    }
+  });
+
   app.get("/v1/system", [validApiKey], async (_, response) => {
     /*
     #swagger.tags = ['System Settings']

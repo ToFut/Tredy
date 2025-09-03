@@ -186,29 +186,15 @@ export default function ChatHistory({
 
   if (history.length === 0 && !hasAttachments) {
     return (
-      <div className="flex flex-col h-full md:mt-0 pb-44 md:pb-40 w-full justify-end items-center">
-        <div className="flex flex-col items-center md:items-start md:max-w-[600px] w-full px-4">
-          <p className="text-white/60 text-lg font-base py-4">
-            {t("chat_window.welcome")}
+      <div className="flex flex-col h-full md:mt-0 pb-44 md:pb-40 w-full justify-center items-center">
+        <div className="flex h-full flex-col items-center justify-center">
+          <p className="text-theme-text-secondary text-opacity-60 text-center">
+            {workspace?.slug !== "home"
+              ? t("chat.begin-conversation")
+              : t("chat.begin-conversation-anon")}
           </p>
-          {!user || user.role !== "default" ? (
-            <p className="w-full items-center text-white/60 text-lg font-base flex flex-col md:flex-row gap-x-1">
-              {t("chat_window.get_started")}
-              <span
-                className="underline font-medium cursor-pointer"
-                onClick={showModal}
-              >
-                {t("chat_window.upload")}
-              </span>
-              {t("chat_window.or")}{" "}
-              <b className="font-medium italic">{t("chat_window.send_chat")}</b>
-            </p>
-          ) : (
-            <p className="w-full items-center text-white/60 text-lg font-base flex flex-col md:flex-row gap-x-1">
-              {t("chat_window.get_started_default")}{" "}
-              <b className="font-medium italic">{t("chat_window.send_chat")}</b>
-            </p>
-          )}
+        </div>
+        <div className="flex flex-col items-center md:items-start md:max-w-[600px] w-full px-4 mt-8">
           <WorkspaceChatSuggestions
             suggestions={workspace?.suggestedMessages ?? []}
             sendSuggestion={handleSendSuggestedMessage}

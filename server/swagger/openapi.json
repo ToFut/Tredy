@@ -2511,6 +2511,69 @@
         }
       }
     },
+    "/v1/system/nango-config": {
+      "get": {
+        "tags": [
+          "System Settings"
+        ],
+        "description": "Get Nango configuration for frontend",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Nango configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "publicKey": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "host": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "configured": {
+                      "type": "string",
+                      "example": "boolean"
+                    }
+                  },
+                  "xml": {
+                    "name": "main"
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "publicKey": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "host": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "configured": {
+                      "type": "string",
+                      "example": "boolean"
+                    }
+                  },
+                  "xml": {
+                    "name": "main"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/v1/system": {
       "get": {
         "tags": [

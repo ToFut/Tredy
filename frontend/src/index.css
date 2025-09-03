@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import structured UI improvements */
+@import './styles/structured-ui.css';
+
 * {
   -webkit-font-smoothing: antialiased;
 }

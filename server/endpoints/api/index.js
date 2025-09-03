@@ -9,6 +9,8 @@ const { apiWorkspaceThreadEndpoints } = require("./workspaceThread");
 const { apiUserManagementEndpoints } = require("./userManagement");
 const { apiOpenAICompatibleEndpoints } = require("./openai");
 const { apiEmbedEndpoints } = require("./embed");
+const { nangoWebhookEndpoints } = require("./webhooks/nango");
+const { oauthCallbackEndpoints } = require("./oauth/callback");
 
 // All endpoints must be documented and pass through the validApiKey Middleware.
 // How to JSDoc an endpoint
@@ -26,6 +28,8 @@ function developerEndpoints(app, router) {
   apiUserManagementEndpoints(router);
   apiOpenAICompatibleEndpoints(router);
   apiEmbedEndpoints(router);
+  nangoWebhookEndpoints(app);
+  oauthCallbackEndpoints(app);
 }
 
 module.exports = { developerEndpoints };

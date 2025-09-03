@@ -367,7 +367,7 @@ const System = {
         throw new Error("Failed to fetch logo!");
       })
       .catch((e) => {
-        console.log(e);
+        console.error("Error fetching logo:", e);
         return { isCustomLogo: false, logoURL: null };
       });
   },

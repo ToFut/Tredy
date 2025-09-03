@@ -24,6 +24,7 @@ import {
 import useTextSize from "@/hooks/useTextSize";
 import { useTranslation } from "react-i18next";
 import Appearance from "@/models/appearance";
+import ResponseModeSelector, { useResponseMode } from "./ResponseModeSelector";
 
 export const PROMPT_INPUT_ID = "primary-prompt-input";
 export const PROMPT_INPUT_EVENT = "set_prompt_input";
@@ -41,6 +42,7 @@ export default function PromptInput({
   const [promptInput, setPromptInput] = useState("");
   const { showAgents, setShowAgents } = useAvailableAgents();
   const { showSlashCommand, setShowSlashCommand } = useSlashCommands();
+  const { responseMode, setResponseMode, showModeSelector, setShowModeSelector } = useResponseMode();
   const formRef = useRef(null);
   const textareaRef = useRef(null);
   const [_, setFocused] = useState(false);
@@ -88,8 +90,21 @@ export default function PromptInput({
   const debouncedSaveState = debounce(saveCurrentState, 250);
 
   function handleSubmit(e) {
+    e.preventDefault();
     setFocused(false);
-    submit(e);
+    
+    // Modify the textarea value to include @agent prefix if in agent mode
+    if (responseMode === "agent" && !promptInput.startsWith("@agent")) {
+      // Update both the textarea value and state to include @agent prefix
+      const messageWithAgent = "@agent " + promptInput;
+      textareaRef.current.value = messageWithAgent;
+      setPromptInput(messageWithAgent);
+    }
+    
+    // Use setTimeout to ensure the value is set before submitting
+    setTimeout(() => {
+      submit(e);
+    }, 0);
   }
 
   function resetTextAreaHeight() {
@@ -242,7 +257,7 @@ export default function PromptInput({
   }
 
   return (
-    <div className="w-full fixed md:absolute bottom-0 left-0 z-10 md:z-0 flex justify-center items-center">
+    <div className="w-full fixed md:absolute bottom-0 left-0 z-10 md:z-0 flex flex-col justify-center items-center">
       <SlashCommands
         showing={showSlashCommand}
         setShowing={setShowSlashCommand}
@@ -319,13 +334,15 @@ export default function PromptInput({
             <div className="flex justify-between py-3.5 mx-3 mb-1">
               <div className="flex gap-x-2">
                 <AttachItem />
+                <ResponseModeSelector
+                  responseMode={responseMode}
+                  setResponseMode={setResponseMode}
+                  showing={showModeSelector}
+                  setShowing={setShowModeSelector}
+                />
                 <SlashCommandsButton
                   showing={showSlashCommand}
                   setShowSlashCommand={setShowSlashCommand}
-                />
-                <AvailableAgentsButton
-                  showing={showAgents}
-                  setShowAgents={setShowAgents}
                 />
                 <TextSizeButton />
                 <LLMSelectorAction />

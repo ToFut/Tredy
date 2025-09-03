@@ -14,7 +14,7 @@ function apiWorkspaceConnectorEndpoints(app) {
    * List available connector providers
    */
   app.get(
-    "/api/workspace/:slug/connectors/available",
+    "/v1/workspace/:slug/connectors/available",
     [validatedRequest],
     async (request, response) => {
       try {
@@ -32,12 +32,12 @@ function apiWorkspaceConnectorEndpoints(app) {
    * List connected services for workspace
    */
   app.get(
-    "/api/workspace/:slug/connectors",
+    "/v1/workspace/:slug/connectors",
     [validatedRequest],
     async (request, response) => {
       try {
         const { slug } = request.params;
-        const workspace = await Workspace.getBySlug(slug);
+        const workspace = await Workspace.get({ slug });
         
         if (!workspace) {
           return response.status(404).json({ error: "Workspace not found" });
@@ -57,14 +57,14 @@ function apiWorkspaceConnectorEndpoints(app) {
    * Initiate connection to a service (returns OAuth URL if using Nango)
    */
   app.post(
-    "/api/workspace/:slug/connectors/connect",
+    "/v1/workspace/:slug/connectors/connect",
     [validatedRequest],
     async (request, response) => {
       try {
         const { slug } = request.params;
         const { provider } = reqBody(request);
         
-        const workspace = await Workspace.getBySlug(slug);
+        const workspace = await Workspace.get({ slug });
         if (!workspace) {
           return response.status(404).json({ error: "Workspace not found" });
         }
@@ -83,35 +83,25 @@ function apiWorkspaceConnectorEndpoints(app) {
           });
         }
 
+        // Check if Nango is configured
+        if (!process.env.NANGO_SECRET_KEY || !process.env.NANGO_PUBLIC_KEY) {
+          return response.status(400).json({
+            error: "Nango integration not configured. Please set NANGO_SECRET_KEY and NANGO_PUBLIC_KEY environment variables.",
+          });
+        }
+
         // Generate OAuth config via Nango
-        if (process.env.NANGO_SECRET_KEY) {
+        try {
           const authConfig = await bridge.generateAuthUrl(provider, workspace.id);
           return response.status(200).json({
             success: true,
             authConfig, // Frontend will use Nango.auth() with this config
             message: "Please complete authentication",
           });
-        } else {
-          // Direct API key mode - expect credentials in request
-          const { credentials } = reqBody(request);
-          if (!credentials) {
-            return response.status(400).json({
-              error: "Credentials required when not using OAuth",
-            });
-          }
-
-          await ConnectorTokens.upsert({
-            workspaceId: workspace.id,
-            provider,
-            status: "connected",
-            metadata: credentials,
-          });
-
-          await bridge.updateMCPServersForWorkspace(workspace.id);
-
-          return response.status(200).json({
-            success: true,
-            message: "Connected successfully",
+        } catch (error) {
+          console.error("Nango auth config error:", error);
+          return response.status(500).json({
+            error: `Failed to generate authentication config: ${error.message}`,
           });
         }
       } catch (error) {
@@ -126,14 +116,14 @@ function apiWorkspaceConnectorEndpoints(app) {
    * OAuth callback handler (called after frontend completes OAuth)
    */
   app.post(
-    "/api/workspace/:slug/connectors/callback",
+    "/v1/workspace/:slug/connectors/callback",
     [validatedRequest],
     async (request, response) => {
       try {
         const { slug } = request.params;
         const { provider, connectionId } = reqBody(request);
         
-        const workspace = await Workspace.getBySlug(slug);
+        const workspace = await Workspace.get({ slug });
         if (!workspace) {
           return response.status(404).json({ error: "Workspace not found" });
         }
@@ -157,12 +147,12 @@ function apiWorkspaceConnectorEndpoints(app) {
    * Disconnect a service
    */
   app.delete(
-    "/api/workspace/:slug/connectors/:provider",
+    "/v1/workspace/:slug/connectors/:provider",
     [validatedRequest],
     async (request, response) => {
       try {
         const { slug, provider } = request.params;
-        const workspace = await Workspace.getBySlug(slug);
+        const workspace = await Workspace.get({ slug });
         
         if (!workspace) {
           return response.status(404).json({ error: "Workspace not found" });
@@ -186,18 +176,21 @@ function apiWorkspaceConnectorEndpoints(app) {
    * Trigger manual sync for a connector
    */
   app.post(
-    "/api/workspace/:slug/connectors/:provider/sync",
+    "/v1/workspace/:slug/connectors/:provider/sync",
     [validatedRequest],
     async (request, response) => {
       try {
         const { slug, provider } = request.params;
         const { syncName } = reqBody(request);
-        const workspace = await Workspace.getBySlug(slug);
+        const workspace = await Workspace.get({ slug });
         
         if (!workspace) {
           return response.status(404).json({ error: "Workspace not found" });
         }
 
+        // Update lastSync timestamp
+        await ConnectorTokens.updateLastSync(workspace.id, provider);
+        
         // Trigger sync via Nango if configured
         if (process.env.NANGO_SECRET_KEY && syncName) {
           const { NangoIntegration } = require("../../../utils/connectors/nango-integration");

@@ -36,50 +36,22 @@ class MCPNangoBridge {
       return null;
     }
     
-    const credentials = connection.credentials || {};
-
-    // Return MCP server config based on provider
-    const configs = {
-      shopify: {
-        command: "npx",
-        args: ["-y", "@shopify/mcp-server"],
-        env: {
-          SHOPIFY_STORE_URL: connector.metadata?.shop || credentials.shop,
-          SHOPIFY_ACCESS_TOKEN: credentials.access_token,
-        },
+    // Universal config for ALL providers - no more per-provider configs!
+    return {
+      type: "stdio",
+      command: "node",
+      args: ["/Users/segevbin/anything-llm/server/universal-nango-mcp.js"],
+      env: {
+        NANGO_PROVIDER: provider,
+        NANGO_PROVIDER_CONFIG_KEY: connector.nangoProviderConfigKey || `${provider}-getting-started`,
+        NANGO_SECRET_KEY: process.env.NANGO_SECRET_KEY || '7aac4fec-c1fa-4eba-9100-4b2ef9bc2b91',
+        NANGO_HOST: process.env.NANGO_HOST || 'https://api.nango.dev',
+        NANGO_CONNECTION_ID: `workspace_${workspaceId}`,
       },
-      google: {
-        command: "npx",
-        args: ["-y", "google-workspace-mcp"],
-        env: {
-          GOOGLE_ACCESS_TOKEN: credentials.access_token,
-          GOOGLE_REFRESH_TOKEN: credentials.refresh_token,
-        },
-      },
-      stripe: {
-        // Stripe MCP server uses HTTP endpoint
-        url: "https://mcp.stripe.com",
-        headers: {
-          Authorization: `Bearer ${credentials.access_token || credentials.secret_key}`,
-        },
-      },
-      github: {
-        command: "npx",
-        args: ["-y", "@modelcontextprotocol/server-github"],
-        env: {
-          GITHUB_PERSONAL_ACCESS_TOKEN: credentials.access_token,
-        },
-      },
-      slack: {
-        command: "npx",
-        args: ["-y", "@modelcontextprotocol/server-slack"],
-        env: {
-          SLACK_BOT_TOKEN: credentials.access_token,
-        },
-      },
+      anythingllm: {
+        autoStart: true
+      }
     };
-
-    return configs[provider] || null;
   }
 
   /**
@@ -106,7 +78,7 @@ class MCPNangoBridge {
     const configPath =
       process.env.NODE_ENV === "development"
         ? path.resolve(__dirname, "../../storage/plugins/anythingllm_mcp_servers.json")
-        : path.resolve(process.env.STORAGE_DIR, "plugins/anythingllm_mcp_servers.json");
+        : path.resolve(process.env.STORAGE_DIR || path.resolve(__dirname, "../../storage"), "plugins/anythingllm_mcp_servers.json");
 
     let existingConfig = { mcpServers: {} };
     if (fs.existsSync(configPath)) {

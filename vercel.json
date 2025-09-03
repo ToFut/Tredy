@@ -11,14 +11,10 @@
   ],
   "routes": [
     {
-      "src": "/",
-      "dest": "/frontend/dist/_index.html"
-    },
-    {
       "src": "/(.*)",
       "dest": "/frontend/dist/$1"
     }
   ],
-  "buildCommand": "cd frontend && npm install && npm run build",
+  "buildCommand": "cd frontend && npm install && npx vite build",
   "outputDirectory": "frontend/dist"
 }

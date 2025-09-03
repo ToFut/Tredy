@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Brain, Code, Search, FileText, CheckCircle, Warning, Cpu } from "@phosphor-icons/react";
 
-export default function AgentVisualizer({ status, operations = [], thinking = false }) {
+export default function AgentVisualizer({ status = 'idle', operations = [], thinking = false }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [particles, setParticles] = useState([]);
 

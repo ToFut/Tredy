@@ -1,9 +1,9 @@
+/* Import modern chat styles */
+@import './styles/modern-chat.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import modern chat styles */
-@import './styles/modern-chat.css';
 
 * {
   -webkit-font-smoothing: antialiased;

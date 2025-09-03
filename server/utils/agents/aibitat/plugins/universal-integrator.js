@@ -125,15 +125,14 @@ To disconnect: "disconnect ${service}"`;
 • OAuth configuration ✅
 • MCP tools ✅
 
-🔐 OAuth Setup Required:
-Click here to connect your ${service} account:
+🔐 **Connect Your ${service} Account:**
 
-[Connect ${service}](${authConfig.authUrl}?provider_config_key=${authConfig.providerConfigKey}&connection_id=${authConfig.connectionId}&public_key=${authConfig.publicKey})
+[connect:${service.toLowerCase()}]
 
 Once connected, you can:
-• Search data: "@agent search ${service} for..."
-• Create content: "@agent create ${service} post..."
-• Sync data: "@agent sync ${service}"
+• **Search data:** "@agent search ${service} for..."
+• **Create content:** "@agent create ${service} post..."
+• **Sync data:** "@agent sync ${service}"
 
 ⚡ The integration will auto-complete when you authorize access.`;
                   } else {
@@ -166,11 +165,28 @@ Manual Setup Required:
 3. Try: "test universal integrator"`;
                 }
               } else {
+                // Check if this is a known provider that can be connected directly
+                const knownProviders = ['linkedin', 'gmail', 'google-calendar', 'github', 'slack', 'shopify', 'airtable', 'notion'];
+                const serviceLower = service.toLowerCase();
+                
+                if (knownProviders.includes(serviceLower)) {
+                  return `⚠️ ${service} Integration Setup Incomplete
+
+The integration may exist but OAuth setup is needed. You can try connecting directly:
+
+[connect:${serviceLower}]
+
+**Alternative Options:**
+• Check if ${service} is configured in [Data Connectors](/workspace/settings/connectors)  
+• Verify Nango OAuth app credentials
+• Contact admin if ${service} app needs setup`;
+                }
+
                 return `❌ Failed to integrate ${service}. 
 
 Possible issues:
 • Service template not found
-• API discovery failed
+• API discovery failed  
 • Invalid service name
 
 Try one of these supported services:

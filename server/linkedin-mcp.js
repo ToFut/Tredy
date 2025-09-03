@@ -56,12 +56,11 @@ class LinkedInMCPServer {
 
   // Generate connection button for chat
   generateConnectButton() {
-    const workspaceSlug = process.env.WORKSPACE_SLUG || 'default';
     return `🔗 **LinkedIn Not Connected**
 
-To send messages and access LinkedIn, please connect your account:
+To access LinkedIn features, please connect your account:
 
-**[Connect LinkedIn](${process.env.ANYTHINGLLM_HOST || 'http://localhost:3000'}/workspace/${workspaceSlug}/settings/connectors)**
+[connect:linkedin]
 
 Or run: \`@agent integrate linkedin\` to set up the connection.`;
   }
@@ -99,15 +98,11 @@ Or run: \`@agent integrate linkedin\` to set up the connection.`;
             type: 'text',
             text: `🚀 **Connect LinkedIn Account**
 
-I'll help you connect your LinkedIn account. Here are two ways:
+Connect your LinkedIn account to access messaging, profile, and networking features:
 
-**Option 1: Quick Setup**
-Run: \`@agent integrate linkedin\` 
+[connect:linkedin]
 
-**Option 2: Manual Setup**
-1. Go to [Workspace Settings → Data Connectors](${process.env.ANYTHINGLLM_HOST || 'http://localhost:3000'}/workspace/${process.env.WORKSPACE_SLUG || 'default'}/settings/connectors)
-2. Click on LinkedIn
-3. Complete OAuth authorization
+**Alternative:** Run \`@agent integrate linkedin\` for full setup with sync capabilities.
 
 Once connected, I'll be able to:
 • ✉️ Help with LinkedIn messaging (with limitations)

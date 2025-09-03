@@ -1,0 +1,28 @@
+integrations:
+  linkedin:
+    syncs:
+      profile:
+        runs: every 15 minutes
+        auto_start: true
+        sync_type: incremental
+        track_deletes: false
+        output: Profile
+        description: Sync user profile data
+      posts:
+        runs: every 30 minutes
+        auto_start: false
+        sync_type: incremental
+        track_deletes: false
+        output: Posts
+        description: Sync user posts
+    actions:
+      create-post:
+        endpoint: POST /v2/ugcPosts
+        input: CreatePostInput
+        output: Post
+        description: Create a LinkedIn post
+      get-profile:
+        endpoint: GET /v2/userinfo
+        input: GetProfileInput
+        output: Profile
+        description: Get user profile

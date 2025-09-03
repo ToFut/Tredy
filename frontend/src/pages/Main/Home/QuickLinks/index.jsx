@@ -53,30 +53,33 @@ export default function QuickLinks() {
   };
 
   return (
-    <div>
-      <h1 className="text-theme-home-text uppercase text-sm font-semibold mb-4">
+    <div className="animate-fadeIn">
+      <h1 className="text-theme-home-text uppercase text-sm font-bold mb-6 tracking-wide">
         {t("main-page.quickLinks.title")}
       </h1>
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <button
           onClick={sendChat}
-          className="h-[45px] text-sm font-semibold bg-theme-home-button-secondary rounded-lg text-theme-home-button-secondary-text flex items-center justify-center gap-x-2.5 transition-all duration-200 hover:bg-theme-home-button-secondary-hover hover:text-theme-home-button-secondary-hover-text"
+          className="group h-[60px] text-sm font-semibold glass-effect rounded-2xl text-theme-home-button-secondary-text flex items-center justify-center gap-x-3 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg border border-theme-sidebar-border hover:border-purple-500/30 animate-slideInLeft"
+          style={{ animationDelay: '0.1s' }}
         >
-          <ChatCenteredDots size={16} />
+          <ChatCenteredDots size={20} className="group-hover:animate-pulse" />
           {t("main-page.quickLinks.sendChat")}
         </button>
         <button
           onClick={embedDocument}
-          className="h-[45px] text-sm font-semibold bg-theme-home-button-secondary rounded-lg text-theme-home-button-secondary-text flex items-center justify-center gap-x-2.5 transition-all duration-200 hover:bg-theme-home-button-secondary-hover hover:text-theme-home-button-secondary-hover-text"
+          className="group h-[60px] text-sm font-semibold glass-effect rounded-2xl text-theme-home-button-secondary-text flex items-center justify-center gap-x-3 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg border border-theme-sidebar-border hover:border-blue-500/30 animate-slideInLeft"
+          style={{ animationDelay: '0.2s' }}
         >
-          <FileArrowDown size={16} />
+          <FileArrowDown size={20} className="group-hover:animate-bounce" />
           {t("main-page.quickLinks.embedDocument")}
         </button>
         <button
           onClick={createWorkspace}
-          className="h-[45px] text-sm font-semibold bg-theme-home-button-secondary rounded-lg text-theme-home-button-secondary-text flex items-center justify-center gap-x-2.5 transition-all duration-200 hover:bg-theme-home-button-secondary-hover hover:text-theme-home-button-secondary-hover-text"
+          className="group h-[60px] text-sm font-semibold glass-effect rounded-2xl text-theme-home-button-secondary-text flex items-center justify-center gap-x-3 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg border border-theme-sidebar-border hover:border-green-500/30 animate-slideInLeft"
+          style={{ animationDelay: '0.3s' }}
         >
-          <Plus size={16} />
+          <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
           {t("main-page.quickLinks.createWorkspace")}
         </button>
       </div>

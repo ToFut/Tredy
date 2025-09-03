@@ -20,6 +20,7 @@ import paths from "@/utils/paths";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { chatQueryRefusalResponse } from "@/utils/chat";
+import InteractiveConnectionButton from "../../../InteractiveConnectionButton";
 
 const HistoricalMessage = ({
   uuid = v4(),
@@ -86,9 +87,7 @@ const HistoricalMessage = ({
       onAnimationEnd={onEndAnimation}
       className={`${
         isDeleted ? "animate-remove" : ""
-      } flex justify-center w-full group ${
-        role === 'user' ? 'bg-white' : 'bg-[#f7f7f8]'
-      }`}
+      } flex justify-center w-full group bg-white hover:bg-gray-50/50 transition-colors border-b border-gray-100`}
     >
       <div className="w-full max-w-3xl mx-auto px-4 py-5">
         <div className="flex gap-x-4">
@@ -120,6 +119,7 @@ const HistoricalMessage = ({
                   role={role}
                   message={message}
                   expanded={isLastMessage}
+                  workspace={workspace}
                 />
               </div>
               {isRefusalMessage && (
@@ -198,9 +198,13 @@ function ProfileImage({ role, workspace, username }) {
   
   return (
     <div className="flex-shrink-0">
-      <div className="w-[30px] h-[30px] rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-        <span className="text-white text-xs font-medium">
-          {displayName?.charAt(0)?.toUpperCase() || "U"}
+      <div className={`w-[32px] h-[32px] rounded-lg flex items-center justify-center ${
+        role === "user" 
+          ? "bg-gradient-to-br from-emerald-500 to-teal-600" 
+          : "bg-gradient-to-br from-blue-500 to-purple-600"
+      }`}>
+        <span className="text-white text-sm font-semibold">
+          {role === "user" ? (displayName?.charAt(0)?.toUpperCase() || "U") : "AI"}
         </span>
       </div>
     </div>
@@ -238,7 +242,30 @@ function ChatAttachments({ attachments = [] }) {
 }
 
 const RenderChatContent = memo(
-  ({ role, message, expanded = false }) => {
+  ({ role, message, expanded = false, workspace }) => {
+    // Process OAuth connection patterns
+    const processConnectionPatterns = (text) => {
+      // Pattern: [connect:provider]
+      const connectionPattern = /\[connect:([^\]]+)\]/g;
+      let processedText = text;
+      const connections = [];
+      
+      let match;
+      while ((match = connectionPattern.exec(text)) !== null) {
+        const provider = match[1];
+        const buttonId = `oauth-btn-${provider}-${Math.random().toString(36).substr(2, 9)}`;
+        connections.push({ provider, buttonId });
+        
+        // Replace pattern with placeholder div
+        processedText = processedText.replace(
+          match[0], 
+          `<div id="${buttonId}" class="oauth-connection-placeholder"></div>`
+        );
+      }
+      
+      return { processedText, connections };
+    };
+
     // If the message is not from the assistant, we can render it directly
     // as normal since the user cannot think (lol)
     if (role !== "assistant")
@@ -273,6 +300,9 @@ const RenderChatContent = memo(
       msgToRender = splitMessage[1];
     }
 
+    // Process connection patterns
+    const { processedText, connections } = processConnectionPatterns(msgToRender);
+
     return (
       <>
         {thoughtChain && (
@@ -281,9 +311,17 @@ const RenderChatContent = memo(
         <span
           className="flex flex-col gap-y-1"
           dangerouslySetInnerHTML={{
-            __html: DOMPurify.sanitize(renderMarkdown(msgToRender)),
+            __html: DOMPurify.sanitize(renderMarkdown(processedText)),
           }}
         />
+        {connections.map(({ provider, buttonId }) => (
+          <InteractiveConnectionButton
+            key={buttonId}
+            provider={provider}
+            workspace={workspace}
+            placeholderId={buttonId}
+          />
+        ))}
       </>
     );
   },

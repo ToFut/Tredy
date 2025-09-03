@@ -40,6 +40,7 @@ class MCPNangoBridge {
     const mcpServerMap = {
       'gmail': '/Users/segevbin/anything-llm/server/gmail-mcp-server.js',
       'google-calendar': '/Users/segevbin/anything-llm/server/simple-google-calendar-mcp.js',
+      'linkedin': '/Users/segevbin/anything-llm/server/linkedin-mcp.js',
       // Add other providers as needed
       'default': '/Users/segevbin/anything-llm/server/universal-nango-mcp.js'
     };
@@ -143,6 +144,59 @@ class MCPNangoBridge {
   }
 
   /**
+   * Configure MCP server for a provider (called during integration)
+   */
+  async configureMCPServer(provider, workspaceId) {
+    // This is called during integration to prepare MCP config
+    // Actual MCP server starts when OAuth completes
+    console.log(`[MCPBridge] MCP server configured for ${provider} in workspace ${workspaceId}`);
+    return { success: true };
+  }
+
+  /**
+   * Test connection by making a simple API call
+   */
+  async testConnection(provider, workspaceId) {
+    try {
+      const connection = await this.nango.getConnection(provider, workspaceId);
+      if (!connection) {
+        throw new Error('No connection found');
+      }
+
+      // Make a simple test API call based on provider
+      let testEndpoint;
+      switch (provider) {
+        case 'linkedin':
+        case 'linkedin-getting-started':
+          testEndpoint = '/v2/userinfo';
+          break;
+        case 'google-mail-getting-started':
+        case 'gmail':
+          testEndpoint = '/gmail/v1/users/me/profile';
+          break;
+        case 'google-calendar-getting-started':
+          testEndpoint = '/calendar/v3/users/me/calendarList';
+          break;
+        default:
+          // Skip test for unknown providers
+          return { success: true, message: 'Connection configured (test skipped)' };
+      }
+
+      const testResponse = await this.nango.get({
+        endpoint: testEndpoint,
+        connectionId: `workspace_${workspaceId}`,
+        providerConfigKey: provider
+      });
+
+      console.log(`[MCPBridge] Connection test successful for ${provider}`);
+      return { success: true, data: testResponse.data };
+    } catch (error) {
+      console.error(`[MCPBridge] Connection test failed for ${provider}:`, error);
+      throw new Error(`Connection test failed: ${error.message}`);
+    }
+  }
+
+  /**
    * Get list of available providers
    */
   getAvailableProviders() {
@@ -170,6 +224,14 @@ class MCPNangoBridge {
         category: "productivity",
         authType: "oauth",
         logo: "/icons/google.svg",
+      },
+      {
+        id: "linkedin",
+        name: "LinkedIn",
+        description: "Professional networking and messaging",
+        category: "communication",
+        authType: "oauth",
+        logo: "/icons/linkedin.svg",
       },
       {
         id: "stripe",

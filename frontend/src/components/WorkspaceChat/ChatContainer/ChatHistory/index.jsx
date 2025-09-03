@@ -4,7 +4,7 @@ import PromptReply from "./PromptReply";
 import StatusResponse from "./StatusResponse";
 import { useManageWorkspaceModal } from "../../../Modals/ManageWorkspace";
 import ManageWorkspace from "../../../Modals/ManageWorkspace";
-import { ArrowDown } from "@phosphor-icons/react";
+import { ArrowDown, Brain, Sparkle, Lightning, ChatsCircle } from "@phosphor-icons/react";
 import debounce from "lodash.debounce";
 import useUser from "@/hooks/useUser";
 import Chartable from "./Chartable";
@@ -192,20 +192,58 @@ export default function ChatHistory({
 
   if (history.length === 0 && !hasAttachments) {
     return (
-      <div className="flex flex-col h-full md:mt-0 pb-44 md:pb-40 w-full justify-center items-center">
-        <div className="flex h-full flex-col items-center justify-center">
-          <p className="text-theme-text-secondary text-opacity-60 text-center">
+      <div className="flex flex-col h-full md:mt-0 pb-44 md:pb-40 w-full justify-center items-center bg-gradient-to-b from-white via-gray-50/30 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+        <div className="flex h-full flex-col items-center justify-center px-4 max-w-2xl">
+          {/* Enhanced animated logo */}
+          <div className="relative mb-6">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-3xl blur-2xl opacity-30 animate-pulse" />
+            <div className="relative w-20 h-20 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 rounded-3xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-transform">
+              <Brain className="w-10 h-10 text-white" weight="bold" />
+              <Sparkle className="absolute -top-2 -right-2 w-6 h-6 text-amber-400 animate-pulse" />
+            </div>
+          </div>
+          
+          {/* Enhanced heading */}
+          <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            {workspace?.slug !== "home" ? "Ready to assist you" : "Welcome to AnythingLLM"}
+          </h3>
+          
+          {/* Enhanced description */}
+          <p className="text-gray-600 dark:text-gray-400 text-center max-w-md mb-8 leading-relaxed">
             {workspace?.slug !== "home"
-              ? t("chat.begin-conversation")
-              : t("chat.begin-conversation-anon")}
+              ? "I'm here to help with questions, ideas, and documents. Let's explore together."
+              : "Your AI workspace for intelligent conversations and document analysis."}
           </p>
+          
+          {/* Feature highlights */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8 w-full max-w-lg">
+            <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+              <Lightning className="w-5 h-5 text-purple-500" />
+              <span className="text-xs text-gray-600 dark:text-gray-400">Fast</span>
+            </div>
+            <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+              <Brain className="w-5 h-5 text-pink-500" />
+              <span className="text-xs text-gray-600 dark:text-gray-400">Smart</span>
+            </div>
+            <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+              <ChatsCircle className="w-5 h-5 text-blue-500" />
+              <span className="text-xs text-gray-600 dark:text-gray-400">Interactive</span>
+            </div>
+            <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+              <Sparkle className="w-5 h-5 text-amber-500" />
+              <span className="text-xs text-gray-600 dark:text-gray-400">Creative</span>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col items-center md:items-start md:max-w-[600px] w-full px-4 mt-8">
+        
+        {/* Enhanced suggestions */}
+        <div className="flex flex-col items-center md:items-start md:max-w-[700px] w-full px-4 mt-auto">
           <WorkspaceChatSuggestions
             suggestions={workspace?.suggestedMessages ?? []}
             sendSuggestion={handleSendSuggestedMessage}
           />
         </div>
+        
         {showing && (
           <ManageWorkspace
             hideModal={hideModal}
@@ -259,18 +297,44 @@ const getLastMessageInfo = (history) => {
 
 function WorkspaceChatSuggestions({ suggestions = [], sendSuggestion }) {
   if (suggestions.length === 0) return null;
+  
+  const icons = [Lightning, Brain, Sparkle, ChatsCircle];
+  
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-theme-text-primary text-xs mt-10 w-full justify-center">
-      {suggestions.map((suggestion, index) => (
-        <button
-          key={index}
-          className="text-left p-2.5 rounded-xl bg-theme-sidebar-footer-icon hover:bg-theme-sidebar-footer-icon-hover border border-theme-border"
-          onClick={() => sendSuggestion(suggestion.heading, suggestion.message)}
-        >
-          <p className="font-semibold">{suggestion.heading}</p>
-          <p>{suggestion.message}</p>
-        </button>
-      ))}
+    <div className="w-full">
+      <div className="flex items-center justify-center gap-2 mb-4">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-700 to-transparent flex-1" />
+        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3">Quick Start</p>
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-700 to-transparent flex-1" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
+        {suggestions.map((suggestion, index) => {
+          const Icon = icons[index % icons.length];
+          return (
+            <button
+              key={index}
+              className="relative text-left p-4 rounded-xl bg-white dark:bg-gray-800 hover:bg-gradient-to-br hover:from-purple-50 hover:to-pink-50 dark:hover:from-purple-900/20 dark:hover:to-pink-900/20 border border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-lg transition-all group transform hover:scale-[1.02] active:scale-[0.98]"
+              onClick={() => sendSuggestion(suggestion.heading, suggestion.message)}
+            >
+              <div className="absolute -top-2 -left-2 w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                <Icon className="w-4 h-4 text-white" weight="bold" />
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 group-hover:from-purple-100 group-hover:to-pink-100 dark:group-hover:from-purple-900/30 dark:group-hover:to-pink-900/30 flex items-center justify-center flex-shrink-0 transition-colors">
+                  <Icon className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-gray-900 dark:text-white group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors mb-1">
+                    {suggestion.heading}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{suggestion.message}</p>
+                </div>
+              </div>
+              <Sparkle className="absolute bottom-2 right-2 w-4 h-4 text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity animate-pulse" />
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

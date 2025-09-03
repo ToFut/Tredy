@@ -19,7 +19,7 @@ const { getLLMProviderClass } = require("../../../helpers");
 const { parseLMStudioBasePath } = require("../../../AiProviders/lmStudio");
 
 const DEFAULT_WORKSPACE_PROMPT =
-  "You are a helpful ai assistant who can assist the user and use tools available to help answer the users prompts and questions.";
+  "You are a helpful ai assistant who can assist the user and use tools available to help answer the users prompts and questions. When a user asks to connect to a service (like 'connect me with gmail', 'I want to connect to slack', etc.), ALWAYS use the 'suggest_integrations' function first to provide them with an interactive connection button. Do not try to directly connect using other tools unless the user has already authorized the connection.";
 
 class Provider {
   _client;

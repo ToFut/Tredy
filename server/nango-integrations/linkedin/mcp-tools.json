@@ -1,0 +1,74 @@
+{
+  "tools": [
+    {
+      "name": "search_profile",
+      "description": "Search Profile records",
+      "parameters": {
+        "query": {
+          "type": "string",
+          "description": "Search query"
+        },
+        "limit": {
+          "type": "number",
+          "default": 10
+        }
+      }
+    },
+    {
+      "name": "search_post",
+      "description": "Search Post records",
+      "parameters": {
+        "query": {
+          "type": "string",
+          "description": "Search query"
+        },
+        "limit": {
+          "type": "number",
+          "default": 10
+        }
+      }
+    },
+    {
+      "name": "create_post",
+      "description": "Create a LinkedIn post",
+      "parameters": {
+        "input": {
+          "type": "object",
+          "description": "Action input data"
+        }
+      }
+    },
+    {
+      "name": "get_profile",
+      "description": "Get user profile",
+      "parameters": {
+        "input": {
+          "type": "object",
+          "description": "Action input data"
+        }
+      }
+    },
+    {
+      "name": "sync_profile",
+      "description": "Sync user profile data",
+      "parameters": {
+        "force": {
+          "type": "boolean",
+          "default": false,
+          "description": "Force full sync"
+        }
+      }
+    },
+    {
+      "name": "sync_posts",
+      "description": "Sync user posts",
+      "parameters": {
+        "force": {
+          "type": "boolean",
+          "default": false,
+          "description": "Force full sync"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "service": "linkedin",
+  "name": "LinkedIn Professional Network",
+  "baseUrl": "https://api.linkedin.com",
+  "version": "v2",
+  "authType": "oauth2",
+  "provider": "linkedin",
+  "scopes": [
+    "openid",
+    "profile", 
+    "email",
+    "w_member_social"
+  ],
+  "capabilities": ["sync", "create", "search"],
+  "limitations": {
+    "messaging": "Read access restricted to partners",
+    "connections": "List access removed from public API",  
+    "search": "Limited by LinkedIn API"
+  },
+  "syncs": {
+    "profile": {
+      "runs": "every 15 minutes",
+      "endpoint": "GET /v2/userinfo",
+      "auto_start": true,
+      "description": "Sync user profile data"
+    },
+    "posts": {
+      "runs": "every 30 minutes", 
+      "endpoint": "GET /v2/ugcPosts",
+      "auto_start": false,
+      "description": "Sync user posts"
+    }
+  },
+  "actions": {
+    "create-post": {
+      "endpoint": "POST /v2/ugcPosts",
+      "description": "Create a LinkedIn post",
+      "input": "CreatePostInput",
+      "output": "Post"
+    },
+    "get-profile": {
+      "endpoint": "GET /v2/userinfo", 
+      "description": "Get user profile",
+      "input": "GetProfileInput",
+      "output": "Profile"
+    }
+  },
+  "models": [
+    {
+      "name": "Profile",
+      "description": "LinkedIn user profile",
+      "fields": [
+        {"name": "sub", "type": "string", "required": true, "description": "User ID"},
+        {"name": "name", "type": "string", "required": true, "description": "Full name"},
+        {"name": "email", "type": "string", "required": false, "description": "Email address"},
+        {"name": "email_verified", "type": "boolean", "required": false},
+        {"name": "locale", "type": "object", "required": false}
+      ],
+      "vectorFields": ["name"],
+      "searchableFields": ["name", "email"],
+      "primaryKey": "sub"
+    },
+    {
+      "name": "Post",
+      "description": "LinkedIn post",
+      "fields": [
+        {"name": "id", "type": "string", "required": true, "description": "Post ID"},
+        {"name": "text", "type": "string", "required": true, "description": "Post content"},
+        {"name": "author", "type": "string", "required": true, "description": "Author URN"},
+        {"name": "lifecycleState", "type": "string", "required": false},
+        {"name": "created", "type": "object", "required": false}
+      ],
+      "vectorFields": ["text"],
+      "searchableFields": ["text"],
+      "primaryKey": "id"
+    }
+  ],
+  "headers": {
+    "X-Restli-Protocol-Version": "2.0.0",
+    "LinkedIn-Version": "202401"
+  },
+  "nangoProviderKey": "linkedin",
+  "webhooks": {
+    "enabled": true,
+    "events": ["sync.success", "sync.error", "auth.success"]
+  }
+}

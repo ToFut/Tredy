@@ -1,0 +1,33 @@
+{
+  "models": [
+    {
+      "name": "Profile",
+      "vectorFields": [
+        "name"
+      ],
+      "searchableFields": [
+        "name",
+        "email"
+      ],
+      "metadata": [
+        "id",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "name": "Post",
+      "vectorFields": [
+        "text"
+      ],
+      "searchableFields": [
+        "text"
+      ],
+      "metadata": [
+        "id",
+        "created_at",
+        "updated_at"
+      ]
+    }
+  ]
+}

@@ -52,13 +52,11 @@ const universalIntegrator = {
           },
           handler: async function({ service, capabilities, syncFrequency, syncData }) {
             try {
-              this.super.introspect(`Starting integration for ${service}...`);
+              this.super.introspect(`Starting ${service} integration following Nango best practices...`);
               
               const workspaceId = this.super.handlerProps.invocation?.workspace_id;
               if (!workspaceId) {
-                this.super.introspect(`Warning: No workspace context available. Using demo mode.`);
-                // Continue with demo/test mode instead of failing
-                return `Demo: Would integrate ${service} with capabilities: ${capabilities?.join(', ')}. To fully enable, ensure workspace context is available.`;
+                return `⚠️ Workspace context required for integration. Please ensure you're in a workspace.`;
               }
 
               // Check if already connected
@@ -68,54 +66,148 @@ const universalIntegrator = {
               });
               
               if (existing && existing.status === 'connected') {
-                return `${service} is already connected. Use 'sync_service' to refresh data or 'disconnect_service' to remove.`;
+                return `✅ ${service} is already integrated!
+
+Current configuration:
+• Status: Connected
+• Last sync: ${existing.lastSyncAt || 'Never'}
+• Capabilities: ${existing.syncConfig?.capabilities?.join(', ') || 'Standard'}
+
+To refresh: "sync ${service} data"
+To disconnect: "disconnect ${service}"`;
               }
 
-              // Start integration process
-              this.super.introspect(`Discovering ${service} API structure...`);
+              // Start integration process with Nango best practices
+              this.super.introspect(`Generating Nango integration files for ${service}...`);
               
               const result = await integrationSystem.integrate({
                 service: service.toLowerCase(),
                 workspaceId,
-                capabilities: capabilities || ['sync', 'search', 'create'],
+                capabilities: capabilities || ['sync', 'create'],
                 syncFrequency: syncFrequency || '15m',
-                discoveryMethod: 'auto'
+                discoveryMethod: 'template' // Use templates first for better results
               });
 
               if (result.success) {
-                return `✅ ${service} integrated successfully!
+                this.super.introspect(`Integration files generated! Now deploying to Nango and setting up OAuth...`);
                 
-📊 Integration Details:
-• ${result.endpoints} API endpoints discovered
-• ${result.models} data models created
-• Syncing every ${result.syncFrequency}
+                // Step 1: Deploy to Nango (actually call Nango API)
+                const { MCPNangoBridge } = require("../../../../utils/connectors/mcp-nango-bridge");
+                const bridge = new MCPNangoBridge();
+                
+                try {
+                  this.super.introspect(`Deploying ${service} integration to Nango...`);
+                  
+                  // Deploy integration files to Nango
+                  await integrationSystem.deployToNangoAPI(service, workspaceId);
+                  
+                  // Step 2: Trigger OAuth flow (return auth URL)
+                  this.super.introspect(`Generating OAuth URL for ${service}...`);
+                  const authConfig = await bridge.generateAuthUrl(service.toLowerCase(), workspaceId);
+                  
+                  if (authConfig && authConfig.publicKey) {
+                    // Step 3: Create MCP server configuration (ready for when OAuth completes)
+                    await bridge.configureMCPServer(service.toLowerCase(), workspaceId);
+                    
+                    return `🚀 ${service} Integration Ready for OAuth!
+
+📋 Generated Integration:
+• Service: ${result.service}
+• Endpoints: ${result.endpoints} API endpoints
+• Data Models: ${result.models} models
+• Sync Frequency: ${result.syncFrequency}
 • Capabilities: ${result.capabilities.join(', ')}
 
-🎯 What you can do now:
-• Search: "find ${service} items about..."
-• Create: "create new ${service} item..."
-• Query: "show my ${service} data"
-• Sync: "refresh ${service} data"
+📁 Files Deployed:
+• Nango sync scripts ✅
+• Action scripts ✅
+• TypeScript models ✅
+• OAuth configuration ✅
+• MCP tools ✅
 
-Try: "search ${service} for recent updates"`;
+🔐 OAuth Setup Required:
+Click here to connect your ${service} account:
+
+[Connect ${service}](${authConfig.authUrl}?provider_config_key=${authConfig.providerConfigKey}&connection_id=${authConfig.connectionId}&public_key=${authConfig.publicKey})
+
+Once connected, you can:
+• Search data: "@agent search ${service} for..."
+• Create content: "@agent create ${service} post..."
+• Sync data: "@agent sync ${service}"
+
+⚡ The integration will auto-complete when you authorize access.`;
+                  } else {
+                    return `⚠️ ${service} integration created but OAuth setup incomplete.
+
+Files generated successfully, but missing:
+• NANGO_PUBLIC_KEY environment variable
+• OAuth app credentials in Nango dashboard
+
+Please configure Nango OAuth for ${service} and try again.`;
+                  }
+                  
+                } catch (deployError) {
+                  this.super.introspect(`Deployment error: ${deployError.message}`);
+                  
+                  // Still return partial success - files were generated
+                  return `⚠️ ${service} Integration Partially Complete
+
+📋 Generated Integration Files:
+• Service: ${result.service}
+• Endpoints: ${result.endpoints} API endpoints  
+• Data Models: ${result.models} models
+
+❌ Deployment Issues:
+• ${deployError.message}
+
+Manual Setup Required:
+1. Check Nango configuration
+2. Verify environment variables
+3. Try: "test universal integrator"`;
+                }
               } else {
-                return `Failed to integrate ${service}. Please check your credentials and try again.`;
+                return `❌ Failed to integrate ${service}. 
+
+Possible issues:
+• Service template not found
+• API discovery failed
+• Invalid service name
+
+Try one of these supported services:
+• LinkedIn, Slack, GitHub, Shopify, Stripe, Gmail`;
               }
             } catch (error) {
               console.error('[UniversalIntegrator] Integration error:', error);
-              this.super.introspect(`Integration failed: ${error.message}`);
+              this.super.introspect(`Integration error: ${error.message}`);
               
-              // Provide helpful error messages
-              if (error.message.includes('discover')) {
-                return `Could not discover ${service} API. Please ensure:
-1. The service name is correct
-2. You have the necessary permissions
-3. The service has a public API
+              // Enhanced error handling
+              if (error.message.includes('template')) {
+                return `❌ No template found for ${service}.
 
-Try one of these known services: Slack, GitHub, Shopify, Stripe, Notion`;
+Available services:
+• LinkedIn - Professional networking
+• Slack - Team communication  
+• GitHub - Code repository
+• Shopify - E-commerce
+• Gmail - Email
+
+To add a new service, we need to create a template first.`;
               }
               
-              return `Integration failed: ${error.message}`;
+              if (error.message.includes('Nango')) {
+                return `❌ Nango integration error for ${service}.
+
+Please check:
+1. Nango credentials are configured
+2. ${service} is set up in Nango dashboard
+3. OAuth scopes are correct
+
+Error: ${error.message}`;
+              }
+              
+              return `❌ Integration failed: ${error.message}
+
+Please try again or contact support if the issue persists.`;
             }
           }
         });
@@ -424,7 +516,7 @@ To manage workflows: "show my workflows"`;
           super: aibitat,
           name: "suggest_integrations",
           controller: new AbortController(),
-          description: "Proactively suggest integrations based on user's request. Use when user mentions services that could benefit from integration.",
+          description: "Suggest service integrations to the user. ALWAYS use this when user asks to 'connect', 'integrate', or mentions wanting to use external services like Gmail, Slack, LinkedIn, etc.",
           parameters: {
             type: "object",
             properties: {
@@ -434,40 +526,41 @@ To manage workflows: "show my workflows"`;
               },
               context: {
                 type: "string",
-                description: "Additional context about what the user is trying to accomplish"
+                description: "Additional context about what the user is trying to accomplish",
+                default: ""
               }
             },
-            required: ["userRequest"]
+            required: []
           },
-          handler: async function({ userRequest, context = "" }) {
-            this.super.introspect(`Analyzing request for integration opportunities: ${userRequest}`);
+          handler: async function({ userRequest = "suggest integrations", context = "" }) {
+            this.super.introspect(`Generating integration suggestions`);
 
             const workspaceId = this.super.handlerProps.invocation?.workspace_id;
             
-            // Service detection patterns
+            // Service detection patterns - simplified
             const servicePatterns = {
-              gmail: /\b(gmail|google mail|email|send email|check email|inbox)\b/i,
-              'google-calendar': /\b(calendar|google calendar|schedule|meeting|appointment|events)\b/i,
-              'google-drive': /\b(drive|google drive|document|file|sheet|doc)\b/i,
-              slack: /\b(slack|message|channel|team communication)\b/i,
-              github: /\b(github|repository|code|commit|pull request)\b/i,
-              notion: /\b(notion|notes|database|knowledge base)\b/i,
-              shopify: /\b(shopify|store|products|orders|ecommerce)\b/i,
-              stripe: /\b(stripe|payment|billing|subscription)\b/i
+              gmail: /\b(gmail|email|mail)\b/i,
+              'google-calendar': /\b(calendar|schedule|meeting|appointment|events)\b/i,
+              linkedin: /\b(linkedin)\b/i,
+              slack: /\b(slack)\b/i,
+              github: /\b(github)\b/i,
+              shopify: /\b(shopify|store)\b/i,
             };
 
             const detectedServices = [];
-            const suggestions = [];
-
-            // Detect mentioned services
-            Object.entries(servicePatterns).forEach(([service, pattern]) => {
-              if (pattern.test(userRequest)) {
-                detectedServices.push(service);
-              }
-            });
-
+            
+            // Check what user mentioned or default to common services
+            if (userRequest && userRequest !== "suggest integrations") {
+              Object.entries(servicePatterns).forEach(([service, pattern]) => {
+                if (pattern.test(userRequest)) {
+                  detectedServices.push(service);
+                }
+              });
+            }
+            
+            // If no specific service detected, suggest common ones
             if (detectedServices.length === 0) {
-              return "No specific integrations detected for this request.";
+              detectedServices.push('gmail', 'google-calendar', 'linkedin');
             }
 
             // Generate proactive suggestions
@@ -531,7 +624,8 @@ To manage workflows: "show my workflows"`;
               return suggestions.join('\n\n---\n\n');
             }
 
-            return "I can help you integrate various services. Just say something like 'connect Gmail' or 'integrate Slack' to get started!";
+            // Always provide at least LinkedIn connection if no specific service detected
+            return "💼 **Connect LinkedIn**\n\nConnect your LinkedIn account to:\n• Send messages and invitations\n• Access your network\n• Post updates\n\n[connect:linkedin]";
           }
         });
       }

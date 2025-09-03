@@ -4,7 +4,7 @@ import SlashCommandsButton, {
   useSlashCommands,
 } from "./SlashCommands";
 import debounce from "lodash.debounce";
-import { PaperPlaneRight } from "@phosphor-icons/react";
+import { PaperPlaneRight, Lightning, Sparkle, Brain, ArrowUp } from "@phosphor-icons/react";
 import StopGenerationButton from "./StopGenerationButton";
 import AvailableAgentsButton, {
   AvailableAgents,
@@ -262,7 +262,7 @@ export default function PromptInput({
   }
 
   return (
-    <div className="w-full fixed md:absolute bottom-0 left-0 z-10 md:z-0 flex flex-col justify-center items-center app-safe-area">
+    <div className="w-full fixed md:absolute bottom-0 left-0 z-10 md:z-0 flex flex-col justify-center items-center">
       <SlashCommands
         showing={showSlashCommand}
         setShowing={setShowSlashCommand}
@@ -275,95 +275,133 @@ export default function PromptInput({
         sendCommand={sendCommand}
         promptRef={textareaRef}
       />
+      
+      {/* Mobile optimized input container */}
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-3xl mx-auto px-4 pb-6"
+        className="w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800"
       >
-        <div className="relative">
-          <div className="relative flex items-end bg-white border border-gray-300 rounded-xl shadow-sm overflow-hidden"
-               style={{ minHeight: '52px' }}>
-            <AttachmentManager attachments={attachments} />
-            <div className="flex items-end w-full">
-              {/* Left side tools */}
-              <div className="flex items-center gap-1 p-2">
-                <AttachItem />
-                <SlashCommandsButton
-                  showing={showSlashCommand}
-                  setShowSlashCommand={setShowSlashCommand}
-                />
-                <AvailableAgentsButton
-                  showing={showAgents}
-                  setShowing={setShowAgents}
-                />
-                <ResponseModeSelector
-                  responseMode={responseMode}
-                  setResponseMode={setResponseMode}
-                  showing={showModeSelector}
-                  setShowing={setShowModeSelector}
-                />
+        <div className="max-w-4xl mx-auto px-4 py-3 md:py-4">
+          {/* Response mode indicator */}
+          {responseMode === "agent" && (
+            <div className="flex items-center gap-2 mb-2 px-2">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-full border border-purple-200 dark:border-purple-800">
+                <Brain className="w-4 h-4 text-purple-600 dark:text-purple-400 animate-pulse" />
+                <span className="text-xs font-medium text-purple-700 dark:text-purple-300">Agent Mode</span>
+                <Sparkle className="w-3 h-3 text-amber-500 animate-pulse" />
               </div>
+            </div>
+          )}
+          
+          <div className="relative">
+            <div className="relative flex items-end bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                 style={{ minHeight: '56px' }}>
+              <AttachmentManager attachments={attachments} />
               
-              {/* Textarea */}
-              <textarea
-                id={PROMPT_INPUT_ID}
-                ref={textareaRef}
-                onChange={handleChange}
-                onKeyDown={captureEnterOrUndo}
-                onPaste={(e) => {
-                  saveCurrentState();
-                  handlePasteEvent(e);
-                }}
-                required={true}
-                onFocus={() => setFocused(true)}
-                onBlur={(e) => {
-                  setFocused(false);
-                  adjustTextArea(e);
-                }}
-                value={promptInput}
-                spellCheck={Appearance.get("enableSpellCheck")}
-                className="flex-1 border-none resize-none bg-transparent text-black placeholder:text-gray-400 text-[15px] leading-6 max-h-[200px] focus:outline-none py-3"
-                style={{ minHeight: '24px' }}
-                placeholder="Message ChatGPT..."
-              />
-              
-              {/* Right side - send button */}
-              <div className="p-3 pb-2">
-                {isStreaming ? (
-                  <StopGenerationButton />
-                ) : (
-                  <>
-                    <button
-                      ref={formRef}
-                      type="submit"
-                      disabled={isDisabled || !promptInput.trim()}
-                      className={`p-1.5 rounded-lg transition-colors ${
-                        !isDisabled && promptInput.trim() 
-                          ? 'bg-black hover:bg-gray-800 cursor-pointer' 
-                          : 'bg-gray-300 cursor-not-allowed'
-                      }`}
-                      aria-label="Send message"
-                    >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path 
-                          d="M7 11L12 6L17 11M12 18V7" 
-                          stroke="white" 
-                          strokeWidth="2" 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </button>
-                    <Tooltip
-                      id="send-prompt"
-                      place="bottom"
-                      delayShow={300}
-                      className="tooltip !text-xs z-99"
-                    />
-                  </>
-                )}
+              <div className="flex items-end w-full">
+                {/* Enhanced mobile tools */}
+                <div className="flex items-center gap-0.5 p-2 md:gap-1">
+                  <button
+                    type="button"
+                    className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors touch-manipulation"
+                    style={{ minWidth: '40px', minHeight: '40px' }}
+                  >
+                    <AttachItem />
+                  </button>
+                  <SlashCommandsButton
+                    showing={showSlashCommand}
+                    setShowSlashCommand={setShowSlashCommand}
+                  />
+                  <AvailableAgentsButton
+                    showing={showAgents}
+                    setShowing={setShowAgents}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowModeSelector(!showModeSelector)}
+                    className={`p-2 rounded-lg transition-all touch-manipulation ${
+                      responseMode === "agent"
+                        ? "bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 text-purple-600 dark:text-purple-400"
+                        : "hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+                    }`}
+                    style={{ minWidth: '40px', minHeight: '40px' }}
+                  >
+                    {responseMode === "agent" ? (
+                      <Brain className="w-5 h-5" weight="bold" />
+                    ) : (
+                      <Lightning className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+                
+                {/* Enhanced textarea */}
+                <textarea
+                  id={PROMPT_INPUT_ID}
+                  ref={textareaRef}
+                  onChange={handleChange}
+                  onKeyDown={captureEnterOrUndo}
+                  onPaste={(e) => {
+                    saveCurrentState();
+                    handlePasteEvent(e);
+                  }}
+                  required={true}
+                  onFocus={() => setFocused(true)}
+                  onBlur={(e) => {
+                    setFocused(false);
+                    adjustTextArea(e);
+                  }}
+                  value={promptInput}
+                  spellCheck={Appearance.get("enableSpellCheck")}
+                  className="flex-1 border-none resize-none bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 text-[16px] md:text-[15px] leading-6 max-h-[200px] focus:outline-none py-3 px-2"
+                  style={{ minHeight: '24px' }}
+                  placeholder={responseMode === "agent" ? "Ask me anything with AI tools..." : "Message AnythingLLM..."}
+                />
+                
+                {/* Enhanced send button */}
+                <div className="p-2 md:p-3">
+                  {isStreaming ? (
+                    <StopGenerationButton />
+                  ) : (
+                    <>
+                      <button
+                        ref={formRef}
+                        type="submit"
+                        disabled={isDisabled || !promptInput.trim()}
+                        className={`relative p-2.5 rounded-xl transition-all transform active:scale-95 ${
+                          !isDisabled && promptInput.trim() 
+                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 cursor-pointer shadow-md hover:shadow-lg' 
+                            : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'
+                        }`}
+                        style={{ minWidth: '44px', minHeight: '44px' }}
+                        aria-label="Send message"
+                      >
+                        {!isDisabled && promptInput.trim() && (
+                          <Sparkle className="absolute -top-1 -right-1 w-3 h-3 text-amber-400 animate-pulse" />
+                        )}
+                        <ArrowUp className="w-5 h-5 text-white" weight="bold" />
+                      </button>
+                      <Tooltip
+                        id="send-prompt"
+                        place="bottom"
+                        delayShow={300}
+                        className="tooltip !text-xs z-99"
+                      />
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>
+          
+          {/* Mode selector modal */}
+          {showModeSelector && (
+            <ResponseModeSelector
+              responseMode={responseMode}
+              setResponseMode={setResponseMode}
+              showing={showModeSelector}
+              setShowing={setShowModeSelector}
+            />
+          )}
         </div>
       </form>
     </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, Suspense, lazy } from "react";
-import { List, Plus } from "@phosphor-icons/react";
+import { List, Plus, House, Gear, MagnifyingGlass, Sparkle, Brain } from "@phosphor-icons/react";
 import { useNewWorkspaceModal } from "../Modals/NewWorkspace";
 import ActiveWorkspaces from "./ActiveWorkspaces";
 import useLogo from "@/hooks/useLogo";
@@ -55,7 +55,11 @@ export default function Sidebar() {
         </div>
         <div
           ref={sidebarRef}
-          className="relative m-[16px] rounded-[16px] bg-theme-bg-sidebar border-[2px] border-theme-sidebar-border light:border-none min-w-[250px] p-[10px] h-[calc(100%-76px)]"
+          className="relative m-[16px] rounded-[20px] bg-theme-bg-sidebar backdrop-blur-xl border border-theme-sidebar-border shadow-xl min-w-[250px] p-[12px] h-[calc(100%-76px)] transition-all duration-300 hover:shadow-2xl"
+          style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            backdropFilter: 'blur(20px)',
+          }}
         >
           <div className="flex flex-col h-full overflow-x-hidden">
             <div className="flex-grow flex flex-col min-w-[235px]">
@@ -65,7 +69,7 @@ export default function Sidebar() {
                   <ActiveWorkspaces />
                 </div>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 pt-4 pb-3 rounded-b-[16px] bg-theme-bg-sidebar bg-opacity-80 backdrop-filter backdrop-blur-md z-1">
+              <div className="absolute bottom-0 left-0 right-0 pt-4 pb-3 rounded-b-[20px] bg-gradient-to-t from-theme-bg-sidebar to-transparent backdrop-blur-xl z-10">
                 <Footer />
               </div>
             </div>
@@ -113,25 +117,34 @@ export function SidebarMobileHeader() {
     <>
       <div
         aria-label="Show sidebar"
-        className="fixed top-0 left-0 right-0 z-10 flex justify-between items-center px-4 py-3 bg-theme-bg-sidebar/95 light:bg-white/95 text-slate-200 app-backdrop-blur border-b border-white/10 app-safe-area"
-        style={{ height: 'var(--app-header-height)' }}
+        className="fixed top-0 left-0 right-0 z-10 flex justify-between items-center px-4 py-3 backdrop-blur-xl border-b shadow-lg transition-all duration-300"
+        style={{ 
+          height: 'var(--app-header-height, 64px)',
+          background: 'rgba(255, 255, 255, 0.01)',
+          backdropFilter: 'blur(20px)',
+          borderColor: 'rgba(139, 92, 246, 0.1)'
+        }}
       >
         <button
           onClick={() => setShowSidebar(true)}
-          className="app-button rounded-xl p-3 flex items-center justify-center text-theme-text-secondary hover:bg-white/10 active:bg-white/20 transition-colors"
-          style={{ minWidth: 'var(--app-touch-target)', minHeight: 'var(--app-touch-target)' }}
+          className="rounded-2xl p-3 flex items-center justify-center bg-gradient-to-r from-purple-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20 active:scale-95 transition-all duration-200 shadow-md hover:shadow-lg"
+          style={{ minWidth: '48px', minHeight: '48px' }}
         >
-          <List className="h-5 w-5" />
+          <List className="h-6 w-6 text-purple-500" weight="bold" />
         </button>
-        <div className="flex items-center justify-center flex-grow">
-          <img
-            src={logo}
-            alt="Logo"
-            className="block mx-auto h-12 w-auto"
-            style={{ maxHeight: "60px", objectFit: "contain" }}
-          />
+        <div className="flex items-center justify-center gap-3">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg animate-pulse">
+            <Brain className="h-6 w-6 text-white" weight="bold" />
+          </div>
+          <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">AnythingLLM</span>
         </div>
-        <div className="w-12"></div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/50" />
+            <span className="text-xs text-green-500 font-medium">Active</span>
+          </div>
+          <Sparkle className="h-5 w-5 text-purple-500 animate-spin" style={{ animationDuration: '3s' }} />
+        </div>
       </div>
       <div
         style={{
@@ -149,38 +162,76 @@ export function SidebarMobileHeader() {
         />
         <div
           ref={sidebarRef}
-          className="relative h-[100vh] fixed top-0 left-0  rounded-r-[26px] bg-theme-bg-sidebar w-[80%] p-[18px] "
+          className="relative h-[100vh] fixed top-0 left-0 bg-white dark:bg-gray-900 w-[85%] max-w-[320px] shadow-2xl"
         >
-          <div className="w-full h-full flex flex-col overflow-x-hidden items-between">
-            {/* Header Information */}
-            <div className="flex w-full items-center justify-between gap-x-4">
-              <div className="flex shrink-1 w-fit items-center justify-start">
-                <img
-                  src={logo}
-                  alt="Logo"
-                  className="rounded w-full max-h-[60px]"
-                  style={{ objectFit: "contain" }}
-                />
+          <div className="w-full h-full flex flex-col overflow-x-hidden">
+            {/* Enhanced Mobile Header */}
+            <div className="p-4 border-b border-gray-200 dark:border-gray-800 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-800 dark:to-gray-900">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                    <Brain className="h-6 w-6 text-white" weight="bold" />
+                  </div>
+                  <div>
+                    <h2 className="font-bold text-gray-900 dark:text-white">AnythingLLM</h2>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">AI Workspace</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowSidebar(false)}
+                  className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
               {(!user || user?.role !== "default") && (
-                <div className="flex gap-x-2 items-center text-slate-500 shink-0">
-                  <SettingsButton />
+                <div className="flex items-center gap-2 p-2 bg-white dark:bg-gray-800 rounded-xl">
+                  <MagnifyingGlass className="w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search workspaces..."
+                    className="flex-1 text-sm bg-transparent outline-none text-gray-700 dark:text-gray-300"
+                  />
                 </div>
               )}
             </div>
 
-            {/* Primary Body */}
-            <div className="h-full flex flex-col w-full justify-between pt-4 ">
-              <div className="h-auto md:sidebar-items">
-                <div className=" flex flex-col gap-y-4 overflow-y-scroll no-scroll pb-[60px]">
-                  <NewWorkspaceButton
-                    user={user}
-                    showNewWsModal={showNewWsModal}
-                  />
+            {/* Enhanced Navigation Body */}
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {/* Quick Actions */}
+              <div className="p-4">
+                <NewWorkspaceButton
+                  user={user}
+                  showNewWsModal={showNewWsModal}
+                />
+              </div>
+              
+              {/* Workspaces List */}
+              <div className="flex-1 overflow-y-auto px-4">
+                <div className="mb-3">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Workspaces</p>
                   <ActiveWorkspaces />
                 </div>
               </div>
-              <div className="z-99 absolute bottom-0 left-0 right-0 pt-2 pb-6 rounded-br-[26px] bg-theme-bg-sidebar bg-opacity-80 backdrop-filter backdrop-blur-md">
+              
+              {/* Bottom Navigation */}
+              <div className="border-t border-gray-200 dark:border-gray-800 p-4 bg-gray-50 dark:bg-gray-900/50">
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  <button className="flex flex-col items-center gap-1 p-3 rounded-xl hover:bg-white dark:hover:bg-gray-800 transition-colors">
+                    <House className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Home</span>
+                  </button>
+                  <button className="flex flex-col items-center gap-1 p-3 rounded-xl hover:bg-white dark:hover:bg-gray-800 transition-colors">
+                    <MagnifyingGlass className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Search</span>
+                  </button>
+                  <button className="flex flex-col items-center gap-1 p-3 rounded-xl hover:bg-white dark:hover:bg-gray-800 transition-colors">
+                    <Gear className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Settings</span>
+                  </button>
+                </div>
                 <Footer />
               </div>
             </div>
@@ -201,16 +252,13 @@ function NewWorkspaceButton({ user, showNewWsModal }) {
   if (!!user && user?.role === "default") return null;
 
   return (
-    <div className="flex gap-x-2 items-center justify-between">
-      <button
-        onClick={showNewWsModal}
-        className="flex flex-grow w-[75%] h-[44px] gap-x-2 py-[5px] px-4 bg-white rounded-lg text-sidebar justify-center items-center hover:bg-opacity-80 transition-all duration-300"
-      >
-        <Plus className="h-5 w-5" />
-        <p className="text-sidebar text-sm font-semibold">
-          {t("new-workspace.title")}
-        </p>
-      </button>
-    </div>
+    <button
+      onClick={showNewWsModal}
+      className="w-full flex items-center justify-center gap-2 p-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
+    >
+      <Plus className="h-5 w-5" weight="bold" />
+      <span className="font-semibold">{t("new-workspace.title")}</span>
+      <Sparkle className="h-4 w-4 animate-pulse" />
+    </button>
   );
 }

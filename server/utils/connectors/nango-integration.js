@@ -30,18 +30,65 @@ class NangoIntegration {
 
     const connectionId = `workspace_${workspaceId}`;
     
-    // Map provider IDs to actual Nango provider config keys
-    const providerConfigKeyMap = {
-      'gmail': 'google-mail', // Exact key from Nango dashboard
-      'google-calendar': 'google-calendar-getting-started',
-      'google': 'google-calendar-getting-started',
-      'shopify': 'shopify',
-      'github': 'github',
-      'stripe': 'stripe',
-      'slack': 'slack',
-    };
-    
-    const providerConfigKey = providerConfigKeyMap[provider] || provider;
+    // Check what provider configs actually exist in Nango
+    let providerConfigKey;
+    try {
+      const integrations = await this.nango.listIntegrations();
+      console.log('[Nango] Raw integrations response:', integrations);
+      
+      // Handle different response formats
+      let availableKeys = [];
+      if (Array.isArray(integrations)) {
+        availableKeys = integrations.map(i => i.unique_key || i.id || i.name).filter(Boolean);
+      } else if (integrations && integrations.configs && Array.isArray(integrations.configs)) {
+        // This is the correct format: {configs: [...]}
+        availableKeys = integrations.configs.map(i => i.unique_key || i.id || i.name).filter(Boolean);
+      } else if (integrations && integrations.integrations) {
+        availableKeys = integrations.integrations.map(i => i.unique_key || i.id || i.name).filter(Boolean);
+      } else if (integrations && typeof integrations === 'object' && !integrations.configs) {
+        // Only use Object.keys as last resort and not when there's a 'configs' property
+        availableKeys = Object.keys(integrations);
+      }
+      
+      console.log('[Nango] Available provider configs:', availableKeys);
+      
+      // Try common patterns for this provider
+      const possibleKeys = [
+        provider, // exact match
+        `${provider}-getting-started`,
+        `${provider}_getting_started`,
+        // Special mappings based on your actual Nango configs
+        provider === 'gmail' ? 'google-mail' : null, // Use specific gmail config first
+        provider === 'gmail' ? 'google' : null, // Fallback to general google
+        provider === 'google-calendar' ? 'google-calendar-getting-started' : null,
+        provider === 'google-calendar' ? 'google' : null,
+      ].filter(Boolean);
+      
+      // Find the first matching key
+      providerConfigKey = possibleKeys.find(key => availableKeys.includes(key));
+      
+      if (!providerConfigKey) {
+        console.warn(`[Nango] No matching provider config found for ${provider}. Available: ${availableKeys.join(', ')}`);
+        
+        // For unsupported providers, don't use a random fallback
+        // This will cause a cleaner error message
+        throw new Error(`Provider ${provider} is not configured in Nango. Please add a provider config for ${provider} in your Nango dashboard. Available providers: ${availableKeys.join(', ')}`);
+      }
+      
+    } catch (error) {
+      console.error('[Nango] Failed to list integrations:', error);
+      // Fall back to simple mapping
+      const providerConfigKeyMap = {
+        'gmail': 'google',
+        'google-calendar': 'google',  
+        'linkedin': 'linkedin',
+        'shopify': 'shopify',
+        'github': 'github',
+        'stripe': 'stripe',
+        'slack': 'slack',
+      };
+      providerConfigKey = providerConfigKeyMap[provider] || provider;
+    }
     
     // Return config for frontend Nango.auth() method
     const config = {
@@ -54,11 +101,51 @@ class NangoIntegration {
     };
     
     console.log('[Nango] Auth config generated:', {
-      ...config,
+      provider,
+      providerConfigKey,
+      connectionId,
       publicKey: config.publicKey ? config.publicKey.substring(0, 8) + '...' : 'MISSING'
     });
     
     return config;
+  }
+
+  /**
+   * Get the correct provider config key for Nango
+   */
+  async getProviderConfigKey(provider) {
+    try {
+      const integrations = await this.nango.listIntegrations();
+      
+      // Handle different response formats
+      let availableKeys = [];
+      if (Array.isArray(integrations)) {
+        availableKeys = integrations.map(i => i.unique_key || i.id || i.name).filter(Boolean);
+      } else if (integrations && integrations.configs && Array.isArray(integrations.configs)) {
+        // This is the correct format: {configs: [...]}
+        availableKeys = integrations.configs.map(i => i.unique_key || i.id || i.name).filter(Boolean);
+      } else if (integrations && integrations.integrations) {
+        availableKeys = integrations.integrations.map(i => i.unique_key || i.id || i.name).filter(Boolean);
+      } else if (integrations && typeof integrations === 'object' && !integrations.configs) {
+        // Only use Object.keys as last resort and not when there's a 'configs' property
+        availableKeys = Object.keys(integrations);
+      }
+      
+      const possibleKeys = [
+        provider,
+        `${provider}-getting-started`,
+        `${provider}_getting_started`,
+        provider === 'gmail' ? 'google' : null,
+        provider === 'gmail' ? 'google-mail' : null,
+        provider === 'google-calendar' ? 'google' : null,
+      ].filter(Boolean);
+      
+      const providerConfigKey = possibleKeys.find(key => availableKeys.includes(key));
+      return providerConfigKey || availableKeys[0] || provider;
+    } catch (error) {
+      console.error('[Nango] Failed to get provider config key:', error);
+      return provider;
+    }
   }
 
   /**
@@ -67,18 +154,7 @@ class NangoIntegration {
   async createConnection(provider, workspaceId, connectionId) {
     if (!this.nango) throw new Error("Nango not configured");
 
-    // Map provider IDs to actual Nango provider config keys
-    const providerConfigKeyMap = {
-      'gmail': 'google-mail', // Exact key from Nango dashboard
-      'google-calendar': 'google-calendar-getting-started',
-      'google': 'google-calendar-getting-started',
-      'shopify': 'shopify',
-      'github': 'github',
-      'stripe': 'stripe',
-      'slack': 'slack',
-    };
-    
-    const providerConfigKey = providerConfigKeyMap[provider] || provider;
+    const providerConfigKey = await this.getProviderConfigKey(provider);
 
     try {
       // Get connection to verify it exists
@@ -184,18 +260,7 @@ class NangoIntegration {
   async deleteConnection(provider, workspaceId) {
     if (!this.nango) throw new Error("Nango not configured");
 
-    // Map provider IDs to actual Nango provider config keys
-    const providerConfigKeyMap = {
-      'gmail': 'google-mail', // Updated to match your Nango dashboard
-      'google-calendar': 'google-calendar-getting-started',
-      'google': 'google-calendar-getting-started',
-      'shopify': 'shopify',
-      'github': 'github',
-      'stripe': 'stripe',
-      'slack': 'slack',
-    };
-    
-    const providerConfigKey = providerConfigKeyMap[provider] || provider;
+    const providerConfigKey = await this.getProviderConfigKey(provider);
     const connectionId = `workspace_${workspaceId}`;
 
     try {
@@ -218,18 +283,7 @@ class NangoIntegration {
   async getConnection(provider, workspaceId) {
     if (!this.nango) throw new Error("Nango not configured");
 
-    // Map provider IDs to actual Nango provider config keys
-    const providerConfigKeyMap = {
-      'gmail': 'google-mail', // Exact key from Nango dashboard
-      'google-calendar': 'google-calendar-getting-started',
-      'google': 'google-calendar-getting-started',
-      'shopify': 'shopify-getting-started',
-      'github': 'github-getting-started',
-      'stripe': 'stripe-getting-started',
-      'slack': 'slack-getting-started',
-    };
-    
-    const providerConfigKey = providerConfigKeyMap[provider] || provider;
+    const providerConfigKey = await this.getProviderConfigKey(provider);
     const connectionId = `workspace_${workspaceId}`;
 
     try {

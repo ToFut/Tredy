@@ -40,6 +40,8 @@ const { mobileEndpoints } = require("./endpoints/mobile");
 const { supabaseIntegrationEndpoints } = require("./endpoints/supabaseIntegration");
 const { supabaseAuthEndpoints } = require("./endpoints/supabaseAuth");
 const { threadSharingEndpoints } = require("./endpoints/threadSharing");
+const { userConnectorEndpoints } = require("./endpoints/user/connectors");
+const { apiWorkspaceConnectorEndpoints } = require("./endpoints/api/workspace/connectors");
 const { WelcomeMessages } = require("./models/welcomeMessages");
 const app = express();
 const apiRouter = express.Router();
@@ -56,7 +58,7 @@ app.use(
 );
 
 if (!!process.env.ENABLE_HTTPS) {
-  bootSSL(app, process.env.SERVER_PORT || 3001);
+  bootSSL(app, process.env.SERVER_PORT || process.env.PORT || 3001);
 } else {
   require("@mintplex-labs/express-ws").default(app); // load WebSockets in non-SSL mode.
 }
@@ -83,6 +85,8 @@ mobileEndpoints(apiRouter);
 supabaseIntegrationEndpoints(apiRouter);
 supabaseAuthEndpoints(apiRouter);
 threadSharingEndpoints(apiRouter);
+userConnectorEndpoints(apiRouter);
+apiWorkspaceConnectorEndpoints(apiRouter);
 
 // Externally facing embedder endpoints
 embeddedEndpoints(apiRouter);
@@ -160,5 +164,6 @@ app.all("*", function (_, response) {
 
 // In non-https mode we need to boot at the end since the server has not yet
 // started and is `.listen`ing.
-if (!process.env.ENABLE_HTTPS) bootHTTP(app, process.env.SERVER_PORT || 8124);
+if (!process.env.ENABLE_HTTPS) bootHTTP(app, process.env.SERVER_PORT || process.env.PORT || 3001);
 // Port config updated
+ 

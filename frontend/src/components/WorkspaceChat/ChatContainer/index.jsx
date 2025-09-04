@@ -25,6 +25,7 @@ import { MetricsProvider } from "./ChatHistory/HistoricalMessage/Actions/RenderM
 import AgentVisualizer from "@/components/AgentVisualizer";
 import IntelligenceCards from "@/components/IntelligenceCards";
 import { generateProactiveSystemPrompt } from "@/utils/chat/proactive";
+import ChatConnectorHeader from "@/components/ChatConnectorHeader";
 
 export default function ChatContainer({ workspace, knownHistory = [] }) {
   const { threadSlug = null } = useParams();
@@ -361,9 +362,10 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
   return (
     <div
       style={{ height: "100%" }}
-      className="relative bg-white dark:bg-dark-bg-primary w-full h-full overflow-y-scroll z-[2]"
+      className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2]"
     >
-      {isMobile && <SidebarMobileHeader />}
+      <ChatConnectorHeader />
+      
       
       {/* Agent Visualizer - disabled */}
       {false && (agentStatus !== 'idle' || websocket) && (

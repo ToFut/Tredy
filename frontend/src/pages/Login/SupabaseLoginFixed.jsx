@@ -201,8 +201,8 @@ export default function SupabaseLogin() {
           </h2>
           <p className="mt-2 text-sm text-theme-text-secondary">
             {isSignUp 
-              ? 'Sign up to get started with AnythingLLM' 
-              : 'Sign in to your AnythingLLM account'}
+              ? 'Sign up to get started with Tredy' 
+              : 'Sign in to your Tredy account'}
           </p>
         </div>
 

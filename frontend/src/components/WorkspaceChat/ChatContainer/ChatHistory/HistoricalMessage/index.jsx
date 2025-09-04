@@ -113,8 +113,8 @@ const HistoricalMessage = ({
               saveChanges={saveEditedMessage}
             />
           ) : (
-            <div className="flex-1 min-w-0">
-              <div className="text-[15px] leading-[1.7] text-gray-900 whitespace-pre-wrap font-medium">
+            <div className="flex-1 min-w-0 max-w-full">
+              <div className="text-[15px] leading-[1.7] text-gray-900 whitespace-pre-wrap font-medium break-words">
                 <RenderChatContent
                   role={role}
                   message={message}
@@ -263,14 +263,13 @@ const RenderChatContent = memo(
         const provider = match[1];
         const buttonId = `oauth-btn-${provider}-${Math.random().toString(36).substr(2, 9)}`;
         connections.push({ provider, buttonId });
+        console.log("🔌 Found connection pattern:", provider);
         
-        // Replace pattern with placeholder div
-        processedText = processedText.replace(
-          match[0], 
-          `<div id="${buttonId}" class="oauth-connection-placeholder"></div>`
-        );
+        // Remove the pattern from the text (button will render separately)
+        processedText = processedText.replace(match[0], '');
       }
       
+      console.log("🔌 Connections found:", connections.length);
       return { processedText, connections };
     };
 

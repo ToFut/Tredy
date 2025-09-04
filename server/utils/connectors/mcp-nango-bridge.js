@@ -208,6 +208,22 @@ class MCPNangoBridge {
   getAvailableProviders() {
     return [
       {
+        id: "facebook",
+        name: "Facebook",
+        description: "Social media platform and messaging",
+        category: "communication",
+        authType: "oauth",
+        logo: "/icons/facebook.svg",
+      },
+      {
+        id: "airtable",
+        name: "Airtable",
+        description: "Database and spreadsheet platform",
+        category: "productivity",
+        authType: "oauth",
+        logo: "/icons/airtable.svg",
+      },
+      {
         id: "shopify",
         name: "Shopify",
         description: "E-commerce platform",

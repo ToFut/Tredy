@@ -87,6 +87,7 @@ model users {
   workspace_parsed_files      workspace_parsed_files[]
   agent_schedules             agent_schedules[]
   thread_participants         thread_participants[]
+  connector_tokens            connector_tokens[]
 }
 
 model recovery_codes {
@@ -343,18 +344,24 @@ model temporary_auth_tokens {
 
 model connector_tokens {
   id                Int         @id @default(autoincrement())
-  workspaceId       Int
+  workspaceId       Int?        // Now optional for user-level connectors
+  userId            Int?        // New field for user-level connectors
   provider          String      // shopify, google, stripe, etc.
   nangoConnectionId String?     // Nango's connection ID
   status            String      @default("pending") // pending, connected, error
   lastSync          DateTime?
   metadata          String?     // JSON string for provider-specific data
+  scope             String      @default("workspace") // "workspace" or "user"
+  supabaseTokenRef  String?     // Reference to Supabase secure token storage
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
-  workspace         workspaces  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace         workspaces? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user              users?      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([workspaceId, provider])
+  @@unique([userId, provider])
   @@index([workspaceId])
+  @@index([userId])
 }
 
 model system_prompt_variables {

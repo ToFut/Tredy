@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Brain, Sparkle, Search, Code, Database, FileSearch, ChartLine, Cpu, CaretDown, CaretRight, Globe, Terminal, Lightning, CheckCircle, Warning, Clock, CircleNotch, Copy, Check } from "@phosphor-icons/react";
+import { Brain, Sparkle, MagnifyingGlass, Code, Database, FileSearch, ChartLine, Cpu, CaretDown, CaretRight, Globe, Terminal, Lightning, CheckCircle, Warning, Clock, CircleNotch, Copy, Check } from "@phosphor-icons/react";
 
 export default function AgenticThinking({ stage = 'thinking', context = '', isActive = true, debugMessages = [], operations = [] }) {
   const [currentProcess, setCurrentProcess] = useState(0);
@@ -9,11 +9,11 @@ export default function AgenticThinking({ stage = 'thinking', context = '', isAc
   const [copiedId, setCopiedId] = useState(null);
   
   const processes = [
-    { icon: Brain, label: "Understanding request", color: "from-purple-500 to-pink-500" },
-    { icon: Search, label: "Searching knowledge", color: "from-blue-500 to-cyan-500" },
-    { icon: Database, label: "Analyzing context", color: "from-emerald-500 to-teal-500" },
-    { icon: Code, label: "Processing logic", color: "from-amber-500 to-orange-500" },
-    { icon: ChartLine, label: "Generating insights", color: "from-indigo-500 to-purple-500" }
+    { icon: Brain, label: "Understanding your request", color: "from-purple-500 to-pink-500" },
+    { icon: MagnifyingGlass, label: "Searching relevant information", color: "from-blue-500 to-cyan-500" },
+    { icon: Database, label: "Gathering context", color: "from-emerald-500 to-teal-500" },
+    { icon: Code, label: "Working on your task", color: "from-amber-500 to-orange-500" },
+    { icon: ChartLine, label: "Preparing response", color: "from-indigo-500 to-purple-500" }
   ];
 
   // Tool icons mapping
@@ -23,6 +23,11 @@ export default function AgenticThinking({ stage = 'thinking', context = '', isAc
     'database': Database,
     'api': Globe,
     'code': Code,
+    'facebook': Globe,
+    'messenger': Globe,
+    'linkedin': Globe,
+    'gmail': Globe,
+    'slack': Globe,
     'default': Lightning
   };
 
@@ -53,6 +58,78 @@ export default function AgenticThinking({ stage = 'thinking', context = '', isAc
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  // Helper function to get readable tool information
+  const getReadableToolInfo = (tool) => {
+    if (tool.includes('facebook_messenger')) {
+      return {
+        name: 'Facebook Messenger',
+        toolIcon: 'facebook',
+        description: '📱 Preparing to send Facebook message'
+      };
+    } else if (tool.includes('linkedin')) {
+      return {
+        name: 'LinkedIn',
+        toolIcon: 'linkedin',
+        description: '💼 Preparing LinkedIn action'
+      };
+    } else if (tool.includes('gmail')) {
+      return {
+        name: 'Gmail',
+        toolIcon: 'gmail',
+        description: '📧 Preparing email action'
+      };
+    } else if (tool.includes('slack')) {
+      return {
+        name: 'Slack',
+        toolIcon: 'slack',
+        description: '💬 Preparing Slack message'
+      };
+    }
+    
+    return {
+      name: tool.replace(/[_-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      toolIcon: 'default',
+      description: '🔧 Preparing to use external tool'
+    };
+  };
+
+  // Helper function to get readable action from server execution
+  const getReadableServerInfo = (server, params) => {
+    if (server.toLowerCase().includes('facebook')) {
+      const text = params?.text || '';
+      const page = params?.page || 'Page';
+      return {
+        name: 'Facebook Messenger',
+        toolIcon: 'facebook',
+        description: `📱 Sending message "${text.substring(0, 30)}${text.length > 30 ? '...' : ''}" to ${page}`
+      };
+    } else if (server.toLowerCase().includes('linkedin')) {
+      return {
+        name: 'LinkedIn',
+        toolIcon: 'linkedin',
+        description: '💼 Executing LinkedIn action'
+      };
+    } else if (server.toLowerCase().includes('gmail')) {
+      return {
+        name: 'Gmail',
+        toolIcon: 'gmail',
+        description: '📧 Processing email request'
+      };
+    } else if (server.toLowerCase().includes('slack')) {
+      return {
+        name: 'Slack',
+        toolIcon: 'slack',
+        description: '💬 Sending team message'
+      };
+    }
+    
+    return {
+      name: server.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      toolIcon: 'default',
+      description: `🔧 Executing ${server} integration`
+    };
+  };
+
   const parseOperations = () => {
     if (operations && operations.length > 0) return operations;
     
@@ -61,12 +138,14 @@ export default function AgenticThinking({ stage = 'thinking', context = '', isAc
       if (msg.includes('@agent is attempting to call')) {
         const toolMatch = msg.match(/`([^`]+)`/);
         const tool = toolMatch ? toolMatch[1] : 'unknown';
+        const toolInfo = getReadableToolInfo(tool);
+        
         return {
           id: index,
-          name: tool.replace(/-/g, ' '),
-          tool: tool.includes('linkedin') ? 'universal-linkedin' : 'mcp-server',
+          name: toolInfo.name,
+          tool: toolInfo.toolIcon,
           status: 'pending',
-          description: 'Preparing to execute tool',
+          description: toolInfo.description,
           debugMsg: msg
         };
       } else if (msg.includes('Executing MCP server:')) {
@@ -79,24 +158,29 @@ export default function AgenticThinking({ stage = 'thinking', context = '', isAc
             params = JSON.parse(paramsMatch[1]);
           }
         } catch (e) {}
+        
+        const serverInfo = getReadableServerInfo(server, params);
+        
         return {
           id: index,
-          name: server.replace(/-/g, ' '),
-          tool: server.includes('linkedin') ? 'universal-linkedin' : 'mcp-server',
+          name: serverInfo.name,
+          tool: serverInfo.toolIcon,
           status: 'running',
-          description: params ? `${params.method} ${params.endpoint}` : 'Executing operation...',
+          description: serverInfo.description,
           params: params,
           debugMsg: msg
         };
       } else if (msg.includes('completed successfully')) {
         const serverMatch = msg.match(/MCP server: ([^:]+):/);
         const server = serverMatch ? serverMatch[1] : 'unknown';
+        const serverInfo = getReadableServerInfo(server, null);
+        
         return {
           id: index,
-          name: server.replace(/-/g, ' '),
-          tool: server.includes('linkedin') ? 'universal-linkedin' : 'mcp-server',
+          name: serverInfo.name,
+          tool: serverInfo.toolIcon,
           status: 'success',
-          description: 'Operation completed successfully',
+          description: '✅ Task completed successfully',
           debugMsg: msg
         };
       }
@@ -165,7 +249,7 @@ export default function AgenticThinking({ stage = 'thinking', context = '', isAc
             {/* Content area */}
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <h3 className="text-sm font-semibold text-gray-900">AI is thinking</h3>
+                <h3 className="text-sm font-semibold text-gray-900">Analyzing your request</h3>
                 <Sparkle className="w-4 h-4 text-amber-500 animate-pulse" />
               </div>
               

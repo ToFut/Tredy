@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { CaretDown } from "@phosphor-icons/react";
+import AgenticThinking from "@/components/AgenticThinking";
 
 import AgentAnimation from "@/media/animations/agent-animation.webm";
 import AgentStatic from "@/media/animations/agent-static.png";
@@ -18,6 +19,20 @@ export default function StatusResponse({
     setIsExpanded(!isExpanded);
   }
 
+  // Use enhanced AgenticThinking component when agent is actively thinking
+  if (isThinking) {
+    return (
+      <AgenticThinking
+        stage="thinking"
+        context={currentThought?.content || "Working on your request..."}
+        isActive={isThinking}
+        debugMessages={[]} // Debug messages will be populated by backend in the future
+        operations={[]}
+      />
+    );
+  }
+
+  // Fallback to simple display for non-debug status responses
   return (
     <div className="flex justify-center w-full">
       <div className="w-full max-w-[80%] flex flex-col">
@@ -36,8 +51,8 @@ export default function StatusResponse({
                   playsInline
                   className="w-8 h-8 scale-150 transition-opacity duration-200 light:invert light:opacity-50"
                   data-tooltip-id="agent-thinking"
-                  data-tooltip-content="Agent is thinking..."
-                  aria-label="Agent is thinking..."
+                  data-tooltip-content="Working on your request..."
+                  aria-label="Working on your request..."
                 >
                   <source src={AgentAnimation} type="video/webm" />
                 </video>
@@ -47,8 +62,8 @@ export default function StatusResponse({
                   alt="Agent complete"
                   className="w-6 h-6 transition-opacity duration-200 light:invert light:opacity-50"
                   data-tooltip-id="agent-thinking"
-                  data-tooltip-content="Agent has finished thinking"
-                  aria-label="Agent has finished thinking"
+                  data-tooltip-content="Task completed"
+                  aria-label="Task completed"
                 />
               )}
             </div>
@@ -59,7 +74,7 @@ export default function StatusResponse({
                 <div className="text-theme-text-secondary font-mono leading-6">
                   {!isExpanded ? (
                     <span className="block w-full truncate mt-[2px]">
-                      {currentThought.content}
+                      {currentThought?.content || "Working on your request..."}
                     </span>
                   ) : (
                     <>
@@ -71,7 +86,7 @@ export default function StatusResponse({
                           {thought.content}
                         </div>
                       ))}
-                      <div>{currentThought.content}</div>
+                      <div>{currentThought?.content || ""}</div>
                     </>
                   )}
                 </div>

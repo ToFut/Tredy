@@ -67,24 +67,32 @@ export default function DataConnectors() {
   );
 
   return (
-    <div className="flex upload-modal -mt-10 relative min-h-[80vh] w-[70vw]">
-      <div className="w-full p-4 top-0 z-20">
-        <div className="w-full flex items-center sticky top-0 z-50">
+    <div className="flex h-[80vh] w-[80vw] max-w-6xl bg-white dark:bg-gray-900 rounded-xl shadow-xl">
+      {/* Left Panel - Connector List */}
+      <div className="w-1/2 border-r border-gray-200 dark:border-gray-700 p-6">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          Data Connectors
+        </h2>
+        
+        {/* Search */}
+        <div className="relative mb-6">
           <MagnifyingGlass
             size={16}
             weight="bold"
-            className="absolute left-4 z-30 text-white"
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
           />
           <input
             type="text"
             placeholder={t("connectors.search-placeholder")}
-            className="border-none z-20 pl-10 h-[38px] rounded-full w-full px-4 py-1 text-sm border-2 border-slate-300/40 outline-none focus:outline-primary-button active:outline-primary-button outline-none placeholder:text-theme-settings-input-placeholder text-white bg-theme-settings-input-bg"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             autoComplete="off"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="mt-2 flex flex-col gap-y-2">
+
+        {/* Connector List */}
+        <div className="space-y-2 max-h-96 overflow-y-auto">
           {filteredConnectors.length > 0 ? (
             filteredConnectors.map((slug, index) => (
               <ConnectorOption
@@ -98,15 +106,36 @@ export default function DataConnectors() {
               />
             ))
           ) : (
-            <div className="text-white text-center mt-4">
+            <div className="text-center text-gray-500 dark:text-gray-400 mt-8">
               {t("connectors.no-connectors")}
             </div>
           )}
         </div>
       </div>
-      <div className="xl:block hidden absolute left-1/2 top-0 bottom-0 w-[0.5px] bg-white/20 -translate-x-1/2"></div>
-      <div className="w-full p-4 top-0 text-white min-w-[500px]">
-        {DATA_CONNECTORS[selectedConnector].options}
+
+      {/* Right Panel - Configuration */}
+      <div className="w-1/2 p-6">
+        <div className="h-full flex flex-col">
+          <div className="flex items-center gap-3 mb-6">
+            <img
+              src={DATA_CONNECTORS[selectedConnector].image}
+              alt={DATA_CONNECTORS[selectedConnector].name}
+              className="w-10 h-10 rounded-lg"
+            />
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {DATA_CONNECTORS[selectedConnector].name}
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {DATA_CONNECTORS[selectedConnector].description}
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto">
+            {DATA_CONNECTORS[selectedConnector].options}
+          </div>
+        </div>
       </div>
     </div>
   );

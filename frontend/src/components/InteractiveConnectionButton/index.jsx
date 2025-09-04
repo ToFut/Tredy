@@ -61,15 +61,32 @@ export default function InteractiveConnectionButton({
     onConnectionStart();
 
     try {
-      // Create OAuth flow URL
-      const baseUrl = window.location.origin;
-      const authUrl = `/api/nango/auth/${provider}?workspace=${workspaceSlug || 'default'}`;
+      // Use the same user-level connector flow as settings page
+      const response = await fetch('/api/user/connectors/connect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ provider })
+      });
+
+      const data = await response.json();
       
-      // Open OAuth popup
+      if (!data.success) {
+        if (data.error === 'Provider already connected') {
+          setStatus('connected');
+          onConnectionComplete({ success: true, message: 'Already connected' });
+          return;
+        }
+        throw new Error(data.error);
+      }
+      
+      // Open OAuth popup with user-level auth URL
       const popup = window.open(
-        authUrl,
+        data.authUrl,
         'oauth',
-        'width=500,height=600,scrollbars=yes,resizable=yes'
+        'width=600,height=700,scrollbars=yes,resizable=yes'
       );
 
       // Listen for popup completion
@@ -77,13 +94,16 @@ export default function InteractiveConnectionButton({
         if (popup.closed) {
           clearInterval(checkClosed);
           
-          // Check if connection was successful by making a test API call
-          fetch(`/api/nango/connections/${provider}?workspace=${workspaceSlug || 'default'}`)
+          // Check if connection was successful
+          fetch('/api/user/connectors')
             .then(res => res.json())
-            .then(data => {
-              if (data.success) {
+            .then(connectorsData => {
+              const isConnected = connectorsData.success && 
+                connectorsData.connectors.some(c => c.provider === provider && c.status === 'connected');
+              
+              if (isConnected) {
                 setStatus('connected');
-                onConnectionComplete(data);
+                onConnectionComplete({ success: true });
               } else {
                 setStatus('error');
                 setError('Connection failed. Please try again.');

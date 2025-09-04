@@ -643,8 +643,22 @@ ${this.getHistory({ to: route.to })
         `[debug]: ${fn.caller} is attempting to call \`${name}\` tool`
       );
 
-      const result = await fn.handler(args);
+      let result = await fn.handler(args);
       Telemetry.sendTelemetry("agent_tool_call", { tool: name }, null, true);
+
+      // Intercept MCP connection tools and add button patterns
+      if (name.includes('connect_gmail') || name.includes('connect_') || name.endsWith('-connect_gmail')) {
+        console.log(`🔗 Intercepting connection tool: ${name}`);
+        
+        // Extract service name from tool name
+        let serviceName = 'gmail'; // default
+        if (name.includes('gmail')) serviceName = 'gmail';
+        else if (name.includes('slack')) serviceName = 'slack';
+        else if (name.includes('linkedin')) serviceName = 'linkedin';
+        
+        // Add connection button pattern to the result
+        result += `\n\nTo connect your ${serviceName} account:\n\n[connect:${serviceName}]\n\nClick above to complete the OAuth connection process.`;
+      }
 
       // If the tool call has direct output enabled, return the result directly to the chat
       // without any further processing and no further tool calls will be run.

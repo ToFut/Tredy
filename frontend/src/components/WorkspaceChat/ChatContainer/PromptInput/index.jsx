@@ -262,7 +262,7 @@ export default function PromptInput({
   }
 
   return (
-    <div className="w-full fixed md:absolute bottom-0 left-0 z-10 md:z-0 flex flex-col justify-center items-center">
+    <div className="w-full fixed md:absolute bottom-0 left-0 z-10 md:z-0 flex flex-col justify-center items-center backdrop-blur-lg">
       <SlashCommands
         showing={showSlashCommand}
         setShowing={setShowSlashCommand}
@@ -279,7 +279,7 @@ export default function PromptInput({
       {/* Mobile optimized input container */}
       <form
         onSubmit={handleSubmit}
-        className="w-full bg-gradient-to-t from-white/95 via-white/90 to-transparent backdrop-blur-xl dark:from-gray-900/95 dark:via-gray-900/90 border-t border-gray-200/50 dark:border-gray-800/50"
+        className="w-full bg-gradient-to-t from-white/95 via-white/90 to-transparent backdrop-blur-xl dark:from-gray-900/95 dark:via-gray-900/90 border-t border-gray-200/50 dark:border-gray-800/50 shadow-[0_-8px_16px_-6px_rgba(0,0,0,0.1)] dark:shadow-[0_-8px_16px_-6px_rgba(0,0,0,0.3)]"
       >
         <div className="max-w-5xl mx-auto px-6 py-4 md:py-6">
           {/* Response mode indicator */}

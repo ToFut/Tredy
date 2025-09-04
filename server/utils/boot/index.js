@@ -13,7 +13,7 @@ const setupTelemetry = require("../telemetry");
 // Update .env keys with the correct values and boot. These are temporary and not real SSL certs - only use for local.
 // Test with https://localhost:8124/api/ping
 // build and copy frontend to server/public with correct API_BASE and start server in prod model and all should be ok
-function bootSSL(app, port = 8124) {
+function bootSSL(app, port = 3001) {
   try {
     console.log(
       `\x1b[33m[SSL BOOT ENABLED]\x1b[0m Loading the certificate and key for HTTPS mode...`
@@ -51,7 +51,7 @@ function bootSSL(app, port = 8124) {
   }
 }
 
-function bootHTTP(app, port = 8124) {
+function bootHTTP(app, port = 3001) {
   if (!app) throw new Error('No "app" defined - crashing!');
 
   app

@@ -5,10 +5,13 @@
       "url": "https://mcp.zapier.com/api/mcp/s/NTdlYTE1NGYtYzI5OS00NmVhLTg2N2EtZjA3YWZiZDdjN2E1Ojg3MjNkNGFjLTI2MjItNDU0NS04MmE4LWRmNzg5ZDJhYTgzMQ==/mcp",
       "headers": {}
     },
-    "GoogleDrive": {
+    "_disabled_GoogleDrive": {
       "type": "sse",
       "url": "https://mcp.zapier.com/api/mcp/s/Y2UwYTJiMTItYThiOS00NTllLWEwNGUtODYxY2I1MjBhZjlhOjU1MWZkZTNhLWFlM2YtNGE1YS04OTdhLTNlODRhNzA2ZmY5OQ==/mcp",
-      "headers": {}
+      "headers": {},
+      "anythingllm": {
+        "autoStart": false
+      }
     },
     "Facebook": {
       "type": "sse",

@@ -356,6 +356,12 @@ const SidebarOptions = ({ user = null, t }) => (
           user={user}
           childOptions={[
             {
+              btnText: "User Connectors",
+              href: paths.settings.userConnectors(),
+              flex: true,
+              roles: ["admin", "manager"],
+            },
+            {
               hidden: !canViewChatHistory,
               btnText: t("settings.embeds"),
               href: paths.settings.embedChatWidgets(),

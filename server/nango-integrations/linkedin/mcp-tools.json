@@ -1,8 +1,23 @@
 {
   "tools": [
     {
-      "name": "search_profile",
-      "description": "Search Profile records",
+      "name": "linkedin_connect",
+      "description": "Connect linkedin account directly from chat with intelligent error handling",
+      "parameters": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "initiate",
+            "status"
+          ],
+          "description": "Action to perform: initiate connection or check status",
+          "default": "initiate"
+        }
+      }
+    },
+    {
+      "name": "linkedin_search_profile",
+      "description": "Search Profile records with connection auto-detection",
       "parameters": {
         "query": {
           "type": "string",
@@ -10,13 +25,24 @@
         },
         "limit": {
           "type": "number",
-          "default": 10
+          "default": 10,
+          "description": "Maximum results to return"
         }
       }
     },
     {
-      "name": "search_post",
-      "description": "Search Post records",
+      "name": "linkedin_get_profile",
+      "description": "Get specific Profile record with rich formatting",
+      "parameters": {
+        "id": {
+          "type": "string",
+          "description": "Profile ID or identifier"
+        }
+      }
+    },
+    {
+      "name": "linkedin_search_post",
+      "description": "Search Post records with connection auto-detection",
       "parameters": {
         "query": {
           "type": "string",
@@ -24,51 +50,100 @@
         },
         "limit": {
           "type": "number",
-          "default": 10
+          "default": 10,
+          "description": "Maximum results to return"
         }
       }
     },
     {
-      "name": "create_post",
-      "description": "Create a LinkedIn post",
+      "name": "linkedin_get_post",
+      "description": "Get specific Post record with rich formatting",
       "parameters": {
-        "input": {
-          "type": "object",
-          "description": "Action input data"
+        "id": {
+          "type": "string",
+          "description": "Post ID or identifier"
         }
       }
     },
     {
-      "name": "get_profile",
-      "description": "Get user profile",
+      "name": "linkedin_create_post",
+      "description": "Create a LinkedIn post. Includes connection validation and user-friendly error messages.",
       "parameters": {
-        "input": {
-          "type": "object",
-          "description": "Action input data"
+        "text": {
+          "type": "string",
+          "description": "Post content to share on LinkedIn"
+        },
+        "visibility": {
+          "type": "string",
+          "enum": [
+            "PUBLIC",
+            "CONNECTIONS",
+            "LOGGED_IN"
+          ],
+          "default": "CONNECTIONS",
+          "description": "Post visibility level"
         }
       }
     },
     {
-      "name": "sync_profile",
-      "description": "Sync user profile data",
+      "name": "linkedin_get_profile",
+      "description": "Get user profile. Includes connection validation and user-friendly error messages.",
+      "parameters": {
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Profile fields to retrieve",
+          "default": [
+            "id",
+            "name",
+            "email"
+          ]
+        }
+      }
+    },
+    {
+      "name": "linkedin_sync_profile",
+      "description": "Sync user profile data. Shows progress and handles errors gracefully.",
       "parameters": {
         "force": {
           "type": "boolean",
           "default": false,
-          "description": "Force full sync"
+          "description": "Force full sync instead of incremental"
+        },
+        "notify": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show sync progress and results"
         }
       }
     },
     {
-      "name": "sync_posts",
-      "description": "Sync user posts",
+      "name": "linkedin_sync_posts",
+      "description": "Sync user posts. Shows progress and handles errors gracefully.",
       "parameters": {
         "force": {
           "type": "boolean",
           "default": false,
-          "description": "Force full sync"
+          "description": "Force full sync instead of incremental"
+        },
+        "notify": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show sync progress and results"
         }
       }
     }
-  ]
+  ],
+  "metadata": {
+    "service": "linkedin",
+    "version": "2.0.0",
+    "features": [
+      "connection-detection",
+      "interactive-buttons",
+      "rich-formatting",
+      "error-recovery"
+    ]
+  }
 }

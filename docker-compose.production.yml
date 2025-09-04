@@ -1,0 +1,271 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: anythingllm-postgres
+    environment:
+      POSTGRES_USER: anythingllm
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-securepassword123}
+      POSTGRES_DB: anythingllm
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - anythingllm-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U anythingllm"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching and job queue
+  redis:
+    image: redis:7-alpine
+    container_name: anythingllm-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - anythingllm-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Vector Database (Qdrant)
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: anythingllm-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - anythingllm-network
+    environment:
+      QDRANT__SERVICE__GRPC_PORT: 6334
+
+  # Main Application Server
+  server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: production
+    container_name: anythingllm-server
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      # Core Configuration
+      NODE_ENV: production
+      SERVER_PORT: 3001
+      JWT_SECRET: ${JWT_SECRET}
+      SIG_KEY: ${SIG_KEY}
+      SIG_SALT: ${SIG_SALT}
+      
+      # Database
+      DATABASE_URL: postgresql://anythingllm:${POSTGRES_PASSWORD:-securepassword123}@postgres:5432/anythingllm
+      
+      # Redis
+      REDIS_URL: redis://redis:6379
+      
+      # Vector Database
+      VECTOR_DB: qdrant
+      QDRANT_URL: http://qdrant:6333
+      
+      # Storage
+      STORAGE_DIR: /app/storage
+      
+      # LLM Configuration
+      LLM_PROVIDER: ${LLM_PROVIDER}
+      OPEN_AI_KEY: ${OPEN_AI_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      
+      # Embedding Configuration
+      EMBEDDING_ENGINE: ${EMBEDDING_ENGINE:-openai}
+      EMBEDDING_MODEL_PREF: ${EMBEDDING_MODEL_PREF:-text-embedding-3-small}
+      
+      # Nango Configuration
+      NANGO_SECRET_KEY: ${NANGO_SECRET_KEY}
+      NANGO_PUBLIC_KEY: ${NANGO_PUBLIC_KEY}
+      NANGO_HOST: ${NANGO_HOST:-https://api.nango.dev}
+      NANGO_WEBHOOK_URL: ${NANGO_WEBHOOK_URL}
+      
+      # OAuth Providers
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      LINKEDIN_CLIENT_ID: ${LINKEDIN_CLIENT_ID}
+      LINKEDIN_CLIENT_SECRET: ${LINKEDIN_CLIENT_SECRET}
+      
+      # MCP Configuration
+      MCP_ENABLED: "true"
+      MCP_SERVERS_PATH: /app/storage/plugins/mcp_servers.json
+      
+      # Background Jobs
+      ENABLE_BACKGROUND_JOBS: "true"
+    volumes:
+      - storage_data:/app/storage
+      - ./server:/app/server
+      - ./frontend/dist:/app/server/public
+    ports:
+      - "3001:3001"
+    networks:
+      - anythingllm-network
+    command: >
+      sh -c "
+        cd /app/server &&
+        npx prisma migrate deploy &&
+        npm run start:production
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Document Collector Service
+  collector:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.collector
+    container_name: anythingllm-collector
+    depends_on:
+      - server
+    environment:
+      NODE_ENV: production
+      COLLECTOR_PORT: 8888
+      STORAGE_DIR: /app/storage
+    volumes:
+      - storage_data:/app/storage
+    ports:
+      - "8888:8888"
+    networks:
+      - anythingllm-network
+
+  # MCP Server - Gmail
+  mcp-gmail:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.mcp
+    container_name: anythingllm-mcp-gmail
+    environment:
+      MCP_TYPE: gmail
+      NANGO_SECRET_KEY: ${NANGO_SECRET_KEY}
+      NANGO_HOST: ${NANGO_HOST:-https://api.nango.dev}
+    networks:
+      - anythingllm-network
+    restart: unless-stopped
+
+  # MCP Server - Calendar
+  mcp-calendar:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.mcp
+    container_name: anythingllm-mcp-calendar
+    environment:
+      MCP_TYPE: calendar
+      NANGO_SECRET_KEY: ${NANGO_SECRET_KEY}
+      NANGO_HOST: ${NANGO_HOST:-https://api.nango.dev}
+    networks:
+      - anythingllm-network
+    restart: unless-stopped
+
+  # Background Job Scheduler
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: production
+    container_name: anythingllm-scheduler
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://anythingllm:${POSTGRES_PASSWORD:-securepassword123}@postgres:5432/anythingllm
+      REDIS_URL: redis://redis:6379
+      STORAGE_DIR: /app/storage
+    volumes:
+      - storage_data:/app/storage
+    networks:
+      - anythingllm-network
+    command: >
+      sh -c "
+        cd /app/server &&
+        node utils/jobs/scheduler.js
+      "
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: anythingllm-nginx
+    depends_on:
+      - server
+      - collector
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/ssl:/etc/nginx/ssl:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - anythingllm-network
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Monitoring - Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: anythingllm-prometheus
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9090:9090"
+    networks:
+      - anythingllm-network
+
+  # Monitoring - Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: anythingllm-grafana
+    depends_on:
+      - prometheus
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_INSTALL_PLUGINS: redis-app
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./docker/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    ports:
+      - "3000:3000"
+    networks:
+      - anythingllm-network
+
+networks:
+  anythingllm-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  qdrant_data:
+  storage_data:
+  prometheus_data:
+  grafana_data:

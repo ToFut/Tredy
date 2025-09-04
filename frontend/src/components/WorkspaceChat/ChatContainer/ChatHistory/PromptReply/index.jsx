@@ -153,7 +153,8 @@ function RenderAssistantChatContent({ message }) {
       ) : (
         <>
           <span
-            className="break-words"
+            className="break-words max-w-full"
+            style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
             dangerouslySetInnerHTML={{ __html: renderMarkdown(contentRef.current) }}
           />
           {/* Auto-generate visual summary for long responses */}

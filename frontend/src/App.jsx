@@ -97,6 +97,9 @@ const SystemPromptVariables = lazy(
 const MobileConnections = lazy(
   () => import("@/pages/GeneralSettings/MobileConnections")
 );
+const UserConnectors = lazy(
+  () => import("@/pages/GeneralSettings/UserConnectors")
+);
 
 export default function App() {
   return (
@@ -282,6 +285,10 @@ export default function App() {
                   <Route
                     path="/settings/mobile-connections"
                     element={<ManagerRoute Component={MobileConnections} />}
+                  />
+                  <Route
+                    path="/settings/user-connectors"
+                    element={<PrivateRoute Component={UserConnectors} />}
                   />
                 </Routes>
                 <ToastContainer />

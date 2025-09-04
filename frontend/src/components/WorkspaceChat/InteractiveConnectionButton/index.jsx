@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Plug, Check, X, ArrowRight } from "@phosphor-icons/react";
-import { API_BASE } from "@/utils/constants";
-import { baseHeaders } from "@/utils/request";
 import System from "@/models/system";
 import Workspace from "@/models/workspace";
+import nangoService from "@/services/NangoService";
 
 export default function InteractiveConnectionButton({ 
   provider, 
@@ -16,28 +15,26 @@ export default function InteractiveConnectionButton({
   const [mounted, setMounted] = useState(false);
   const [providerInfo, setProviderInfo] = useState(null);
 
+  console.log("🔌 InteractiveConnectionButton rendering for:", provider, workspace?.slug);
+
+  // Early return with debug if no provider
+  if (!provider) {
+    console.error("🔌 ERROR: No provider specified for InteractiveConnectionButton");
+    return <div className="text-red-500">Error: No provider specified</div>;
+  }
+
   useEffect(() => {
-    // Mount the button in the placeholder after render
-    const placeholder = document.getElementById(placeholderId);
-    if (placeholder && !mounted) {
-      setMounted(true);
-      loadProviderInfo();
-      checkConnectionStatus();
-    }
-  }, [placeholderId]);
+    // Load provider info and check status on mount
+    console.log("🔌 Component mounted, loading provider info for:", provider);
+    loadProviderInfo();
+    checkConnectionStatus();
+  }, []);
 
   const loadProviderInfo = async () => {
     try {
-      // Get available providers list
-      const response = await fetch(
-        `${API_BASE}/v1/workspace/${workspace?.slug}/connectors/available`,
-        {
-          method: "GET",
-          headers: baseHeaders(),
-        }
-      );
-      const { providers } = await response.json();
-      const info = providers.find(p => p.id === provider);
+      // Get available providers list using workspace model
+      const response = await Workspace.connectors.getAvailable(workspace?.slug);
+      const info = response.providers?.find(p => p.id === provider);
       if (info) {
         setProviderInfo(info);
       }
@@ -48,15 +45,9 @@ export default function InteractiveConnectionButton({
 
   const checkConnectionStatus = async () => {
     try {
-      const response = await fetch(
-        `${API_BASE}/v1/workspace/${workspace?.slug}/connectors`,
-        {
-          method: "GET",
-          headers: baseHeaders(),
-        }
-      );
-      const { connectors } = await response.json();
-      const connector = connectors.find(c => c.provider === provider);
+      // Use workspace model to check connection status
+      const response = await Workspace.connectors.list(workspace?.slug);
+      const connector = response.connectors?.find(c => c.provider === provider);
       setIsConnected(connector?.status === "connected");
     } catch (err) {
       console.error("Failed to check connection status:", err);
@@ -89,6 +80,13 @@ export default function InteractiveConnectionButton({
       if (message === "Already connected") {
         setIsConnected(true);
         System.success(`Already connected to ${providerInfo?.name || provider}!`);
+        setIsConnecting(false);
+        return;
+      }
+
+      // Check if provider is not configured in Nango
+      if (authConfig?.error === 'provider_not_configured') {
+        setError(`${authConfig.message} Please configure ${provider} in your Nango dashboard first.`);
         setIsConnecting(false);
         return;
       }

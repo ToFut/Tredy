@@ -29,7 +29,7 @@ function apiWorkspaceConnectorEndpoints(app) {
 
   /**
    * GET /api/workspace/:slug/connectors
-   * List connected services for workspace
+   * List connected services for workspace (includes inherited user connectors)
    */
   app.get(
     "/v1/workspace/:slug/connectors",
@@ -43,8 +43,34 @@ function apiWorkspaceConnectorEndpoints(app) {
           return response.status(404).json({ error: "Workspace not found" });
         }
 
-        const connectors = await ConnectorTokens.forWorkspace(workspace.id);
-        response.status(200).json({ connectors });
+        // Get workspace-specific connectors
+        const workspaceConnectors = await ConnectorTokens.forWorkspace(workspace.id);
+        
+        // Get user-level connectors (if user exists)
+        let availableConnectors = [...workspaceConnectors];
+        if (response.locals.user?.id) {
+          const userConnectors = await ConnectorTokens.getAvailableForWorkspace(workspace.id, response.locals.user.id);
+          
+          // Add user connectors that aren't overridden by workspace-level ones
+          const workspaceProviders = new Set(workspaceConnectors.map(c => c.provider));
+          const inheritedConnectors = userConnectors
+            .filter(c => !workspaceProviders.has(c.provider))
+            .map(c => ({
+              ...c,
+              inherited: true,
+              scope: 'user'
+            }));
+          
+          availableConnectors = [
+            ...workspaceConnectors.map(c => ({ ...c, scope: 'workspace' })),
+            ...inheritedConnectors
+          ];
+        }
+
+        response.status(200).json({ 
+          connectors: availableConnectors,
+          inheritanceSupported: true 
+        });
       } catch (error) {
         console.error("Failed to list connectors:", error);
         response.status(500).json({ error: error.message });
@@ -166,6 +192,71 @@ function apiWorkspaceConnectorEndpoints(app) {
         });
       } catch (error) {
         console.error("Failed to disconnect service:", error);
+        response.status(500).json({ error: error.message });
+      }
+    }
+  );
+
+  /**
+   * POST /api/workspace/:slug/connectors/:provider/override
+   * Override a user-level connector with workspace-specific settings
+   */
+  app.post(
+    "/v1/workspace/:slug/connectors/:provider/override",
+    [validatedRequest],
+    async (request, response) => {
+      try {
+        const { slug, provider } = request.params;
+        const { settings } = reqBody(request);
+        const workspace = await Workspace.get({ slug });
+        
+        if (!workspace) {
+          return response.status(404).json({ error: "Workspace not found" });
+        }
+
+        // Check if user has this connector available
+        if (response.locals.user?.id) {
+          const userConnector = await ConnectorTokens.get({
+            userId: response.locals.user.id,
+            provider,
+          });
+
+          if (!userConnector) {
+            return response.status(404).json({ 
+              error: "User connector not found. You must connect this service at the user level first." 
+            });
+          }
+
+          // Create workspace-level override
+          const { connector, error } = await ConnectorTokens.upsert({
+            workspaceId: workspace.id,
+            provider,
+            nangoConnectionId: userConnector.nangoConnectionId, // Inherit the connection
+            metadata: {
+              ...userConnector.metadata,
+              ...settings, // Override with workspace-specific settings
+              overrides: settings,
+            },
+            status: "connected",
+            scope: "workspace",
+          });
+
+          if (error) {
+            return response.status(500).json({ success: false, error });
+          }
+
+          response.status(200).json({
+            success: true,
+            connector,
+            message: "Workspace override created successfully",
+          });
+        } else {
+          return response.status(401).json({ 
+            error: "User authentication required for connector overrides" 
+          });
+        }
+      } catch (error) {
+        console.error("Failed to create connector override:", error);
         response.status(500).json({ error: error.message });
       }
     }

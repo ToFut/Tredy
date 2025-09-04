@@ -170,6 +170,9 @@ export default {
     mobileConnections: () => {
       return `/settings/mobile-connections`;
     },
+    userConnectors: () => {
+      return `/settings/user-connectors`;
+    },
   },
   agents: {
     builder: () => {

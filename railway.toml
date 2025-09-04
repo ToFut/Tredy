@@ -1,0 +1,41 @@
+[build]
+builder = "nixpacks"
+buildCommand = "cd server && npm install && npx prisma generate && cd ../frontend && npm install && npm run build"
+
+[deploy]
+startCommand = "cd server && npm run start:production"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+healthcheckPath = "/api/health"
+healthcheckTimeout = 30
+
+[[services]]
+name = "server"
+port = 3001
+internalPort = 3001
+targetPort = 3001
+protocol = "http"
+
+[[services]]
+name = "collector"
+port = 8888
+internalPort = 8888
+targetPort = 8888
+protocol = "http"
+
+[env]
+NODE_ENV = "production"
+SERVER_PORT = "3001"
+STORAGE_DIR = "/app/storage"
+
+# Add cron job for document processing
+[[crons]]
+name = "process-documents"
+schedule = "*/5 * * * *"
+command = "cd server && node utils/jobs/processDocuments.js"
+
+# Add cron job for session cleanup
+[[crons]]
+name = "cleanup-sessions"
+schedule = "0 0 * * *"
+command = "cd server && node utils/jobs/cleanupSessions.js"

@@ -44,11 +44,14 @@ class NangoIntegration {
   /**
    * Get OAuth URL for frontend embed
    * Uses Nango's frontend auth flow
+   * @param {string} provider - The provider name (gmail, slack, etc.)
+   * @param {string} identifier - Either workspaceId or user_${userId}
    */
-  async getAuthConfig(provider, workspaceId) {
+  async getAuthConfig(provider, identifier) {
     if (!this.nango) throw new Error("Nango not configured");
 
-    const connectionId = `workspace_${workspaceId}`;
+    // Support both workspace_${id} and user_${id} patterns
+    const connectionId = identifier.includes('_') ? identifier : `workspace_${identifier}`;
     const isProduction = process.env.NODE_ENV === 'production';
     
     // Load production config if in production mode
@@ -121,7 +124,16 @@ class NangoIntegration {
       
       if (!providerConfigKey) {
         console.warn(`[Nango] No matching provider config found for ${provider}. Available: ${availableKeys.join(', ')}`);
-        throw new Error(`Provider ${provider} is not configured in Nango. Please add a provider config for ${provider} in your Nango dashboard. Available providers: ${availableKeys.join(', ')}`);
+        
+        // Return a special config that will trigger frontend to show setup instructions
+        return {
+          error: 'provider_not_configured',
+          provider: provider,
+          message: `${provider} is not configured in Nango yet. Please add a provider config for ${provider} in your Nango dashboard.`,
+          setupInstructions: `To connect ${provider}, you need to:\n1. Go to your Nango dashboard\n2. Add a new integration for ${provider}\n3. Configure the OAuth settings\n4. Return here to connect`,
+          availableProviders: availableKeys,
+          nangoSetupUrl: `${isProduction ? nangoConfig?.NANGO_HOST : (process.env.NANGO_HOST || "https://api.nango.dev")}/integrations`
+        };
       }
       
     } catch (error) {

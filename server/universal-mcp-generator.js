@@ -25,95 +25,40 @@ class UniversalMCPGenerator {
     
     this.nango = new Nango(this.nangoConfig);
     
-    // Knowledge base of API patterns
-    this.apiPatterns = {
-      linkedin: {
-        baseUrl: 'https://api.linkedin.com',
-        apiVersion: 'v2',
-        headers: {
-          'X-Restli-Protocol-Version': '2.0.0',
-          'LinkedIn-Version': '202401'
-        },
-        knownEndpoints: [
-          { path: '/v2/userinfo', method: 'GET', category: 'profile' },
-          { path: '/v2/ugcPosts', method: 'POST', category: 'posts' },
-          { path: '/v2/messages', method: 'POST', category: 'messaging' },
-          { path: '/v2/socialActions', method: 'GET', category: 'social' }
-        ],
-        limitations: {
-          messaging: 'Read access restricted to partners',
-          connections: 'List access removed from public API',
-          search: 'Requires special permissions'
-        }
-      },
-      slack: {
-        baseUrl: 'https://slack.com/api',
-        apiVersion: 'v1',
-        knownEndpoints: [
-          { path: '/conversations.list', method: 'GET', category: 'channels' },
-          { path: '/chat.postMessage', method: 'POST', category: 'messaging' },
-          { path: '/users.list', method: 'GET', category: 'users' },
-          { path: '/files.upload', method: 'POST', category: 'files' }
-        ]
-      },
-      github: {
-        baseUrl: 'https://api.github.com',
-        apiVersion: 'v3',
-        headers: {
-          'Accept': 'application/vnd.github.v3+json'
-        },
-        knownEndpoints: [
-          { path: '/user', method: 'GET', category: 'profile' },
-          { path: '/repos', method: 'GET', category: 'repositories' },
-          { path: '/issues', method: 'GET', category: 'issues' },
-          { path: '/pulls', method: 'GET', category: 'pull_requests' }
-        ]
-      },
-      shopify: {
-        baseUrl: 'https://{shop}.myshopify.com/admin/api',
-        apiVersion: '2024-01',
-        knownEndpoints: [
-          { path: '/products.json', method: 'GET', category: 'products' },
-          { path: '/orders.json', method: 'GET', category: 'orders' },
-          { path: '/customers.json', method: 'GET', category: 'customers' },
-          { path: '/inventory_items.json', method: 'GET', category: 'inventory' }
-        ]
-      },
-      'google-drive': {
-        baseUrl: 'https://www.googleapis.com/drive',
-        apiVersion: 'v3',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        knownEndpoints: [
-          { path: '/v3/files', method: 'GET', category: 'files', description: 'List files and folders' },
-          { path: '/v3/files', method: 'POST', category: 'files', description: 'Create/upload files' },
-          { path: '/v3/files/{fileId}', method: 'GET', category: 'files', description: 'Get file metadata' },
-          { path: '/v3/files/{fileId}', method: 'PATCH', category: 'files', description: 'Update file metadata' },
-          { path: '/v3/files/{fileId}', method: 'DELETE', category: 'files', description: 'Delete file' },
-          { path: '/v3/files/{fileId}/copy', method: 'POST', category: 'files', description: 'Copy file' },
-          { path: '/v3/files/{fileId}/permissions', method: 'GET', category: 'sharing', description: 'List permissions' },
-          { path: '/v3/files/{fileId}/permissions', method: 'POST', category: 'sharing', description: 'Share file' },
-          { path: '/v3/files/{fileId}/export', method: 'GET', category: 'export', description: 'Export Google Docs/Sheets' },
-          { path: '/v3/about', method: 'GET', category: 'account', description: 'Get Drive info' },
-          { path: '/v3/changes', method: 'GET', category: 'sync', description: 'Get changes for sync' },
-          { path: '/v3/changes/watch', method: 'POST', category: 'sync', description: 'Watch for changes' }
-        ],
-        scopes: [
-          'https://www.googleapis.com/auth/drive',
-          'https://www.googleapis.com/auth/drive.file',
-          'https://www.googleapis.com/auth/drive.metadata'
-        ],
-        features: {
-          fileOperations: ['list', 'upload', 'download', 'delete', 'copy', 'move'],
-          sharing: ['share', 'unshare', 'permissions'],
-          sync: ['changes', 'watch', 'webhooks'],
-          export: ['docs', 'sheets', 'slides', 'pdf'],
-          search: ['content', 'metadata', 'fulltext']
-        }
+    // Universal patterns for API discovery (not service-specific)
+    this.universalPatterns = {
+      // Common OpenAPI/Swagger paths
+      openApiPaths: [
+        '/openapi.json', '/swagger.json', '/api-docs', '/.well-known/openapi',
+        '/api/v1/openapi', '/api/v2/swagger', '/v1/api-docs', '/v2/api-docs'
+      ],
+      
+      // Common API endpoint patterns to probe
+      commonEndpoints: [
+        '/api', '/api/v1', '/api/v2', '/api/v3', '/v1', '/v2', '/v3',
+        '/users', '/user', '/me', '/profile', '/account',
+        '/items', '/resources', '/data', '/list', '/search',
+        '/files', '/documents', '/folders', '/media',
+        '/messages', '/posts', '/comments', '/notifications',
+        '/events', '/activities', '/logs', '/history',
+        '/settings', '/config', '/preferences',
+        '/products', '/services', '/catalog',
+        '/orders', '/transactions', '/payments',
+        '/customers', '/contacts', '/leads'
+      ],
+      
+      // Method patterns for different operations
+      methodPatterns: {
+        'GET': ['list', 'read', 'fetch', 'search', 'query'],
+        'POST': ['create', 'add', 'submit', 'send'],
+        'PUT': ['update', 'replace', 'set'],
+        'PATCH': ['modify', 'edit', 'change'],
+        'DELETE': ['remove', 'delete', 'destroy']
       }
     };
+    
+    // Store learned patterns for services (builds over time)
+    this.learnedPatterns = {};
   }
 
   /**
@@ -141,7 +86,7 @@ class UniversalMCPGenerator {
       
       // Step 5: Verify Functionality
       console.log('5️⃣ Verifying functionality...');
-      const verification = await this.verifyMCPFunctionality(serviceName, workspaceId);
+      const verification = await this.verifyMCPFunctionality(serviceName, workspaceId, analysis);
       
       return {
         success: true,
@@ -180,8 +125,10 @@ class UniversalMCPGenerator {
     
     const connectionId = `workspace_${workspaceId}`;
     
-    // Use known patterns
-    const patterns = this.apiPatterns[serviceName] || {};
+    // Initialize API config for the service
+    analysis.apiConfig = {
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+    };
     
     // Test authentication
     try {
@@ -203,9 +150,28 @@ class UniversalMCPGenerator {
       };
     }
     
-    // Probe endpoints comprehensively
-    if (patterns.knownEndpoints) {
-      for (const endpoint of patterns.knownEndpoints) {
+    // First try to discover OpenAPI/Swagger spec
+    console.log(`[Universal MCP] Discovering API specification for ${serviceName}...`);
+    const openApiSpec = await this.discoverOpenAPISpec(serviceName, connectionId);
+    
+    if (openApiSpec) {
+      console.log(`[Universal MCP] Found OpenAPI spec for ${serviceName}`);
+      const specEndpoints = this.parseOpenAPISpec(openApiSpec);
+      for (const endpoint of specEndpoints) {
+        const endpointAnalysis = await this.analyzeEndpoint(
+          serviceName,
+          endpoint,
+          connectionId
+        );
+        analysis.endpoints.push(endpointAnalysis);
+      }
+      analysis.authentication.type = openApiSpec.components?.securitySchemes ? 
+        Object.keys(openApiSpec.components.securitySchemes)[0] : 'OAuth2';
+    } else {
+      // Fallback to intelligent probing
+      console.log(`[Universal MCP] No OpenAPI spec found, using intelligent probing...`);
+      const discovered = await this.intelligentProbe(serviceName, connectionId);
+      for (const endpoint of discovered) {
         const endpointAnalysis = await this.analyzeEndpoint(
           serviceName,
           endpoint,
@@ -215,18 +181,14 @@ class UniversalMCPGenerator {
       }
     }
     
-    // Discover additional endpoints
-    const discovered = await this.discoverEndpoints(serviceName, connectionId);
-    analysis.endpoints.push(...discovered);
-    
     // Analyze rate limits
     analysis.rateLimits = await this.detectRateLimits(serviceName, connectionId);
     
     // Determine capabilities
     analysis.capabilities = this.determineCapabilities(analysis.endpoints);
     
-    // Document limitations
-    analysis.limitations = patterns.limitations || {};
+    // Document limitations based on analysis
+    analysis.limitations = this.detectLimitations(analysis.endpoints);
     
     // Extract data models
     analysis.dataModels = await this.extractDataModels(analysis.endpoints);
@@ -259,7 +221,7 @@ class UniversalMCPGenerator {
         connectionId,
         providerConfigKey: serviceName,
         params: endpoint.method === 'GET' ? { limit: 1 } : {},
-        headers: this.apiPatterns[serviceName]?.headers
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
       });
       
       result.working = true;
@@ -299,19 +261,22 @@ class UniversalMCPGenerator {
   }
 
   /**
-   * Discover endpoints through intelligent probing
+   * Discover OpenAPI/Swagger specification
    */
-  async discoverEndpoints(serviceName, connectionId) {
-    const discovered = [];
-    const commonPaths = [
+  async discoverOpenAPISpec(serviceName, connectionId) {
+    const specPaths = [
+      '/openapi.json',
+      '/swagger.json',
+      '/api-docs',
+      '/api/swagger.json',
+      '/.well-known/openapi',
       '/api/v1/openapi',
       '/api/v2/swagger',
-      '/.well-known/openapi',
-      '/api-docs',
-      '/swagger.json'
+      '/docs/api.json',
+      '/api-docs.json'
     ];
     
-    for (const path of commonPaths) {
+    for (const path of specPaths) {
       try {
         const response = await this.nango.proxy({
           method: 'GET',
@@ -320,14 +285,98 @@ class UniversalMCPGenerator {
           providerConfigKey: serviceName
         });
         
-        if (response.data && (response.data.openapi || response.data.swagger)) {
-          // Parse OpenAPI/Swagger spec
-          const endpoints = this.parseOpenAPISpec(response.data);
-          discovered.push(...endpoints);
-          break;
+        if (response.data && (response.data.openapi || response.data.swagger || response.data.paths)) {
+          console.log(`[Universal MCP] Found API spec at ${path}`);
+          return response.data;
         }
       } catch (e) {
         // Continue trying other paths
+      }
+    }
+    
+    return null;
+  }
+  
+  /**
+   * Intelligent API probing when no spec is available
+   */
+  async intelligentProbe(serviceName, connectionId) {
+    const discovered = [];
+    
+    // Service-specific patterns for common APIs
+    const servicePatterns = {
+      'google-drive': [
+        { path: 'https://www.googleapis.com/drive/v3/files', method: 'GET', category: 'files' },
+        { path: 'https://www.googleapis.com/drive/v3/about', method: 'GET', category: 'account' }
+      ],
+      'gmail': [
+        { path: 'https://gmail.googleapis.com/gmail/v1/users/me/messages', method: 'GET', category: 'messages' },
+        { path: 'https://gmail.googleapis.com/gmail/v1/users/me/profile', method: 'GET', category: 'profile' }
+      ],
+      'google-calendar': [
+        { path: 'https://www.googleapis.com/calendar/v3/calendars/primary/events', method: 'GET', category: 'events' },
+        { path: 'https://www.googleapis.com/calendar/v3/users/me/calendarList', method: 'GET', category: 'calendars' }
+      ]
+    };
+    
+    // Use service-specific patterns if available, otherwise use generic patterns
+    const patterns = servicePatterns[serviceName] || [
+      // REST patterns
+      { path: '/api/users', method: 'GET', category: 'users' },
+      { path: '/api/me', method: 'GET', category: 'auth' },
+      { path: '/api/profile', method: 'GET', category: 'users' },
+      { path: '/api/account', method: 'GET', category: 'account' },
+      { path: '/api/files', method: 'GET', category: 'files' },
+      { path: '/api/documents', method: 'GET', category: 'documents' },
+      { path: '/api/items', method: 'GET', category: 'items' },
+      { path: '/api/resources', method: 'GET', category: 'resources' },
+      { path: '/api/events', method: 'GET', category: 'events' },
+      { path: '/api/messages', method: 'GET', category: 'messages' },
+      // Version patterns
+      { path: '/v1/users', method: 'GET', category: 'users' },
+      { path: '/v2/users', method: 'GET', category: 'users' },
+      // Common endpoints
+      { path: '/users', method: 'GET', category: 'users' },
+      { path: '/files', method: 'GET', category: 'files' },
+      { path: '/search', method: 'GET', category: 'search' },
+      { path: '/status', method: 'GET', category: 'system' },
+      { path: '/health', method: 'GET', category: 'system' }
+    ];
+    
+    const commonPatterns = patterns;
+    
+    // Test each pattern
+    for (const pattern of commonPatterns) {
+      try {
+        const response = await this.nango.proxy({
+          method: pattern.method,
+          endpoint: pattern.path,
+          connectionId,
+          providerConfigKey: serviceName,
+          params: { limit: 1 }
+        });
+        
+        if (response.status === 200) {
+          console.log(`[Universal MCP] Found working endpoint: ${pattern.method} ${pattern.path}`);
+          discovered.push({
+            ...pattern,
+            description: `${pattern.category} operations`,
+            working: true
+          });
+          
+          // If we found a base path, explore related CRUD operations
+          if (pattern.method === 'GET') {
+            const basePath = pattern.path.replace(/\/$/,'');
+            discovered.push(
+              { path: basePath, method: 'POST', category: pattern.category, description: `Create ${pattern.category}` },
+              { path: `${basePath}/{id}`, method: 'GET', category: pattern.category, description: `Get ${pattern.category} by ID` },
+              { path: `${basePath}/{id}`, method: 'PUT', category: pattern.category, description: `Update ${pattern.category}` },
+              { path: `${basePath}/{id}`, method: 'DELETE', category: pattern.category, description: `Delete ${pattern.category}` }
+            );
+          }
+        }
+      } catch (error) {
+        // Endpoint doesn't exist or requires auth, continue
       }
     }
     
@@ -376,7 +425,7 @@ class ${className} {
     };
 
     // Service-specific configuration
-    this.apiConfig = ${JSON.stringify(this.apiPatterns[serviceName] || {}, null, 4)};
+    this.apiConfig = ${JSON.stringify(analysis.apiConfig || { headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' } }, null, 4)};
     
     // Discovered endpoints
     this.endpoints = ${JSON.stringify(analysis.endpoints.filter(e => e.working), null, 4)};
@@ -700,7 +749,7 @@ module.exports = ${className};`;
   /**
    * Step 5: Verify MCP Functionality
    */
-  async verifyMCPFunctionality(serviceName, workspaceId) {
+  async verifyMCPFunctionality(serviceName, workspaceId, analysis = {}) {
     const verification = {
       service: serviceName,
       timestamp: new Date().toISOString(),
@@ -727,9 +776,9 @@ module.exports = ${className};`;
       });
     }
     
-    // Test basic functionality
-    const testEndpoint = this.apiPatterns[serviceName]?.knownEndpoints?.[0];
-    if (testEndpoint) {
+    // Test basic functionality with first discovered endpoint
+    const testEndpoint = analysis.endpoints?.[0];
+    if (testEndpoint && testEndpoint.working) {
       try {
         const nango = new Nango(this.nangoConfig);
         const response = await nango.proxy({
@@ -830,12 +879,73 @@ module.exports = ${className};`;
   }
 
   categorizeFromPath(path) {
-    if (path.includes('message')) return 'messaging';
-    if (path.includes('user') || path.includes('profile')) return 'users';
-    if (path.includes('post') || path.includes('feed')) return 'posts';
-    if (path.includes('file') || path.includes('upload')) return 'files';
-    if (path.includes('channel') || path.includes('conversation')) return 'channels';
+    // Use regex patterns for more flexible matching
+    const patterns = {
+      'messaging': /message|chat|conversation|comment|reply/i,
+      'users': /user|profile|account|member|person|people|contact/i,
+      'posts': /post|article|blog|content|feed|story|update/i,
+      'files': /file|document|upload|attachment|media|asset|download/i,
+      'channels': /channel|room|space|group|team|workspace/i,
+      'events': /event|calendar|schedule|meeting|appointment/i,
+      'tasks': /task|todo|issue|ticket|job|workflow/i,
+      'storage': /drive|storage|folder|directory|bucket/i,
+      'email': /mail|email|inbox|message/i,
+      'payments': /payment|transaction|invoice|billing|subscription/i,
+      'products': /product|item|catalog|inventory|sku/i,
+      'orders': /order|purchase|cart|checkout/i,
+      'analytics': /analytics|metrics|stats|report|insight/i,
+      'auth': /auth|login|logout|token|session|oauth/i,
+      'settings': /setting|config|preference|option/i
+    };
+    
+    for (const [category, pattern] of Object.entries(patterns)) {
+      if (pattern.test(path)) {
+        return category;
+      }
+    }
+    
     return 'general';
+  }
+  
+  detectLimitations(endpoints) {
+    const limitations = {};
+    
+    // Analyze endpoints to detect limitations
+    const hasRateLimiting = endpoints.some(e => 
+      e.errors?.some(err => err.status === 429)
+    );
+    
+    if (hasRateLimiting) {
+      limitations.rateLimit = 'Rate limiting detected - implement exponential backoff';
+    }
+    
+    const hasPagination = endpoints.some(e => 
+      e.responseSchema?.includes('next') || 
+      e.responseSchema?.includes('cursor') ||
+      e.responseSchema?.includes('page')
+    );
+    
+    if (hasPagination) {
+      limitations.pagination = 'API uses pagination - handle multiple requests for full data';
+    }
+    
+    const requiresAuth = endpoints.some(e => 
+      e.errors?.some(err => err.status === 401 || err.status === 403)
+    );
+    
+    if (requiresAuth) {
+      limitations.authentication = 'OAuth2 authentication required for all endpoints';
+    }
+    
+    const hasComplexParams = endpoints.some(e => 
+      e.requiredParams?.length > 3
+    );
+    
+    if (hasComplexParams) {
+      limitations.complexity = 'Some endpoints require multiple parameters';
+    }
+    
+    return limitations;
   }
 
   async detectRateLimits(serviceName, connectionId) {

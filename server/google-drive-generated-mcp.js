@@ -2,7 +2,7 @@
 
 /**
  * GOOGLE-DRIVE MCP - Auto-generated
- * Generated: 2025-09-04T04:05:17.825Z
+ * Generated: 2025-09-04T04:19:20.229Z
  * 
  * Capabilities:
  * 
@@ -31,121 +31,9 @@ class GoogledriveMCP {
 
     // Service-specific configuration
     this.apiConfig = {
-    "baseUrl": "https://www.googleapis.com/drive",
-    "apiVersion": "v3",
     "headers": {
         "Accept": "application/json",
         "Content-Type": "application/json"
-    },
-    "knownEndpoints": [
-        {
-            "path": "/v3/files",
-            "method": "GET",
-            "category": "files",
-            "description": "List files and folders"
-        },
-        {
-            "path": "/v3/files",
-            "method": "POST",
-            "category": "files",
-            "description": "Create/upload files"
-        },
-        {
-            "path": "/v3/files/{fileId}",
-            "method": "GET",
-            "category": "files",
-            "description": "Get file metadata"
-        },
-        {
-            "path": "/v3/files/{fileId}",
-            "method": "PATCH",
-            "category": "files",
-            "description": "Update file metadata"
-        },
-        {
-            "path": "/v3/files/{fileId}",
-            "method": "DELETE",
-            "category": "files",
-            "description": "Delete file"
-        },
-        {
-            "path": "/v3/files/{fileId}/copy",
-            "method": "POST",
-            "category": "files",
-            "description": "Copy file"
-        },
-        {
-            "path": "/v3/files/{fileId}/permissions",
-            "method": "GET",
-            "category": "sharing",
-            "description": "List permissions"
-        },
-        {
-            "path": "/v3/files/{fileId}/permissions",
-            "method": "POST",
-            "category": "sharing",
-            "description": "Share file"
-        },
-        {
-            "path": "/v3/files/{fileId}/export",
-            "method": "GET",
-            "category": "export",
-            "description": "Export Google Docs/Sheets"
-        },
-        {
-            "path": "/v3/about",
-            "method": "GET",
-            "category": "account",
-            "description": "Get Drive info"
-        },
-        {
-            "path": "/v3/changes",
-            "method": "GET",
-            "category": "sync",
-            "description": "Get changes for sync"
-        },
-        {
-            "path": "/v3/changes/watch",
-            "method": "POST",
-            "category": "sync",
-            "description": "Watch for changes"
-        }
-    ],
-    "scopes": [
-        "https://www.googleapis.com/auth/drive",
-        "https://www.googleapis.com/auth/drive.file",
-        "https://www.googleapis.com/auth/drive.metadata"
-    ],
-    "features": {
-        "fileOperations": [
-            "list",
-            "upload",
-            "download",
-            "delete",
-            "copy",
-            "move"
-        ],
-        "sharing": [
-            "share",
-            "unshare",
-            "permissions"
-        ],
-        "sync": [
-            "changes",
-            "watch",
-            "webhooks"
-        ],
-        "export": [
-            "docs",
-            "sheets",
-            "slides",
-            "pdf"
-        ],
-        "search": [
-            "content",
-            "metadata",
-            "fulltext"
-        ]
     }
 };
     

@@ -1,7 +1,7 @@
 const { SystemSettings } = require("../../models/systemSettings");
 const { User } = require("../../models/user");
 const { EncryptionManager } = require("../EncryptionManager");
-const { decodeJWT } = require("../http");
+const { decodeJWT } = require("../jwt");
 const EncryptionMgr = new EncryptionManager();
 
 async function validatedRequest(request, response, next) {

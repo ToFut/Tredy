@@ -299,11 +299,11 @@ export default function PromptInput({
               <AttachmentManager attachments={attachments} />
               
               <div className="flex items-end w-full">
-                {/* Enhanced modern tools */}
-                <div className="flex items-center gap-1 p-3">
+                {/* Enhanced modern tools with mobile-friendly touch targets */}
+                <div className="flex items-center gap-1 md:gap-1.5 p-2 md:p-3">
                   <button
                     type="button"
-                    className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation"
+                    className="p-2 md:p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation"
                     style={{ minWidth: '44px', minHeight: '44px' }}
                   >
                     <AttachItem />
@@ -316,15 +316,20 @@ export default function PromptInput({
                     showing={showAgents}
                     setShowing={setShowAgents}
                   />
+                  {/* Speech-to-Text Button */}
+                  <div className="p-2 md:p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation"
+                       style={{ minWidth: '44px', minHeight: '44px' }}>
+                    <SpeechToText sendCommand={sendCommand} />
+                  </div>
                   <button
                     type="button"
                     onClick={() => setShowModeSelector(!showModeSelector)}
-                    className={`p-2 rounded-lg transition-all touch-manipulation ${
+                    className={`p-2 md:p-2.5 rounded-xl transition-all touch-manipulation ${
                       responseMode === "agent"
                         ? "bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 text-purple-600 dark:text-purple-400"
                         : "hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
                     }`}
-                    style={{ minWidth: '40px', minHeight: '40px' }}
+                    style={{ minWidth: '44px', minHeight: '44px' }}
                   >
                     {responseMode === "agent" ? (
                       <Brain className="w-5 h-5" weight="bold" />
@@ -334,7 +339,7 @@ export default function PromptInput({
                   </button>
                 </div>
                 
-                {/* Enhanced textarea */}
+                {/* Enhanced textarea with improved mobile support */}
                 <textarea
                   id={PROMPT_INPUT_ID}
                   ref={textareaRef}
@@ -352,12 +357,16 @@ export default function PromptInput({
                   }}
                   value={promptInput}
                   spellCheck={Appearance.get("enableSpellCheck")}
-                  className="flex-1 border-none resize-none bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500/70 dark:placeholder:text-gray-400/70 text-[16px] md:text-[16px] leading-7 max-h-[160px] focus:outline-none py-4 px-3 font-medium"
-                  style={{ minHeight: '28px' }}
+                  className="flex-1 border-none resize-none bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500/70 dark:placeholder:text-gray-400/70 text-[16px] leading-relaxed max-h-[120px] md:max-h-[160px] focus:outline-none py-3 md:py-4 px-2 md:px-3 font-medium"
+                  style={{ 
+                    minHeight: '44px',
+                    WebkitAppearance: 'none',
+                    fontSize: '16px' // Prevents iOS zoom on focus
+                  }}
                   placeholder={responseMode === "agent" ? "Ask me anything with AI tools..." : "Ask me anything..."}
                 />
                 
-                {/* Enhanced send button */}
+                {/* Enhanced send button with mobile optimization */}
                 <div className="p-2 md:p-3">
                   {isStreaming ? (
                     <StopGenerationButton />
@@ -367,12 +376,17 @@ export default function PromptInput({
                         ref={formRef}
                         type="submit"
                         disabled={isDisabled || !promptInput.trim()}
-                        className={`relative overflow-hidden rounded-2xl transition-all transform active:scale-95 group ${
+                        className={`relative overflow-hidden rounded-2xl transition-all transform active:scale-95 group touch-manipulation ${
                           !isDisabled && promptInput.trim() 
-                            ? 'bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600 hover:from-blue-600 hover:via-purple-600 hover:to-blue-700 cursor-pointer shadow-lg hover:shadow-xl hover:scale-105' 
+                            ? 'bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600 hover:from-blue-600 hover:via-purple-600 hover:to-blue-700 cursor-pointer shadow-lg hover:shadow-xl md:hover:scale-105' 
                             : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'
                         }`}
-                        style={{ minWidth: '52px', minHeight: '52px', padding: '14px' }}
+                        style={{ 
+                          minWidth: '48px', 
+                          minHeight: '48px', 
+                          padding: '12px',
+                          WebkitTapHighlightColor: 'transparent'
+                        }}
                         aria-label="Send message"
                       >
                         {!isDisabled && promptInput.trim() && (

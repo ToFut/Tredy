@@ -1,11 +1,11 @@
 process.env.NODE_ENV === "development"
   ? require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` })
   : require("dotenv").config();
-const JWT = require("jsonwebtoken");
 const { User } = require("../../models/user");
 const { jsonrepair } = require("jsonrepair");
 const extract = require("extract-json-from-string");
 const { validateSupabaseJWT } = require("../supabase");
+const { makeJWT, decodeJWT } = require("../jwt");
 
 function reqBody(request) {
   return typeof request.body === "string"
@@ -17,17 +17,6 @@ function queryParams(request) {
   return request.query;
 }
 
-/**
- * Creates a JWT with the given info and expiry
- * @param {object} info - The info to include in the JWT
- * @param {string} expiry - The expiry time for the JWT (default: 30 days)
- * @returns {string} The JWT
- */
-function makeJWT(info = {}, expiry = "30d") {
-  if (!process.env.JWT_SECRET)
-    throw new Error("Cannot create JWT as JWT_SECRET is unset.");
-  return JWT.sign(info, process.env.JWT_SECRET, { expiresIn: expiry });
-}
 
 // Note: Only valid for finding users in multi-user mode
 // as single-user mode with password is not a "user"
@@ -63,12 +52,6 @@ async function userFromSession(request, response = null) {
   return user;
 }
 
-function decodeJWT(jwtToken) {
-  try {
-    return JWT.verify(jwtToken, process.env.JWT_SECRET);
-  } catch {}
-  return { p: null, id: null, username: null };
-}
 
 function multiUserMode(response) {
   return response?.locals?.multiUserMode;

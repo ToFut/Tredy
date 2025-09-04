@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Login Flow</title>
+</head>
+<body>
+    <h1>Test AnythingLLM Login Flow</h1>
+    
+    <button id="testBackend">Test Backend API</button>
+    <button id="testSupabase">Test Supabase Auth</button>
+    <button id="checkSession">Check Current Session</button>
+    
+    <pre id="output"></pre>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        document.getElementById('testBackend').addEventListener('click', async () => {
+            try {
+                const response = await fetch('http://localhost:3001/api/auth/check-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: 'test' })
+                });
+                const data = await response.json();
+                output.textContent = 'Backend API: ' + JSON.stringify(data, null, 2);
+            } catch (err) {
+                output.textContent = 'Backend Error: ' + err.message;
+            }
+        });
+        
+        document.getElementById('testSupabase').addEventListener('click', async () => {
+            try {
+                const response = await fetch('http://localhost:3001/api/auth/supabase', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        id: 'test-123',
+                        supabaseToken: 'test-token'
+                    })
+                });
+                const data = await response.json();
+                output.textContent = 'Supabase Endpoint: ' + JSON.stringify(data, null, 2);
+            } catch (err) {
+                output.textContent = 'Supabase Error: ' + err.message;
+            }
+        });
+        
+        document.getElementById('checkSession').addEventListener('click', () => {
+            const user = localStorage.getItem('anythingllm_user');
+            const token = localStorage.getItem('anythingllm_authToken');
+            const supabaseToken = localStorage.getItem('anythingllm_supabase_token');
+            
+            output.textContent = 'Local Storage:\n' +
+                'User: ' + (user || 'none') + '\n' +
+                'Auth Token: ' + (token ? 'present' : 'none') + '\n' +
+                'Supabase Token: ' + (supabaseToken ? 'present' : 'none');
+        });
+    </script>
+</body>
+</html>

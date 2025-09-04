@@ -1,13 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/utils/supabase';
 import { CircleNotch } from '@phosphor-icons/react';
 import paths from '@/utils/paths';
-import { AuthContext } from '@/AuthContext';
 
 export default function SupabaseLogin() {
   const navigate = useNavigate();
-  const { actions } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -99,8 +97,8 @@ export default function SupabaseLogin() {
       
       if (authData.user) {
         window.localStorage.setItem('anythingllm_user', JSON.stringify(authData.user));
-        // Update AuthContext so UserButton appears immediately
-        actions.updateUser(authData.user, authData.token);
+        // TODO: Update AuthContext when available
+        // actions.updateUser(authData.user, authData.token);
       }
 
       console.log('[SYNC] Login complete, redirecting...');
@@ -162,10 +160,13 @@ export default function SupabaseLogin() {
     setMessage('Redirecting to Google...');
 
     try {
+      const redirectUrl = `${window.location.origin}/login`;
+      console.log('[OAuth] Using redirect URL:', redirectUrl);
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin + '/login',
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',

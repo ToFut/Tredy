@@ -89,14 +89,31 @@ const websocket = {
           if (message.from === "USER" && muteUserReply) return;
           
           // Format the message properly for the frontend
-          if (message.from === "ASSISTANT" || message.from === "agent") {
-            // Send agent messages as plain content without type
-            // This will be handled by the frontend as a regular assistant message
+          console.log("[Websocket Debug] Message received:", { from: message.from, to: message.to, role: message.role, hasContent: !!message.content });
+          
+          // Handle agent responses - when 'to' is USER, it's the agent responding
+          if (message.to === "USER" && message.content) {
+            console.log("[Websocket] Sending assistant message to frontend:", message.content.substring(0, 100));
+            socket.send(JSON.stringify({ 
+              content: message.content,
+              role: "assistant"
+            }));
+          } else if (message.from === "ASSISTANT" || message.from === "agent") {
+            // Alternative format for assistant messages
             socket.send(JSON.stringify({ 
               content: message.content || message.text || message.message || "",
               role: "assistant"
             }));
+          } else if (message.role === "function") {
+            // Skip function messages - they're internal to the agent
+            console.log("[Websocket] Skipping function message:", message.name);
+            return;
+          } else if (message.from === "USER") {
+            // Skip echoing user messages back
+            return;
           } else {
+            // Send other messages as-is for debugging
+            console.log("[Websocket] Sending raw message:", message);
             socket.send(JSON.stringify(message));
           }
         });

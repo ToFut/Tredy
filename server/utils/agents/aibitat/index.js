@@ -689,7 +689,13 @@ ${this.getHistory({ to: route.to })
       );
     }
 
-    return completion?.result;
+    // Log the completion for debugging
+    this.handlerProps?.log?.("[debug] Final completion result:", completion);
+    
+    // Extract the actual content from completion
+    const result = completion?.result || completion?.content || completion?.message || completion;
+    
+    return result;
   }
 
   /**

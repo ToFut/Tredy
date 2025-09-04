@@ -1,6 +1,7 @@
 const { execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+const { PrismaClient } = require('@prisma/client');
 
 /**
  * Initialize database by running Prisma migrations
@@ -34,6 +35,9 @@ async function initializeDatabase() {
     
     console.log("[Database] Database initialization completed successfully");
     
+    // Enable multi-user mode for OAuth support
+    await enableMultiUserMode();
+    
   } catch (error) {
     console.error("[Database] Failed to initialize database:", error.message);
     
@@ -49,6 +53,43 @@ async function initializeDatabase() {
       console.error("[Database] Fallback approach also failed:", fallbackError.message);
       throw new Error("Database initialization failed");
     }
+  }
+}
+
+/**
+ * Enable multi-user mode for OAuth support
+ */
+async function enableMultiUserMode() {
+  const prisma = new PrismaClient();
+  try {
+    console.log('[Database] Enabling multi-user mode for OAuth support...');
+    
+    // Check if setting exists
+    const existingSetting = await prisma.system_settings.findUnique({
+      where: { label: 'multi_user_mode' }
+    });
+    
+    if (existingSetting?.value === 'true') {
+      console.log('[Database] Multi-user mode already enabled');
+    } else if (existingSetting) {
+      await prisma.system_settings.update({
+        where: { label: 'multi_user_mode' },
+        data: { value: 'true' }
+      });
+      console.log('[Database] Multi-user mode enabled successfully');
+    } else {
+      await prisma.system_settings.create({
+        data: {
+          label: 'multi_user_mode',
+          value: 'true'
+        }
+      });
+      console.log('[Database] Multi-user mode enabled successfully');
+    }
+  } catch (error) {
+    console.error('[Database] Failed to enable multi-user mode:', error.message);
+  } finally {
+    await prisma.$disconnect();
   }
 }
 

@@ -613,6 +613,7 @@ module.exports = ${className};`;
    * Step 4: Register MCP in system
    */
   async registerMCP(serviceName, mcpPath, workspaceId) {
+    // 1. Register MCP Server
     const configPath = path.join(__dirname, 'storage/plugins/anythingllm_mcp_servers.json');
     
     // Read current config
@@ -641,6 +642,59 @@ module.exports = ${className};`;
     // Save config
     await fs.writeFile(configPath, JSON.stringify(config, null, 2));
     console.log(`✅ Registered ${mcpKey} in MCP configuration`);
+    
+    // 2. Register as Connector in Workspace System
+    try {
+      const { ConnectorTokens } = require('./models/connectorTokens');
+      const { Workspace } = require('./models/workspace');
+      
+      // Get workspace
+      const workspace = await Workspace.get({ id: parseInt(workspaceId) });
+      if (!workspace) {
+        console.warn(`⚠️ Workspace ${workspaceId} not found, skipping connector registration`);
+        return;
+      }
+      
+      // Register connector
+      const connectorResult = await ConnectorTokens.upsert({
+        workspaceId: parseInt(workspaceId),
+        provider: serviceName,
+        status: 'connected',
+        authMethod: 'oauth',
+        nangoConnectionId: `workspace_${workspaceId}`,
+        metadata: {
+          mcpEnabled: true,
+          mcpPath: mcpPath,
+          generatedAt: new Date().toISOString(),
+          capabilities: this.getServiceCapabilities(serviceName),
+          syncEnabled: true
+        }
+      });
+      
+      if (connectorResult.connector) {
+        console.log(`✅ Registered ${serviceName} as connector for workspace ${workspaceId}`);
+      }
+    } catch (error) {
+      console.warn(`⚠️ Could not register connector: ${error.message}`);
+      // Don't fail the whole process if connector registration fails
+    }
+  }
+  
+  /**
+   * Get service capabilities for connector registration
+   */
+  getServiceCapabilities(serviceName) {
+    const capabilities = {
+      'google-drive': ['documents', 'files', 'folders', 'sync', 'sharing'],
+      'gmail': ['emails', 'attachments', 'labels', 'threads'],
+      'google-calendar': ['events', 'calendars', 'reminders'],
+      'linkedin': ['posts', 'connections', 'messages', 'profile'],
+      'slack': ['messages', 'channels', 'users', 'files'],
+      'github': ['repos', 'issues', 'pulls', 'commits'],
+      'shopify': ['products', 'orders', 'customers', 'inventory']
+    };
+    
+    return capabilities[serviceName] || ['data'];
   }
 
   /**

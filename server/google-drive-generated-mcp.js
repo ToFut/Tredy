@@ -2,7 +2,7 @@
 
 /**
  * GOOGLE-DRIVE MCP - Auto-generated
- * Generated: 2025-09-04T03:56:17.909Z
+ * Generated: 2025-09-04T04:05:17.825Z
  * 
  * Capabilities:
  * 

@@ -43,6 +43,7 @@ const { threadSharingEndpoints } = require("./endpoints/threadSharing");
 const { userConnectorEndpoints } = require("./endpoints/user/connectors");
 const { apiWorkspaceConnectorEndpoints } = require("./endpoints/api/workspace/connectors");
 const { WelcomeMessages } = require("./models/welcomeMessages");
+const { initializeDatabase } = require("./utils/database/init");
 const app = express();
 const apiRouter = express.Router();
 const FILE_LIMIT = "3GB";
@@ -158,12 +159,16 @@ app.all("*", function (_, response) {
   response.sendStatus(404);
 });
 
-// Initialize Tredy default welcome messages
+// Initialize database and default data
 (async () => {
   try {
+    // Initialize database schema first
+    await initializeDatabase();
+    
+    // Then initialize default welcome messages
     await WelcomeMessages.initializeDefaults();
   } catch (error) {
-    console.error("Failed to initialize welcome messages:", error);
+    console.error("Failed to initialize application:", error);
   }
 })();
 

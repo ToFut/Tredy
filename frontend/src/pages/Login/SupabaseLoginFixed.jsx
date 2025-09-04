@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/utils/supabase';
 import { CircleNotch } from '@phosphor-icons/react';
 import paths from '@/utils/paths';
+import { AuthContext } from '@/AuthContext';
 
 export default function SupabaseLogin() {
   const navigate = useNavigate();
+  const { actions } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -91,12 +93,14 @@ export default function SupabaseLogin() {
         throw new Error('Invalid auth response from backend');
       }
       
-      // Store the AnythingLLM JWT token
+      // Store the AnythingLLM JWT token and update AuthContext
       window.localStorage.setItem('anythingllm_authToken', authData.token);
       window.localStorage.setItem('anythingllm_authTimestamp', String(Date.now()));
       
       if (authData.user) {
         window.localStorage.setItem('anythingllm_user', JSON.stringify(authData.user));
+        // Update AuthContext so UserButton appears immediately
+        actions.updateUser(authData.user, authData.token);
       }
 
       console.log('[SYNC] Login complete, redirecting...');

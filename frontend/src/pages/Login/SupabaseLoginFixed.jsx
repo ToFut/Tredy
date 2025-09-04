@@ -46,12 +46,13 @@ export default function SupabaseLogin() {
         throw new Error('Invalid session data');
       }
 
-      // Create a simple test to verify backend is running
-      const testResponse = await fetch('/api/system/check-token', {
-        method: 'GET',
+      // Simple test to verify backend is running by calling auth endpoint with invalid data
+      const testResponse = await fetch('/api/auth/check-token', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        }
+        },
+        body: JSON.stringify({ token: 'test' })
       }).catch(() => null);
 
       if (!testResponse) {

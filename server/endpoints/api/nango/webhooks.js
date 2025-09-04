@@ -263,6 +263,28 @@ Snippet: ${record.snippet || ''}`,
         }
       };
       
+    case "google-drive":
+      return {
+        ...baseDoc,
+        content: `Google Drive Document: ${record.name || record.title}
+Type: ${record.mimeType || 'Unknown'}
+Size: ${record.size ? `${Math.round(record.size/1024)}KB` : 'N/A'}
+Description: ${record.description || 'No description'}
+Content: ${record.content || record.body || 'Content not available'}`,
+        metadata: {
+          ...baseDoc,
+          fileName: record.name,
+          mimeType: record.mimeType,
+          fileSize: record.size,
+          fileId: record.id,
+          webViewLink: record.webViewLink,
+          downloadUrl: record.downloadUrl,
+          parents: record.parents,
+          lastModified: record.modifiedTime,
+          owner: record.owners?.[0]?.emailAddress,
+        }
+      };
+      
     default:
       // Generic document format for unknown providers
       return {

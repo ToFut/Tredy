@@ -36,8 +36,18 @@ class ContextWindowFinder {
   constructor() {
     if (ContextWindowFinder.instance) return ContextWindowFinder.instance;
     ContextWindowFinder.instance = this;
-    if (!fs.existsSync(this.cacheLocation))
-      fs.mkdirSync(this.cacheLocation, { recursive: true });
+    try {
+      if (!fs.existsSync(this.cacheLocation))
+        fs.mkdirSync(this.cacheLocation, { recursive: true });
+    } catch (error) {
+      console.error('[ContextWindowFinder] Failed to create cache directory:', error);
+      // Create a fallback cache location in the current directory if STORAGE_DIR fails
+      this.cacheLocation = path.resolve(__dirname, '../../../storage/models/context-windows');
+      this.cacheFilePath = path.resolve(this.cacheLocation, 'context-windows.json');
+      this.cacheFileExpiryPath = path.resolve(this.cacheLocation, '.cached_at');
+      if (!fs.existsSync(this.cacheLocation))
+        fs.mkdirSync(this.cacheLocation, { recursive: true });
+    }
 
     // If the cache is stale or not found at all, pull the model map from remote
     if (this.isCacheStale || !fs.existsSync(this.cacheFilePath))

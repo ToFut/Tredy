@@ -66,23 +66,35 @@ export default function ChatHistory({
       (!isUserScrolling && isAtBottom); // Scroll if user was at bottom
 
     if (shouldAutoScroll && chatHistoryRef.current) {
-      // Use requestAnimationFrame for smooth scrolling
-      // Use immediate scroll without requestAnimationFrame to prevent glitch
-      chatHistoryRef.current.scrollTo({
-        top: chatHistoryRef.current.scrollHeight,
-        behavior: 'auto'  // Always use auto to prevent glitches
+      // Use RAF to ensure DOM is ready and prevent race conditions
+      requestAnimationFrame(() => {
+        if (!chatHistoryRef.current) return;
+        
+        const scrollHeight = chatHistoryRef.current.scrollHeight;
+        const clientHeight = chatHistoryRef.current.clientHeight;
+        
+        // Only scroll if there's content to scroll to
+        if (scrollHeight > clientHeight) {
+          chatHistoryRef.current.scrollTo({
+            top: scrollHeight,
+            behavior: 'auto'
+          });
+        }
       });
     }
   }, [history, isStreaming, hasStatusResponse, isUserScrolling, isAtBottom]);
 
   const handleScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
-    // Consider "near bottom" if within 100px of the bottom
-    const isNearBottom = scrollHeight - scrollTop - clientHeight <= 100;
+    // Consider "near bottom" if within 50px of the bottom (tighter tolerance)
+    const isNearBottom = scrollHeight - scrollTop - clientHeight <= 50;
     
-    // Only consider user scrolling if they've moved more than 100px from bottom
-    if (Math.abs(scrollTop - lastScrollTopRef.current) > 10) {
-      setIsUserScrolling(!isNearBottom);
+    // Reset user scrolling state when they return to bottom
+    if (isNearBottom) {
+      setIsUserScrolling(false);
+    } else if (Math.abs(scrollTop - lastScrollTopRef.current) > 10) {
+      // Only set user scrolling if they're NOT near bottom
+      setIsUserScrolling(true);
     }
 
     setIsAtBottom(isNearBottom);
@@ -247,16 +259,16 @@ export default function ChatHistory({
       id="chat-container"
     >
       <div
-        className="flex-1 overflow-y-auto overflow-x-hidden min-h-0"
+        className="flex-1 overflow-y-auto overflow-x-hidden"
         style={{ 
-          scrollBehavior: 'auto',  // Disable smooth scroll to prevent glitches
+          scrollBehavior: 'auto',
           WebkitOverflowScrolling: 'touch'
         }}
         id="chat-history"
         ref={chatHistoryRef}
         onScroll={handleScroll}
       >
-        <div className="px-4 py-2 pb-4">
+          <div className="px-4 py-2 pb-4">
           {compiledHistory.map((item, index) =>
             Array.isArray(item) ? renderStatusResponse(item, index) : item
           )}

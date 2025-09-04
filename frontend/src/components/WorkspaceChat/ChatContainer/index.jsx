@@ -362,7 +362,7 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
 
   return (
     <div
-      className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] overflow-hidden"
+      className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] overflow-hidden safe-area-inset"
     >
       <ChatWidgetHeader 
         workspace={workspace}

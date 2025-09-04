@@ -61,7 +61,7 @@ const HistoricalMessage = ({
         key={uuid}
         className={`flex justify-center items-end w-full bg-theme-bg-chat`}
       >
-        <div className="py-8 px-4 w-full flex gap-x-5 md:max-w-[80%] flex-col">
+        <div className="py-3 sm:py-6 lg:py-8 px-2 sm:px-4 w-full flex gap-x-2 sm:gap-x-4 lg:gap-x-5 md:max-w-[80%] flex-col">
           <div className={`flex gap-x-5 ${alignmentCls}`}>
             <ProfileImage role={role} workspace={workspace} username={username} />
             <div className="p-2 rounded-lg bg-red-50 text-red-500">
@@ -89,8 +89,8 @@ const HistoricalMessage = ({
         isDeleted ? "animate-remove" : ""
       } flex justify-center w-full group hover:bg-gradient-to-r hover:from-gray-50/30 hover:to-transparent transition-all duration-300`}
     >
-      <div className="w-full max-w-4xl mx-auto px-6 py-6">
-        <div className="flex gap-x-5">
+      <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 lg:px-6 py-2 sm:py-4 lg:py-6">
+        <div className="flex gap-x-2 sm:gap-x-4 lg:gap-x-5">
           <div className="flex flex-col items-center">
             <ProfileImage role={role} workspace={workspace} username={username} />
             <div className="mt-1 -mb-10">
@@ -114,7 +114,7 @@ const HistoricalMessage = ({
             />
           ) : (
             <div className="flex-1 min-w-0 max-w-full">
-              <div className="text-[15px] leading-[1.7] text-gray-900 whitespace-pre-wrap font-medium break-words">
+              <div className="text-sm sm:text-[15px] leading-[1.6] sm:leading-[1.7] text-gray-900 whitespace-pre-wrap font-medium break-words">
                 <RenderChatContent
                   role={role}
                   message={message}
@@ -144,7 +144,7 @@ const HistoricalMessage = ({
         </div>
         {/* Enhanced Actions - Modern style */}
         {role === "assistant" && (
-          <div className="mt-3 ml-[50px] opacity-0 group-hover:opacity-100 transition-all duration-200">
+          <div className="mt-2 ml-[32px] sm:ml-[50px] opacity-0 group-hover:opacity-100 transition-all duration-200">
             <div className="flex items-center gap-x-2">
               <button 
                 onClick={() => navigator.clipboard.writeText(message)}
@@ -170,7 +170,7 @@ const HistoricalMessage = ({
           </div>
         )}
         {role === "assistant" && sources?.length > 0 && (
-          <div className="mt-3 ml-[46px]">
+          <div className="mt-2 ml-[32px] sm:ml-[46px]">
             <Citations sources={sources} />
           </div>
         )}
@@ -203,12 +203,12 @@ function ProfileImage({ role, workspace, username }) {
   
   return (
     <div className="flex-shrink-0">
-      <div className={`relative w-[38px] h-[38px] rounded-xl flex items-center justify-center shadow-lg transform transition-all duration-200 hover:scale-105 ${
+      <div className={`relative w-[30px] h-[30px] sm:w-[38px] sm:h-[38px] rounded-xl flex items-center justify-center shadow-lg transform transition-all duration-200 hover:scale-105 ${
         role === "user" 
           ? "bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700" 
           : "bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
       }`}>
-        <span className="text-white text-sm font-bold drop-shadow-sm">
+        <span className="text-white text-xs sm:text-sm font-bold drop-shadow-sm">
           {role === "user" ? (displayName?.charAt(0)?.toUpperCase() || "U") : "AI"}
         </span>
         {role === "assistant" && (

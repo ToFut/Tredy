@@ -665,66 +665,68 @@ function ExpandedMobileView({ isOpen, onClose, members, services, workspace, onI
   if (!isOpen) return null;
   
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 lg:hidden animate-fadeIn">
-      <div className="absolute inset-x-0 top-20 mx-4 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-h-[70vh] overflow-hidden animate-slideUp">
-        {/* Header */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 md:hidden animate-fadeIn safe-area-inset">
+      <div className="absolute inset-x-0 top-16 mx-3 sm:mx-4 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-h-[calc(100vh-6rem)] overflow-hidden animate-slideUp">
+        {/* Header - Mobile optimized */}
+        <div className="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Workspace Team
+              Team & Services
             </h3>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors touch-manipulation"
+              style={{ minWidth: '44px', minHeight: '44px' }}
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
         
-        {/* Members Section */}
-        <div className="p-4 space-y-4 overflow-y-auto max-h-[50vh]">
+        {/* Members Section - Mobile optimized grid */}
+        <div className="p-4 sm:p-5 space-y-4 overflow-y-auto max-h-[calc(100vh-12rem)]">
           <div>
             <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
               <Users className="w-4 h-4" />
-              Members ({members.length})
+              Team ({members.length})
             </h4>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4">
               {members.map((member, idx) => (
                 <div key={idx} className="flex flex-col items-center gap-2">
                   <Avatar 
                     user={member} 
-                    size={56}
+                    size={48}
                     badgeIcon={member.role === 'admin' ? Crown : null}
                   />
-                  <span className="text-xs text-center text-gray-600 dark:text-gray-400 truncate w-full">
-                    {member.username?.split(' ')[0]}
+                  <span className="text-xs text-center text-gray-600 dark:text-gray-400 truncate w-full leading-tight">
+                    {member.username?.split(' ')[0] || member.email?.split('@')[0]}
                   </span>
                 </div>
               ))}
               <div className="flex flex-col items-center gap-2">
-                <AddButton onClick={onInvite} type="member" size={56} />
+                <AddButton onClick={onInvite} type="member" size={48} />
                 <span className="text-xs text-gray-500">Invite</span>
               </div>
             </div>
           </div>
           
-          {/* Services Section */}
+          {/* Services Section - Mobile optimized */}
           {services.length > 0 && (
-            <div>
+            <div className="border-t border-gray-100 dark:border-gray-700 pt-4">
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
                 <Plug className="w-4 h-4" />
-                Connected Services ({services.length})
+                Services ({services.length})
               </h4>
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4">
                 {services.map((service, idx) => (
                   <div key={idx} className="flex flex-col items-center gap-2">
                     <ConnectorBubble 
                       connector={service} 
-                      size={56}
+                      size={48}
                       onClick={onManageConnectors}
                     />
-                    <span className="text-xs text-center text-gray-600 dark:text-gray-400 truncate w-full">
+                    <span className="text-xs text-center text-gray-600 dark:text-gray-400 truncate w-full leading-tight">
                       {service.name}
                     </span>
                   </div>
@@ -733,7 +735,7 @@ function ExpandedMobileView({ isOpen, onClose, members, services, workspace, onI
                   <AddButton 
                     onClick={onManageConnectors}
                     type="service"
-                    size={56}
+                    size={48}
                   />
                   <span className="text-xs text-gray-500">Add</span>
                 </div>
@@ -874,7 +876,7 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showConnectorModal, setShowConnectorModal] = useState(false);
   const [showExpanded, setShowExpanded] = useState(false);
-  const avatarSize = isMobile ? 32 : 40;
+  const avatarSize = isMobile ? 28 : 40;
 
   useEffect(() => {
     async function fetchMembers() {
@@ -901,17 +903,17 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
 
   return (
     <>
-      <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-gray-200/60 dark:border-gray-700/60 sticky top-0 z-40">
-        <div className="px-3 lg:px-5 py-2.5 lg:py-3">
-          <div className="flex items-center justify-between gap-3">
+      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/40 dark:border-gray-700/40 sticky top-0 z-40 safe-area-inset-top">
+        <div className="px-2 sm:px-4 lg:px-5 py-2 sm:py-2.5 lg:py-3">
+          <div className="flex items-center justify-between gap-2 sm:gap-3">
             {/* Left: Workspace Info */}
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="hidden lg:flex items-center gap-2.5">
-                <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl">
-                  <Sparkle className="w-4 h-4 text-white" />
+            <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-shrink-0">
+              <div className="hidden md:flex items-center gap-2.5">
+                <div className="p-1.5 sm:p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl">
+                  <Sparkle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                 </div>
                 <div className="min-w-0">
-                  <h2 className="font-medium text-gray-900 dark:text-white truncate text-base">
+                  <h2 className="font-medium text-gray-900 dark:text-white truncate text-sm sm:text-base">
                     {workspace?.name || "Workspace"}
                   </h2>
                   <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
@@ -922,16 +924,26 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
                 </div>
               </div>
               
-              {/* Mobile: Compact Title */}
-              <div className="lg:hidden font-medium text-gray-900 dark:text-white truncate">
-                {workspace?.name || "Workspace"}
+              {/* Mobile: Compact Title with better layout */}
+              <div className="md:hidden flex items-center gap-1.5">
+                <div className="p-1 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
+                  <Sparkle className="w-3 h-3 text-white" />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="font-medium text-gray-900 dark:text-white truncate text-xs leading-tight">
+                    {workspace?.name || "Workspace"}
+                  </h2>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    {members.length}m • {services.length}s
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Center/Right: Avatar Stack */}
-            <div className="flex items-center gap-2">
-              {/* Members Stack */}
-              <div className="flex items-center -space-x-2">
+            {/* Center/Right: Avatar Stack - Mobile Optimized */}
+            <div className="flex items-center gap-0.5 sm:gap-2">
+              {/* Members Stack - Responsive sizing */}
+              <div className="flex items-center -space-x-1 sm:-space-x-2">
                 {loading ? (
                   <div className="flex -space-x-2">
                     {[...Array(2)].map((_, i) => (
@@ -945,8 +957,8 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
                         key={idx}
                         user={member}
                         size={avatarSize}
-                        showBadge={idx === 0}
-                        badgeIcon={member.role === 'admin' ? Crown : null}
+                        showBadge={idx === 0 && !isMobile}
+                        badgeIcon={member.role === 'admin' && !isMobile ? Crown : null}
                       />
                     ))}
                     
@@ -973,9 +985,9 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
                 )}
               </div>
 
-              {/* Services Stack */}
-              <div className="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1" />
-              <div className="flex items-center -space-x-2">
+              {/* Services Stack - Mobile responsive */}
+              <div className="h-4 sm:h-6 w-px bg-gray-300 dark:bg-gray-600 mx-0.5 sm:mx-1" />
+              <div className="flex items-center -space-x-1 sm:-space-x-2">
                 {services.slice(0, visibleServices).map((service, idx) => (
                   <ConnectorBubble 
                     key={idx}
@@ -991,30 +1003,32 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
                 />
               </div>
 
-              {/* Expand Button (Mobile) */}
+              {/* Expand Button (Mobile) - Improved touch target */}
               {isMobile && (
                 <button
                   onClick={() => setShowExpanded(true)}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors lg:hidden"
+                  className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors md:hidden touch-manipulation"
+                  style={{ minWidth: '44px', minHeight: '44px' }}
+                  aria-label="Expand team view"
                 >
-                  <ArrowsOut className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <ArrowsOut className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                 </button>
               )}
             </div>
           </div>
         </div>
 
-        {/* AI Assistant Indicator */}
-        <div className="px-3 lg:px-6 pb-2 lg:hidden">
-          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-            <div className="flex items-center gap-1">
+        {/* AI Assistant Indicator - Improved mobile visibility */}
+        <div className="px-2 sm:px-4 pb-1 md:hidden">
+          <div className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-0.5">
               <Robot className="w-3 h-3" />
-              <span>AI Ready</span>
+              <span>Ready</span>
             </div>
             <span>•</span>
-            <div className="flex items-center gap-1">
-              <Lightning className="w-3 h-3 text-green-500" />
-              <span>Connected</span>
+            <div className="flex items-center gap-0.5">
+              <Lightning className="w-3 h-3 text-green-500 animate-pulse" />
+              <span>Live</span>
             </div>
           </div>
         </div>
@@ -1117,12 +1131,66 @@ const connectorAnimations = `
   }
 `;
 
-// Inject elegant animation styles
+// Inject elegant animations and mobile optimizations
+const mobileOptimizations = `
+  ${connectorAnimations}
+  
+  /* Mobile-first responsive utilities */
+  .safe-area-inset {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  .safe-area-inset-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  /* Improved touch targets for mobile */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Better mobile scrolling */
+  .mobile-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
+  /* Prevent zoom on iOS inputs */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea {
+    font-size: 16px !important;
+  }
+  
+  /* Mobile-specific animations */
+  @media (max-width: 768px) {
+    .animate-gentle-slide {
+      animation: gentleSlideIn 0.3s ease-out;
+    }
+    
+    .animate-connected-float {
+      animation: connectedFloat 4s ease-in-out infinite;
+    }
+  }
+  
+  /* Dark mode mobile optimizations */
+  @media (prefers-color-scheme: dark) {
+    .mobile-scroll::-webkit-scrollbar {
+      display: none;
+    }
+  }
+`;
+
 if (typeof document !== 'undefined') {
   const styleSheet = document.createElement('style');
-  styleSheet.textContent = connectorAnimations;
-  if (!document.head.querySelector('style[data-connector-animations="true"]')) {
-    styleSheet.setAttribute('data-connector-animations', 'true');
+  styleSheet.textContent = mobileOptimizations;
+  if (!document.head.querySelector('style[data-mobile-chat="true"]')) {
+    styleSheet.setAttribute('data-mobile-chat', 'true');
     document.head.appendChild(styleSheet);
   }
 }

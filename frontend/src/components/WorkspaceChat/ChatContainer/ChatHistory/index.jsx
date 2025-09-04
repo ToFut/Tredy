@@ -225,19 +225,19 @@ export default function ChatHistory({
 
   if (history.length === 0 && !hasAttachments) {
     return (
-      <div className="flex-1 flex flex-col md:mt-0 w-full justify-center items-center bg-gray-50 dark:bg-gray-900 overflow-y-auto">
-        <div className="flex h-full flex-col items-center justify-center px-6 max-w-2xl">
-          {/* Simple welcome logo */}
-          <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-6">
-            <Brain className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+      <div className="flex-1 flex flex-col w-full justify-center items-center bg-gray-50 dark:bg-gray-900 overflow-y-auto safe-area-inset">
+        <div className="flex h-full flex-col items-center justify-center px-4 sm:px-6 max-w-2xl mx-auto">
+          {/* Mobile-optimized welcome logo */}
+          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-4 sm:mb-6">
+            <Brain className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600 dark:text-blue-400" />
           </div>
           
-          {/* Clean heading */}
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          {/* Mobile-responsive heading */}
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 leading-tight">
               {workspace?.name ? `Welcome to ${workspace.name}` : "Start a Conversation"}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 px-2">
               Ask me anything about your workspace documents and data.
             </p>
           </div>
@@ -248,15 +248,15 @@ export default function ChatHistory({
             sendSuggestion={handleSendSuggestedMessage}
           />
           
-          {/* Setup guidance */}
+          {/* Mobile-optimized setup guidance */}
           {(!workspace?.documents || workspace.documents.length === 0) && (
-            <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-800">
-              <p className="text-sm text-blue-700 dark:text-blue-300 mb-2">
+            <div className="mt-6 sm:mt-8 p-4 sm:p-5 bg-blue-50 dark:bg-blue-900/30 rounded-xl border border-blue-200 dark:border-blue-800 mx-4 sm:mx-0">
+              <p className="text-sm text-blue-700 dark:text-blue-300 mb-3 text-center">
                 No documents connected yet.
               </p>
               <button
                 onClick={showModal}
-                className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                className="w-full sm:w-auto text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium text-center block"
               >
                 Add documents to get started →
               </button>
@@ -276,19 +276,22 @@ export default function ChatHistory({
 
   return (
     <div
-      className="flex-1 flex flex-col bg-white dark:bg-gray-900 min-h-0"
+      className="flex-1 flex flex-col bg-white dark:bg-gray-900 min-h-0 safe-area-inset"
       id="chat-container"
     >
       <div
         className="flex-1 overflow-y-auto overflow-x-hidden"
         style={{ 
           scrollBehavior: 'smooth',
-          WebkitOverflowScrolling: 'touch'
+          WebkitOverflowScrolling: 'touch',
+          // Better mobile scroll performance
+          transform: 'translate3d(0,0,0)',
+          WebkitTransform: 'translate3d(0,0,0)'
         }}
         id="chat-history"
         ref={chatHistoryRef}
       >
-          <div className="px-4 py-2 pb-4">
+          <div className="px-2 sm:px-4 py-2 pb-4 sm:pb-6">
           {compiledHistory.map((item, index) =>
             Array.isArray(item) ? renderStatusResponse(item, index) : item
           )}
@@ -298,12 +301,14 @@ export default function ChatHistory({
         </div>
       </div>
       {!isAtBottom && (
-        <div className="absolute bottom-4 right-4 md:right-8 z-50 cursor-pointer">
+        <div className="absolute bottom-2 right-2 sm:right-4 md:right-8 z-50 cursor-pointer">
           <button
             onClick={manualScrollToBottom}
-            className="flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 active:scale-95 touch-manipulation"
+            style={{ minWidth: '40px', minHeight: '40px' }}
+            aria-label="Scroll to bottom"
           >
-            <ArrowDown className="w-5 h-5" weight="bold" />
+            <ArrowDown className="w-4 h-4 sm:w-6 sm:h-6" weight="bold" />
           </button>
         </div>
       )}

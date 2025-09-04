@@ -1,6 +1,6 @@
 const { validatedRequest } = require("../../utils/middleware/validatedRequest");
 const { ConnectorTokens } = require("../../models/connectorTokens");
-const { MCPNangoBridge } = require("../../utils/connectors/mcp-nango-bridge");
+const { MCPNangoBridge } = require("../../utils/connectors/mcp-nango-bridge.js");
 const { reqBody } = require("../../utils/http");
 
 /**
@@ -77,18 +77,34 @@ function userConnectorEndpoints(app) {
         });
       }
 
+      // Check if Nango is configured
+      if (!process.env.NANGO_SECRET_KEY) {
+        return response.status(501).json({
+          success: false,
+          error: "Connector integration not configured. Please set NANGO_SECRET_KEY in environment variables.",
+        });
+      }
+
       // Initiate OAuth flow via Nango bridge
       const connectionId = response.locals.user?.id 
         ? `user_${response.locals.user.id}`
         : `system`;
-        
-      const authConfig = await bridge.generateAuthUrl(provider, connectionId);
       
-      response.status(200).json({
-        success: true,
-        authUrl: authConfig.authUrl || `${authConfig.host}/oauth/connect?provider_config_key=${authConfig.providerConfigKey}&connection_id=${authConfig.connectionId}&public_key=${authConfig.publicKey}`,
-        connectionId: authConfig.connectionId,
-      });
+      try {
+        const authConfig = await bridge.generateAuthUrl(provider, connectionId);
+        
+        response.status(200).json({
+          success: true,
+          authUrl: authConfig.authUrl || `${authConfig.host}/oauth/connect?provider_config_key=${authConfig.providerConfigKey}&connection_id=${authConfig.connectionId}&public_key=${authConfig.publicKey}`,
+          connectionId: authConfig.connectionId,
+        });
+      } catch (nangoError) {
+        console.error("Nango error:", nangoError);
+        return response.status(503).json({
+          success: false,
+          error: "Connector service temporarily unavailable. Please check Nango configuration.",
+        });
+      }
 
     } catch (error) {
       console.error("Failed to initiate connector:", error);

@@ -45,10 +45,11 @@ export default function PromptInput({
   const { responseMode, setResponseMode, showModeSelector, setShowModeSelector } = useResponseMode();
   const formRef = useRef(null);
   const textareaRef = useRef(null);
-  const [_, setFocused] = useState(false);
+  const [isFocused, setFocused] = useState(false);
   const undoStack = useRef([]);
   const redoStack = useRef([]);
   const { textSizeClass } = useTextSize();
+  const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
 
   /**
    * To prevent too many re-renders we remotely listen for updates from the parent
@@ -73,6 +74,33 @@ export default function PromptInput({
     if (!isStreaming && textareaRef.current) textareaRef.current.focus();
     resetTextAreaHeight();
   }, [isStreaming]);
+
+  // Handle mobile viewport changes (keyboard show/hide)
+  useEffect(() => {
+    const handleViewportChange = () => {
+      const newHeight = window.innerHeight;
+      setViewportHeight(newHeight);
+      
+      // Scroll to input when keyboard opens on mobile
+      if (isFocused && textareaRef.current && newHeight < viewportHeight) {
+        setTimeout(() => {
+          textareaRef.current?.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+        }, 300);
+      }
+    };
+
+    // Listen for viewport changes (mobile keyboard)
+    window.addEventListener('resize', handleViewportChange);
+    window.visualViewport?.addEventListener('resize', handleViewportChange);
+    
+    return () => {
+      window.removeEventListener('resize', handleViewportChange);
+      window.visualViewport?.removeEventListener('resize', handleViewportChange);
+    };
+  }, [isFocused, viewportHeight]);
 
   /**
    * Save the current state before changes
@@ -279,7 +307,10 @@ export default function PromptInput({
       {/* Mobile optimized input container */}
       <form
         onSubmit={handleSubmit}
-        className="w-full bg-gradient-to-t from-white/95 via-white/90 to-transparent backdrop-blur-xl dark:from-gray-900/95 dark:via-gray-900/90 border-t border-gray-200/50 dark:border-gray-800/50 shadow-[0_-8px_16px_-6px_rgba(0,0,0,0.1)] dark:shadow-[0_-8px_16px_-6px_rgba(0,0,0,0.3)]"
+        className="w-full bg-gradient-to-t from-white/95 via-white/90 to-transparent backdrop-blur-xl dark:from-gray-900/95 dark:via-gray-900/90 border-t border-gray-200/50 dark:border-gray-800/50 shadow-[0_-8px_16px_-6px_rgba(0,0,0,0.1)] dark:shadow-[0_-8px_16px_-6px_rgba(0,0,0,0.3)] safe-bottom"
+        style={{
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)', // iOS safe area
+        }}
       >
         <div className="max-w-5xl mx-auto px-6 py-4 md:py-6">
           {/* Response mode indicator */}

@@ -2,10 +2,10 @@
  * Production configuration for Nango integrations
  */
 module.exports = {
-  // Nango production environment
-  NANGO_SECRET_KEY: process.env.NANGO_PROD_SECRET_KEY,
-  NANGO_PUBLIC_KEY: process.env.NANGO_PROD_PUBLIC_KEY,
-  NANGO_HOST: process.env.NANGO_PROD_HOST || "https://api.nango.dev",
+  // Nango production environment - use same env vars as dev for simplicity
+  NANGO_SECRET_KEY: process.env.NANGO_PROD_SECRET_KEY || process.env.NANGO_SECRET_KEY,
+  NANGO_PUBLIC_KEY: process.env.NANGO_PROD_PUBLIC_KEY || process.env.NANGO_PUBLIC_KEY,
+  NANGO_HOST: process.env.NANGO_PROD_HOST || process.env.NANGO_HOST || "https://api.nango.dev",
 
   // OAuth provider configurations
   providers: {

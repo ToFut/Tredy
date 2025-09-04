@@ -120,28 +120,40 @@ export default function SpeechToText({ sendCommand }) {
 
   if (!browserSupportsSpeechRecognition) return null;
   return (
-    <div
-      data-tooltip-id="tooltip-microphone-btn"
-      data-tooltip-content={`${t("chat_window.microphone")} (CTRL + M)`}
-      aria-label={t("chat_window.microphone")}
-      onClick={listening ? endSTTSession : startSTTSession}
-      className={`border-none relative flex justify-center items-center opacity-60 hover:opacity-100 light:opacity-100 light:hover:opacity-60 cursor-pointer ${
-        !!listening ? "!opacity-100" : ""
-      }`}
-    >
-      <Microphone
-        weight="fill"
-        color="var(--theme-sidebar-footer-icon-fill)"
-        className={`w-[22px] h-[22px] pointer-events-none text-theme-text-primary ${
-          listening ? "animate-pulse-glow" : ""
+    <>
+      <button
+        type="button"
+        data-tooltip-id="tooltip-microphone-btn"
+        data-tooltip-content={`${t("chat_window.microphone")} (CTRL + M)`}
+        aria-label={t("chat_window.microphone")}
+        onClick={listening ? endSTTSession : startSTTSession}
+        className={`border-none relative flex justify-center items-center cursor-pointer touch-manipulation transition-all ${
+          listening 
+            ? "text-red-500 dark:text-red-400 scale-110" 
+            : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
         }`}
-      />
+        style={{
+          WebkitTapHighlightColor: 'transparent',
+          minWidth: '44px',
+          minHeight: '44px'
+        }}
+      >
+        <Microphone
+          weight="fill"
+          className={`w-6 h-6 pointer-events-none ${
+            listening ? "animate-pulse" : ""
+          }`}
+        />
+        {listening && (
+          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+        )}
+      </button>
       <Tooltip
         id="tooltip-microphone-btn"
         place="top"
         delayShow={300}
         className="tooltip !text-xs z-99"
       />
-    </div>
+    </>
   );
 }

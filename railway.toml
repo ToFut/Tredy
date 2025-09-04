@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-buildCommand = "cd server && npm install && npx prisma generate && cd ../frontend && npm install && npm run build"
+buildCommand = "cd server && npm install --legacy-peer-deps && npx prisma generate && cd ../frontend && npm install && npm run build"
 
 [deploy]
 startCommand = "cd server && npm run start:production"

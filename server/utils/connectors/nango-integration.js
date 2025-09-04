@@ -43,8 +43,9 @@ class NangoIntegration {
   async getAuthConfig(provider, identifier) {
     if (!this.nango) throw new Error("Nango not configured");
 
-    // Support both workspace_${id} and user_${id} patterns
-    const connectionId = identifier.includes('_') ? identifier : `workspace_${identifier}`;
+    // Ensure identifier is a string and support both workspace_${id} and user_${id} patterns
+    const identifierStr = String(identifier);
+    const connectionId = identifierStr.includes('_') ? identifierStr : `workspace_${identifierStr}`;
     const isProduction = process.env.NODE_ENV === 'production';
     
     // Load production config if in production mode

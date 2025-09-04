@@ -12,32 +12,25 @@ class NangoIntegration {
   }
 
   initNango() {
-    // Load production config if available
-    let nangoConfig;
-    try {
-      nangoConfig = require('../../config/nango.production.js');
-    } catch (error) {
-      console.log('[Nango] Production config not found, using development mode');
+    // Check if Nango credentials are available
+    const secretKey = process.env.NANGO_SECRET_KEY;
+    const host = process.env.NANGO_HOST || "https://api.nango.dev";
+    
+    if (!secretKey) {
+      console.warn("[Nango] NANGO_SECRET_KEY not found - Nango integration disabled");
+      this.nango = null;
+      return;
     }
 
-    const isProduction = process.env.NODE_ENV === 'production';
-    
-    if (isProduction && nangoConfig) {
-      // Use production credentials
+    try {
       this.nango = new Nango({
-        secretKey: nangoConfig.NANGO_SECRET_KEY,
-        host: nangoConfig.NANGO_HOST,
+        secretKey: secretKey,
+        host: host,
       });
-      console.log("[Nango] Initialized in PRODUCTION mode");
-    } else if (process.env.NANGO_SECRET_KEY) {
-      // Use development credentials
-      this.nango = new Nango({
-        secretKey: process.env.NANGO_SECRET_KEY,
-        host: process.env.NANGO_HOST || "https://api.nango.dev",
-      });
-      console.log("[Nango] Initialized in DEVELOPMENT mode");
-    } else {
-      console.warn("[Nango] No credentials found for any environment");
+      console.log(`[Nango] Initialized successfully (${process.env.NODE_ENV || 'development'} mode)`);
+    } catch (error) {
+      console.error("[Nango] Failed to initialize:", error.message);
+      this.nango = null;
     }
   }
 

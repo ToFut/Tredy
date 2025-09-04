@@ -67,11 +67,10 @@ export default function ChatHistory({
 
     if (shouldAutoScroll && chatHistoryRef.current) {
       // Use requestAnimationFrame for smooth scrolling
-      requestAnimationFrame(() => {
-        chatHistoryRef.current.scrollTo({
-          top: chatHistoryRef.current.scrollHeight,
-          behavior: isStreaming ? 'auto' : 'smooth'
-        });
+      // Use immediate scroll without requestAnimationFrame to prevent glitch
+      chatHistoryRef.current.scrollTo({
+        top: chatHistoryRef.current.scrollHeight,
+        behavior: 'auto'  // Always use auto to prevent glitches
       });
     }
   }, [history, isStreaming, hasStatusResponse, isUserScrolling, isAtBottom]);
@@ -90,7 +89,7 @@ export default function ChatHistory({
     lastScrollTopRef.current = scrollTop;
   };
 
-  const debouncedScroll = debounce(handleScroll, 100);
+  const debouncedScroll = debounce(handleScroll, 50);
 
   useEffect(() => {
     const chatHistoryElement = chatHistoryRef.current;
@@ -105,10 +104,7 @@ export default function ChatHistory({
     if (chatHistoryRef.current) {
       chatHistoryRef.current.scrollTo({
         top: chatHistoryRef.current.scrollHeight,
-        // Smooth is on when user clicks the button but disabled during auto scroll
-        // We must disable this during auto scroll because it causes issues with
-        // detecting when we are at the bottom of the chat.
-        ...(smooth ? { behavior: "smooth" } : {}),
+        behavior: smooth ? "smooth" : "auto"
       });
     }
   };
@@ -196,7 +192,7 @@ export default function ChatHistory({
 
   if (history.length === 0 && !hasAttachments) {
     return (
-      <div className="flex flex-col h-full md:mt-0 pb-44 md:pb-40 w-full justify-center items-center bg-gray-50 dark:bg-gray-900">
+      <div className="flex-1 flex flex-col md:mt-0 w-full justify-center items-center bg-gray-50 dark:bg-gray-900 overflow-y-auto">
         <div className="flex h-full flex-col items-center justify-center px-6 max-w-2xl">
           {/* Simple welcome logo */}
           <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-6">
@@ -247,20 +243,20 @@ export default function ChatHistory({
 
   return (
     <div
-      className="flex-1 flex flex-col relative bg-white dark:bg-gray-900 overflow-hidden"
+      className="flex-1 flex flex-col bg-white dark:bg-gray-900 min-h-0"
       id="chat-container"
     >
       <div
-        className="flex-1 overflow-y-auto overflow-x-hidden"
+        className="flex-1 overflow-y-auto overflow-x-hidden min-h-0"
         style={{ 
-          scrollBehavior: isStreaming ? 'auto' : 'smooth',
+          scrollBehavior: 'auto',  // Disable smooth scroll to prevent glitches
           WebkitOverflowScrolling: 'touch'
         }}
         id="chat-history"
         ref={chatHistoryRef}
         onScroll={handleScroll}
       >
-        <div className="px-4 py-2 pb-32 md:pb-40">
+        <div className="px-4 py-2 pb-4">
           {compiledHistory.map((item, index) =>
             Array.isArray(item) ? renderStatusResponse(item, index) : item
           )}

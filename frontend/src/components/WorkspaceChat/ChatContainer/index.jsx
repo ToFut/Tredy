@@ -362,8 +362,7 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
 
   return (
     <div
-      style={{ height: "100%" }}
-      className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] min-h-0"
+      className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] overflow-hidden"
     >
       <ChatConnectorHeader />
       

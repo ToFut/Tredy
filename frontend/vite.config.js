@@ -22,17 +22,17 @@ export default defineConfig({
     host: "localhost",
     proxy: {
       "/api": {
-        target: "http://localhost:8124",
+        target: "http://localhost:3001",
         changeOrigin: true,
         secure: false
       },
       "/system": {
-        target: "http://localhost:8124",
+        target: "http://localhost:3001",
         changeOrigin: true,
         secure: false
       },
       "/auth": {
-        target: "http://localhost:8124",
+        target: "http://localhost:3001",
         changeOrigin: true,
         secure: false
       }
@@ -82,6 +82,10 @@ export default defineConfig({
           if (assetInfo.name === 'index.css') return `index.css`;
           return assetInfo.name;
         },
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          utils: ['moment', 'lodash', 'uuid']
+        }
       },
       external: [
         // Reduces transformation time by 50% and we don't even use this variant, so we can ignore.
@@ -90,6 +94,14 @@ export default defineConfig({
     },
     commonjsOptions: {
       transformMixedEsModules: true
+    },
+    sourcemap: false,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      }
     }
   },
   optimizeDeps: {

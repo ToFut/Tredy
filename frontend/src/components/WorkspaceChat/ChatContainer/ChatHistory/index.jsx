@@ -247,17 +247,16 @@ export default function ChatHistory({
 
   return (
     <div
-      className="flex-1 flex flex-col relative bg-white dark:bg-gray-900"
+      className="flex-1 flex flex-col relative bg-white dark:bg-gray-900 min-h-0"
       id="chat-container"
-      style={{ height: '100%', minHeight: 0 }}
     >
       <div
-        className="flex-1 overflow-y-auto overflow-x-hidden"
+        className="flex-1 overflow-y-auto overflow-x-hidden min-h-0"
         style={{ 
           scrollBehavior: isStreaming ? 'auto' : 'smooth',
           WebkitOverflowScrolling: 'touch',
-          minHeight: 0,
-          flexGrow: 1
+          overscrollBehavior: 'contain',
+          contain: 'paint'
         }}
         id="chat-history"
         ref={chatHistoryRef}
@@ -273,7 +272,7 @@ export default function ChatHistory({
         </div>
       </div>
       {!isAtBottom && (
-                 <div className="fixed bottom-20 right-10 md:right-20 z-50 cursor-pointer">
+        <div className="absolute bottom-4 right-4 md:right-8 z-50 cursor-pointer">
           <button
             onClick={() => scrollToBottom(true)}
             className="flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"

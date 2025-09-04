@@ -673,6 +673,20 @@ const Workspace = {
         });
     },
   },
+
+  members: async function (slug) {
+    try {
+      const response = await fetch(`${API_BASE}/workspace/${slug}/users`, {
+        method: "GET",
+        headers: baseHeaders(),
+      });
+      const data = await response.json();
+      return data.users || [];
+    } catch (error) {
+      console.error("Failed to fetch workspace members:", error);
+      return [];
+    }
+  },
 };
 
 export default Workspace;

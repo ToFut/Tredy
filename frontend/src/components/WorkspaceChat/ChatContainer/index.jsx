@@ -25,7 +25,6 @@ import { MetricsProvider } from "./ChatHistory/HistoricalMessage/Actions/RenderM
 import AgentVisualizer from "@/components/AgentVisualizer";
 import IntelligenceCards from "@/components/IntelligenceCards";
 import { generateProactiveSystemPrompt } from "@/utils/chat/proactive";
-import ChatConnectorHeader from "@/components/ChatConnectorHeader";
 import ChatWidgetHeader from "@/components/ChatWidgetHeader";
 
 export default function ChatContainer({ workspace, knownHistory = [] }) {
@@ -365,7 +364,11 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
     <div
       className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] overflow-hidden"
     >
-      <ChatConnectorHeader />
+      <ChatWidgetHeader 
+        workspace={workspace}
+        connectors={[]} 
+        enabledWidgets={["members", "connectors", "stats", "share"]}
+      />
       
       
       {/* Agent Visualizer - disabled */}

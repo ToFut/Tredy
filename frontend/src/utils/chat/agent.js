@@ -8,6 +8,7 @@ export const AGENT_SESSION_START = "agentSessionStart";
 export const AGENT_SESSION_END = "agentSessionEnd";
 const handledEvents = [
   "statusResponse",
+  "agentThinking",
   "fileDownload",
   "awaitingFeedback",
   "wssFailure",
@@ -18,6 +19,20 @@ export function websocketURI() {
   const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
   if (API_BASE === "/api") return `${wsProtocol}//${window.location.host}`;
   return `${wsProtocol}//${new URL(import.meta.env.VITE_API_BASE).host}`;
+}
+
+// Check if a message is a debug message that should be captured for thinking display
+function isDebugMessage(message) {
+  if (!message || typeof message !== 'string') return false;
+  
+  return (
+    message.includes('[debug]:') ||
+    message.includes('@agent is attempting to call') ||
+    message.includes('Executing MCP server:') ||
+    message.includes('MCP server:') ||
+    message.includes('completed successfully') ||
+    message.includes('failed with error')
+  );
 }
 
 export default function handleSocketResponse(event, setChatHistory) {
@@ -37,6 +52,44 @@ export default function handleSocketResponse(event, setChatHistory) {
     if (!messageContent || messageContent.trim() === '') {
       console.log("[Agent Response] Skipping empty message");
       return;
+    }
+    
+    // Check if this is a debug message that should be captured for thinking display
+    if (isDebugMessage(messageContent)) {
+      return setChatHistory((prev) => {
+        // Find the last thinking message and add this debug message to it
+        const updated = [...prev];
+        const lastThinkingIndex = updated.length - 1;
+        
+        if (lastThinkingIndex >= 0 && updated[lastThinkingIndex]?.type === 'agentThinking') {
+          // Update existing thinking message with new debug info
+          updated[lastThinkingIndex] = {
+            ...updated[lastThinkingIndex],
+            debugMessages: [
+              ...(updated[lastThinkingIndex].debugMessages || []),
+              messageContent
+            ]
+          };
+          return updated;
+        } else {
+          // Create new thinking message with debug info
+          return [
+            ...updated,
+            {
+              uuid: v4(),
+              type: 'agentThinking',
+              content: 'Agent working...',
+              role: "assistant",
+              sources: [],
+              closed: false,
+              error: null,
+              animate: true,
+              pending: false,
+              debugMessages: [messageContent]
+            }
+          ];
+        }
+      });
     }
     
     return setChatHistory((prev) => {

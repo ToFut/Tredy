@@ -21,6 +21,30 @@
   }
 }
 
+/* Apple-class breathing animation */
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 0 20px rgba(59, 130, 246, 0.15);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.16), 0 0 30px rgba(59, 130, 246, 0.25);
+  }
+}
+
+/* Smooth floating animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(-10px) rotate(180deg);
+    opacity: 0.8;
+  }
+}
+
 @keyframes slideInLeft {
   from {
     opacity: 0;

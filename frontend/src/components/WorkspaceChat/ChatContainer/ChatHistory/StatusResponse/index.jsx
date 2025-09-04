@@ -21,14 +21,26 @@ export default function StatusResponse({
 
   // Use enhanced AgenticThinking component when agent is actively thinking
   if (isThinking) {
+    // Collect debug messages from all thinking messages
+    const allDebugMessages = messages.reduce((acc, msg) => {
+      if (msg.debugMessages) {
+        acc.push(...msg.debugMessages);
+      }
+      return acc;
+    }, []);
+
     return (
-      <AgenticThinking
-        stage="thinking"
-        context={currentThought?.content || "Working on your request..."}
-        isActive={isThinking}
-        debugMessages={[]} // Debug messages will be populated by backend in the future
-        operations={[]}
-      />
+      <div className="flex justify-center w-full">
+        <div className="w-full max-w-4xl px-4">
+          <AgenticThinking
+            stage="thinking"
+            context={currentThought?.content || "Working on your request..."}
+            isActive={isThinking}
+            debugMessages={allDebugMessages}
+            operations={[]}
+          />
+        </div>
+      </div>
     );
   }
 

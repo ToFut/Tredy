@@ -3,10 +3,7 @@ import { Brain, Sparkle, MagnifyingGlass, Code, Database, FileSearch, ChartLine,
 
 export default function AgenticThinking({ stage = 'thinking', context = '', isActive = true, debugMessages = [], operations = [] }) {
   const [currentProcess, setCurrentProcess] = useState(0);
-  const [particles, setParticles] = useState([]);
-  const [showDebugDetails, setShowDebugDetails] = useState(false);
-  const [expandedOps, setExpandedOps] = useState(new Set());
-  const [copiedId, setCopiedId] = useState(null);
+  const [dots, setDots] = useState('');
   
   const processes = [
     { icon: Brain, label: "Understanding your request", color: "from-purple-500 to-pink-500" },
@@ -190,19 +187,23 @@ export default function AgenticThinking({ stage = 'thinking', context = '', isAc
 
   const parsedOperations = parseOperations();
 
+  // Animate dots
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots(prev => {
+        if (prev === "...") return "";
+        return prev + ".";
+      });
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Progress through processes
   useEffect(() => {
     if (!isActive) return;
     
     const interval = setInterval(() => {
       setCurrentProcess((prev) => (prev + 1) % processes.length);
-      
-      // Add particles
-      setParticles(prev => [...prev.slice(-10), {
-        id: Date.now(),
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: Math.random() * 4 + 2
-      }]);
     }, 2000);
 
     return () => clearInterval(interval);
@@ -211,236 +212,45 @@ export default function AgenticThinking({ stage = 'thinking', context = '', isAc
   const CurrentIcon = processes[currentProcess].icon;
 
   return (
-    <div className="relative w-full px-4 py-6">
-      <div className="max-w-3xl mx-auto">
-        {/* Main thinking container */}
-        <div className="relative glass-effect rounded-2xl p-6 border border-theme-sidebar-border overflow-hidden transition-all duration-300 hover:shadow-lg">
+    <div className="w-full max-w-none py-2">
+      {/* Claude-style header */}
+      <div className="mb-2">
+        <h3 className="text-[13px] font-medium text-gray-800 tracking-[-0.01em] leading-none">
+          Thinking{dots}
+        </h3>
+      </div>
+
+      {/* Claude-style bullet list - only show current and completed */}
+      <div className="space-y-[6px]">
+        {processes.slice(0, currentProcess + 1).map((process, index) => {
+          const isCompleted = index < currentProcess;
+          const isCurrent = index === currentProcess;
           
-          {/* Animated background gradient */}
-          <div className="absolute inset-0 opacity-30">
-            <div className={`absolute inset-0 bg-gradient-to-r ${processes[currentProcess].color} animate-pulse`} />
-          </div>
-
-          {/* Particle effects */}
-          <div className="absolute inset-0 pointer-events-none">
-            {particles.map(p => (
-              <div
-                key={p.id}
-                className="absolute rounded-full bg-white/60 animate-float"
-                style={{
-                  left: `${p.x}%`,
-                  top: `${p.y}%`,
-                  width: `${p.size}px`,
-                  height: `${p.size}px`,
-                  animation: `float ${3 + Math.random() * 2}s ease-in-out infinite`
-                }}
-              />
-            ))}
-          </div>
-
-          <div className="relative flex items-start gap-4">
-            {/* Animated icon */}
-            <div className="flex-shrink-0">
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${processes[currentProcess].color} flex items-center justify-center animate-pulse shadow-lg`}>
-                <CurrentIcon className="w-6 h-6 text-white" />
-              </div>
-            </div>
-
-            {/* Content area */}
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <h3 className="text-sm font-semibold text-gray-900">Analyzing your request</h3>
-                <Sparkle className="w-4 h-4 text-amber-500 animate-pulse" />
+          return (
+            <div
+              key={index}
+              className={`flex items-start gap-[8px] transition-opacity duration-300 ${
+                isCurrent ? 'opacity-100' : 'opacity-70'
+              }`}
+            >
+              {/* Animated bullet */}
+              <div className="mt-[6px] flex-shrink-0">
+                {isCompleted ? (
+                  <div className="w-[3px] h-[3px] bg-gray-600 rounded-full" />
+                ) : (
+                  <div className="w-[3px] h-[3px] bg-gray-800 rounded-full animate-pulse" />
+                )}
               </div>
               
-              {/* Current process */}
-              <p className="text-sm text-gray-600 mb-3">{processes[currentProcess].label}...</p>
-
-              {/* Process indicators */}
-              <div className="flex gap-2 mb-3">
-                {processes.map((process, index) => (
-                  <div
-                    key={index}
-                    className={`h-1 flex-1 rounded-full transition-all duration-500 ${
-                      index <= currentProcess 
-                        ? `bg-gradient-to-r ${process.color}` 
-                        : 'bg-gray-300'
-                    }`}
-                  />
-                ))}
-              </div>
-
-              {/* Context preview */}
-              {context && (
-                <div className="p-3 bg-theme-bg-secondary/70 rounded-lg border border-theme-sidebar-border">
-                  <p className="text-xs text-theme-text-secondary mb-1">Analyzing:</p>
-                  <p className="text-sm text-theme-text-primary line-clamp-2">{context}</p>
-                </div>
-              )}
-              
-              {/* Tool Operations */}
-              {parsedOperations.length > 0 && (
-                <div className="mt-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-sm font-semibold text-theme-text-primary flex items-center gap-2">
-                      <Terminal className="w-4 h-4" />
-                      Tool Operations ({parsedOperations.length})
-                    </h4>
-                    <button
-                      onClick={() => setShowDebugDetails(!showDebugDetails)}
-                      className="text-xs text-theme-text-secondary hover:text-theme-text-primary transition-colors flex items-center gap-1"
-                    >
-                      {showDebugDetails ? <CaretDown className="w-3 h-3" /> : <CaretRight className="w-3 h-3" />}
-                      {showDebugDetails ? 'Hide Details' : 'Show Details'}
-                    </button>
-                  </div>
-                  
-                  <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
-                    {parsedOperations.map((op, index) => {
-                      const isExpanded = expandedOps.has(op.id);
-                      const StatusIcon = STATUS_CONFIG[op.status]?.icon || Clock;
-                      const statusConfig = STATUS_CONFIG[op.status] || STATUS_CONFIG.pending;
-                      const ToolIcon = TOOL_ICONS[op.tool] || TOOL_ICONS.default;
-                      
-                      return (
-                        <div key={op.id} className="bg-theme-bg-secondary/50 rounded-lg border border-theme-sidebar-border/50">
-                          <div
-                            className="p-3 cursor-pointer hover:bg-theme-bg-secondary/70 transition-colors"
-                            onClick={() => showDebugDetails && toggleExpanded(op.id)}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className={`p-1.5 rounded-lg ${statusConfig.bgColor} transition-colors`}>
-                                <StatusIcon className={`w-3 h-3 ${statusConfig.textColor} ${op.status === 'running' ? 'animate-spin' : ''}`} />
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2">
-                                  <ToolIcon className="w-3 h-3 text-theme-text-secondary" />
-                                  <span className="text-sm font-medium text-theme-text-primary">{op.name}</span>
-                                  {op.status === 'running' && <div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse" />}
-                                </div>
-                                <p className="text-xs text-theme-text-secondary mt-0.5">{op.description}</p>
-                              </div>
-                              {showDebugDetails && (
-                                <div className="text-theme-text-secondary">
-                                  {isExpanded ? <CaretDown className="w-3 h-3" /> : <CaretRight className="w-3 h-3" />}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          
-                          {/* Expanded Debug Details */}
-                          {showDebugDetails && isExpanded && (
-                            <div className="px-3 pb-3 border-t border-theme-sidebar-border/30 animate-fadeIn">
-                              {op.params && (
-                                <div className="mt-2">
-                                  <div className="flex items-center justify-between mb-1">
-                                    <span className="text-xs font-medium text-theme-text-secondary">Parameters</span>
-                                    <button
-                                      onClick={() => copyToClipboard(JSON.stringify(op.params, null, 2), `params-${op.id}`)}
-                                      className="text-xs text-theme-text-secondary hover:text-theme-text-primary"
-                                    >
-                                      {copiedId === `params-${op.id}` ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                                    </button>
-                                  </div>
-                                  <pre className="text-xs bg-theme-bg-primary/20 rounded p-2 overflow-x-auto max-h-20">
-                                    <code className="text-theme-text-primary">{JSON.stringify(op.params, null, 2)}</code>
-                                  </pre>
-                                </div>
-                              )}
-                              <div className="mt-2">
-                                <span className="text-xs font-medium text-theme-text-secondary">Debug Message</span>
-                                <div className="mt-1 text-xs text-theme-text-secondary bg-theme-bg-primary/10 rounded p-2">
-                                  {op.debugMsg}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Live process steps */}
-              <div className="mt-3 space-y-1">
-                {processes.slice(0, currentProcess + 1).map((process, index) => {
-                  const Icon = process.icon;
-                  const isActive = index === currentProcess;
-                  
-                  return (
-                    <div
-                      key={index}
-                      className={`flex items-center gap-2 text-xs transition-all ${
-                        isActive ? 'opacity-100' : 'opacity-50'
-                      }`}
-                    >
-                      <Icon className={`w-3 h-3 ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
-                      <span className={isActive ? 'text-gray-900' : 'text-gray-500'}>
-                        {process.label}
-                      </span>
-                      {index < currentProcess && (
-                        <span className="text-green-500">✓</span>
-                      )}
-                      {isActive && (
-                        <span className="flex gap-1 ml-auto">
-                          <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+              {/* Animated text */}
+              <span className={`text-[12px] leading-[18px] font-normal ${
+                isCompleted ? 'text-gray-600' : 'text-gray-800'
+              }`}>
+                {process.label}{isCurrent ? dots : ''}
+              </span>
             </div>
-          </div>
-        </div>
-
-        {/* Intelligence cards preview */}
-        {parsedOperations.length === 0 && (
-          <div className="grid grid-cols-3 gap-2 mt-3">
-            {['Analyzing patterns', 'Building context', 'Generating response'].map((text, i) => (
-              <div
-                key={i}
-                className={`p-2 rounded-lg glass-effect border border-theme-sidebar-border text-center transition-all hover-lift ${
-                  i <= currentProcess / 2 ? 'opacity-100' : 'opacity-40'
-                }`}
-              >
-                <p className="text-xs text-theme-text-secondary">{text}</p>
-                <div className="mt-1 flex justify-center gap-1">
-                  <div className="w-1 h-1 bg-purple-400 rounded-full animate-pulse" />
-                  <div className="w-1 h-1 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '100ms' }} />
-                  <div className="w-1 h-1 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '200ms' }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-        
-        {/* Operation Summary */}
-        {parsedOperations.length > 0 && (
-          <div className="mt-3 pt-3 border-t border-theme-sidebar-border/30">
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <p className="text-xs text-theme-text-secondary">Total</p>
-                <p className="text-lg font-semibold text-theme-text-primary">{parsedOperations.length}</p>
-              </div>
-              <div>
-                <p className="text-xs text-theme-text-secondary">Success</p>
-                <p className="text-lg font-semibold text-green-600">
-                  {parsedOperations.filter(op => op.status === 'success').length}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-theme-text-secondary">Running</p>
-                <p className="text-lg font-semibold text-blue-600">
-                  {parsedOperations.filter(op => op.status === 'running').length}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+          );
+        })}
       </div>
     </div>
   );

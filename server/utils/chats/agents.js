@@ -52,17 +52,18 @@ async function grepAgents({
     // Close HTTP stream-able chunk response method because we will swap to agents now.
     writeResponseChunk(response, {
       id: uuid,
-      type: "statusResponse",
+      type: "agentThinking",
       textResponse: `${pluralize(
         "Agent",
         agentHandles.length
       )} ${agentHandles.join(
         ", "
-      )} invoked.\nSwapping over to agent chat. Type /exit to exit agent execution loop early.`,
+      )} invoked`,
       sources: [],
       close: true,
       error: null,
       animate: true,
+      agentName: agentHandles.join(", "),
     });
     return true;
   }

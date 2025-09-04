@@ -50,38 +50,47 @@ export default function ChatHistory({
     return scrollHeight - scrollTop - clientHeight <= 5; // Tighter tolerance
   }, []);
 
-  // Smooth scroll to bottom
+  // Enhanced scroll to bottom with guaranteed visibility
   const scrollToBottom = useCallback((force = false) => {
     if (!chatHistoryRef.current) return;
     
-    const now = Date.now();
-    const timeSinceLastScroll = now - lastScrollTime.current;
-    
-    // Don't interrupt recent user scrolling unless forced
-    if (!force && timeSinceLastScroll < 100) return;
-    
     const element = chatHistoryRef.current;
-    const isAtBottom = checkIsAtBottom();
     
-    // Only auto-scroll if user is already near bottom or during streaming
-    if (force || isAtBottom || isStreaming) {
+    // Always scroll to bottom for new messages
+    requestAnimationFrame(() => {
       element.scrollTo({
         top: element.scrollHeight,
-        behavior: isStreaming ? 'auto' : 'smooth'
+        behavior: force ? 'auto' : 'smooth'
       });
+      
+      // Double-check scroll position after a brief delay
+      setTimeout(() => {
+        if (!checkIsAtBottom()) {
+          element.scrollTo({
+            top: element.scrollHeight,
+            behavior: 'auto'
+          });
+        }
+      }, 100);
+      
       setIsUserScrolling(false);
-    }
-  }, [checkIsAtBottom, isStreaming]);
+    });
+  }, [checkIsAtBottom]);
 
-  // Auto-scroll on new messages
+  // Always ensure last message is visible
   useEffect(() => {
-    const shouldAutoScroll = isStreaming || hasStatusResponse || (!isUserScrolling && isAtBottom);
-    
-    if (shouldAutoScroll) {
-      // Small delay to ensure DOM is updated
-      setTimeout(() => scrollToBottom(isStreaming), 16);
+    // Immediately scroll to bottom when new messages arrive
+    if (history.length > 0) {
+      scrollToBottom(true); // Force scroll to show new messages
     }
-  }, [history, isStreaming, hasStatusResponse, isUserScrolling, isAtBottom, scrollToBottom]);
+  }, [history]);
+
+  // Handle streaming updates
+  useEffect(() => {
+    if (isStreaming || hasStatusResponse) {
+      scrollToBottom(true);
+    }
+  }, [isStreaming, hasStatusResponse]);
 
   // Unified scroll handler with passive listening
   const handleScroll = useCallback(() => {

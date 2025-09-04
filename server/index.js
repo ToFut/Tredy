@@ -98,8 +98,13 @@ if (process.env.NODE_ENV !== "development") {
   const { MetaGenerator } = require("./utils/boot/MetaGenerator");
   const IndexPage = new MetaGenerator();
 
+  // Serve static frontend files from the correct location
+  const frontendDistPath = process.env.FRONTEND_BUILD_DIR 
+    ? path.resolve(process.env.FRONTEND_BUILD_DIR)
+    : path.resolve(__dirname, "../frontend/dist");
+    
   app.use(
-    express.static(path.resolve(__dirname, "public"), {
+    express.static(frontendDistPath, {
       extensions: ["js"],
       setHeaders: (res) => {
         // Disable I-framing of entire site UI

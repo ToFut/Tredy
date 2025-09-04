@@ -460,6 +460,25 @@ model schedule_executions {
   @@index([started_at])
 }
 
+model sync_cursors {
+  id           Int       @id @default(autoincrement())
+  workspaceId  Int
+  provider     String    // linkedin, gmail, etc.
+  model        String    // profile, emails, etc.
+  cursor       String?   // Last sync cursor from Nango
+  lastSyncAt   DateTime  @default(now())
+  recordCount  Int       @default(0)
+  status       String    @default("success") // success, error, running
+  error        String?   // Error message if sync failed
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @default(now())
+
+  @@unique([workspaceId, provider, model], name: "workspaceId_provider_model")
+  @@index([workspaceId])
+  @@index([provider])
+  @@index([lastSyncAt])
+}
+
 model thread_participants {
   id           Int               @id @default(autoincrement())
   thread_id    Int

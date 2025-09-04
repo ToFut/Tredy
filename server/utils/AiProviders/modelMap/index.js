@@ -25,9 +25,9 @@ class ContextWindowFinder {
     "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json";
 
   cacheLocation = path.resolve(
-    process.env.STORAGE_DIR
-      ? path.resolve(process.env.STORAGE_DIR, "models", "context-windows")
-      : path.resolve(__dirname, `../../../storage/models/context-windows`)
+    process.env.NODE_ENV === "development"
+      ? path.resolve(__dirname, `../../../storage/models/context-windows`)
+      : path.resolve(process.env.STORAGE_DIR || "/app/storage", "models", "context-windows")
   );
   cacheFilePath = path.resolve(this.cacheLocation, "context-windows.json");
   cacheFileExpiryPath = path.resolve(this.cacheLocation, ".cached_at");

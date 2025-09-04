@@ -434,9 +434,18 @@ class NangoIntegration {
    * Verify webhook signature
    */
   verifyWebhookSignature(payload, signature) {
-    // TODO: Implement signature verification
-    // See: https://docs.nango.dev/guides/webhooks
-    return true;
+    if (!process.env.NANGO_WEBHOOK_SECRET) {
+      console.warn('[Nango] NANGO_WEBHOOK_SECRET not set - skipping signature verification');
+      return true;
+    }
+
+    const crypto = require('crypto');
+    const expectedSignature = crypto
+      .createHmac('sha256', process.env.NANGO_WEBHOOK_SECRET)
+      .update(JSON.stringify(payload))
+      .digest('hex');
+    
+    return signature === expectedSignature;
   }
 
   /**

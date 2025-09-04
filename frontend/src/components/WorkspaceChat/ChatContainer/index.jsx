@@ -26,6 +26,7 @@ import AgentVisualizer from "@/components/AgentVisualizer";
 import IntelligenceCards from "@/components/IntelligenceCards";
 import { generateProactiveSystemPrompt } from "@/utils/chat/proactive";
 import ChatConnectorHeader from "@/components/ChatConnectorHeader";
+import ChatWidgetHeader from "@/components/ChatWidgetHeader";
 
 export default function ChatContainer({ workspace, knownHistory = [] }) {
   const { threadSlug = null } = useParams();

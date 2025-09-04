@@ -9,7 +9,7 @@ import PrivateRoute, {
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Login from "@/pages/Login";
-import SupabaseLogin from "@/pages/Login/SupabaseLogin";
+import SupabaseLogin from "@/pages/Login/SupabaseLoginFixed";
 import SimpleSSOPassthrough from "@/pages/Login/SSO/simple";
 import OnboardingFlow from "@/pages/OnboardingFlow";
 import i18n from "./i18n";

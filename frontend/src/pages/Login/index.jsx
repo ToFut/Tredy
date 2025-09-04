@@ -5,7 +5,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import paths from "@/utils/paths";
 import useQuery from "@/hooks/useQuery";
 import useSimpleSSO from "@/hooks/useSimpleSSO";
-import SupabaseLogin from "./SupabaseLogin";
+import SupabaseLogin from "./SupabaseLoginFixed";
 
 /**
  * Login page that handles both single and multi-user login.

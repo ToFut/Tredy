@@ -113,7 +113,7 @@ export default function NewUserModal({ closeModal }) {
                 <select
                   name="role"
                   required={true}
-                  defaultValue={"default"}
+                  defaultValue={"admin"}
                   onChange={(e) => setRole(e.target.value)}
                   className="border-none bg-theme-settings-input-bg w-full text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
                 >

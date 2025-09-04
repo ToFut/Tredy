@@ -23,5 +23,12 @@ fi
     node /app/server/index.js
 } &
 { node /app/collector/index.js; } &
+
+# Start MCP servers if the script exists
+if [ -f "/usr/local/bin/start-mcp-servers.sh" ]; then
+  echo "[Docker] Starting MCP servers..."
+  /usr/local/bin/start-mcp-servers.sh &
+fi
+
 wait -n
 exit $?

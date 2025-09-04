@@ -45,11 +45,13 @@ RUN groupadd -g "$ARG_GID" anythingllm && \
 # Copy docker helper scripts
 COPY ./docker/docker-entrypoint.sh /usr/local/bin/
 COPY ./docker/docker-healthcheck.sh /usr/local/bin/
+COPY ./docker/start-mcp-servers.sh /usr/local/bin/
 COPY --chown=anythingllm:anythingllm ./docker/.env.example /app/server/.env
 
 # Ensure the scripts are executable
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh && \
-    chmod +x /usr/local/bin/docker-healthcheck.sh
+    chmod +x /usr/local/bin/docker-healthcheck.sh && \
+    chmod +x /usr/local/bin/start-mcp-servers.sh
 
 USER anythingllm
 WORKDIR /app
@@ -111,11 +113,13 @@ RUN groupadd -g "$ARG_GID" anythingllm && \
 # Copy docker helper scripts
 COPY ./docker/docker-entrypoint.sh /usr/local/bin/
 COPY ./docker/docker-healthcheck.sh /usr/local/bin/
+COPY ./docker/start-mcp-servers.sh /usr/local/bin/
 COPY --chown=anythingllm:anythingllm ./docker/.env.example /app/server/.env
 
 # Ensure the scripts are executable
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh && \
-    chmod +x /usr/local/bin/docker-healthcheck.sh
+    chmod +x /usr/local/bin/docker-healthcheck.sh && \
+    chmod +x /usr/local/bin/start-mcp-servers.sh
 
 #############################################
 # COMMON BUILD FLOW FOR ALL ARCHS

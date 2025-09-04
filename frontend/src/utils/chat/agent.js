@@ -24,15 +24,26 @@ export default function handleSocketResponse(event, setChatHistory) {
   const data = safeJsonParse(event.data, null);
   if (data === null) return;
 
+  // Debug logging for development
+  console.log("[Agent Response]", data);
+
   // No message type is defined then this is a generic message
   // that we need to print to the user as a system response
   if (!data.hasOwnProperty("type")) {
     // Handle both string messages and object messages without type
     const messageContent = typeof data === 'string' ? data : (data.content || data.message || JSON.stringify(data));
     
+    // Skip empty messages
+    if (!messageContent || messageContent.trim() === '') {
+      console.log("[Agent Response] Skipping empty message");
+      return;
+    }
+    
     return setChatHistory((prev) => {
+      // Remove any pending messages first
+      const filtered = prev.filter((msg) => !msg.pending);
       return [
-        ...prev.filter((msg) => !!msg.content),
+        ...filtered,
         {
           uuid: v4(),
           content: messageContent,
@@ -47,7 +58,29 @@ export default function handleSocketResponse(event, setChatHistory) {
     });
   }
 
-  if (!handledEvents.includes(data.type) || !data.content) return;
+  // Allow messages with types not in handledEvents if they have content and look like assistant messages
+  if (!handledEvents.includes(data.type)) {
+    if (data.content && data.role === "assistant") {
+      console.log("[Agent Response] Handling unregistered message type as assistant message:", data.type);
+      return setChatHistory((prev) => {
+        const filtered = prev.filter((msg) => !msg.pending);
+        return [
+          ...filtered,
+          {
+            uuid: v4(),
+            content: data.content,
+            role: "assistant",
+            sources: data.sources || [],
+            closed: true,
+            error: null,
+            animate: false,
+            pending: false,
+          },
+        ];
+      });
+    }
+    if (!data.content) return;
+  }
 
   if (data.type === "fileDownload") {
     saveAs(data.content.b64Content, data.content.filename ?? "unknown.txt");

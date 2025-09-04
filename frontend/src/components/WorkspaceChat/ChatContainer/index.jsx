@@ -257,6 +257,7 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
 
         socket.addEventListener("message", (event) => {
           setLoadingResponse(true);
+          console.log("[WebSocket Raw Event]", event.data);
           try {
             handleSocketResponse(event, setChatHistory);
             // Try to update agent visualizer based on message type

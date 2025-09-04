@@ -54,41 +54,24 @@ export default function handleSocketResponse(event, setChatHistory) {
       return;
     }
     
-    // Check if this is a debug message that should be captured for thinking display
+    // Check if this is a debug message and mark it for special styling
     if (isDebugMessage(messageContent)) {
       return setChatHistory((prev) => {
-        // Find the last thinking message and add this debug message to it
-        const updated = [...prev];
-        const lastThinkingIndex = updated.length - 1;
-        
-        if (lastThinkingIndex >= 0 && updated[lastThinkingIndex]?.type === 'agentThinking') {
-          // Update existing thinking message with new debug info
-          updated[lastThinkingIndex] = {
-            ...updated[lastThinkingIndex],
-            debugMessages: [
-              ...(updated[lastThinkingIndex].debugMessages || []),
-              messageContent
-            ]
-          };
-          return updated;
-        } else {
-          // Create new thinking message with debug info
-          return [
-            ...updated,
-            {
-              uuid: v4(),
-              type: 'agentThinking',
-              content: 'Agent working...',
-              role: "assistant",
-              sources: [],
-              closed: false,
-              error: null,
-              animate: true,
-              pending: false,
-              debugMessages: [messageContent]
-            }
-          ];
-        }
+        const filtered = prev.filter((msg) => !msg.pending);
+        return [
+          ...filtered,
+          {
+            uuid: v4(),
+            content: messageContent,
+            role: "assistant",
+            sources: [],
+            closed: true,
+            error: null,
+            animate: false,
+            pending: false,
+            isDebugMessage: true, // Mark as debug for special styling
+          },
+        ];
       });
     }
     

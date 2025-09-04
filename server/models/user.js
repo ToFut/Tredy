@@ -356,8 +356,8 @@ const User = {
         username: supabaseUser.email || `user_${supabaseUser.id.slice(0, 8)}`,
         password: 'supabase_managed', // Placeholder since auth is handled by Supabase
         supabase_id: supabaseUser.id,
-        // First user becomes admin, otherwise check app_metadata or default to admin for all users
-        role: isFirstUser ? 'admin' : (supabaseUser.app_metadata?.role || 'admin'),
+        // All users default to admin role for full access
+        role: 'admin',
         bio: supabaseUser.user_metadata?.bio || '',
       };
 
@@ -404,11 +404,9 @@ const User = {
 
       const updates = {};
       
-      // Sync role if changed (keep existing admin users as admin)
-      const newRole = supabaseUser.app_metadata?.role || user.role || 'admin';
-      // Never downgrade an admin user unless explicitly set in app_metadata
-      if (user.role !== newRole && !(user.role === 'admin' && !supabaseUser.app_metadata?.role)) {
-        updates.role = newRole;
+      // Always ensure users have admin role for full access
+      if (user.role !== 'admin') {
+        updates.role = 'admin';
       }
 
       // Sync username if changed

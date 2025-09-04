@@ -6,7 +6,7 @@ import { MessageLimitInput, RoleHintDisplay } from "..";
 
 export default function NewUserModal({ closeModal }) {
   const [error, setError] = useState(null);
-  const [role, setRole] = useState("default");
+  const [role, setRole] = useState("admin");
   const [messageLimit, setMessageLimit] = useState({
     enabled: false,
     limit: 10,

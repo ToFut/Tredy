@@ -36,7 +36,7 @@ const User = {
         throw new Error(e.message);
       }
     },
-    role: (role = "default") => {
+    role: (role = "admin") => {
       const VALID_ROLES = ["default", "admin", "manager"];
       if (!VALID_ROLES.includes(role)) {
         throw new Error(
@@ -82,7 +82,7 @@ const User = {
   create: async function ({
     username,
     password,
-    role = "default",
+    role = "admin",
     dailyMessageLimit = null,
     bio = "",
   }) {

@@ -52,7 +52,7 @@ function inviteEndpoints(app) {
         const { user, error } = await User.create({
           username,
           password,
-          role: "default",
+          role: "admin",
         });
         if (!user) {
           console.error("Accepting invite:", error);

@@ -28,14 +28,9 @@ NODE_ENV = "production"
 SERVER_PORT = "3001"
 STORAGE_DIR = "/app/storage"
 
-# Add cron job for document processing
-[[crons]]
-name = "process-documents"
-schedule = "*/5 * * * *"
-command = "cd server && node utils/jobs/processDocuments.js"
-
-# Add cron job for session cleanup
-[[crons]]
-name = "cleanup-sessions"
-schedule = "0 0 * * *"
-command = "cd server && node utils/jobs/cleanupSessions.js"
+# Cron jobs can be added here when the job files are created
+# Example:
+# [[crons]]
+# name = "process-documents"
+# schedule = "*/5 * * * *"
+# command = "cd server && node utils/jobs/processDocuments.js"

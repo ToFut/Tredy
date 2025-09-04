@@ -247,15 +247,14 @@ export default function ChatHistory({
 
   return (
     <div
-      className="flex-1 flex flex-col relative bg-white dark:bg-gray-900 min-h-0"
+      className="flex-1 flex flex-col relative bg-white dark:bg-gray-900 overflow-hidden"
       id="chat-container"
     >
       <div
-        className="flex-1 overflow-y-auto overflow-x-hidden min-h-0"
+        className="flex-1 overflow-y-auto overflow-x-hidden"
         style={{ 
           scrollBehavior: isStreaming ? 'auto' : 'smooth',
-          WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'contain'
+          WebkitOverflowScrolling: 'touch'
         }}
         id="chat-history"
         ref={chatHistoryRef}

@@ -1,5 +1,32 @@
 {
   "mcpServers": {
+    "gmail": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/app/server/gmail-mcp-server.js"],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}"
+      }
+    },
+    "linkedin": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/app/server/linkedin-mcp.js"],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}"
+      }
+    },
+    "google-calendar": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/app/server/simple-google-calendar-mcp.js"],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}"
+      }
+    },
     "Zapier": {
       "type": "sse",
       "url": "https://mcp.zapier.com/api/mcp/s/NTdlYTE1NGYtYzI5OS00NmVhLTg2N2EtZjA3YWZiZDdjN2E1Ojg3MjNkNGFjLTI2MjItNDU0NS04MmE4LWRmNzg5ZDJhYTgzMQ==/mcp",

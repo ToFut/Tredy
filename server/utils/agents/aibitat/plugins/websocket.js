@@ -87,7 +87,18 @@ const websocket = {
           if (message.from !== "USER")
             Telemetry.sendTelemetry("agent_chat_sent");
           if (message.from === "USER" && muteUserReply) return;
-          socket.send(JSON.stringify(message));
+          
+          // Format the message properly for the frontend
+          if (message.from === "ASSISTANT" || message.from === "agent") {
+            // Send agent messages as plain content without type
+            // This will be handled by the frontend as a regular assistant message
+            socket.send(JSON.stringify({ 
+              content: message.content || message.text || message.message || "",
+              role: "assistant"
+            }));
+          } else {
+            socket.send(JSON.stringify(message));
+          }
         });
 
         aibitat.onTerminate(() => {

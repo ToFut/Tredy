@@ -27,12 +27,15 @@ export default function handleSocketResponse(event, setChatHistory) {
   // No message type is defined then this is a generic message
   // that we need to print to the user as a system response
   if (!data.hasOwnProperty("type")) {
+    // Handle both string messages and object messages without type
+    const messageContent = typeof data === 'string' ? data : (data.content || data.message || JSON.stringify(data));
+    
     return setChatHistory((prev) => {
       return [
         ...prev.filter((msg) => !!msg.content),
         {
           uuid: v4(),
-          content: data.content,
+          content: messageContent,
           role: "assistant",
           sources: [],
           closed: true,

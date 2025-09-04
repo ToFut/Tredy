@@ -312,54 +312,61 @@ export default function PromptInput({
           paddingBottom: 'env(safe-area-inset-bottom, 0px)', // iOS safe area
         }}
       >
-        <div className="max-w-5xl mx-auto px-6 py-4 md:py-6">
-          {/* Response mode indicator */}
+        <div className="max-w-5xl mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-4 md:py-6">
+          {/* Response mode indicator - Mobile optimized */}
           {responseMode === "agent" && (
-            <div className="flex items-center gap-2 mb-2 px-2">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-full border border-purple-200 dark:border-purple-800">
-                <Brain className="w-4 h-4 text-purple-600 dark:text-purple-400 animate-pulse" />
+            <div className="flex items-center justify-center mb-2 sm:mb-3 px-1 sm:px-2">
+              <div className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-full border border-purple-200 dark:border-purple-800">
+                <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600 dark:text-purple-400 animate-pulse" />
                 <span className="text-xs font-medium text-purple-700 dark:text-purple-300">Agent Mode</span>
-                <Sparkle className="w-3 h-3 text-amber-500 animate-pulse" />
+                <Sparkle className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-500 animate-pulse" />
               </div>
             </div>
           )}
           
           <div className="relative">
-            <div className="relative flex items-end bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200/30 dark:border-gray-700/30 rounded-3xl shadow-lg hover:shadow-2xl hover:border-purple-300/50 transition-all duration-300 overflow-hidden group"
-                 style={{ minHeight: '64px' }}>
+            <div className="relative flex items-end bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200/30 dark:border-gray-700/30 rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl hover:border-purple-300/50 transition-all duration-300 overflow-hidden group"
+                 style={{ minHeight: '52px' }}>
               <AttachmentManager attachments={attachments} />
               
               <div className="flex items-end w-full">
-                {/* Enhanced modern tools with mobile-friendly touch targets */}
-                <div className="flex items-center gap-1 md:gap-1.5 p-2 md:p-3">
-                  <AttachItem />
+                {/* Compact mobile tools with smart layout */}
+                <div className="flex items-center gap-0.5 sm:gap-1 md:gap-1.5 p-1.5 sm:p-2 md:p-3">
+                  <div className="hidden sm:block">
+                    <AttachItem />
+                  </div>
+                  <div className="sm:hidden">
+                    <AttachItem compact />
+                  </div>
                   <SlashCommandsButton
                     showing={showSlashCommand}
                     setShowSlashCommand={setShowSlashCommand}
+                    compact
                   />
                   <AvailableAgentsButton
                     showing={showAgents}
                     setShowing={setShowAgents}
+                    compact
                   />
-                  {/* Speech-to-Text Button */}
-                  <div className="p-2 md:p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation"
-                       style={{ minWidth: '44px', minHeight: '44px' }}>
+                  {/* Speech-to-Text Button - Hidden on mobile */}
+                  <div className="hidden sm:block p-2 md:p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation"
+                       style={{ minWidth: '40px', minHeight: '40px' }}>
                     <SpeechToText sendCommand={sendCommand} />
                   </div>
                   <button
                     type="button"
                     onClick={() => setShowModeSelector(!showModeSelector)}
-                    className={`p-2 md:p-2.5 rounded-xl transition-all touch-manipulation ${
+                    className={`p-1.5 sm:p-2 md:p-2.5 rounded-lg sm:rounded-xl transition-all touch-manipulation ${
                       responseMode === "agent"
                         ? "bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 text-purple-600 dark:text-purple-400"
                         : "hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
                     }`}
-                    style={{ minWidth: '44px', minHeight: '44px' }}
+                    style={{ minWidth: '36px', minHeight: '36px' }}
                   >
                     {responseMode === "agent" ? (
-                      <Brain className="w-5 h-5" weight="bold" />
+                      <Brain className="w-4 h-4 sm:w-5 sm:h-5" weight="bold" />
                     ) : (
-                      <Lightning className="w-5 h-5" />
+                      <Lightning className="w-4 h-4 sm:w-5 sm:h-5" />
                     )}
                   </button>
                 </div>
@@ -382,17 +389,17 @@ export default function PromptInput({
                   }}
                   value={promptInput}
                   spellCheck={Appearance.get("enableSpellCheck")}
-                  className="flex-1 border-none resize-none bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500/70 dark:placeholder:text-gray-400/70 text-[16px] leading-relaxed max-h-[120px] md:max-h-[160px] focus:outline-none py-3 md:py-4 px-2 md:px-3 font-medium"
+                  className="flex-1 border-none resize-none bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500/70 dark:placeholder:text-gray-400/70 text-[16px] leading-relaxed max-h-[100px] sm:max-h-[120px] md:max-h-[160px] focus:outline-none py-2 sm:py-3 md:py-4 px-1 sm:px-2 md:px-3 font-medium"
                   style={{ 
-                    minHeight: '44px',
+                    minHeight: '40px',
                     WebkitAppearance: 'none',
                     fontSize: '16px' // Prevents iOS zoom on focus
                   }}
                   placeholder={responseMode === "agent" ? "Ask me anything with AI tools..." : "Ask me anything..."}
                 />
                 
-                {/* Enhanced send button with mobile optimization */}
-                <div className="p-2 md:p-3">
+                {/* Compact modern send button */}
+                <div className="p-1.5 sm:p-2 md:p-3">
                   {isStreaming ? (
                     <StopGenerationButton />
                   ) : (
@@ -401,15 +408,15 @@ export default function PromptInput({
                         ref={formRef}
                         type="submit"
                         disabled={isDisabled || !promptInput.trim()}
-                        className={`relative overflow-hidden rounded-2xl transition-all transform active:scale-95 group touch-manipulation ${
+                        className={`relative overflow-hidden rounded-xl sm:rounded-2xl transition-all transform active:scale-95 group touch-manipulation ${
                           !isDisabled && promptInput.trim() 
                             ? 'bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600 hover:from-blue-600 hover:via-purple-600 hover:to-blue-700 cursor-pointer shadow-lg hover:shadow-xl md:hover:scale-105' 
                             : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'
                         }`}
                         style={{ 
-                          minWidth: '48px', 
-                          minHeight: '48px', 
-                          padding: '12px',
+                          minWidth: '40px', 
+                          minHeight: '40px', 
+                          padding: '8px',
                           WebkitTapHighlightColor: 'transparent'
                         }}
                         aria-label="Send message"
@@ -417,10 +424,10 @@ export default function PromptInput({
                         {!isDisabled && promptInput.trim() && (
                           <>
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-400 to-blue-500 animate-pulse opacity-50" />
-                            <Sparkle className="absolute -top-0.5 -right-0.5 w-4 h-4 text-amber-300 animate-pulse z-10" />
+                            <Sparkle className="absolute -top-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 text-amber-300 animate-pulse z-10" />
                           </>
                         )}
-                        <ArrowUp className="relative z-10 w-6 h-6 text-white drop-shadow-sm" weight="bold" />
+                        <ArrowUp className="relative z-10 w-5 h-5 sm:w-6 sm:h-6 text-white drop-shadow-sm" weight="bold" />
                       </button>
                       <Tooltip
                         id="send-prompt"

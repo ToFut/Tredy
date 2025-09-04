@@ -3,7 +3,7 @@ builder = "nixpacks"
 buildCommand = "cd server && npm install --legacy-peer-deps && npx prisma generate && cd ../frontend && npm install && npm run build"
 
 [deploy]
-startCommand = "cd server && npm run start"
+startCommand = "cd server && chmod +x setup-production-mcp.sh && ./setup-production-mcp.sh && npm run start"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 healthcheckPath = "/api/health"

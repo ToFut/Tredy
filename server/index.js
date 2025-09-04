@@ -167,6 +167,12 @@ app.all("*", function (_, response) {
     
     // Then initialize default welcome messages
     await WelcomeMessages.initializeDefaults();
+    
+    // Initialize MCP servers for production (Railway/non-Docker deployments)
+    if (process.env.NODE_ENV === "production" || process.env.RAILWAY_ENVIRONMENT) {
+      const { startMCPServersForProduction } = require("./utils/MCP/railway-startup");
+      await startMCPServersForProduction();
+    }
   } catch (error) {
     console.error("Failed to initialize application:", error);
   }

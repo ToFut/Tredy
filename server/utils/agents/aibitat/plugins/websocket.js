@@ -94,8 +94,12 @@ const websocket = {
           // Handle agent responses - when 'to' is USER, it's the agent responding
           if (message.to === "USER" && message.content) {
             console.log("[Websocket] Sending assistant message to frontend:", message.content.substring(0, 100));
+            // Ensure content is a string
+            const content = typeof message.content === 'string' 
+              ? message.content 
+              : JSON.stringify(message.content, null, 2);
             socket.send(JSON.stringify({ 
-              content: message.content,
+              content: content,
               role: "assistant"
             }));
           } else if (message.from === "ASSISTANT" || message.from === "agent") {

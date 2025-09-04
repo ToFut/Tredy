@@ -68,11 +68,26 @@ class MCPCompatibilityLayer extends MCPHypervisor {
                       `MCP server: ${name}:${tool.name} completed successfully`,
                       result
                     );
+                    
+                    // Format calendar events nicely if this is a calendar tool
+                    if (tool.name.includes('calendar_events') && Array.isArray(result)) {
+                      const formattedEvents = result.map(event => 
+                        `📅 ${event.summary || 'No title'}\n` +
+                        `   📍 ${event.start?.dateTime || event.start?.date || 'No time'}\n` +
+                        `   ${event.location ? '📍 ' + event.location : ''}`
+                      ).join('\n\n');
+                      
+                      aibitat.introspect(
+                        `Found ${result.length} calendar events`
+                      );
+                      return formattedEvents || "No events found on your calendar.";
+                    }
+                    
                     aibitat.introspect(
                       `MCP server: ${name}:${tool.name} completed successfully`
                     );
                     return typeof result === "object"
-                      ? JSON.stringify(result)
+                      ? JSON.stringify(result, null, 2)
                       : String(result);
                   } catch (error) {
                     aibitat.handlerProps.log(

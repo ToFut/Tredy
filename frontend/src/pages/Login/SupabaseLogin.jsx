@@ -47,11 +47,12 @@ export default function SupabaseLogin() {
       }
 
       // Create a simple test to verify backend is running
-      const testResponse = await fetch('/api/system/check-token', {
-        method: 'GET',
+      const testResponse = await fetch('/api/auth/check-token', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        }
+        },
+        body: JSON.stringify({ token: 'test' })
       }).catch(() => null);
 
       if (!testResponse) {

@@ -78,6 +78,40 @@ class UniversalMCPGenerator {
           { path: '/customers.json', method: 'GET', category: 'customers' },
           { path: '/inventory_items.json', method: 'GET', category: 'inventory' }
         ]
+      },
+      'google-drive': {
+        baseUrl: 'https://www.googleapis.com/drive',
+        apiVersion: 'v3',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        knownEndpoints: [
+          { path: '/v3/files', method: 'GET', category: 'files', description: 'List files and folders' },
+          { path: '/v3/files', method: 'POST', category: 'files', description: 'Create/upload files' },
+          { path: '/v3/files/{fileId}', method: 'GET', category: 'files', description: 'Get file metadata' },
+          { path: '/v3/files/{fileId}', method: 'PATCH', category: 'files', description: 'Update file metadata' },
+          { path: '/v3/files/{fileId}', method: 'DELETE', category: 'files', description: 'Delete file' },
+          { path: '/v3/files/{fileId}/copy', method: 'POST', category: 'files', description: 'Copy file' },
+          { path: '/v3/files/{fileId}/permissions', method: 'GET', category: 'sharing', description: 'List permissions' },
+          { path: '/v3/files/{fileId}/permissions', method: 'POST', category: 'sharing', description: 'Share file' },
+          { path: '/v3/files/{fileId}/export', method: 'GET', category: 'export', description: 'Export Google Docs/Sheets' },
+          { path: '/v3/about', method: 'GET', category: 'account', description: 'Get Drive info' },
+          { path: '/v3/changes', method: 'GET', category: 'sync', description: 'Get changes for sync' },
+          { path: '/v3/changes/watch', method: 'POST', category: 'sync', description: 'Watch for changes' }
+        ],
+        scopes: [
+          'https://www.googleapis.com/auth/drive',
+          'https://www.googleapis.com/auth/drive.file',
+          'https://www.googleapis.com/auth/drive.metadata'
+        ],
+        features: {
+          fileOperations: ['list', 'upload', 'download', 'delete', 'copy', 'move'],
+          sharing: ['share', 'unshare', 'permissions'],
+          sync: ['changes', 'watch', 'webhooks'],
+          export: ['docs', 'sheets', 'slides', 'pdf'],
+          search: ['content', 'metadata', 'fulltext']
+        }
       }
     };
   }
@@ -304,7 +338,9 @@ class UniversalMCPGenerator {
    * Step 2: Generate Comprehensive MCP
    */
   async generateComprehensiveMCP(serviceName, analysis) {
-    const className = `${serviceName.charAt(0).toUpperCase()}${serviceName.slice(1)}MCP`;
+    // Clean service name for valid JavaScript class name
+    const cleanServiceName = serviceName.replace(/[-_\s]/g, '').toLowerCase();
+    const className = `${cleanServiceName.charAt(0).toUpperCase()}${cleanServiceName.slice(1)}MCP`;
     const fileName = `${serviceName}-generated-mcp.js`;
     const filePath = path.join(__dirname, fileName);
     

@@ -39,87 +39,99 @@ export default function ChatHistory({
   const { textSizeClass } = useTextSize();
   const { getMessageAlignment } = useChatMessageAlignment();
 
-  useEffect(() => {
-    // Use IntersectionObserver to detect when we're near bottom
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsAtBottom(entry.isIntersecting);
-      },
-      { threshold: 0.5 }
-    );
+  // Simplified scroll state management
+  const scrollTimeoutRef = useRef(null);
+  const lastScrollTime = useRef(0);
 
-    const bottomSentinel = document.createElement('div');
-    bottomSentinel.style.height = '1px';
-    chatHistoryRef.current?.appendChild(bottomSentinel);
-    observer.observe(bottomSentinel);
-
-    return () => {
-      observer.disconnect();
-      bottomSentinel.remove();
-    };
+  // Check if user is at bottom
+  const checkIsAtBottom = useCallback(() => {
+    if (!chatHistoryRef.current) return false;
+    const { scrollTop, scrollHeight, clientHeight } = chatHistoryRef.current;
+    return scrollHeight - scrollTop - clientHeight <= 5; // Tighter tolerance
   }, []);
 
-  useEffect(() => {
-    const shouldAutoScroll = 
-      isStreaming || // Always scroll during streaming
-      hasStatusResponse || // Always scroll for status updates
-      (!isUserScrolling && isAtBottom); // Scroll if user was at bottom
-
-    if (shouldAutoScroll && chatHistoryRef.current) {
-      // Use RAF to ensure DOM is ready and prevent race conditions
-      requestAnimationFrame(() => {
-        if (!chatHistoryRef.current) return;
-        
-        const scrollHeight = chatHistoryRef.current.scrollHeight;
-        const clientHeight = chatHistoryRef.current.clientHeight;
-        
-        // Only scroll if there's content to scroll to
-        if (scrollHeight > clientHeight) {
-          chatHistoryRef.current.scrollTo({
-            top: scrollHeight,
-            behavior: 'auto'
-          });
-        }
-      });
-    }
-  }, [history, isStreaming, hasStatusResponse, isUserScrolling, isAtBottom]);
-
-  const handleScroll = (e) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.target;
-    // Consider "near bottom" if within 50px of the bottom (tighter tolerance)
-    const isNearBottom = scrollHeight - scrollTop - clientHeight <= 50;
+  // Smooth scroll to bottom
+  const scrollToBottom = useCallback((force = false) => {
+    if (!chatHistoryRef.current) return;
     
-    // Reset user scrolling state when they return to bottom
-    if (isNearBottom) {
+    const now = Date.now();
+    const timeSinceLastScroll = now - lastScrollTime.current;
+    
+    // Don't interrupt recent user scrolling unless forced
+    if (!force && timeSinceLastScroll < 100) return;
+    
+    const element = chatHistoryRef.current;
+    const isAtBottom = checkIsAtBottom();
+    
+    // Only auto-scroll if user is already near bottom or during streaming
+    if (force || isAtBottom || isStreaming) {
+      element.scrollTo({
+        top: element.scrollHeight,
+        behavior: isStreaming ? 'auto' : 'smooth'
+      });
       setIsUserScrolling(false);
-    } else if (Math.abs(scrollTop - lastScrollTopRef.current) > 10) {
-      // Only set user scrolling if they're NOT near bottom
-      setIsUserScrolling(true);
     }
+  }, [checkIsAtBottom, isStreaming]);
 
-    setIsAtBottom(isNearBottom);
-    lastScrollTopRef.current = scrollTop;
-  };
+  // Auto-scroll on new messages
+  useEffect(() => {
+    const shouldAutoScroll = isStreaming || hasStatusResponse || (!isUserScrolling && isAtBottom);
+    
+    if (shouldAutoScroll) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => scrollToBottom(isStreaming), 16);
+    }
+  }, [history, isStreaming, hasStatusResponse, isUserScrolling, isAtBottom, scrollToBottom]);
 
-  const debouncedScroll = debounce(handleScroll, 50);
+  // Unified scroll handler with passive listening
+  const handleScroll = useCallback(() => {
+    if (!chatHistoryRef.current) return;
+    
+    lastScrollTime.current = Date.now();
+    const isAtBottom = checkIsAtBottom();
+    
+    // Clear any existing timeout
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    
+    // Update states immediately for responsive UI
+    setIsAtBottom(isAtBottom);
+    
+    // Set user scrolling state with delay to avoid flickering
+    if (!isAtBottom) {
+      setIsUserScrolling(true);
+      
+      // Reset user scrolling state after user stops scrolling
+      scrollTimeoutRef.current = setTimeout(() => {
+        if (checkIsAtBottom()) {
+          setIsUserScrolling(false);
+        }
+      }, 150);
+    } else {
+      setIsUserScrolling(false);
+    }
+  }, [checkIsAtBottom]);
 
   useEffect(() => {
-    const chatHistoryElement = chatHistoryRef.current;
-    if (chatHistoryElement) {
-      chatHistoryElement.addEventListener("scroll", debouncedScroll);
-      return () =>
-        chatHistoryElement.removeEventListener("scroll", debouncedScroll);
-    }
-  }, []);
+    const element = chatHistoryRef.current;
+    if (!element) return;
 
-  const scrollToBottom = (smooth = false) => {
-    if (chatHistoryRef.current) {
-      chatHistoryRef.current.scrollTo({
-        top: chatHistoryRef.current.scrollHeight,
-        behavior: smooth ? "smooth" : "auto"
-      });
-    }
-  };
+    // Use passive listener for better performance
+    element.addEventListener("scroll", handleScroll, { passive: true });
+    
+    return () => {
+      element.removeEventListener("scroll", handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [handleScroll]);
+
+  // Manual scroll to bottom for button click
+  const manualScrollToBottom = useCallback(() => {
+    scrollToBottom(true);
+  }, [scrollToBottom]);
 
   const handleSendSuggestedMessage = (heading, message) => {
     sendCommand({ text: `${heading} ${message}`, autoSubmit: true });
@@ -261,12 +273,11 @@ export default function ChatHistory({
       <div
         className="flex-1 overflow-y-auto overflow-x-hidden"
         style={{ 
-          scrollBehavior: 'auto',
+          scrollBehavior: 'smooth',
           WebkitOverflowScrolling: 'touch'
         }}
         id="chat-history"
         ref={chatHistoryRef}
-        onScroll={handleScroll}
       >
           <div className="px-4 py-2 pb-4">
           {compiledHistory.map((item, index) =>
@@ -280,7 +291,7 @@ export default function ChatHistory({
       {!isAtBottom && (
         <div className="absolute bottom-4 right-4 md:right-8 z-50 cursor-pointer">
           <button
-            onClick={() => scrollToBottom(true)}
+            onClick={manualScrollToBottom}
             className="flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"
           >
             <ArrowDown className="w-5 h-5" weight="bold" />

@@ -496,7 +496,7 @@ After authorization, you can use Gmail commands like:
 
     const response = await nango.get({
       endpoint: `/gmail/v1/users/me/messages/${args.messageId}`,
-      connectionId: process.env.NANGO_CONNECTION_ID || 'workspace_3',
+      connectionId: process.env.NANGO_CONNECTION_ID,
       providerConfigKey: 'google-mail',
       params: { format: 'full' }
     });
@@ -548,7 +548,7 @@ ${body}`
     for (const messageId of args.messageIds) {
       await nango.post({
         endpoint: `/gmail/v1/users/me/messages/${messageId}/modify`,
-        connectionId: process.env.NANGO_CONNECTION_ID || 'workspace_3',
+        connectionId: process.env.NANGO_CONNECTION_ID,
         providerConfigKey: 'google-mail',
         data: {
           removeLabelIds: ['UNREAD']
@@ -575,7 +575,7 @@ ${body}`
     for (const messageId of args.messageIds) {
       await nango.delete({
         endpoint: `/gmail/v1/users/me/messages/${messageId}`,
-        connectionId: process.env.NANGO_CONNECTION_ID || 'workspace_3',
+        connectionId: process.env.NANGO_CONNECTION_ID,
         providerConfigKey: 'gmail-integration'
       });
     }

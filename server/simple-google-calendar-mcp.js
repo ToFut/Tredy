@@ -186,10 +186,16 @@ class SimpleCalendarMCP {
     
     try {
       // Use Nango's proxy to make the API call
+      // Get connection ID from environment (set by MCP bridge)
+      const connectionId = process.env.NANGO_CONNECTION_ID;
+      if (!connectionId) {
+        throw new Error('NANGO_CONNECTION_ID not set. Calendar not connected for this workspace.');
+      }
+      
       const response = await nango.get({
         endpoint,
-        connectionId: process.env.NANGO_CONNECTION_ID || 'workspace_3',
-        providerConfigKey: 'google-calendar-getting-started'
+        connectionId,
+        providerConfigKey: process.env.NANGO_PROVIDER_CONFIG_KEY || 'google-calendar-getting-started'
       });
 
     const data = response.data;
@@ -308,7 +314,7 @@ class SimpleCalendarMCP {
     try {
       const response = await nango.post({
         endpoint: '/calendar/v3/calendars/primary/events',
-        connectionId: process.env.NANGO_CONNECTION_ID || 'workspace_4',
+        connectionId: process.env.NANGO_CONNECTION_ID,
         providerConfigKey: 'google-calendar-getting-started',
         data: eventData
       });

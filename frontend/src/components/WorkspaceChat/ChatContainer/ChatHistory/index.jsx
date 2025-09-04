@@ -255,14 +255,13 @@ export default function ChatHistory({
         style={{ 
           scrollBehavior: isStreaming ? 'auto' : 'smooth',
           WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'contain',
-          contain: 'paint'
+          overscrollBehavior: 'contain'
         }}
         id="chat-history"
         ref={chatHistoryRef}
         onScroll={handleScroll}
       >
-                 <div className="px-4 pb-0">
+        <div className="px-4 py-2 pb-32 md:pb-40">
           {compiledHistory.map((item, index) =>
             Array.isArray(item) ? renderStatusResponse(item, index) : item
           )}

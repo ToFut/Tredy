@@ -332,13 +332,7 @@ export default function PromptInput({
               <div className="flex items-end w-full">
                 {/* Enhanced modern tools with mobile-friendly touch targets */}
                 <div className="flex items-center gap-1 md:gap-1.5 p-2 md:p-3">
-                  <button
-                    type="button"
-                    className="p-2 md:p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation"
-                    style={{ minWidth: '44px', minHeight: '44px' }}
-                  >
-                    <AttachItem />
-                  </button>
+                  <AttachItem />
                   <SlashCommandsButton
                     showing={showSlashCommand}
                     setShowSlashCommand={setShowSlashCommand}

@@ -36,9 +36,18 @@ module.exports = {
 
     // Gmail production config
     gmail: {
-      configKey: "google-mail-prod",
-      clientId: process.env.GMAIL_PROD_CLIENT_ID,
-      clientSecret: process.env.GMAIL_PROD_CLIENT_SECRET,
+      configKey: "google-mail", // Must match what's in Nango dashboard
+      clientId: process.env.GMAIL_PROD_CLIENT_ID || process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GMAIL_PROD_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET,
+      scopes: [
+        "https://www.googleapis.com/auth/gmail.readonly",
+        "https://www.googleapis.com/auth/gmail.send"
+      ]
+    },
+    'google-mail': {
+      configKey: "google-mail", // Alternative key mapping
+      clientId: process.env.GMAIL_PROD_CLIENT_ID || process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GMAIL_PROD_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET,
       scopes: [
         "https://www.googleapis.com/auth/gmail.readonly",
         "https://www.googleapis.com/auth/gmail.send"

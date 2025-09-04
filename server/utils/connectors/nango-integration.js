@@ -52,8 +52,16 @@ class NangoIntegration {
     let nangoConfig;
     try {
       nangoConfig = isProduction ? require('../../config/nango.production.js') : null;
+      if (isProduction) {
+        console.log('[Nango] Production mode detected, config loaded:', {
+          hasPublicKey: !!nangoConfig?.NANGO_PUBLIC_KEY,
+          hasSecretKey: !!nangoConfig?.NANGO_SECRET_KEY,
+          host: nangoConfig?.NANGO_HOST,
+          providers: Object.keys(nangoConfig?.providers || {})
+        });
+      }
     } catch (error) {
-      console.log('[Nango] Production config not found');
+      console.log('[Nango] Production config not found:', error.message);
     }
     
     // Check what provider configs actually exist in Nango

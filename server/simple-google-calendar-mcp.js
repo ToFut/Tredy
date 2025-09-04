@@ -288,9 +288,27 @@ class SimpleCalendarMCP {
 
     const { summary, startTime, endTime, description, location, attendees } = args;
     
+    // If no start time provided, default to tomorrow at 3pm
+    const defaultStartTime = (() => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(15, 0, 0, 0);
+      return tomorrow.toISOString();
+    })();
+    
     // Parse and validate times
-    const parsedStartTime = parseDateTime(startTime);
-    const parsedEndTime = parseDateTime(endTime || startTime, true);
+    const parsedStartTime = parseDateTime(startTime || defaultStartTime);
+    
+    // If no end time, make it 1 hour after start
+    const parsedEndTime = (() => {
+      if (endTime) {
+        return parseDateTime(endTime, true);
+      } else {
+        const end = new Date(parsedStartTime);
+        end.setHours(end.getHours() + 1);
+        return end.toISOString();
+      }
+    })();
     
     console.error('[Calendar MCP] Creating event:', { 
       summary, 
@@ -299,10 +317,17 @@ class SimpleCalendarMCP {
       attendees 
     });
 
+    // Ensure both dates are in the same format (dateTime with timezone)
     const eventData = {
       summary: summary || 'Meeting',
-      start: { dateTime: parsedStartTime },
-      end: { dateTime: parsedEndTime },
+      start: { 
+        dateTime: parsedStartTime,
+        timeZone: 'America/New_York'  // Add timezone to be explicit
+      },
+      end: { 
+        dateTime: parsedEndTime,
+        timeZone: 'America/New_York'  // Add timezone to be explicit
+      },
       ...(description && { description }),
       ...(location && { location }),
       ...(attendees && attendees.length > 0 && { 

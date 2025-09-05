@@ -40,8 +40,8 @@ import AttachmentManager from "../PromptInput/Attachments";
 import LLMSelectorModal from "../PromptInput/LLMSelector";
 import ResponseModeSelector from "../PromptInput/ResponseModeSelector";
 import { useResponseMode } from "../PromptInput/ResponseModeSelector";
-import AgentActivityIndicator from "../../AgentActivityIndicator";
-import SmartContextPills from "../../SmartContextPills";
+// import AgentActivityIndicator from "../../AgentActivityIndicator";
+// import SmartContextPills from "../../SmartContextPills";
 import ChatWidgetHeader from "@/components/ChatWidgetHeader";
 
 export default function MobileOptimizedChat({ 
@@ -270,20 +270,20 @@ export default function MobileOptimizedChat({
             </div>
           )}
           
-          {/* Smart Context Pills */}
-          <SmartContextPills 
+          {/* Smart Context Pills - Disabled */}
+          {/* <SmartContextPills 
             threadStats={threadStats}
             workspace={workspace}
             performance={performance}
-          />
+          /> */}
         </div>
       </div>
 
-      {/* Agent Activity Indicator (floating) */}
-      <AgentActivityIndicator 
+      {/* Agent Activity Indicator (floating) - Disabled */}
+      {/* <AgentActivityIndicator 
         activeAgents={activeAgents}
         thinking={loadingResponse}
-      />
+      /> */}
 
       {/* Chat Messages Area */}
       <div 

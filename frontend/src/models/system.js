@@ -121,11 +121,17 @@ const System = {
   },
 
   checkDocumentProcessorOnline: async () => {
-    return await fetch(`${API_BASE}/system/document-processing-status`, {
-      headers: baseHeaders(),
-    })
-      .then((res) => res.ok)
-      .catch(() => false);
+    try {
+      const response = await fetch(`${API_BASE}/system/document-processing-status`, {
+        headers: baseHeaders(),
+        signal: AbortSignal.timeout(5000), // 5 second timeout
+      });
+      return response.ok;
+    } catch (error) {
+      // Document processor is offline or unreachable
+      console.log('Document processor status check failed:', error.message);
+      return false;
+    }
   },
   acceptedDocumentTypes: async () => {
     return await fetch(`${API_BASE}/system/accepted-document-types`, {

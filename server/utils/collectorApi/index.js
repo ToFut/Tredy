@@ -43,9 +43,17 @@ class CollectorApi {
   }
 
   async online() {
-    return await fetch(this.endpoint)
-      .then((res) => res.ok)
-      .catch(() => false);
+    try {
+      const response = await fetch(this.endpoint, {
+        method: 'GET',
+        timeout: 3000, // 3 second timeout
+      });
+      return response.ok;
+    } catch (error) {
+      // Log the error for debugging but don't expose it to client
+      console.log(`[CollectorApi] Document processor offline or unreachable: ${error.message}`);
+      return false;
+    }
   }
 
   async acceptedFileTypes() {

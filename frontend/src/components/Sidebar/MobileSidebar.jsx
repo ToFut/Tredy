@@ -8,18 +8,15 @@ import {
   Plus,
   X,
   CaretRight as ChevronRight,
-  Users,
   FileText,
   Brain,
-  Sparkle as Sparkles,
-  Clock,
   Star,
   Folder,
   SignOut as LogOut,
   Question as HelpCircle,
   List as Menu
 } from "@phosphor-icons/react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import paths from "@/utils/paths";
 import useUser from "@/hooks/useUser";
 import useLogo from "@/hooks/useLogo";
@@ -232,9 +229,12 @@ export function MobileSlideOutSidebar({ isOpen, onClose }) {
                   <button
                     onClick={() => {
                       navigator.vibrate?.([10]);
-                      window.location.href = paths.workspace.new();
+                      const newWorkspacePath = paths.workspace?.new?.() || paths.home() + '#new-workspace';
+                      console.log('Navigating to new workspace:', newWorkspacePath);
+                      window.location.href = newWorkspacePath;
+                      onClose(); // Close sidebar after navigation
                     }}
-                    className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl hover:shadow-md transition-all active:scale-98"
+                    className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl hover:shadow-md transition-all active:scale-[0.98]"
                   >
                     <div className="p-2 bg-white dark:bg-gray-800 rounded-lg">
                       <Plus className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -282,7 +282,7 @@ export function MobileSlideOutSidebar({ isOpen, onClose }) {
                       <button
                         key={workspace.id}
                         onClick={() => handleWorkspaceClick(workspace)}
-                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all active:scale-98 ${
+                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all active:scale-[0.98] ${
                           selectedWorkspace?.id === workspace.id
                             ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
                             : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
@@ -323,8 +323,13 @@ export function MobileSlideOutSidebar({ isOpen, onClose }) {
                         No workspaces found
                       </p>
                       <button
-                        onClick={() => window.location.href = paths.workspace.new?.() || '/new-workspace'}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium"
+                        onClick={() => {
+                          const newWorkspacePath = paths.workspace?.new?.() || paths.home() + '#new-workspace';
+                          console.log('Creating first workspace:', newWorkspacePath);
+                          window.location.href = newWorkspacePath;
+                          onClose();
+                        }}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium active:scale-95"
                       >
                         Create First Workspace
                       </button>
@@ -335,7 +340,7 @@ export function MobileSlideOutSidebar({ isOpen, onClose }) {
                     <button
                       key={workspace.id}
                       onClick={() => handleWorkspaceClick(workspace)}
-                      className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all active:scale-98 ${
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all active:scale-[0.98] ${
                         selectedWorkspace?.id === workspace.id
                           ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
                           : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
@@ -370,7 +375,13 @@ export function MobileSlideOutSidebar({ isOpen, onClose }) {
               <div className="border-t border-gray-200 dark:border-gray-800 pt-4 mt-8">
                 <div className="space-y-2">
                   <button
-                    onClick={() => window.location.href = paths.settings.appearance()}
+                    onClick={() => {
+                      navigator.vibrate?.([10]);
+                      const settingsPath = paths.settings?.appearance?.() || paths.settings?.llmPreference?.() || '/settings';
+                      console.log('Navigating to settings:', settingsPath);
+                      window.location.href = settingsPath;
+                      onClose();
+                    }}
                     className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-xl transition-all"
                   >
                     <Settings className="w-4 h-4 text-gray-500" />
@@ -378,7 +389,12 @@ export function MobileSlideOutSidebar({ isOpen, onClose }) {
                   </button>
                   
                   <button
-                    onClick={() => window.location.href = '/help'}
+                    onClick={() => {
+                      navigator.vibrate?.([10]);
+                      // Open docs in new tab
+                      window.open('https://docs.anythingllm.com', '_blank');
+                      onClose();
+                    }}
                     className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-xl transition-all"
                   >
                     <HelpCircle className="w-4 h-4 text-gray-500" />

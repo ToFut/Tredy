@@ -326,12 +326,15 @@ export default function PromptInput({
           
           <div className="relative">
             <div className="relative flex items-end bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200/30 dark:border-gray-700/30 rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl hover:border-purple-300/50 transition-all duration-300 overflow-hidden group"
-                 style={{ minHeight: '52px' }}>
+                 style={{ 
+                   minHeight: '52px',
+                   maxWidth: isFocused && window.innerWidth < 640 ? '100%' : undefined
+                 }}>
               <AttachmentManager attachments={attachments} />
               
               <div className="flex items-end w-full">
                 {/* Compact mobile tools with smart layout */}
-                <div className="flex items-center gap-0.5 sm:gap-1 md:gap-1.5 p-1.5 sm:p-2 md:p-3">
+                <div className={`flex items-center gap-0.5 sm:gap-1 md:gap-1.5 p-1.5 sm:p-2 md:p-3 ${isFocused && window.innerWidth < 640 ? 'scale-75 origin-left' : ''}`}>
                   <div className="hidden sm:block">
                     <AttachItem />
                   </div>
@@ -348,9 +351,9 @@ export default function PromptInput({
                     setShowing={setShowAgents}
                     compact
                   />
-                  {/* Speech-to-Text Button - Hidden on mobile */}
-                  <div className="hidden sm:block p-2 md:p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation"
-                       style={{ minWidth: '40px', minHeight: '40px' }}>
+                  {/* Speech-to-Text Button - Show on mobile but smaller */}
+                  <div className="p-1.5 sm:p-2 md:p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation"
+                       style={{ minWidth: isFocused && window.innerWidth < 640 ? '32px' : '40px', minHeight: isFocused && window.innerWidth < 640 ? '32px' : '40px' }}>
                     <SpeechToText sendCommand={sendCommand} />
                   </div>
                   <button
@@ -382,10 +385,22 @@ export default function PromptInput({
                     handlePasteEvent(e);
                   }}
                   required={true}
-                  onFocus={() => setFocused(true)}
+                  onFocus={() => {
+                    setFocused(true);
+                    // Expand input area on mobile when focused
+                    if (window.innerWidth < 640 && formRef.current) {
+                      formRef.current.style.position = 'relative';
+                      formRef.current.style.zIndex = '100';
+                    }
+                  }}
                   onBlur={(e) => {
                     setFocused(false);
                     adjustTextArea(e);
+                    // Reset mobile positioning
+                    if (window.innerWidth < 640 && formRef.current) {
+                      formRef.current.style.position = '';
+                      formRef.current.style.zIndex = '';
+                    }
                   }}
                   value={promptInput}
                   spellCheck={Appearance.get("enableSpellCheck")}
@@ -393,13 +408,14 @@ export default function PromptInput({
                   style={{ 
                     minHeight: '40px',
                     WebkitAppearance: 'none',
-                    fontSize: '16px' // Prevents iOS zoom on focus
+                    fontSize: '16px', // Prevents iOS zoom on focus
+                    width: isFocused && window.innerWidth < 640 ? 'calc(100vw - 120px)' : 'auto'
                   }}
                   placeholder={responseMode === "agent" ? "Ask me anything with AI tools..." : "Ask me anything..."}
                 />
                 
                 {/* Compact modern send button */}
-                <div className="p-1.5 sm:p-2 md:p-3">
+                <div className="p-1 sm:p-1.5 md:p-2">
                   {isStreaming ? (
                     <StopGenerationButton />
                   ) : (
@@ -414,10 +430,11 @@ export default function PromptInput({
                             : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'
                         }`}
                         style={{ 
-                          minWidth: '40px', 
-                          minHeight: '40px', 
-                          padding: '8px',
-                          WebkitTapHighlightColor: 'transparent'
+                          minWidth: window.innerWidth < 640 ? '44px' : '48px', 
+                          minHeight: window.innerWidth < 640 ? '44px' : '48px', 
+                          padding: window.innerWidth < 640 ? '10px' : '12px',
+                          WebkitTapHighlightColor: 'transparent',
+                          zIndex: 10
                         }}
                         aria-label="Send message"
                       >
@@ -427,7 +444,7 @@ export default function PromptInput({
                             <Sparkle className="absolute -top-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 text-amber-300 animate-pulse z-10" />
                           </>
                         )}
-                        <ArrowUp className="relative z-10 w-5 h-5 sm:w-6 sm:h-6 text-white drop-shadow-sm" weight="bold" />
+                        <ArrowUp className="relative z-10 w-6 h-6 sm:w-7 sm:h-7 text-white drop-shadow-sm" weight="bold" />
                       </button>
                       <Tooltip
                         id="send-prompt"

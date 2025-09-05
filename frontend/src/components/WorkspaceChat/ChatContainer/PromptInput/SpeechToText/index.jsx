@@ -31,7 +31,19 @@ export default function SpeechToText({ sendCommand }) {
     clearTranscriptOnListen: true,
   });
   const { t } = useTranslation();
-  function startSTTSession() {
+  async function startSTTSession() {
+    // On mobile, request permission first
+    if (window.innerWidth < 640) {
+      try {
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (err) {
+        alert(
+          "Microphone access is required for speech-to-text. Please enable microphone permissions in your browser settings."
+        );
+        return;
+      }
+    }
+    
     if (!isMicrophoneAvailable) {
       alert(
         "AnythingLLM does not have access to microphone. Please enable for this site to use this feature."
@@ -45,6 +57,11 @@ export default function SpeechToText({ sendCommand }) {
       continuous: browserSupportsContinuousListening,
       language: window?.navigator?.language ?? "en-US",
     });
+    
+    // Vibrate on mobile to indicate recording started
+    if (window.innerWidth < 640) {
+      navigator.vibrate?.([50]);
+    }
   }
 
   function endSTTSession() {
@@ -124,7 +141,7 @@ export default function SpeechToText({ sendCommand }) {
       <button
         type="button"
         data-tooltip-id="tooltip-microphone-btn"
-        data-tooltip-content={`${t("chat_window.microphone")} (CTRL + M)`}
+        data-tooltip-content={window.innerWidth >= 640 ? `${t("chat_window.microphone")} (CTRL + M)` : t("chat_window.microphone")}
         aria-label={t("chat_window.microphone")}
         onClick={listening ? endSTTSession : startSTTSession}
         className={`border-none relative flex justify-center items-center cursor-pointer touch-manipulation transition-all ${
@@ -134,13 +151,13 @@ export default function SpeechToText({ sendCommand }) {
         }`}
         style={{
           WebkitTapHighlightColor: 'transparent',
-          minWidth: '44px',
-          minHeight: '44px'
+          minWidth: window.innerWidth < 640 ? '36px' : '44px',
+          minHeight: window.innerWidth < 640 ? '36px' : '44px'
         }}
       >
         <Microphone
           weight="fill"
-          className={`w-6 h-6 pointer-events-none ${
+          className={`${window.innerWidth < 640 ? 'w-4 h-4' : 'w-6 h-6'} pointer-events-none ${
             listening ? "animate-pulse" : ""
           }`}
         />

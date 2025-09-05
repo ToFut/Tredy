@@ -13,7 +13,7 @@
     "dev": "cross-env NODE_ENV=development nodemon --ignore documents --ignore vector-cache --ignore storage --ignore swagger --trace-warnings index.js",
     "start": "cross-env NODE_ENV=production node index.js",
     "build": "npx prisma generate && npx prisma migrate deploy",
-    "postinstall": "npx prisma generate",
+    "postinstall": "npx prisma generate && npm rebuild @lancedb/lancedb",
     "lint": "yarn prettier --ignore-path ../.prettierignore --write ./endpoints ./models ./utils index.js",
     "swagger": "node ./swagger/init.js",
     "webhooks-proxy": "node start-webhook-proxy.js"

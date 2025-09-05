@@ -114,25 +114,23 @@ export function SidebarMobileHeader() {
 
   return (
     <>
-      {/* Clean Mobile Header */}
+      {/* Compact Mobile Header */}
       <div
         aria-label="Show sidebar"
-        className="fixed top-0 left-0 right-0 z-10 flex justify-between items-center px-4 py-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700"
-        style={{ height: 'var(--app-header-height, 64px)' }}
+        className="fixed top-0 left-0 right-0 z-10 flex items-center gap-2 px-3 py-2 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700"
+        style={{ height: '48px' }}
       >
         <button
           onClick={() => setShowSidebar(true)}
-          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
         >
-          <List className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+          <List className="h-5 w-5 text-gray-700 dark:text-gray-300" />
         </button>
         
-        <div className="flex items-center gap-2">
-          <img src={logo} alt="Logo" className="h-8 w-8 rounded" />
-          <span className="font-semibold text-gray-900 dark:text-white">Tredy</span>
+        <div className="flex items-center gap-1.5">
+          <img src={logo} alt="Logo" className="h-7 w-7 rounded" />
+          <span className="font-medium text-gray-900 dark:text-white text-sm">Tredy</span>
         </div>
-        
-        <div className="w-8 h-8"></div> {/* Spacer for balance */}
       </div>
 
       {/* Mobile Sidebar */}

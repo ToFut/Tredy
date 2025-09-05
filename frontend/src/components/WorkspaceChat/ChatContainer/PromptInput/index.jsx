@@ -59,6 +59,7 @@ export default function PromptInput({
    */
   function handlePromptUpdate(e) {
     const { messageContent, writeMode = "replace" } = e?.detail ?? {};
+    console.log("[PromptInput] handlePromptUpdate:", { messageContent, writeMode });
     if (writeMode === "append") setPromptInput((prev) => prev + messageContent);
     else setPromptInput(messageContent ?? "");
   }

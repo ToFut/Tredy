@@ -38,14 +38,11 @@ class MCPCompatibilityLayer extends MCPHypervisor {
       }
     }
     
-    // Second pass: Only include non-OAuth generic servers
+    // Second pass: include all generic servers for now
     for (const serverName of allServers) {
       const isWorkspaceSpecific = serverName.includes('_ws');
       if (!isWorkspaceSpecific) {
-        // Skip OAuth providers that aren't connected to avoid confusion
-        if (!oauthProviders.includes(serverName)) {
-          genericServers.push(serverName);
-        }
+        genericServers.push(serverName);
       }
     }
     

@@ -61,6 +61,7 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
    * @param {'replace' | 'append'} writeMode - Replace current text or append to existing text (default: replace)
    */
   function setMessageEmit(messageContent = "", writeMode = "replace") {
+    console.log("[setMessageEmit] Received:", { messageContent, writeMode });
     if (writeMode === "append") setMessage((prev) => prev + messageContent);
     else setMessage(messageContent ?? "");
 

@@ -155,11 +155,14 @@ export default function MobileOptimizedChat({
   const handleVoiceToggle = () => {
     navigator.vibrate?.([20]);
     setIsRecording(!isRecording);
-    // Integrate with actual SpeechToText component
+    // This would need to integrate with SpeechToText component
+    // For now, it's a placeholder for voice recording UI
     if (!isRecording) {
-      console.log("Starting voice recording...");
+      console.log("Voice recording started - STT integration needed");
+      // TODO: Start SpeechRecognition.startListening()
     } else {
-      console.log("Stopping voice recording...");
+      console.log("Voice recording stopped - STT integration needed");
+      // TODO: Stop SpeechRecognition.stopListening()
     }
   };
 
@@ -296,6 +299,7 @@ export default function MobileOptimizedChat({
 
       {/* Enhanced Mobile Input */}
       <EnhancedMobileInput
+        sendCommand={sendCommand}
         onSend={(message) => {
           if (message.type === "text") {
             // Update the message state

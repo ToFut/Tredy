@@ -28,35 +28,28 @@ import {
   Clock,
   Sparkle
 } from "@phosphor-icons/react";
+import SpeechToText from "../PromptInput/SpeechToText";
 
 export default function EnhancedMobileInput({
   onSend,
   onAttachment,
   workspace,
   isStreaming = false,
-  responseMode = "chat"
+  responseMode = "chat",
+  sendCommand
 }) {
   // State management
   const [inputText, setInputText] = useState("");
   const [inputHeight, setInputHeight] = useState(48);
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordingTime, setRecordingTime] = useState(0);
   const [showAttachments, setShowAttachments] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showFormatting, setShowFormatting] = useState(false);
   const [selectedText, setSelectedText] = useState("");
   const [cursorPosition, setCursorPosition] = useState(0);
-  const [voiceWaveform, setVoiceWaveform] = useState([]);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragDistance, setDragDistance] = useState(0);
 
   // Refs
   const textareaRef = useRef(null);
-  const recordingInterval = useRef(null);
   const animationController = useAnimation();
-  const touchStartY = useRef(0);
-  const mediaRecorder = useRef(null);
-  const audioChunks = useRef([]);
 
   // Auto-expand textarea as user types
   useEffect(() => {
@@ -119,87 +112,14 @@ export default function EnhancedMobileInput({
     }
   };
 
-  // Voice recording functions
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder.current = new MediaRecorder(stream);
-      audioChunks.current = [];
-
-      mediaRecorder.current.ondataavailable = (event) => {
-        audioChunks.current.push(event.data);
-      };
-
-      mediaRecorder.current.onstop = () => {
-        const audioBlob = new Blob(audioChunks.current, { type: "audio/webm" });
-        // Handle audio blob - send or preview
-        handleVoiceMessage(audioBlob);
-      };
-
-      mediaRecorder.current.start();
-      setIsRecording(true);
-      setRecordingTime(0);
-
-      // Start recording timer
-      recordingInterval.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
-      }, 1000);
-
-      // Haptic feedback
-      navigator.vibrate?.([50]);
-
-      // Start waveform animation
-      startWaveformAnimation();
-    } catch (error) {
-      console.error("Error starting recording:", error);
-      alert("Microphone access required for voice messages");
+  // Create sendCommand wrapper if not provided
+  const handleSendCommand = sendCommand || (({ text, writeMode = "append" }) => {
+    if (writeMode === "append") {
+      setInputText(prev => prev + text);
+    } else {
+      setInputText(text);
     }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorder.current && mediaRecorder.current.state !== "inactive") {
-      mediaRecorder.current.stop();
-      mediaRecorder.current.stream.getTracks().forEach(track => track.stop());
-      setIsRecording(false);
-      clearInterval(recordingInterval.current);
-      navigator.vibrate?.([30]);
-    }
-  };
-
-  const cancelRecording = () => {
-    stopRecording();
-    setRecordingTime(0);
-    audioChunks.current = [];
-    setDragDistance(0);
-    navigator.vibrate?.([20, 10, 20]);
-  };
-
-  const handleVoiceMessage = (audioBlob) => {
-    // Convert to base64 or handle upload
-    console.log("Voice message recorded:", audioBlob);
-    // You can preview or directly send the voice message
-    if (onSend) {
-      onSend({
-        type: "voice",
-        content: audioBlob,
-        duration: recordingTime
-      });
-    }
-  };
-
-  // Waveform animation for recording
-  const startWaveformAnimation = () => {
-    const interval = setInterval(() => {
-      if (isRecording) {
-        const newWave = Array.from({ length: 20 }, () => 
-          Math.random() * 40 + 10
-        );
-        setVoiceWaveform(newWave);
-      }
-    }, 100);
-    
-    return () => clearInterval(interval);
-  };
+  });
 
   // Handle send message
   const handleSend = () => {
@@ -295,12 +215,6 @@ export default function EnhancedMobileInput({
     }
   };
 
-  // Format recording time
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 transition-all duration-300 z-30"
@@ -404,8 +318,7 @@ export default function EnhancedMobileInput({
       {/* Main Input Area */}
       <div className="flex items-end gap-2 p-3">
         {/* Attachment Button */}
-        {!isRecording && (
-          <motion.button
+        <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={() => {
               setShowAttachments(!showAttachments);
@@ -419,57 +332,7 @@ export default function EnhancedMobileInput({
           >
             <Plus className={`w-5 h-5 transition-transform ${showAttachments ? "rotate-45" : ""}`} />
           </motion.button>
-        )}
 
-        {/* Voice Recording UI */}
-        {isRecording ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex-1 flex items-center gap-3 bg-red-50 dark:bg-red-900/20 rounded-2xl px-4 py-3"
-            onTouchStart={(e) => touchStartY.current = e.touches[0].clientY}
-            onTouchMove={(e) => {
-              const diff = touchStartY.current - e.touches[0].clientY;
-              setDragDistance(diff);
-              if (diff > 100) {
-                cancelRecording();
-              }
-            }}
-            onTouchEnd={() => setDragDistance(0)}
-          >
-            <div className="flex items-center gap-2 flex-1">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-              <span className="text-red-600 dark:text-red-400 font-medium">
-                {formatTime(recordingTime)}
-              </span>
-              {dragDistance > 50 && (
-                <span className="text-xs text-red-500 ml-2">
-                  ↑ Slide to cancel
-                </span>
-              )}
-            </div>
-            
-            {/* Waveform visualization */}
-            <div className="flex items-center gap-0.5 flex-1">
-              {voiceWaveform.map((height, i) => (
-                <motion.div
-                  key={i}
-                  animate={{ height }}
-                  className="w-1 bg-red-500 dark:bg-red-400 rounded-full"
-                  style={{ minHeight: "4px" }}
-                />
-              ))}
-            </div>
-            
-            <button
-              onClick={cancelRecording}
-              className="p-2 text-red-600 dark:text-red-400"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </motion.div>
-        ) : (
-          <>
             {/* Text Input */}
             <div className="flex-1 relative">
               <motion.textarea
@@ -503,15 +366,10 @@ export default function EnhancedMobileInput({
               )}
             </div>
 
-            {/* Voice Toggle Button */}
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onTouchStart={startRecording}
-              onTouchEnd={stopRecording}
-              className="p-3 bg-gray-100 dark:bg-gray-800 rounded-xl text-gray-600 dark:text-gray-400"
-            >
-              <Mic className="w-5 h-5" />
-            </motion.button>
+            {/* Voice Toggle Button - Using original SpeechToText */}
+            <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-xl">
+              <SpeechToText sendCommand={handleSendCommand} />
+            </div>
 
             {/* Send Button */}
             <motion.button
@@ -534,12 +392,10 @@ export default function EnhancedMobileInput({
                 <ArrowUp className="w-5 h-5" weight="bold" />
               )}
             </motion.button>
-          </>
-        )}
       </div>
 
       {/* Quick Phrases (when input is empty) */}
-      {!inputText && !isRecording && (
+      {!inputText && (
         <div className="px-3 pb-2">
           <div className="flex gap-2 overflow-x-auto scrollbar-hide">
             {["How can I help?", "Tell me more", "What's next?", "Show examples"].map((phrase) => (

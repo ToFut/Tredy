@@ -474,6 +474,7 @@ export default function EnhancedMobileInput({
             <div className="flex-1 relative">
               <motion.textarea
                 ref={textareaRef}
+                id="primary-prompt-input"  // Add the ID that parent expects
                 value={inputText}
                 onChange={handleInputChange}
                 onPaste={handlePaste}

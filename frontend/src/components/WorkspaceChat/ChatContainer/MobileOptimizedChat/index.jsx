@@ -298,8 +298,27 @@ export default function MobileOptimizedChat({
       <EnhancedMobileInput
         onSend={(message) => {
           if (message.type === "text") {
+            // Update the message state
             setMessage(message.content);
-            handleSend({ preventDefault: () => {}, target: { value: message.content } });
+            
+            // Create a proper event object for the parent's handleSubmit
+            const formEvent = {
+              preventDefault: () => {},
+              target: {
+                value: message.content
+              }
+            };
+            
+            // Set the textarea value for parent to read
+            const textareaElement = document.getElementById('primary-prompt-input');
+            if (textareaElement) {
+              textareaElement.value = message.content;
+            }
+            
+            // Call parent's handleSubmit
+            if (parentHandleSubmit) {
+              parentHandleSubmit(formEvent);
+            }
           } else if (message.type === "voice") {
             // Handle voice message
             console.log("Voice message:", message);

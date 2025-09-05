@@ -23,7 +23,7 @@ import {
   TextItalic as Italic,
   Link,
   Lightning,
-  Bot,
+  Robot,
   Command,
   Clock,
   Sparkle
@@ -528,7 +528,7 @@ export default function EnhancedMobileInput({
               {isStreaming ? (
                 <Clock className="w-5 h-5 animate-spin" />
               ) : responseMode === "agent" ? (
-                <Bot className="w-5 h-5" />
+                <Robot className="w-5 h-5" />
               ) : (
                 <ArrowUp className="w-5 h-5" weight="bold" />
               )}

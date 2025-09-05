@@ -27,6 +27,8 @@ import IntelligenceCards from "@/components/IntelligenceCards";
 import { generateProactiveSystemPrompt } from "@/utils/chat/proactive";
 import ChatWidgetHeader from "@/components/ChatWidgetHeader";
 import MobileOptimizedChat from "./MobileOptimizedChat";
+import EnhancedMobileInput from "./EnhancedMobileInput";
+import "./EnhancedMobileInput/styles.css";
 
 export default function ChatContainer({ workspace, knownHistory = [] }) {
   const { threadSlug = null } = useParams();
@@ -361,8 +363,11 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
     handleWSS();
   }, [socketId]);
 
+  // Determine if we should use mobile UI (viewport width < 768px is more reliable than isMobile)
+  const useMobileUI = window.innerWidth < 768 || isMobile;
+  
   // Use mobile-optimized chat for mobile devices
-  if (isMobile) {
+  if (useMobileUI) {
     return (
       <div className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] overflow-hidden safe-area-inset">
         <DnDFileUploaderWrapper>

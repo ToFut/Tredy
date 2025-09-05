@@ -37,6 +37,7 @@ import { DndUploaderContext, CLEAR_ATTACHMENTS_EVENT } from "../DnDWrapper";
 import PromptInput, { PROMPT_INPUT_EVENT, PROMPT_INPUT_ID } from "../PromptInput";
 import SpeechToText from "../PromptInput/SpeechToText";
 import AttachmentManager from "../PromptInput/Attachments";
+import EnhancedMobileInput from "../EnhancedMobileInput";
 import LLMSelectorModal from "../PromptInput/LLMSelector";
 import ResponseModeSelector from "../PromptInput/ResponseModeSelector";
 import { useResponseMode } from "../PromptInput/ResponseModeSelector";
@@ -293,14 +294,31 @@ export default function MobileOptimizedChat({
         />
       </div>
 
-      {/* Mobile-Optimized Input Area */}
-      <div 
-        className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 transition-transform duration-200 z-20"
-        style={{
-          transform: `translateY(${-keyboardHeight}px)`,
-          paddingBottom: keyboardHeight > 0 ? '8px' : 'env(safe-area-inset-bottom, 16px)',
+      {/* Enhanced Mobile Input */}
+      <EnhancedMobileInput
+        onSend={(message) => {
+          if (message.type === "text") {
+            setMessage(message.content);
+            handleSend({ preventDefault: () => {}, target: { value: message.content } });
+          } else if (message.type === "voice") {
+            // Handle voice message
+            console.log("Voice message:", message);
+          }
         }}
-      >
+        onAttachment={(file) => {
+          window.dispatchEvent(
+            new CustomEvent('PASTE_ATTACHMENT_EVENT', {
+              detail: { files: [file] }
+            })
+          );
+        }}
+        workspace={workspace}
+        isStreaming={loadingResponse}
+        responseMode={responseMode}
+      />
+      
+      {/* Old input implementation - hidden but kept for reference */}
+      <div className="hidden">
         {/* Attachments Display */}
         {files.length > 0 && (
           <AttachmentManager attachments={files} />

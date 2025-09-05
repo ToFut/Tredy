@@ -1,4 +1,10 @@
-const lancedb = require("@lancedb/lancedb");
+let lancedb;
+try {
+  lancedb = require("@lancedb/lancedb");
+} catch (error) {
+  console.log("[LanceDB] Native module not found, LanceDB will not be available");
+  lancedb = null;
+}
 const { toChunks, getEmbeddingEngineSelection } = require("../../helpers");
 const { TextSplitter } = require("../../TextSplitter");
 const { SystemSettings } = require("../../../models/systemSettings");
@@ -22,6 +28,10 @@ const LanceDb = {
   connect: async function () {
     if (process.env.VECTOR_DB !== "lancedb")
       throw new Error("LanceDB::Invalid ENV settings");
+
+    if (!lancedb) {
+      throw new Error("LanceDB::Native module not available - please install @lancedb/lancedb or use a different vector database provider");
+    }
 
     const client = await lancedb.connect(this.uri);
     return { client };

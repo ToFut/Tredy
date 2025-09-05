@@ -227,7 +227,11 @@ export default function PromptInput({
   function adjustTextArea(event) {
     const element = event.target;
     element.style.height = "auto";
-    element.style.height = `${element.scrollHeight}px`;
+    const newHeight = Math.min(element.scrollHeight, 240); // Max height ~10 lines
+    element.style.height = `${newHeight}px`;
+    
+    // Add smooth transition for height changes
+    element.style.transition = "height 0.2s ease-out";
   }
 
   function handlePasteEvent(e) {

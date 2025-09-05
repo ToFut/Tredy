@@ -93,8 +93,14 @@ function getVectorDbClass(getExactly = null) {
       const { ChromaCloud } = require("../vectorDbProviders/chromacloud");
       return ChromaCloud;
     case "lancedb":
-      const { LanceDb } = require("../vectorDbProviders/lance");
-      return LanceDb;
+      try {
+        const { LanceDb } = require("../vectorDbProviders/lance");
+        return LanceDb;
+      } catch (error) {
+        console.log("[VectorDB] LanceDB not available, using in-memory fallback");
+        const { MemoryVectorDB } = require("../vectorDbProviders/memory");
+        return MemoryVectorDB;
+      }
     case "weaviate":
       const { Weaviate } = require("../vectorDbProviders/weaviate");
       return Weaviate;
@@ -114,7 +120,9 @@ function getVectorDbClass(getExactly = null) {
       const { PGVector } = require("../vectorDbProviders/pgvector");
       return PGVector;
     default:
-      throw new Error("ENV: No VECTOR_DB value found in environment!");
+      console.log("[VectorDB] No VECTOR_DB specified, using in-memory fallback");
+      const { MemoryVectorDB } = require("../vectorDbProviders/memory");
+      return MemoryVectorDB;
   }
 }
 

@@ -317,8 +317,8 @@ export default function PromptInput({
         }}
       >
         <div className="max-w-5xl mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-4 md:py-6">
-          {/* Response mode indicator - Mobile optimized */}
-          {responseMode === "agent" && (
+          {/* Response mode indicator - Desktop only */}
+          {responseMode === "agent" && window.innerWidth >= 640 && (
             <div className="flex items-center justify-center mb-2 sm:mb-3 px-1 sm:px-2">
               <div className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-full border border-purple-200 dark:border-purple-800">
                 <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600 dark:text-purple-400 animate-pulse" />
@@ -338,7 +338,13 @@ export default function PromptInput({
               
               <div className="flex items-end w-full">
                 {/* Compact mobile tools with smart layout */}
-                <div className={`flex items-center gap-0.5 sm:gap-1 md:gap-1.5 p-1.5 sm:p-2 md:p-3 ${isFocused && window.innerWidth < 640 ? 'scale-75 origin-left' : ''}`}>
+                <div className={`flex items-center gap-0.5 sm:gap-1 md:gap-1.5 p-1.5 sm:p-2 md:p-3 transition-all duration-300 ${
+                  isFocused && window.innerWidth < 640 && promptInput.length > 0 
+                    ? 'scale-0 w-0 opacity-0 pointer-events-none' 
+                    : isFocused && window.innerWidth < 640 
+                      ? 'scale-75 origin-left' 
+                      : ''
+                }`}>
                   <div className="hidden sm:block">
                     <AttachItem />
                   </div>
@@ -391,31 +397,25 @@ export default function PromptInput({
                   required={true}
                   onFocus={() => {
                     setFocused(true);
-                    // Expand input area on mobile when focused
-                    if (window.innerWidth < 640 && formRef.current) {
-                      formRef.current.style.position = 'relative';
-                      formRef.current.style.zIndex = '100';
-                    }
                   }}
                   onBlur={(e) => {
                     setFocused(false);
                     adjustTextArea(e);
-                    // Reset mobile positioning
-                    if (window.innerWidth < 640 && formRef.current) {
-                      formRef.current.style.position = '';
-                      formRef.current.style.zIndex = '';
-                    }
                   }}
                   value={promptInput}
                   spellCheck={Appearance.get("enableSpellCheck")}
-                  className="flex-1 border-none resize-none bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500/70 dark:placeholder:text-gray-400/70 text-[16px] leading-relaxed max-h-[100px] sm:max-h-[120px] md:max-h-[160px] focus:outline-none py-2 sm:py-3 md:py-4 px-1 sm:px-2 md:px-3 font-medium"
+                  className={`flex-1 border-none resize-none bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500/70 dark:placeholder:text-gray-400/70 focus:outline-none font-medium transition-all ${
+                    window.innerWidth < 640 
+                      ? 'text-sm leading-tight py-2 px-2' // Mobile: smaller text
+                      : 'text-[16px] leading-relaxed py-3 px-3' // Desktop: normal size
+                  }`}
                   style={{ 
-                    minHeight: '40px',
+                    minHeight: window.innerWidth < 640 ? '36px' : '48px',
+                    maxHeight: window.innerWidth < 640 && !isFocused ? '36px' : window.innerWidth < 640 ? '80px' : '160px',
                     WebkitAppearance: 'none',
-                    fontSize: '16px', // Prevents iOS zoom on focus
-                    width: isFocused && window.innerWidth < 640 ? 'calc(100vw - 120px)' : 'auto'
+                    fontSize: window.innerWidth < 640 ? '14px' : '16px', // Smaller on mobile
                   }}
-                  placeholder={responseMode === "agent" ? "Ask me anything with AI tools..." : "Ask me anything..."}
+                  placeholder={responseMode === "agent" ? "Ask AI..." : "Message..."}
                 />
                 
                 {/* Compact modern send button */}

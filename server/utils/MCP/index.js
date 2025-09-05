@@ -38,25 +38,19 @@ class MCPCompatibilityLayer extends MCPHypervisor {
       }
     }
     
-    // Second pass: include generic servers, but add connection prompts for OAuth providers without workspace connections
-    const oauthProviders = ['gmail', 'google-calendar', 'google-drive', 'linkedin', 'facebook'];
-    const connectionPrompts = [];
-    
+    // Second pass: Only include non-OAuth generic servers
     for (const serverName of allServers) {
       const isWorkspaceSpecific = serverName.includes('_ws');
       if (!isWorkspaceSpecific) {
-        if (oauthProviders.includes(serverName) && !workspaceProviders.has(serverName)) {
-          // Add connection prompt for OAuth providers that aren't connected
-          connectionPrompts.push(`@@connect_${serverName}`);
-        } else {
-          // Include normal generic servers
+        // Skip OAuth providers that aren't connected to avoid confusion
+        if (!oauthProviders.includes(serverName)) {
           genericServers.push(serverName);
         }
       }
     }
     
-    // Combine workspace-specific first, then generic ones, then connection prompts
-    const filteredServers = [...workspaceServers, ...genericServers, ...connectionPrompts];
+    // Only return servers that are actually usable
+    const filteredServers = [...workspaceServers, ...genericServers];
     return filteredServers.flatMap((name) => `@@mcp_${name}`);
   }
 

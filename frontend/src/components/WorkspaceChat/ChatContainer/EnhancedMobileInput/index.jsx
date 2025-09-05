@@ -59,6 +59,11 @@ export default function EnhancedMobileInput({
       const newHeight = Math.min(scrollHeight, 240); // Max 5 lines
       setInputHeight(newHeight);
       textareaRef.current.style.height = `${newHeight}px`;
+      
+      // Also ensure the actual textarea value is synced
+      if (textareaRef.current.value !== inputText) {
+        textareaRef.current.value = inputText;
+      }
     }
   }, [inputText]);
 
@@ -112,14 +117,24 @@ export default function EnhancedMobileInput({
     }
   };
 
-  // Create sendCommand wrapper if not provided
-  const handleSendCommand = sendCommand || (({ text, writeMode = "append" }) => {
+  // Create sendCommand wrapper that updates local state
+  const handleSendCommand = ({ text, writeMode = "append", autoSubmit = false }) => {
     if (writeMode === "append") {
       setInputText(prev => prev + text);
     } else {
       setInputText(text);
     }
-  });
+    
+    // If original sendCommand provided, call it too (for parent state sync)
+    if (sendCommand) {
+      sendCommand({ text, writeMode, autoSubmit });
+    }
+    
+    // Auto-submit if requested
+    if (autoSubmit && text.trim()) {
+      setTimeout(() => handleSend(), 100);
+    }
+  };
 
   // Handle send message
   const handleSend = () => {

@@ -10,8 +10,7 @@ const { sqlAgent } = require("./sql-agent/index.js");
 const { stockMarket } = require("./stock-market.js");
 const { nangoCalendar } = require("./nango-calendar.js");
 const { universalIntegrator } = require("./universal-integrator.js");
-const { agentScheduling } = require("./agent-scheduling-enhanced.js");
-const { taskContinuity } = require("./task-continuity.js");
+const { multiActionHandler } = require("./multi-action-handler.js");
 
 module.exports = {
   webScraping,
@@ -26,8 +25,7 @@ module.exports = {
   stockMarket,
   nangoCalendar,
   universalIntegrator,
-  agentScheduling,
-  taskContinuity,
+  multiActionHandler,
 
   // Plugin name aliases so they can be pulled by slug as well.
   [webScraping.name]: webScraping,
@@ -42,6 +40,5 @@ module.exports = {
   [stockMarket.name]: stockMarket,
   [nangoCalendar.name]: nangoCalendar,
   [universalIntegrator.name]: universalIntegrator,
-  [agentScheduling.name]: agentScheduling,
-  [taskContinuity.name]: taskContinuity,
+  [multiActionHandler.name]: multiActionHandler,
 };

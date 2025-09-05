@@ -12,8 +12,7 @@ const DEFAULT_SKILLS = [
   AgentPlugins.docSummarizer.name,
   AgentPlugins.webScraping.name,
   AgentPlugins.universalIntegrator.name,
-  AgentPlugins.agentScheduling.name,
-  AgentPlugins.taskContinuity.name,
+  AgentPlugins.multiActionHandler.name,
 ];
 
 const USER_AGENT = {

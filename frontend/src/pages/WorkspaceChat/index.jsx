@@ -59,7 +59,7 @@ function ShowWorkspaceChat() {
         {isMobile ? (
           <>
             <SidebarMobileHeader />
-            <div className="pt-16 w-full h-full">
+            <div className="pt-12 w-full h-full">
               <WorkspaceChatContainer 
                 loading={loading} 
                 workspace={workspace || workspaceData} 

@@ -119,6 +119,8 @@ class NangoIntegration {
         provider === 'gmail' ? 'google' : null,
         provider === 'google-calendar' ? 'google-calendar-getting-started' : null,
         provider === 'google-calendar' ? 'google' : null,
+        provider === 'google-drive' ? 'google-drive' : null,
+        provider === 'google-drive' ? 'google' : null,
       ].filter(Boolean);
       
       // Find the first matching key

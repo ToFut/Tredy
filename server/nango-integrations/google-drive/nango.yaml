@@ -1,0 +1,42 @@
+integrations:
+  google-drive:
+    syncs:
+      documents:
+        runs: every 30 minutes
+        track_deletes: true
+        description: |
+          Sync documents from Google Drive folders and files.
+          Requires metadata with folder/file IDs.
+        input: DocumentMetadata
+        auto_start: true
+        output: Document
+        sync_type: full
+        endpoint:
+          method: GET
+          path: /documents
+        scopes: 
+          - https://www.googleapis.com/auth/drive.readonly
+    actions:
+      fetch-document:
+        input: IdEntity
+        description: |
+          Fetches the content of a file given its ID
+        output: string
+        endpoint:
+          method: GET
+          path: /fetch-document
+        scopes: 
+          - https://www.googleapis.com/auth/drive.readonly
+
+models:
+  DocumentMetadata:
+    files: string[] | undefined
+    folders: string[] | undefined
+  Document:
+    id: string
+    url: string
+    title: string
+    mimeType: string
+    updatedAt: string
+  IdEntity:
+    id: string

@@ -7,6 +7,7 @@ const {
   WEBSOCKET_BAIL_COMMANDS,
 } = require("../utils/agents/aibitat/plugins/websocket");
 const { safeJsonParse } = require("../utils/http");
+const { registerConnection } = require("../utils/scheduleEvents");
 
 // Setup listener for incoming messages to relay to socket so it can be handled by agent plugin.
 function relayToSocket(message) {
@@ -28,6 +29,11 @@ function agentWebsocket(app) {
         return;
       }
 
+      // Register this connection for schedule events
+      if (agentHandler.invocation?.workspace_id) {
+        registerConnection(agentHandler.invocation.workspace_id, socket);
+      }
+      
       socket.on("message", relayToSocket);
       socket.on("close", () => {
         agentHandler.closeAlert();

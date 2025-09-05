@@ -365,6 +365,17 @@ export default function ChatConnectorHeader() {
     }
 
     fetchConnectors();
+    
+    // Listen for connector updates from chat buttons
+    const handleConnectorUpdate = () => {
+      refreshConnectors();
+    };
+    
+    window.addEventListener('connector-updated', handleConnectorUpdate);
+    
+    return () => {
+      window.removeEventListener('connector-updated', handleConnectorUpdate);
+    };
   }, []);
 
   const handleConnectorClick = (connector) => {

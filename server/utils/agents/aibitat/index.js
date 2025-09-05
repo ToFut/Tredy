@@ -660,6 +660,8 @@ ${this.getHistory({ to: route.to })
         result += `\n\nTo connect your ${serviceName} account:\n\n[connect:${serviceName}]\n\nClick above to complete the OAuth connection process.`;
       }
 
+      // No forcing - let the task-continuity plugin handle multi-part tasks
+
       // If the tool call has direct output enabled, return the result directly to the chat
       // without any further processing and no further tool calls will be run.
       if (this.skipHandleExecution) {

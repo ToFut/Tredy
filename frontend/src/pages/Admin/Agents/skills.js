@@ -10,6 +10,7 @@ import {
   FileMagnifyingGlass,
   ChartLine,
   Plugs,
+  ListChecks,
 } from "@phosphor-icons/react";
 import RAGImage from "@/media/agents/rag-memory.png";
 import SummarizeImage from "@/media/agents/view-summarize.png";
@@ -43,6 +44,33 @@ export const defaultSkills = {
     icon: Browser,
     image: ScrapeWebsitesImage,
     skill: "web-scraping",
+  },
+  "task-planner": {
+    title: "Task Planning & Tracking",
+    description:
+      "Automatically creates and tracks to-do lists for complex multi-step requests, ensuring all requested actions are completed.",
+    component: DefaultSkillPanel,
+    icon: ListChecks,
+    image: RAGImage,
+    skill: "task-planner",
+  },
+  "flow-orchestrator": {
+    title: "Workflow Orchestrator",
+    description:
+      "Automatically creates and executes workflows for multi-step requests. Ensures ALL actions complete in sequence. Can save workflows for reuse.",
+    component: DefaultSkillPanel,
+    icon: Plugs,
+    image: RAGImage,
+    skill: "flow-orchestrator",
+  },
+  "auto-workflow": {
+    title: "Auto Workflow",
+    description:
+      "Automatically handles ANY action request by creating and executing workflows. Ensures complete task execution for emails, invites, calendar, and all multi-step tasks.",
+    component: DefaultSkillPanel,
+    icon: Brain,
+    image: RAGImage,
+    skill: "auto-workflow",
   },
 };
 

@@ -11,6 +11,7 @@ import {
 } from "../ThoughtContainer";
 import StructuredResponse from "../../StructuredResponse";
 import ProcessingIndicator from "../../ProcessingIndicator";
+import InteractiveConnectionButton from "../../../InteractiveConnectionButton";
 // import VisualSummary from "@/components/VisualSummary";
 
 const PromptReply = ({
@@ -80,6 +81,7 @@ const PromptReply = ({
           <RenderAssistantChatContent
             key={`${uuid}-prompt-reply-content`}
             message={reply}
+            workspace={workspace}
           />
         </div>
         <Citations sources={sources} />
@@ -104,10 +106,11 @@ export function WorkspaceProfileImage({ workspace }) {
   return <UserIcon user={{ uid: workspace.slug }} role="assistant" />;
 }
 
-function RenderAssistantChatContent({ message }) {
+function RenderAssistantChatContent({ message, workspace }) {
   const contentRef = useRef("");
   const thoughtChainRef = useRef(null);
   const [useStructured, setUseStructured] = useState(false);
+  const [connections, setConnections] = useState([]);
 
   useEffect(() => {
     const thinking =
@@ -125,11 +128,26 @@ function RenderAssistantChatContent({ message }) {
       thoughtChainRef.current.updateContent(completeThoughtChain);
     }
 
+    // Process connection patterns
+    const connectionPattern = /\[connect:([^\]]+)\]/g;
+    let processedText = msgToRender;
+    const foundConnections = [];
+    
+    let match;
+    while ((match = connectionPattern.exec(msgToRender)) !== null) {
+      const provider = match[1];
+      const buttonId = `oauth-btn-${provider}-${Math.random().toString(36).substr(2, 9)}`;
+      foundConnections.push({ provider, buttonId });
+      processedText = processedText.replace(match[0], '');
+    }
+    
+    setConnections(foundConnections);
+    
     // Check if content has markdown headers for structured display
-    const hasStructure = msgToRender.includes('## ') || msgToRender.includes('### ');
+    const hasStructure = processedText.includes('## ') || processedText.includes('### ');
     setUseStructured(hasStructure);
     
-    contentRef.current = msgToRender;
+    contentRef.current = processedText;
   }, [message]);
 
   const thinking =
@@ -157,6 +175,14 @@ function RenderAssistantChatContent({ message }) {
             style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
             dangerouslySetInnerHTML={{ __html: renderMarkdown(contentRef.current) }}
           />
+          {connections.map(({ provider, buttonId }) => (
+            <InteractiveConnectionButton
+              key={buttonId}
+              provider={provider}
+              workspace={workspace}
+              placeholderId={buttonId}
+            />
+          ))}
           {/* Auto-generate visual summary for long responses */}
           {false && contentRef.current.length > 500 && (
             <VisualSummary 

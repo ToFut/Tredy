@@ -102,6 +102,27 @@ async function handleAuthSuccess(workspace, provider, body) {
   // Update connection status
   await updateSyncStatus(workspace.id, provider, 'connected');
   
+  // Special handling for Google Drive - needs metadata before sync
+  if (provider === 'google-drive') {
+    const nango = new NangoIntegration();
+    try {
+      // Set default metadata for Google Drive
+      const metadata = {
+        folders: ['root'], // Sync entire drive by default
+        files: []
+      };
+      
+      await nango.nango.setMetadata(
+        provider,
+        `workspace_${workspace.id}`,
+        metadata
+      );
+      console.log(`[Nango Webhook] Set Google Drive metadata: ${JSON.stringify(metadata)}`);
+    } catch (error) {
+      console.error(`[Nango Webhook] Failed to set Google Drive metadata:`, error);
+    }
+  }
+  
   // Trigger initial sync for the connection
   const nango = new NangoIntegration();
   const syncNames = getSyncNamesForProvider(provider);
@@ -236,6 +257,26 @@ Snippet: ${record.snippet || ''}`,
           startTime: record.start,
           endTime: record.end,
           organizer: record.organizer?.email,
+        }
+      };
+      
+    case "google-drive":
+      return {
+        ...baseDoc,
+        content: `Google Drive Document: ${record.title || record.name || 'Untitled'}
+Type: ${record.mimeType || 'Unknown'}
+Last Modified: ${record.updatedAt || record.modifiedTime || 'Unknown'}
+URL: ${record.url || record.webViewLink || ''}
+Path: ${record.parents?.join('/') || 'Root'}`,
+        metadata: {
+          ...baseDoc,
+          fileId: record.id,
+          title: record.title || record.name,
+          mimeType: record.mimeType,
+          url: record.url || record.webViewLink,
+          parents: record.parents,
+          size: record.size,
+          lastModified: record.updatedAt || record.modifiedTime
         }
       };
       

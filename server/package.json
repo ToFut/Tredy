@@ -15,7 +15,8 @@
     "build": "npx prisma generate && npx prisma migrate deploy",
     "postinstall": "npx prisma generate",
     "lint": "yarn prettier --ignore-path ../.prettierignore --write ./endpoints ./models ./utils index.js",
-    "swagger": "node ./swagger/init.js"
+    "swagger": "node ./swagger/init.js",
+    "webhooks-proxy": "node start-webhook-proxy.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

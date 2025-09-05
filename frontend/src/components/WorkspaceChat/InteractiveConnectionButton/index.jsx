@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Plug, Check, X, ArrowRight } from "@phosphor-icons/react";
-import System from "@/models/system";
 import Workspace from "@/models/workspace";
 import nangoService from "@/services/NangoService";
+import showToast from "@/utils/toast";
 
 export default function InteractiveConnectionButton({ 
   provider, 
@@ -32,7 +32,7 @@ export default function InteractiveConnectionButton({
 
   const loadProviderInfo = async () => {
     try {
-      // Get available providers list using workspace model
+      // Get available providers list using workspace endpoint (same as settings)
       const response = await Workspace.connectors.getAvailable(workspace?.slug);
       const info = response.providers?.find(p => p.id === provider);
       if (info) {
@@ -45,7 +45,7 @@ export default function InteractiveConnectionButton({
 
   const checkConnectionStatus = async () => {
     try {
-      // Use workspace model to check connection status
+      // Use workspace endpoint to check connection status (same as settings)
       const response = await Workspace.connectors.list(workspace?.slug);
       const connector = response.connectors?.find(c => c.provider === provider);
       setIsConnected(connector?.status === "connected");
@@ -59,85 +59,58 @@ export default function InteractiveConnectionButton({
     setError(null);
 
     try {
-      // Get OAuth configuration from existing endpoint
-      const initResponse = await fetch(
-        `${API_BASE}/v1/workspace/${workspace?.slug}/connectors/connect`,
-        {
-          method: "POST",
-          headers: baseHeaders(),
-          body: JSON.stringify({ provider }),
-        }
-      );
-
-      if (!initResponse.ok) {
-        const errorData = await initResponse.json();
-        throw new Error(errorData.error || "Failed to initialize OAuth");
-      }
-
-      const { authConfig, message } = await initResponse.json();
-
-      // Check if already connected
-      if (message === "Already connected") {
-        setIsConnected(true);
-        System.success(`Already connected to ${providerInfo?.name || provider}!`);
-        setIsConnecting(false);
-        return;
-      }
-
-      // Check if provider is not configured in Nango
-      if (authConfig?.error === 'provider_not_configured') {
-        setError(`${authConfig.message} Please configure ${provider} in your Nango dashboard first.`);
-        setIsConnecting(false);
-        return;
-      }
-
-      // Check if we have Nango configured
-      if (!authConfig?.publicKey) {
-        setError("OAuth not configured for this provider");
-        setIsConnecting(false);
-        return;
-      }
-
-      // Load Nango frontend SDK if not already loaded
-      if (!window.Nango) {
-        await loadNangoSDK();
-      }
-
-      // Create Nango instance
-      const nango = new window.Nango({ 
-        publicKey: authConfig.publicKey,
-        host: authConfig.host 
+      // Use EXACT same approach as workspace settings
+      const response = await Workspace.connectors.connect(workspace?.slug, {
+        provider: provider,
       });
 
-      // Trigger OAuth flow
-      const result = await nango.auth(
-        authConfig.providerConfigKey,
-        authConfig.connectionId
-      );
-
-      if (result) {
-        // Notify backend of successful OAuth
-        const callbackResponse = await fetch(
-          `${API_BASE}/v1/workspace/${workspace?.slug}/connectors/callback`,
-          {
-            method: "POST",
-            headers: baseHeaders(),
-            body: JSON.stringify({
-              provider,
-              connectionId: authConfig.connectionId,
-            }),
-          }
-        );
-
-        if (callbackResponse.ok) {
-          setIsConnected(true);
-          System.success(`Successfully connected to ${providerInfo?.name || provider}!`);
+      if (response.authConfig) {
+        const { connectionId, providerConfigKey } = response.authConfig;
+        
+        console.log(`[InteractiveButton] Starting OAuth for ${provider}:`, {
+          providerConfigKey,
+          connectionId
+        });
+        
+        // Use Nango SDK EXACTLY like workspace settings does
+        const result = await nangoService.connect(providerConfigKey, connectionId);
+        
+        console.log(`[InteractiveButton] OAuth completed for ${provider}:`, result);
+        
+        // Notify backend that connection is established
+        try {
+          await Workspace.connectors.callback(workspace?.slug, {
+            provider: provider,
+            connectionId: connectionId,
+          });
+        } catch (e) {
+          console.log("Callback processing:", e);
         }
+        
+        // Update connection status
+        setIsConnected(true);
+        showToast(`Successfully connected to ${providerInfo?.name || provider}!`, "success");
+        
+        // Refresh connector lists
+        await checkConnectionStatus();
+        window.dispatchEvent(new Event('connector-updated'));
+        
+      } else if (response.message === "Already connected") {
+        setIsConnected(true);
+        showToast(`Already connected to ${providerInfo?.name || provider}!`, "info");
+      } else if (response.success) {
+        // Direct connection successful
+        setIsConnected(true);
+        showToast(`Connected to ${providerInfo?.name || provider}!`, "success");
+        await checkConnectionStatus();
+        window.dispatchEvent(new Event('connector-updated'));
+      } else {
+        throw new Error(response.error || "Failed to connect");
       }
     } catch (err) {
       console.error("OAuth connection failed:", err);
       setError(err.message || "Connection failed");
-      System.error(`Failed to connect to ${providerInfo?.name || provider}`);
+      showToast(`Failed to connect to ${providerInfo?.name || provider}`, "error");
     } finally {
       setIsConnecting(false);
     }
@@ -146,21 +119,16 @@ export default function InteractiveConnectionButton({
   const handleDisconnect = async () => {
     setIsConnecting(true);
     try {
-      const response = await fetch(
-        `${API_BASE}/v1/workspace/${workspace?.slug}/connectors/${provider}`,
-        {
-          method: "DELETE",
-          headers: baseHeaders(),
-        }
-      );
-
-      if (response.ok) {
-        setIsConnected(false);
-        System.success(`Disconnected from ${providerInfo?.name || provider}`);
-      }
+      await Workspace.connectors.disconnect(workspace?.slug, provider);
+      setIsConnected(false);
+      showToast(`Disconnected from ${providerInfo?.name || provider}`, "success");
+      
+      // Refresh connector lists
+      await checkConnectionStatus();
+      window.dispatchEvent(new Event('connector-updated'));
     } catch (err) {
       console.error("Failed to disconnect:", err);
-      System.error(`Failed to disconnect from ${providerInfo?.name || provider}`);
+      showToast(`Failed to disconnect from ${providerInfo?.name || provider}`, "error");
     } finally {
       setIsConnecting(false);
     }
@@ -254,20 +222,4 @@ export default function InteractiveConnectionButton({
       </div>
     </div>
   );
-}
-
-// Helper function to load Nango SDK
-function loadNangoSDK() {
-  return new Promise((resolve, reject) => {
-    if (window.Nango) {
-      resolve();
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = "https://unpkg.com/@nangohq/frontend/dist/index.umd.js";
-    script.onload = resolve;
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
 }

@@ -21,6 +21,7 @@ import Workspace from "@/models/workspace";
 import showToast from "@/utils/toast";
 import ModalWrapper from "../ModalWrapper";
 import nangoService from "@/services/NangoService";
+import BackgroundTasksBubble from "../WorkspaceChat/BackgroundTasksBubble";
 
 // Avatar Component - Google-style circular avatars
 function Avatar({ user, size = 40, onClick, showBadge = false, badgeIcon: BadgeIcon }) {
@@ -1002,6 +1003,10 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
                   size={avatarSize}
                 />
               </div>
+              
+              {/* Background Tasks Bubble */}
+              <div className="h-4 sm:h-6 w-px bg-gray-300 dark:bg-gray-600 mx-0.5 sm:mx-1" />
+              <BackgroundTasksBubble workspace={workspace} />
 
               {/* Expand Button (Mobile) - Improved touch target */}
               {isMobile && (

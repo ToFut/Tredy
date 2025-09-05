@@ -40,6 +40,7 @@ class MCPNangoBridge {
     const mcpServerMap = {
       'gmail': '/Users/segevbin/anything-llm/server/gmail-mcp-server.js',
       'google-calendar': '/Users/segevbin/anything-llm/server/simple-google-calendar-mcp.js',
+      'google-drive': '/Users/segevbin/anything-llm/server/google-drive-generated-mcp.js',
       'linkedin': '/Users/segevbin/anything-llm/server/linkedin-mcp.js',
       // Add other providers as needed
       'default': '/Users/segevbin/anything-llm/server/universal-nango-mcp.js'
@@ -207,6 +208,19 @@ class MCPNangoBridge {
    */
   getAvailableProviders() {
     return [
+      {
+        id: "google-drive",
+        name: "Google Drive",
+        description: "Cloud storage and document collaboration",
+        category: "productivity",
+        authType: "oauth",
+        logo: "/icons/google-drive.svg",
+        requiresMetadata: true,
+        metadataFields: {
+          folders: "Folder IDs to sync (use 'root' for all)",
+          files: "Specific file IDs to sync (optional)"
+        }
+      },
       {
         id: "facebook",
         name: "Facebook",

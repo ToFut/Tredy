@@ -119,6 +119,8 @@ class AgentSchedulerJob {
       const { Workspace } = require("../../models/workspace");
       const { SchedulableAgent } = require("../../utils/agents/schedulable");
       const { ImportedPlugin } = require("../../models/importedPlugin");
+      const { WorkspaceChats } = require("../../models/workspaceChats");
+      const { broadcastScheduleEvent } = require("../../utils/scheduleEvents");
       
       const schedule = await AgentSchedule.get({ id: scheduleId });
       if (!schedule || !schedule.enabled) {
@@ -131,6 +133,13 @@ class AgentSchedulerJob {
         this.log(`Workspace ${schedule.workspace_id} not found`, "error");
         return;
       }
+      
+      // Broadcast schedule started event
+      broadcastScheduleEvent(workspace.id, "schedule:started", {
+        scheduleId,
+        scheduleName: schedule.name,
+        timestamp: new Date()
+      });
       
       const execution = await ScheduleExecution.create({
         schedule_id: scheduleId,
@@ -149,7 +158,12 @@ class AgentSchedulerJob {
           }
           agent = plugin;
         } else if (schedule.agent_type === "system") {
-          throw new Error("System agents not yet supported for scheduling");
+          // Support for system agents (chat-based schedules)
+          agent = {
+            id: schedule.agent_id || "chat-agent",
+            name: schedule.name,
+            type: "system"
+          };
         } else if (schedule.agent_type === "slash") {
           throw new Error("Slash commands not yet supported for scheduling");
         }
@@ -172,12 +186,66 @@ class AgentSchedulerJob {
         const duration = Date.now() - startTime;
         this.log(`Schedule ${schedule.name} executed successfully in ${duration}ms`);
         
+        // Create proactive chat message with the results
+        const resultText = typeof result === 'object' ? 
+          (result.output || result.message || JSON.stringify(result)) : 
+          String(result);
+        
+        await WorkspaceChats.create({
+          workspaceId: workspace.id,
+          prompt: `[SCHEDULED] ${schedule.name}`,
+          response: JSON.stringify({
+            text: `📋 **Scheduled Task Completed: ${schedule.name}**\n\n${resultText}`,
+            type: "schedule_result",
+            scheduleId: scheduleId,
+            executionId: execution.id,
+            timestamp: new Date()
+          }),
+          user: null,
+          threadId: null,
+          include: true
+        });
+        
+        // Broadcast schedule completed event
+        broadcastScheduleEvent(workspace.id, "schedule:completed", {
+          scheduleId,
+          scheduleName: schedule.name,
+          success: true,
+          result: resultText,
+          duration,
+          timestamp: new Date()
+        });
+        
       } catch (err) {
         error = err.message;
         await ScheduleExecution.update(execution.id, {
           status: "failed",
           completed_at: new Date(),
           error: error
+        });
+        
+        // Create error message in chat
+        await WorkspaceChats.create({
+          workspaceId: workspace.id,
+          prompt: `[SCHEDULED] ${schedule.name}`,
+          response: JSON.stringify({
+            text: `❌ **Scheduled Task Failed: ${schedule.name}**\n\nError: ${error}`,
+            type: "schedule_error",
+            scheduleId: scheduleId,
+            executionId: execution.id,
+            timestamp: new Date()
+          }),
+          user: null,
+          threadId: null,
+          include: true
+        });
+        
+        // Broadcast schedule failed event
+        broadcastScheduleEvent(workspace.id, "schedule:failed", {
+          scheduleId,
+          scheduleName: schedule.name,
+          error,
+          timestamp: new Date()
         });
         
         this.log(`Schedule ${schedule.name} failed: ${error}`, "error");

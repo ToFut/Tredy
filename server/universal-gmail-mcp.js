@@ -31,33 +31,63 @@ class UniversalGmailMCP {
   }
 
   /**
+   * Get provider config key with secure fallback
+   */
+  getProviderConfigKey() {
+    // Priority order for provider config detection:
+    // 1. From constructor nangoConfig (primary)
+    // 2. From environment variable (override)
+    // 3. Secure fallback to known working config
+    
+    if (this.nangoConfig?.providerConfigKey) {
+      console.error(`[Gmail MCP] Using provider config from nangoConfig: ${this.nangoConfig.providerConfigKey}`);
+      return this.nangoConfig.providerConfigKey;
+    }
+    
+    if (process.env.NANGO_PROVIDER_CONFIG_KEY) {
+      console.error(`[Gmail MCP] Using provider config from env: ${process.env.NANGO_PROVIDER_CONFIG_KEY}`);
+      return process.env.NANGO_PROVIDER_CONFIG_KEY;
+    }
+    
+    // Secure fallback - use known working provider config
+    const fallbackConfig = 'google-mail';
+    console.error(`[Gmail MCP] No provider config found, using secure fallback: ${fallbackConfig}`);
+    return fallbackConfig;
+  }
+
+  /**
    * Dynamically get workspace ID from the request context
    */
   getWorkspaceId(args) {
     // Priority order for workspace detection:
-    // 1. Explicit workspaceId in args
-    // 2. From MCP server name (e.g., gmail_ws4)
-    // 3. From environment variable
-    // 4. From connection context
+    // 1. Explicit workspaceId in args (passed from agent)
+    // 2. From environment variable
+    // 3. From MCP server name (legacy support)
     
     if (args?.workspaceId) {
+      console.error(`[Gmail MCP] Using workspace ID from args: ${args.workspaceId}`);
       return args.workspaceId;
-    }
-    
-    // Extract from server instance name if available
-    if (process.env.MCP_SERVER_NAME) {
-      const match = process.env.MCP_SERVER_NAME.match(/_ws(\d+)$/);
-      if (match) return match[1];
     }
     
     // Extract from NANGO_CONNECTION_ID if set
     if (process.env.NANGO_CONNECTION_ID) {
-      return process.env.NANGO_CONNECTION_ID.replace('workspace_', '');
+      const id = process.env.NANGO_CONNECTION_ID.replace('workspace_', '');
+      console.error(`[Gmail MCP] Using workspace ID from NANGO_CONNECTION_ID: ${id}`);
+      return id;
     }
     
-    // Default fallback
-    console.error('[Gmail MCP] Warning: No workspace ID found, using default');
-    return '3'; // Fallback to a known working workspace
+    // Extract from server instance name if available (legacy)
+    if (process.env.MCP_SERVER_NAME) {
+      const match = process.env.MCP_SERVER_NAME.match(/_ws(\d+)$/);
+      if (match) {
+        console.error(`[Gmail MCP] Using workspace ID from server name: ${match[1]}`);
+        return match[1];
+      }
+    }
+    
+    // Default fallback - should rarely happen now
+    console.error('[Gmail MCP] Warning: No workspace ID found, using default workspace 1');
+    return '1'; // Default to workspace 1
   }
 
   setupTools() {
@@ -131,7 +161,15 @@ class UniversalGmailMCP {
     const workspaceId = args.workspaceId;
     const connectionId = `workspace_${workspaceId}`;
     
-    const nango = new Nango(this.nangoConfig);
+    // Create fresh Nango instance for each request (pattern from working gmail-mcp-server.js)
+    const { Nango } = require('@nangohq/node');
+    const nango = new Nango({
+      secretKey: process.env.NANGO_SECRET_KEY,
+      host: process.env.NANGO_HOST || 'https://api.nango.dev'
+    });
+
+    // Get provider config key with secure fallback
+    const providerConfigKey = this.getProviderConfigKey();
     
     const { to, subject = "Message from AnythingLLM", body = "This is an automated message.", cc, bcc } = args;
 
@@ -154,11 +192,13 @@ class UniversalGmailMCP {
       .replace(/=+$/, '');
 
     try {
+      console.error(`[Gmail MCP] Attempting to send email with connectionId: ${connectionId}, providerConfigKey: ${providerConfigKey}`);
+      
       const response = await nango.proxy({
         method: 'POST',
         endpoint: 'https://gmail.googleapis.com/gmail/v1/users/me/messages/send',
         connectionId: connectionId,
-        providerConfigKey: this.nangoConfig.providerConfigKey,
+        providerConfigKey: providerConfigKey,
         headers: {
           'Content-Type': 'application/json'
         },

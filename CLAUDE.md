@@ -41,62 +41,68 @@ yarn verify:translations  # Verify frontend translation files
 
 ### Key Architectural Patterns
 
-- **Workspace Isolation**: Each workspace has isolated documents, chats, and settings
+- **Workspace Isolation**: Each workspace has isolated documents, chats, and settings with configurable `agentProvider` and `agentModel`
+- **Agent Invocation**: Messages must start with `@agent` to trigger agent mode (parsed in `/server/models/workspaceAgentInvocation.js`)
+- **MCP Integration**: Model Context Protocol servers for external tool capabilities (Gmail, Calendar, LinkedIn, etc.)
 - **Plugin Architecture**: Swappable LLM providers, vector databases, and embedders via `/server/utils/` modules
-- **Agent System**: Custom AI agents with tool capabilities in `/server/utils/agents/`
-- **Event-Driven**: WebSocket support for real-time chat and updates
-- **Multi-tenancy**: User/role-based permissions with JWT authentication
-- **MCP Support**: Model Context Protocol (MCP) compatibility for extended tool capabilities
-- **Background Jobs**: Bree scheduler for document processing and agent scheduling
+- **WebSocket Communication**: Agent interactions use WebSocket at `/agent-invocation/:uuid` endpoint
+- **UnTooled Providers**: TogetherAI, LMStudio use natural language function calling via UnTooled helper
 
 ### Database Schema
 
-- **Primary**: SQLite with Prisma ORM (PostgreSQL optional)
+- **Primary**: SQLite at `storage/anythingllm.db` (PostgreSQL optional via DATABASE_URL)
 - **Vector Storage**: LanceDB default, multiple options available
-- **Key Models**: User, Workspace, WorkspaceChat, Document, SystemSettings
-- **Migrations**: Managed via Prisma in `/server/prisma/migrations/`
+- **Key Models**: User, Workspace, WorkspaceChat, Document, SystemSettings, WorkspaceAgentInvocation
+- **Agent Config**: Workspace table includes `agentProvider` and `agentModel` columns
 
-### File Organization
+### Critical Agent System Details
 
+**Agent Triggering**
+- Messages MUST start with `@agent` to invoke agent mode
+- Agent detection: `/server/models/workspaceAgentInvocation.js::parseAgents()`
+- WebSocket endpoint: `/server/endpoints/agentWebsocket.js`
+
+**Provider Function Calling Support**
+- **Native**: OpenAI, Anthropic, Google Gemini
+- **UnTooled** (less reliable): TogetherAI, LMStudio, Ollama
+- Default system prompt: `/server/utils/agents/aibitat/providers/ai-provider.js::DEFAULT_WORKSPACE_PROMPT`
+
+**MCP Server Integration**
+- Config: `/server/storage/plugins/anythingllm_mcp_servers_production.json`
+- Universal Gmail: `/server/universal-gmail-mcp.js`
+- Workspace detection priority: args.workspaceId > MCP_SERVER_NAME > NANGO_CONNECTION_ID
+
+## Common Development Tasks
+
+### Database Operations
+```bash
+# Query workspace agent settings
+sqlite3 storage/anythingllm.db "SELECT slug, agentProvider, agentModel FROM workspaces;"
+
+# Update workspace agent model
+sqlite3 storage/anythingllm.db "UPDATE workspaces SET agentProvider='openai', agentModel='gpt-4o' WHERE slug='workspace-name';"
+
+# Reset database
+yarn prisma:setup --force
+
+# View database in browser
+cd server && npx prisma studio
 ```
-server/
-├── endpoints/          # REST API routes organized by feature
-├── utils/             # Core business logic and integrations
-│   ├── AiProviders/   # LLM provider implementations
-│   ├── vectorDbProviders/  # Vector database integrations
-│   ├── EmbeddingEngines/  # Embedding provider implementations
-│   └── agents/        # AI agent system
-├── models/            # Database models and business logic
-├── prisma/            # Database schema and migrations
-└── storage/           # File storage, logs, and vector cache
 
-frontend/
-├── src/
-│   ├── components/    # Reusable React components
-│   ├── pages/         # Route-based page components
-│   ├── hooks/         # Custom React hooks
-│   ├── utils/         # Frontend utilities and API client
-│   └── media/         # Static assets and branding
+### Agent Configuration
 
-collector/
-├── processers/        # Document type processors
-├── utils/            # Utility functions and constants
-└── api/              # REST endpoints for document processing
+**Changing Agent Model for Workspace**
+```sql
+-- Common providers: openai, anthropic, togetherai, ollama
+-- OpenAI models: gpt-4o, gpt-4o-mini, gpt-3.5-turbo
+-- TogetherAI models: mistralai/Mixtral-8x7B-Instruct-v0.1
+UPDATE workspaces SET agentProvider='provider', agentModel='model' WHERE slug='workspace-slug';
 ```
 
-## Development Guidelines
-
-### API Patterns
-- RESTful endpoints with `/api/` prefix
-- JWT authentication via Bearer tokens
-- Multitenancy via workspace slugs in routes
-- Response format: `{ success: boolean, data/error: ... }`
-
-### Frontend Patterns
-- React functional components with hooks
-- Tailwind CSS for styling with custom theme
-- API calls via `/frontend/src/utils/api/` modules
-- Real-time updates via WebSocket connections
+**Adding New Agent Plugin**
+1. Create plugin in `/server/utils/agents/aibitat/plugins/`
+2. Register in `/server/utils/agents/aibitat/plugins/index.js`
+3. Add to DEFAULT_SKILLS in `/server/utils/agents/defaults.js` if default-enabled
 
 ### Adding New Features
 
@@ -104,17 +110,14 @@ collector/
 1. Create provider class in `/server/utils/AiProviders/`
 2. Implement required methods (chat, embeddings)
 3. Register in `/server/utils/helpers/selectLLMProvider.js`
-4. Add frontend settings UI in `/frontend/src/pages/GeneralSettings/LLMPreference/`
+4. Add agent provider in `/server/utils/agents/aibitat/providers/`
+5. Add frontend settings UI in `/frontend/src/pages/GeneralSettings/LLMPreference/`
 
-#### New Vector Database
-1. Implement interface in `/server/utils/vectorDbProviders/`
-2. Add configuration in system settings
-3. Update frontend vector DB selector
-
-#### New Document Type
-1. Add processor in `/collector/processers/`
-2. Update `/collector/utils/constants.js` with mime types
-3. Add frontend upload validation
+#### New MCP Server
+1. Create MCP server file following `/server/universal-gmail-mcp.js` pattern
+2. Register in `/server/storage/plugins/anythingllm_mcp_servers_production.json`
+3. Implement workspace ID detection logic
+4. Add Nango integration if needed for OAuth
 
 ### Environment Variables
 - Copy `.env.example` files in each service directory
@@ -122,30 +125,26 @@ collector/
   - `JWT_SECRET` - Random string ≥12 chars for JWT signing
   - `SIG_KEY` - Passphrase ≥32 chars for signatures
   - `SIG_SALT` - Salt ≥32 chars for signatures
-- LLM providers need respective API keys
+- Agent-specific:
+  - `TOGETHER_AI_API_KEY` - For TogetherAI models
+  - `OPEN_AI_KEY` - For OpenAI models  
+  - `NANGO_SECRET_KEY` - For MCP OAuth integrations
 - Storage: `STORAGE_DIR` (default: `/server/storage/`)
-- Database: `DATABASE_URL` for PostgreSQL (optional)
-- See `/server/.env.example` for all provider configurations
 
-## Common Tasks
+## Debugging
 
-### Database Operations
-```bash
-# Reset database
-yarn prisma:setup --force
+### Agent Issues
+- Check message starts with `@agent`
+- Verify workspace agent settings in database
+- Monitor WebSocket connection in browser Network tab
+- Check server logs for `[AgentHandler]` entries
+- Verify MCP server is running: `ps aux | grep universal-gmail`
 
-# Create new migration
-cd server && npx prisma migrate dev --name <migration-name>
-
-# View database
-cd server && npx prisma studio
-```
-
-### Debugging
-- Server logs: Check console output or `/server/storage/logs/`
-- Frontend: Browser DevTools + React DevTools
-- API testing: Use built-in Swagger at `/api/docs` (if enabled)
-- WebSocket: Monitor via browser Network tab
+### Common Agent Problems
+1. **"No auth token found"**: Normal for unauthenticated requests
+2. **Agent not triggered**: Message must START with `@agent`
+3. **Function not called**: Check if provider supports function calling
+4. **MCP fails**: Check workspace ID detection and Nango connection
 
 ### Docker Development
 ```bash
@@ -156,35 +155,15 @@ docker-compose -f docker/docker-compose.yml up --build
 docker build -t anything-llm -f docker/Dockerfile .
 ```
 
-## Important Considerations
+## Important Implementation Notes
 
 - **File Storage**: Documents stored in `STORAGE_DIR` (default: `/server/storage/`)
 - **Vector Cache**: Cached embeddings in workspace folders
 - **Session Management**: JWT tokens with configurable expiry (default 30d)
 - **Rate Limiting**: Implemented on chat endpoints
 - **File Size Limits**: Default 3GB per upload, configurable
-- **Workspace Limits**: Configurable document count and user limits
 - **Background Jobs**: Document processing runs async via collector service
 - **Node Version**: Requires Node.js ≥18
-- **Database Location**: SQLite at `/server/storage/anythingllm.db`
-- **Telemetry**: Anonymous usage tracking (can be disabled with `DISABLE_TELEMETRY`)
-
-## Quick Testing Patterns
-
-### Running a Single Test
-```bash
-# Create test file with pattern *.test.js
-# Run with: node <test-file.js>
-```
-
-### Testing API Endpoints
-```bash
-# Server runs on port 3001
-curl -X GET http://localhost:3001/api/system/settings
-```
-
-### Frontend Development
-```bash
-# Frontend proxies API calls from port 3000 to 3001
-# Hot reload enabled with Vite
-```
+- **Telemetry**: Anonymous usage tracking (disable with `DISABLE_TELEMETRY`)
+- **Agent Session**: Uses UUID-based invocation tracking
+- **WebSocket Timeout**: 5 minutes (300 seconds) for agent sessions

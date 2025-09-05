@@ -42,7 +42,7 @@ import ResponseModeSelector from "../PromptInput/ResponseModeSelector";
 import { useResponseMode } from "../PromptInput/ResponseModeSelector";
 // import AgentActivityIndicator from "../../AgentActivityIndicator";
 // import SmartContextPills from "../../SmartContextPills";
-// import ChatWidgetHeader from "@/components/ChatWidgetHeader";
+import ChatWidgetHeader from "@/components/ChatWidgetHeader";
 
 export default function MobileOptimizedChat({ 
   workspace,
@@ -248,10 +248,16 @@ export default function MobileOptimizedChat({
         paddingBottom: keyboardHeight > 0 ? '0' : 'env(safe-area-inset-bottom)',
       }}
     >
-      {/* Mobile header section - removed ChatWidgetHeader since SidebarMobileHeader is already shown */}
+      {/* ChatWidgetHeader - positioned to avoid whitespace */}
+      <ChatWidgetHeader 
+        workspace={workspace}
+        connectors={[]} 
+        enabledWidgets={["members", "connectors", "schedule", "share"]}
+      />
+      
       {/* Response Mode Indicator */}
       {responseMode === "agent" && (
-        <div className="sticky top-0 z-30 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800">
+        <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800">
           <div className="px-4 py-2">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full border border-purple-500/20">
               <Bot className="w-4 h-4 text-purple-600 dark:text-purple-400 animate-pulse" />

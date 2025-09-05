@@ -27,14 +27,14 @@ const USER_AGENT = {
 
 const WORKSPACE_AGENT = {
   name: "@agent",
-  getDefinition: async (provider = null) => {
+  getDefinition: async (provider = null, workspaceId = null) => {
     return {
       role: Provider.systemPrompt(provider),
       functions: [
         ...(await agentSkillsFromSystemSettings()),
         ...ImportedPlugin.activeImportedPlugins(),
         ...AgentFlows.activeFlowPlugins(),
-        ...(await new MCPCompatibilityLayer().activeMCPServers()),
+        ...(await new MCPCompatibilityLayer().activeMCPServers(workspaceId)),
       ],
     };
   },

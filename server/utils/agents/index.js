@@ -512,12 +512,12 @@ class AgentHandler {
     this.aibitat.agent(USER_AGENT.name, await USER_AGENT.getDefinition());
     this.aibitat.agent(
       WORKSPACE_AGENT.name,
-      await WORKSPACE_AGENT.getDefinition(this.provider)
+      await WORKSPACE_AGENT.getDefinition(this.provider, this.invocation?.workspace_id)
     );
 
     this.#funcsToLoad = [
       ...((await USER_AGENT.getDefinition())?.functions || []),
-      ...((await WORKSPACE_AGENT.getDefinition())?.functions || []),
+      ...((await WORKSPACE_AGENT.getDefinition(this.provider, this.invocation?.workspace_id))?.functions || []),
     ];
   }
 

@@ -12,11 +12,52 @@ class MCPCompatibilityLayer extends MCPHypervisor {
   /**
    * Get all of the active MCP servers as plugins we can load into agents.
    * This will also boot all MCP servers if they have not been started yet.
+   * @param {number} workspaceId - Optional workspace ID to prioritize workspace-specific servers
    * @returns {Promise<string[]>} Array of flow names in @@mcp_{name} format
    */
-  async activeMCPServers() {
+  async activeMCPServers(workspaceId = null) {
     await this.bootMCPServers();
-    return Object.keys(this.mcps).flatMap((name) => `@@mcp_${name}`);
+    const allServers = Object.keys(this.mcps);
+    
+    // If no workspace ID, return all servers
+    if (!workspaceId) {
+      return allServers.flatMap((name) => `@@mcp_${name}`);
+    }
+    
+    // Filter to prioritize workspace-specific servers and exclude generic OAuth providers
+    const workspaceServers = [];
+    const genericServers = [];
+    const workspaceProviders = new Set(); // Providers that have workspace-specific servers
+    
+    // First pass: collect workspace-specific servers and track their base providers
+    for (const serverName of allServers) {
+      if (serverName.includes(`_ws${workspaceId}`)) {
+        workspaceServers.push(serverName);
+        const baseProvider = serverName.replace(`_ws${workspaceId}`, '');
+        workspaceProviders.add(baseProvider);
+      }
+    }
+    
+    // Second pass: include generic servers, but add connection prompts for OAuth providers without workspace connections
+    const oauthProviders = ['gmail', 'google-calendar', 'google-drive', 'linkedin', 'facebook'];
+    const connectionPrompts = [];
+    
+    for (const serverName of allServers) {
+      const isWorkspaceSpecific = serverName.includes('_ws');
+      if (!isWorkspaceSpecific) {
+        if (oauthProviders.includes(serverName) && !workspaceProviders.has(serverName)) {
+          // Add connection prompt for OAuth providers that aren't connected
+          connectionPrompts.push(`@@connect_${serverName}`);
+        } else {
+          // Include normal generic servers
+          genericServers.push(serverName);
+        }
+      }
+    }
+    
+    // Combine workspace-specific first, then generic ones, then connection prompts
+    const filteredServers = [...workspaceServers, ...genericServers, ...connectionPrompts];
+    return filteredServers.flatMap((name) => `@@mcp_${name}`);
   }
 
   /**
@@ -53,6 +94,15 @@ class MCPCompatibilityLayer extends MCPHypervisor {
                 },
                 handler: async function (args = {}) {
                   try {
+                    // Always include workspace context in args
+                    if (!args.workspaceId && aibitat.handlerProps?.invocation) {
+                      args.workspaceId = aibitat.handlerProps.invocation.workspace_id || 
+                                        aibitat.handlerProps.invocation.workspace?.id;
+                    }
+                    if (!args.workspaceSlug && aibitat.handlerProps?.invocation?.workspace) {
+                      args.workspaceSlug = aibitat.handlerProps.invocation.workspace.slug;
+                    }
+                    
                     aibitat.handlerProps.log(
                       `Executing MCP server: ${name}:${tool.name} with args:`,
                       args

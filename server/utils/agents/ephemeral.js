@@ -322,14 +322,14 @@ class EphemeralAgentHandler extends AgentHandler {
     this.aibitat.agent(USER_AGENT.name, await USER_AGENT.getDefinition());
     this.aibitat.agent(
       WORKSPACE_AGENT.name,
-      await WORKSPACE_AGENT.getDefinition(this.provider)
+      await WORKSPACE_AGENT.getDefinition(this.provider, this.#workspace?.id)
     );
 
     this.#funcsToLoad = [
       ...(await agentSkillsFromSystemSettings()),
       ...ImportedPlugin.activeImportedPlugins(),
       ...AgentFlows.activeFlowPlugins(),
-      ...(await new MCPCompatibilityLayer().activeMCPServers()),
+      ...(await new MCPCompatibilityLayer().activeMCPServers(this.#workspace?.id)),
     ];
   }
 

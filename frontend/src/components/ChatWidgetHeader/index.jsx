@@ -879,6 +879,17 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
   const [showExpanded, setShowExpanded] = useState(false);
   const avatarSize = isMobile ? 28 : 40;
 
+  // Check for openConnectors query parameter on mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('openConnectors') === 'true') {
+      setShowConnectorModal(true);
+      // Clean up the URL after opening the modal
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  }, []);
+
   useEffect(() => {
     async function fetchMembers() {
       try {
@@ -904,7 +915,7 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
 
   return (
     <>
-      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/40 dark:border-gray-700/40 sticky top-0 z-40 safe-area-inset-top">
+      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/40 dark:border-gray-700/40 sticky top-[48px] md:top-0 z-40 safe-area-inset-top">
         <div className="px-2 sm:px-4 lg:px-5 py-1.5 sm:py-2">
           <div className="flex items-center justify-between gap-1 sm:gap-2">
             {/* Left: Workspace Info - More Compact */}

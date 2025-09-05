@@ -15,7 +15,14 @@ import {
   Sparkle,
   TrendUp,
   Users,
-  Clock
+  Clock,
+  EnvelopeSimple,
+  Calendar,
+  LinkedinLogo,
+  GoogleDriveLogo,
+  Robot,
+  PlugsConnected,
+  Info
 } from "@phosphor-icons/react";
 import useUser from "@/hooks/useUser";
 import Workspace from "@/models/workspace";
@@ -160,8 +167,8 @@ export default function Home() {
 
   const handleAddSource = () => {
     if (workspace?.slug) {
-      // Navigate to user connectors instead of workspace connectors
-      window.location.href = `/settings/user-connectors`;
+      // Navigate to workspace with openConnectors parameter to trigger the connector popup
+      window.location.href = `/workspace/${workspace.slug}?openConnectors=true`;
     } else {
       // If no workspace exists, still go to user connectors
       window.location.href = `/settings/user-connectors`;
@@ -231,6 +238,63 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Agent Quick Actions & Tips */}
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-4 sm:p-6 mb-6 border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center gap-2 mb-4">
+              <Robot className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Agent Quick Actions</h2>
+              <div className="ml-auto">
+                <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-300 rounded-full">
+                  Start with @agent
+                </span>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+              <button
+                onClick={() => window.location.href = workspace?.slug ? `/workspace/${workspace.slug}?prompt=${encodeURIComponent('@agent send email')}` : '/'}
+                className="flex items-center gap-2 p-3 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-all group"
+              >
+                <EnvelopeSimple className="w-4 h-4 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Send Email</span>
+              </button>
+              
+              <button
+                onClick={() => window.location.href = workspace?.slug ? `/workspace/${workspace.slug}?prompt=${encodeURIComponent('@agent schedule meeting')}` : '/'}
+                className="flex items-center gap-2 p-3 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-all group"
+              >
+                <Calendar className="w-4 h-4 text-green-600 dark:text-green-400 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Schedule</span>
+              </button>
+              
+              <button
+                onClick={() => window.location.href = workspace?.slug ? `/workspace/${workspace.slug}?prompt=${encodeURIComponent('@agent post to linkedin')}` : '/'}
+                className="flex items-center gap-2 p-3 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-all group"
+              >
+                <LinkedinLogo className="w-4 h-4 text-blue-700 dark:text-blue-500 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">LinkedIn</span>
+              </button>
+              
+              <button
+                onClick={() => window.location.href = workspace?.slug ? `/workspace/${workspace.slug}?prompt=${encodeURIComponent('@agent search drive')}` : '/'}
+                className="flex items-center gap-2 p-3 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-all group"
+              >
+                <GoogleDriveLogo className="w-4 h-4 text-yellow-600 dark:text-yellow-400 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Drive</span>
+              </button>
+            </div>
+            
+            <div className="flex items-start gap-2 p-3 bg-blue-100/50 dark:bg-blue-900/30 rounded-lg">
+              <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+              <div className="text-xs text-gray-600 dark:text-gray-400">
+                <p className="font-medium mb-1">How to use the agent:</p>
+                <p>• Start messages with <code className="bg-white dark:bg-gray-800 px-1 py-0.5 rounded">@agent</code> to activate AI tools</p>
+                <p>• Example: <code className="bg-white dark:bg-gray-800 px-1 py-0.5 rounded">@agent send email to john@example.com</code></p>
+                <p>• Manage connections in <a href="/settings/user-connectors" className="text-blue-600 dark:text-blue-400 underline">Settings → Connectors</a></p>
+              </div>
+            </div>
+          </div>
+
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <StatsCard
@@ -239,6 +303,20 @@ export default function Home() {
               value={dataSources.length}
               subtitle="Connected"
               color="blue"
+            />
+            <StatsCard
+              icon={PlugsConnected}
+              title="Connectors"
+              value="Active"
+              subtitle="Gmail, Calendar+"
+              color="purple"
+            />
+            <StatsCard
+              icon={Robot}
+              title="Agent Model"
+              value="Mixtral"
+              subtitle={workspace?.agentProvider || "TogetherAI"}
+              color="amber"
             />
             <StatsCard
               icon={TrendUp}
@@ -280,10 +358,10 @@ export default function Home() {
               </div>
               <button
                 onClick={handleAddSource}
-                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium transition-all duration-200 hover:shadow-lg hover:scale-105 text-sm sm:text-base w-full sm:w-auto"
+                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-xl font-medium transition-all duration-200 hover:shadow-lg hover:scale-105 text-sm sm:text-base w-full sm:w-auto"
               >
-                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Add New Source</span>
+                <PlugsConnected className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Manage Connectors</span>
               </button>
             </div>
             

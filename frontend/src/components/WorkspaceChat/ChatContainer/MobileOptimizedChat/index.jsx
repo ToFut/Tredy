@@ -1,33 +1,36 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Send, 
+  PaperPlaneRight as Send, 
   Plus, 
-  Mic, 
-  MicOff,
+  Microphone as Mic, 
+  MicrophoneSlash as MicOff,
   Image,
   Paperclip,
   Hash,
-  AtSign,
-  Sparkles,
+  At as AtSign,
+  Sparkle as Sparkles,
   X,
-  ChevronDown,
+  CaretDown as ChevronDown,
   Activity,
   Users,
-  Zap,
+  Lightning as Zap,
   Brain,
   Clock,
-  TrendingUp,
-  Bot,
-  MessageSquare,
-  Settings,
+  TrendUp as TrendingUp,
+  Robot as Bot,
+  ChatCircle as MessageSquare,
+  Gear as Settings,
   StopCircle,
   ArrowUp,
   Lightning,
   Command,
   FileText,
-  Camera
-} from "lucide-react";
+  Camera,
+  CalendarCheck,
+  Plug,
+  Share
+} from "@phosphor-icons/react";
 import { isMobile } from "react-device-detect";
 import ChatHistory from "../ChatHistory";
 import { DndUploaderContext, CLEAR_ATTACHMENTS_EVENT } from "../DnDWrapper";
@@ -39,6 +42,7 @@ import ResponseModeSelector from "../PromptInput/ResponseModeSelector";
 import { useResponseMode } from "../PromptInput/ResponseModeSelector";
 import AgentActivityIndicator from "../../AgentActivityIndicator";
 import SmartContextPills from "../../SmartContextPills";
+import ChatWidgetHeader from "@/components/ChatWidgetHeader";
 
 export default function MobileOptimizedChat({ 
   workspace,
@@ -52,7 +56,8 @@ export default function MobileOptimizedChat({
   setChatHistory,
   activeAgents = [],
   threadStats = {},
-  performance = {}
+  performance = {},
+  regenerateAssistantMessage
 }) {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [inputFocused, setInputFocused] = useState(false);
@@ -113,17 +118,31 @@ export default function MobileOptimizedChat({
     // Haptic feedback
     navigator.vibrate?.([10]);
     
-    // Update parent state and trigger submission
+    // Create proper form event
+    const formEvent = {
+      preventDefault: () => {},
+      target: {
+        value: inputText
+      }
+    };
+    
+    // Update parent message state first
     setMessage(inputText);
     
-    // Trigger parent's handleSubmit
-    if (parentHandleSubmit) {
-      parentHandleSubmit(e || new Event('submit'));
-    }
-    
+    // Clear local input immediately
     setInputText("");
     setShowQuickActions(false);
     setShowAttachmentOptions(false);
+    
+    // Trigger parent's handleSubmit with the input text
+    if (parentHandleSubmit) {
+      // Set the textarea value for parent to read
+      const textareaElement = document.getElementById('primary-prompt-input');
+      if (textareaElement) {
+        textareaElement.value = inputText;
+      }
+      parentHandleSubmit(formEvent);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -224,60 +243,40 @@ export default function MobileOptimizedChat({
   return (
     <div 
       ref={containerRef}
-      className="flex flex-col h-[100dvh] bg-gray-50 dark:bg-gray-900 relative"
+      className="flex flex-col h-full bg-gray-50 dark:bg-gray-900 relative"
       style={{
-        paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: keyboardHeight > 0 ? '0' : 'env(safe-area-inset-bottom)',
       }}
     >
-      {/* Fixed Header with Agent Activity */}
-      <div className="sticky top-0 z-30 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800">
-        {/* Workspace Header */}
-        <div className="px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-              <Brain className="w-5 h-5 text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h1 className="font-semibold text-gray-900 dark:text-white text-sm truncate">
-                {workspace?.name || 'AI Workspace'}
-              </h1>
-              <div className="flex items-center gap-2 text-xs">
-                {activeAgents.length > 0 ? (
-                  <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
-                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                    {activeAgents.length} agents active
-                  </span>
-                ) : (
-                  <span className="text-gray-500 dark:text-gray-400">Ready</span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Mode Indicator */}
+      {/* Use the ChatWidgetHeader with mobile optimizations */}
+      <div className="sticky top-0 z-30">
+        <ChatWidgetHeader 
+          workspace={workspace}
+          connectors={[]} 
+          enabledWidgets={["members", "connectors", "schedule", "share"]}
+        />
+        
+        {/* Mobile-specific additions below header */}
+        <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800">
+          {/* Response Mode Indicator */}
           {responseMode === "agent" && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="relative flex-shrink-0"
-            >
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full border border-purple-500/20">
+            <div className="px-4 py-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full border border-purple-500/20">
                 <Bot className="w-4 h-4 text-purple-600 dark:text-purple-400 animate-pulse" />
                 <span className="text-xs font-medium text-purple-700 dark:text-purple-300">
-                  Agent
+                  Agent Mode Active
                 </span>
               </div>
-            </motion.div>
+            </div>
           )}
+          
+          {/* Smart Context Pills */}
+          <SmartContextPills 
+            threadStats={threadStats}
+            workspace={workspace}
+            performance={performance}
+          />
         </div>
-
-        {/* Smart Context Pills */}
-        <SmartContextPills 
-          threadStats={threadStats}
-          workspace={workspace}
-          performance={performance}
-        />
       </div>
 
       {/* Agent Activity Indicator (floating) */}
@@ -299,7 +298,7 @@ export default function MobileOptimizedChat({
           workspace={workspace}
           sendCommand={sendCommand}
           updateHistory={setChatHistory}
-          regenerateAssistantMessage={() => {}}
+          regenerateAssistantMessage={regenerateAssistantMessage}
           hasAttachments={files.length > 0}
         />
       </div>
@@ -419,7 +418,7 @@ export default function MobileOptimizedChat({
               onChange={handleInputChange}
               onFocus={() => setInputFocused(true)}
               onBlur={() => setInputFocused(false)}
-              placeholder={responseMode === "agent" ? "Ask AI agents..." : "Message..."}
+              placeholder={responseMode === "agent" ? "Ask AI agents anything..." : "Message..."}
               rows={1}
               className="w-full px-4 py-3 bg-transparent resize-none outline-none text-gray-900 dark:text-white placeholder-gray-500 text-base"
               style={{
@@ -430,7 +429,13 @@ export default function MobileOptimizedChat({
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
-                  handleSend(e);
+                  // Add @agent prefix if in agent mode
+                  if (responseMode === "agent" && !inputText.startsWith("@agent")) {
+                    setInputText("@agent " + inputText);
+                    setTimeout(() => handleSend(e), 10);
+                  } else {
+                    handleSend(e);
+                  }
                 }
               }}
             />
@@ -479,17 +484,29 @@ export default function MobileOptimizedChat({
 
           {/* Send Button */}
           <button
-            onClick={handleSend}
+            onClick={(e) => {
+              // Add @agent prefix if in agent mode before sending
+              if (responseMode === "agent" && !inputText.startsWith("@agent")) {
+                setInputText("@agent " + inputText);
+                setTimeout(() => handleSend(e), 10);
+              } else {
+                handleSend(e);
+              }
+            }}
             disabled={!inputText.trim() || loadingResponse}
             className={`p-3 rounded-xl transition-all touch-manipulation ${
               inputText.trim() && !loadingResponse
-                ? 'bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg active:scale-95' 
+                ? responseMode === "agent" 
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-600 shadow-lg active:scale-95' 
+                  : 'bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg active:scale-95' 
                 : 'bg-gray-200 dark:bg-gray-700 opacity-50'
             }`}
             style={{ minWidth: '48px', minHeight: '48px' }}
           >
             {loadingResponse ? (
               <StopCircle className="w-5 h-5 text-white" />
+            ) : responseMode === "agent" ? (
+              <Bot className="w-5 h-5 text-white" />
             ) : (
               <Send className="w-5 h-5 text-white" />
             )}

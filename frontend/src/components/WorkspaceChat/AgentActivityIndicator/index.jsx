@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Brain, 
-  Sparkles, 
+  Sparkle as Sparkles, 
   Code, 
-  Search, 
+  MagnifyingGlass as Search, 
   FileText, 
   Globe,
   Calendar,
-  Mail,
+  Envelope as Mail,
   Database,
-  Zap,
+  Lightning as Zap,
   Activity
-} from 'lucide-react';
+} from '@phosphor-icons/react';
 
 const agentIcons = {
   'web-search': Globe,

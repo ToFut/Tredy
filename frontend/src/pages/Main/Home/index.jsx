@@ -104,6 +104,7 @@ export default function Home() {
   const { user } = useUser();
   const { slug } = useParams();
   const [workspace, setWorkspace] = useState(null);
+  const [workspaces, setWorkspaces] = useState([]);
   const [dataSources, setDataSources] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -113,9 +114,10 @@ export default function Home() {
       if (!slug) {
         try {
           setLoading(true);
-          const workspaces = await Workspace.all();
-          if (workspaces && workspaces.length > 0) {
-            const firstWorkspace = workspaces[0];
+          const allWorkspaces = await Workspace.all();
+          setWorkspaces(allWorkspaces || []);
+          if (allWorkspaces && allWorkspaces.length > 0) {
+            const firstWorkspace = allWorkspaces[0];
             setWorkspace(firstWorkspace);
             const documents = firstWorkspace?.documents || [];
             setDataSources(documents);
@@ -130,11 +132,15 @@ export default function Home() {
       
       try {
         setLoading(true);
-        const workspace = await Workspace.bySlug(slug);
-        if (workspace) {
-          setWorkspace(workspace);
+        const [workspaceData, allWorkspaces] = await Promise.all([
+          Workspace.bySlug(slug),
+          Workspace.all()
+        ]);
+        setWorkspaces(allWorkspaces || []);
+        if (workspaceData) {
+          setWorkspace(workspaceData);
           // Get documents as data sources
-          const documents = workspace?.documents || [];
+          const documents = workspaceData?.documents || [];
           setDataSources(documents);
         }
       } catch (error) {
@@ -148,8 +154,8 @@ export default function Home() {
   }, [slug]);
 
   const handleDataSourceClick = (dataSource) => {
-    // Navigate to chat with pre-loaded context about this data source
-    window.location.href = `/workspace/${workspace.slug}/chat?source=${encodeURIComponent(dataSource.name)}`;
+    // Navigate to workspace with pre-loaded context about this data source
+    window.location.href = `/workspace/${workspace.slug}?source=${encodeURIComponent(dataSource.name)}`;
   };
 
   const handleAddSource = () => {
@@ -164,7 +170,7 @@ export default function Home() {
 
   const handleStartChat = () => {
     if (workspace?.slug) {
-      window.location.href = `/workspace/${workspace.slug}/chat`;
+      window.location.href = `/workspace/${workspace.slug}`;
     } else {
       // If no workspace exists, redirect to home
       window.location.href = `/`;
@@ -183,21 +189,45 @@ export default function Home() {
   }
 
   return (
-    <div className="h-full bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen overflow-y-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-        {/* Hero Header */}
-        <div className="mb-8 sm:mb-12">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex-shrink-0">
-              <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+    <div className="h-full bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen overflow-y-auto pb-20">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6 lg:py-8">
+        {/* Mobile-Optimized Hero Header */}
+        <div className="mb-6 sm:mb-12">
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-200/50 dark:border-gray-700/50">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2.5 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex-shrink-0 shadow-lg">
+                <Brain className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent truncate">
+                  {workspace?.name || 'AI Workspace'}
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm lg:text-base">
+                  Intelligent analysis platform
+                </p>
+              </div>
             </div>
-            <div className="flex-1">
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent break-words">
-                {workspace?.name || 'Tredy Workspace'}
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base lg:text-lg">
-                AI-powered data analysis and insights platform
-              </p>
+            
+            {/* Quick Stats Row - Mobile Optimized */}
+            <div className="grid grid-cols-3 gap-2 mt-4">
+              <div className="text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <p className="text-lg sm:text-xl font-bold text-blue-600 dark:text-blue-400">
+                  {workspaces.length || 0}
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Workspaces</p>
+              </div>
+              <div className="text-center p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <p className="text-lg sm:text-xl font-bold text-green-600 dark:text-green-400">
+                  {dataSources.length || 0}
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Sources</p>
+              </div>
+              <div className="text-center p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                <p className="text-lg sm:text-xl font-bold text-purple-600 dark:text-purple-400">
+                  Active
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Status</p>
+              </div>
             </div>
           </div>
 

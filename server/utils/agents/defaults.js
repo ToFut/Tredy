@@ -12,7 +12,7 @@ const DEFAULT_SKILLS = [
   AgentPlugins.docSummarizer.name,
   AgentPlugins.webScraping.name,
   AgentPlugins.universalIntegrator.name,
-  AgentPlugins.multiActionHandler.name,
+  // AgentPlugins.multiActionHandler.name, // Temporarily disabled - causing infinite loops
 ];
 
 const USER_AGENT = {

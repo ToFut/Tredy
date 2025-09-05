@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Home,
-  MessageSquare,
-  Search,
-  Settings,
+  House as Home,
+  ChatCircle as MessageSquare,
+  MagnifyingGlass as Search,
+  Gear as Settings,
   Plus,
   X,
-  ChevronRight,
+  CaretRight as ChevronRight,
   Users,
   FileText,
   Brain,
-  Sparkles,
+  Sparkle as Sparkles,
   Clock,
   Star,
   Folder,
-  LogOut,
-  HelpCircle,
-  Menu
-} from "lucide-react";
+  SignOut as LogOut,
+  Question as HelpCircle,
+  List as Menu
+} from "@phosphor-icons/react";
 import { Link, useLocation } from "react-router-dom";
 import paths from "@/utils/paths";
 import useUser from "@/hooks/useUser";
@@ -31,25 +31,26 @@ export function MobileBottomNavigation({ onMenuClick }) {
   
   useEffect(() => {
     // Determine active tab based on current path
-    if (location.pathname.includes('/chat')) setActiveTab('chat');
-    else if (location.pathname.includes('/search')) setActiveTab('search');
+    if (location.pathname.includes('/workspace')) setActiveTab('chat');
+    else if (location.pathname.includes('/agents')) setActiveTab('agents');
     else if (location.pathname.includes('/settings')) setActiveTab('settings');
     else setActiveTab('home');
   }, [location]);
 
   const tabs = [
     { id: 'home', icon: Home, label: 'Home', path: paths.home() },
-    { id: 'chat', icon: MessageSquare, label: 'Chat', path: '#', action: onMenuClick },
-    { id: 'search', icon: Search, label: 'Search', path: paths.search() },
-    { id: 'settings', icon: Settings, label: 'Settings', path: paths.settings() },
+    { id: 'chat', icon: MessageSquare, label: 'Workspaces', path: '#', action: onMenuClick },
+    { id: 'agents', icon: Brain, label: 'Agents', path: paths.agents.builder() },
+    { id: 'settings', icon: Settings, label: 'Settings', path: paths.settings.llmPreference() },
   ];
 
   const handleTabClick = (tab, e) => {
+    e.preventDefault();
     navigator.vibrate?.([10]);
     setActiveTab(tab.id);
     
     if (tab.action) {
-      e.preventDefault();
+      console.log('Opening sidebar from tab:', tab.id);
       tab.action();
     }
   };
@@ -65,9 +66,8 @@ export function MobileBottomNavigation({ onMenuClick }) {
           const isActive = activeTab === tab.id;
           
           return (
-            <Link
+            <button
               key={tab.id}
-              to={tab.path}
               onClick={(e) => handleTabClick(tab, e)}
               className="flex-1 flex flex-col items-center gap-1 py-2 transition-all touch-manipulation"
             >
@@ -96,7 +96,7 @@ export function MobileBottomNavigation({ onMenuClick }) {
               }`}>
                 {tab.label}
               </span>
-            </Link>
+            </button>
           );
         })}
       </div>
@@ -110,13 +110,28 @@ export function MobileSlideOutSidebar({ isOpen, onClose }) {
   const [workspaces, setWorkspaces] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedWorkspace, setSelectedWorkspace] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function fetchWorkspaces() {
-      const ws = await Workspace.all();
-      setWorkspaces(ws);
-      if (ws.length > 0 && !selectedWorkspace) {
-        setSelectedWorkspace(ws[0]);
+      try {
+        setLoading(true);
+        console.log('Fetching workspaces...');
+        const ws = await Workspace.all();
+        console.log('Fetched workspaces:', ws);
+        
+        // Ensure we have an array
+        const workspaceList = Array.isArray(ws) ? ws : (ws?.workspaces || []);
+        setWorkspaces(workspaceList);
+        
+        if (workspaceList.length > 0 && !selectedWorkspace) {
+          setSelectedWorkspace(workspaceList[0]);
+        }
+      } catch (error) {
+        console.error('Error fetching workspaces:', error);
+        setWorkspaces([]);
+      } finally {
+        setLoading(false);
       }
     }
     if (isOpen) {
@@ -134,7 +149,8 @@ export function MobileSlideOutSidebar({ isOpen, onClose }) {
   const handleWorkspaceClick = (workspace) => {
     navigator.vibrate?.([10]);
     setSelectedWorkspace(workspace);
-    window.location.href = `/workspace/${workspace.slug}/chat`;
+    // Use the correct workspace path
+    window.location.href = `/workspace/${workspace.slug}`;
   };
 
   const filteredWorkspaces = workspaces.filter(ws => 
@@ -245,8 +261,18 @@ export function MobileSlideOutSidebar({ isOpen, onClose }) {
                 </div>
               </div>
 
+              {/* Loading State */}
+              {loading && (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-center">
+                    <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Loading workspaces...</p>
+                  </div>
+                </div>
+              )}
+
               {/* Recent Workspaces */}
-              {recentWorkspaces.length > 0 && (
+              {!loading && recentWorkspaces.length > 0 && (
                 <div className="mb-6">
                   <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">
                     Recent
@@ -285,12 +311,27 @@ export function MobileSlideOutSidebar({ isOpen, onClose }) {
               )}
 
               {/* All Workspaces */}
-              <div className="mb-6">
-                <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">
-                  All Workspaces
-                </h3>
-                <div className="space-y-2">
-                  {filteredWorkspaces.map((workspace) => (
+              {!loading && (
+                <div className="mb-6">
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">
+                    All Workspaces {workspaces.length > 0 && `(${workspaces.length})`}
+                  </h3>
+                  {workspaces.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Folder className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        No workspaces found
+                      </p>
+                      <button
+                        onClick={() => window.location.href = paths.workspace.new?.() || '/new-workspace'}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium"
+                      >
+                        Create First Workspace
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {filteredWorkspaces.map((workspace) => (
                     <button
                       key={workspace.id}
                       onClick={() => handleWorkspaceClick(workspace)}
@@ -320,8 +361,10 @@ export function MobileSlideOutSidebar({ isOpen, onClose }) {
                       )}
                     </button>
                   ))}
+                    </div>
+                  )}
                 </div>
-              </div>
+              )}
 
               {/* Bottom Actions */}
               <div className="border-t border-gray-200 dark:border-gray-800 pt-4 mt-8">
@@ -366,10 +409,36 @@ export function MobileSlideOutSidebar({ isOpen, onClose }) {
 
 export default function MobileSidebarWrapper({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { logo } = useLogo();
+
+  console.log('Sidebar open state:', sidebarOpen);
 
   return (
     <>
-      {children}
+      {/* Mobile Header Bar */}
+      <div className="fixed top-0 left-0 right-0 z-30 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800">
+        <div className="flex items-center justify-between px-4 py-3">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors touch-manipulation"
+          >
+            <Menu className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+          </button>
+          
+          <div className="flex items-center gap-2">
+            <img src={logo} alt="Logo" className="h-8 w-8 rounded" />
+            <span className="font-semibold text-gray-900 dark:text-white">AnythingLLM</span>
+          </div>
+          
+          <div className="w-10 h-10" /> {/* Spacer for balance */}
+        </div>
+      </div>
+      
+      {/* Main Content with padding for header */}
+      <div className="pt-14">
+        {children}
+      </div>
+      
       <MobileBottomNavigation onMenuClick={() => setSidebarOpen(true)} />
       <MobileSlideOutSidebar 
         isOpen={sidebarOpen} 

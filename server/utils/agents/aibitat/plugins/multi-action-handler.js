@@ -1,6 +1,7 @@
 /**
- * Multi-Action Handler Plugin
- * Ensures agents complete all parts of multi-action requests
+ * Agent Execution Guardian Plugin
+ * 1. Prevents hallucination - ensures agents call functions instead of just claiming success
+ * 2. Ensures multi-action completion - forces agents to complete all parts of multi-step requests
  * Simple, clean, follows AnythingLLM's original design
  */
 
@@ -21,53 +22,74 @@ const multiActionHandler = {
           targets: []
         };
 
-        // Wrap handleExecution to detect and ensure completion
+        // Simple completion tracker with loop prevention
         const originalHandleExecution = aibitat.handleExecution;
         if (originalHandleExecution && !originalHandleExecution._multiActionWrapped) {
           aibitat.handleExecution = async function(provider, messages, functions, byAgent) {
-            // On first pass, detect if this is a multi-action request
-            const userMsg = messages.find(m => m.role === 'user')?.content || '';
-            
-            if (!aibitat.multiAction.active && userMsg) {
-              // Simple detection: multiple emails or "and" pattern
-              const emails = userMsg.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || [];
-              const hasAnd = userMsg.toLowerCase().includes(' and ');
-              
-              if (emails.length > 1 || (hasAnd && emails.length > 0)) {
-                aibitat.multiAction = {
-                  active: true,
-                  totalExpected: emails.length || 2,
-                  completed: 0,
-                  targets: emails
-                };
-                aibitat.introspect(`Detected ${aibitat.multiAction.totalExpected} actions needed`);
-              }
-            }
-            
-            // Call original execution
+            // Call original execution first
             const result = await originalHandleExecution.apply(this, arguments);
             
-            // After execution, check if we're in a multi-action flow
-            if (aibitat.multiAction.active) {
-              // Check if a function was just called
-              const lastMsg = messages[messages.length - 1];
-              if (lastMsg && lastMsg.role === 'function') {
-                aibitat.multiAction.completed++;
+            // Prevent infinite loops - count system interventions
+            const systemMessages = messages.filter(m => m.role === 'system' && m.content.includes('Continue by sending'));
+            if (systemMessages.length >= 3) {
+              aibitat.introspect('⚠️ Too many continuation attempts. Stopping to prevent infinite loop.');
+              return result;
+            }
+            
+            // Only check for multi-email continuation if we just completed a function call
+            const lastFunctionCall = messages.filter(m => m.role === 'function').pop();
+            if (!lastFunctionCall) {
+              return result; // No function calls yet, let it proceed naturally
+            }
+            
+            // After each execution, check if we need to continue
+            const userMsg = messages.find(m => m.role === 'user')?.content || '';
+            const emails = userMsg.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || [];
+            
+            // Only intervene for multi-email requests after a successful function call
+            if (emails.length > 1 && typeof result === 'string') {
+              // Count actual function executions (not just calls)
+              const functionCalls = messages.filter(m => m.role === 'function');
+              
+              // Extract recipients from actual function execution results or debug logs
+              const emailsSentTo = new Set();
+              functionCalls.forEach(call => {
+                if (call.content && call.content.includes('successfully')) {
+                  // Try to extract recipient from the function call context
+                  const callIndex = messages.indexOf(call);
+                  for (let i = callIndex - 1; i >= 0; i--) {
+                    const msg = messages[i];
+                    if (msg.role === 'assistant' && msg.function_call) {
+                      try {
+                        const args = typeof msg.function_call.arguments === 'string' 
+                          ? JSON.parse(msg.function_call.arguments) 
+                          : msg.function_call.arguments;
+                        if (args && args.to) {
+                          emailsSentTo.add(args.to);
+                          break;
+                        }
+                      } catch (e) {
+                        // Ignore parsing errors
+                      }
+                    }
+                  }
+                }
+              });
+              
+              // Check if we need to continue
+              if (emailsSentTo.size < emails.length) {
+                const remainingEmails = emails.filter(email => !Array.from(emailsSentTo).includes(email));
                 
-                // If not all done and LLM is returning text, force continuation
-                if (aibitat.multiAction.completed < aibitat.multiAction.totalExpected) {
-                  if (typeof result === 'string' && !result.includes('function')) {
-                    const remaining = aibitat.multiAction.targets[aibitat.multiAction.completed];
-                    
-                    aibitat.introspect(`Progress: ${aibitat.multiAction.completed}/${aibitat.multiAction.totalExpected} complete`);
-                    
-                    // Add a system message to continue
+                if (remainingEmails.length > 0) {
+                  aibitat.introspect(`Progress: ${emailsSentTo.size}/${emails.length} emails sent. Need to send to: ${remainingEmails[0]}`);
+                  
+                  // Only continue if LLM returned text instead of making another function call
+                  if (!result.includes('function_call')) {
                     const continueMsg = {
                       role: 'system',
-                      content: `You have completed ${aibitat.multiAction.completed} of ${aibitat.multiAction.totalExpected} actions. Now execute the next action for: ${remaining || 'the next target'}. Call the function now.`
+                      content: `You must now send an email to: ${remainingEmails[0]}. Call the email function immediately.`
                     };
                     
-                    // Force another iteration
                     return await this.handleExecution(
                       provider,
                       [...messages, continueMsg],
@@ -75,10 +97,6 @@ const multiActionHandler = {
                       byAgent
                     );
                   }
-                } else {
-                  // All done
-                  aibitat.introspect(`All ${aibitat.multiAction.totalExpected} actions completed!`);
-                  aibitat.multiAction.active = false;
                 }
               }
             }

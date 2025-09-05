@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Cpu, 
-  Layers, 
-  Zap, 
-  TrendingUp,
+  Stack as Layers, 
+  Lightning as Zap, 
+  TrendUp as TrendingUp,
   Shield,
   Clock,
-  MessageSquare,
+  ChatCircle as MessageSquare,
   Users,
-  Award,
-  BarChart3,
-  Sparkles
-} from 'lucide-react';
+  Trophy as Award,
+  ChartBar as BarChart3,
+  Sparkle as Sparkles
+} from '@phosphor-icons/react';
 
 export default function SmartContextPills({ 
   threadStats = {}, 

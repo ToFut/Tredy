@@ -26,6 +26,7 @@ import AgentVisualizer from "@/components/AgentVisualizer";
 import IntelligenceCards from "@/components/IntelligenceCards";
 import { generateProactiveSystemPrompt } from "@/utils/chat/proactive";
 import ChatWidgetHeader from "@/components/ChatWidgetHeader";
+import MobileOptimizedChat from "./MobileOptimizedChat";
 
 export default function ChatContainer({ workspace, knownHistory = [] }) {
   const { threadSlug = null } = useParams();
@@ -360,6 +361,38 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
     handleWSS();
   }, [socketId]);
 
+  // Use mobile-optimized chat for mobile devices
+  if (isMobile) {
+    return (
+      <div className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] overflow-hidden safe-area-inset">
+        <DnDFileUploaderWrapper>
+          <MobileOptimizedChat
+            workspace={workspace}
+            knownHistory={knownHistory}
+            sendCommand={sendCommand}
+            handleSubmit={handleSubmit}
+            message={message}
+            setMessage={setMessage}
+            loadingResponse={loadingResponse}
+            chatHistory={chatHistory}
+            setChatHistory={setChatHistory}
+            regenerateAssistantMessage={regenerateAssistantMessage}
+            activeAgents={agentOperations.filter(op => op.status === 'active')}
+            threadStats={{
+              activeAgents: agentOperations.filter(op => op.status === 'active').length,
+              complexity: 'Medium',
+              tokensUsed: Math.floor(Math.random() * 50000),
+              tokenLimit: 128000,
+              avgResponse: '1.2s'
+            }}
+            performance={intelligenceMetrics}
+          />
+        </DnDFileUploaderWrapper>
+      </div>
+    );
+  }
+
+  // Desktop layout
   return (
     <div
       className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] overflow-hidden safe-area-inset"

@@ -204,10 +204,73 @@ class MCPNangoBridge {
   }
 
   /**
+   * Get category for a provider based on its ID
+   */
+  getCategory(providerId) {
+    const categoryMap = {
+      'gmail': 'communication',
+      'google-calendar': 'productivity',
+      'google-drive': 'productivity',
+      'google-sheets': 'productivity',
+      'linkedin': 'communication',
+      'facebook': 'communication',
+      'whatsapp': 'communication',
+      'instagram': 'communication',
+      'twitter': 'communication',
+      'slack': 'communication',
+      'discord': 'communication',
+      'telegram': 'communication',
+      'github': 'development',
+      'stripe': 'payments',
+      'shopify': 'ecommerce',
+      'airtable': 'productivity',
+      'notion': 'productivity',
+      'hubspot': 'crm',
+      'salesforce': 'crm',
+      'zendesk': 'support',
+      'jira': 'development',
+      'meta-ads': 'marketing',
+      'reddit': 'communication',
+      'youtube': 'media',
+      'postgres': 'database',
+      'mongodb': 'database',
+      'docker': 'infrastructure',
+      'kubernetes': 'infrastructure',
+      'aws': 'infrastructure',
+      'azure': 'infrastructure',
+      'twilio': 'communication',
+      'sendgrid': 'email',
+      'mailchimp': 'email'
+    };
+    
+    return categoryMap[providerId] || 'other';
+  }
+
+  /**
    * Get list of available providers
    */
   getAvailableProviders() {
-    return [
+    // Load from MCP registry
+    const registry = require('../../mcp-registry.json');
+    const providers = [];
+    
+    for (const [id, config] of Object.entries(registry.mcpServers)) {
+      // Only show OAuth/API key providers (not local ones)
+      if (config.auth.startsWith('nango:') || config.auth.startsWith('api_key:')) {
+        providers.push({
+          id,
+          name: id.charAt(0).toUpperCase() + id.slice(1).replace(/-/g, ' '),
+          description: config.description,
+          category: this.getCategory(id),
+          authType: config.auth.startsWith('nango:') ? 'oauth' : 'api_key',
+          logo: `/icons/${id}.svg`,
+          requiresMetadata: config.auth.includes('instagram') || config.auth.includes('meta')
+        });
+      }
+    }
+    
+    // Keep existing providers for compatibility
+    providers.push(
       {
         id: "google-drive",
         name: "Google Drive",
@@ -292,8 +355,10 @@ class MCPNangoBridge {
         category: "communication",
         authType: "oauth",
         logo: "/icons/slack.svg",
-      },
-    ];
+      }
+    );
+    
+    return providers;
   }
 }
 

@@ -1,0 +1,134 @@
+{
+  "mcpServers": {
+    "github-official": {
+      "type": "github",
+      "repository": "github/github-mcp-server",
+      "auth": "token:GITHUB_TOKEN",
+      "description": "GitHub's official MCP Server - repos, issues, PRs"
+    },
+    "stripe-official": {
+      "type": "github",
+      "repository": "stripe/agent-toolkit",
+      "auth": "api_key:STRIPE_API_KEY",
+      "description": "Stripe's official agent toolkit"
+    },
+    "twilio-official": {
+      "type": "github",
+      "repository": "twilio-labs/mcp",
+      "auth": "api_key:TWILIO_AUTH_TOKEN",
+      "description": "Twilio's official MCP - SMS, calls, phone numbers"
+    },
+    "docker": {
+      "type": "github",
+      "repository": "QuantGeekDev/docker-mcp",
+      "auth": "local",
+      "description": "Docker container management"
+    },
+    "browser": {
+      "type": "github",
+      "repository": "browsermcp/mcp",
+      "auth": "none",
+      "description": "Browser automation"
+    },
+    "whatsapp": {
+      "type": "npm",
+      "package": "whatsapp-mcp",
+      "command": "npx",
+      "args": ["-y", "whatsapp-mcp"],
+      "auth": "qr_code",
+      "description": "WhatsApp messaging"
+    },
+    "meta-ads": {
+      "type": "npm",
+      "package": "meta-ads-mcp",
+      "command": "npx",
+      "args": ["-y", "meta-ads-mcp"],
+      "auth": "nango:meta-ads",
+      "description": "Facebook/Instagram Ads"
+    },
+    "slack": {
+      "type": "npm",
+      "package": "@modelcontextprotocol/server-slack",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "auth": "nango:slack",
+      "description": "Slack messaging"
+    },
+    "discord": {
+      "type": "npm",
+      "package": "discord-mcp",
+      "command": "npx",
+      "args": ["-y", "discord-mcp"],
+      "auth": "token:DISCORD_BOT_TOKEN",
+      "description": "Discord messaging"
+    },
+    "telegram": {
+      "type": "npm",
+      "package": "telegram-mcp",
+      "command": "npx",
+      "args": ["-y", "telegram-mcp"],
+      "auth": "token:TELEGRAM_BOT_TOKEN",
+      "description": "Telegram messaging"
+    },
+    "postgres": {
+      "type": "npm",
+      "package": "@modelcontextprotocol/server-postgres",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "auth": "connection_string",
+      "description": "PostgreSQL database"
+    },
+    "puppeteer": {
+      "type": "npm",
+      "package": "@modelcontextprotocol/server-puppeteer",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
+      "auth": "none",
+      "description": "Browser automation"
+    },
+    "filesystem": {
+      "type": "npm",
+      "package": "@modelcontextprotocol/server-filesystem",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem"],
+      "auth": "none",
+      "description": "File system access"
+    },
+    "redis": {
+      "type": "npm",
+      "package": "@modelcontextprotocol/server-redis",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-redis"],
+      "auth": "connection_string",
+      "description": "Redis cache"
+    },
+    "gmail": {
+      "type": "custom",
+      "command": "node",
+      "args": ["/Users/segevbin/anything-llm/server/universal-gmail-mcp.js"],
+      "auth": "nango:gmail",
+      "description": "Gmail integration"
+    },
+    "google-calendar": {
+      "type": "custom",
+      "command": "node",
+      "args": ["/Users/segevbin/anything-llm/server/simple-google-calendar-mcp.js"],
+      "auth": "nango:google-calendar",
+      "description": "Google Calendar"
+    },
+    "linkedin": {
+      "type": "custom",
+      "command": "node",
+      "args": ["/Users/segevbin/anything-llm/server/linkedin-mcp.js"],
+      "auth": "nango:linkedin",
+      "description": "LinkedIn messaging"
+    },
+    "google-drive": {
+      "type": "custom",
+      "command": "node",
+      "args": ["/Users/segevbin/anything-llm/server/google-drive-generated-mcp.js"],
+      "auth": "nango:google-drive",
+      "description": "Google Drive files"
+    }
+  }
+}

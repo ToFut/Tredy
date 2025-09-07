@@ -83,41 +83,21 @@ export default function handleChat(
       metrics,
     });
     emitAssistantMessageCompleteEvent(chatId);
-  } else if (
-    type === "textResponseChunk" ||
-    type === "finalizeResponseStream"
-  ) {
+  } else if (type === "textResponseChunk") {
     const chatIdx = _chatHistory.findIndex((chat) => chat.uuid === uuid);
     if (chatIdx !== -1) {
       const existingHistory = { ..._chatHistory[chatIdx] };
-      let updatedHistory;
-
-      // If the response is finalized, we can set the loading state to false.
-      // and append the metrics to the history.
-      if (type === "finalizeResponseStream") {
-        updatedHistory = {
-          ...existingHistory,
-          closed: close,
-          animate: !close,
-          pending: false,
-          chatId,
-          metrics,
-        };
-        setLoadingResponse(false);
-        emitAssistantMessageCompleteEvent(chatId);
-      } else {
-        updatedHistory = {
-          ...existingHistory,
-          content: existingHistory.content + textResponse,
-          sources,
-          error,
-          closed: close,
-          animate: !close,
-          pending: false,
-          chatId,
-          metrics,
-        };
-      }
+      const updatedHistory = {
+        ...existingHistory,
+        content: existingHistory.content + textResponse,
+        sources,
+        error,
+        closed: close,
+        animate: !close,
+        pending: false,
+        chatId,
+        metrics,
+      };
       _chatHistory[chatIdx] = updatedHistory;
     } else {
       _chatHistory.push({
@@ -139,12 +119,26 @@ export default function handleChat(
   } else if (type === "finalizeResponseStream") {
     const chatIdx = _chatHistory.findIndex((chat) => chat.uuid === uuid);
     if (chatIdx !== -1) {
-      _chatHistory[chatIdx - 1] = { ..._chatHistory[chatIdx - 1], chatId }; // update prompt with chatID
-      _chatHistory[chatIdx] = { ..._chatHistory[chatIdx], chatId }; // update response with chatID
+      const existingHistory = { ..._chatHistory[chatIdx] };
+      const updatedHistory = {
+        ...existingHistory,
+        closed: true,
+        animate: false,
+        pending: false,
+        chatId,
+        metrics,
+      };
+      _chatHistory[chatIdx] = updatedHistory;
+      
+      // Update prompt with chatID if it exists
+      if (chatIdx > 0) {
+        _chatHistory[chatIdx - 1] = { ..._chatHistory[chatIdx - 1], chatId };
+      }
     }
 
     setChatHistory([..._chatHistory]);
     setLoadingResponse(false);
+    emitAssistantMessageCompleteEvent(chatId);
   } else if (type === "stopGeneration") {
     const chatIdx = _chatHistory.length - 1;
     const existingHistory = { ..._chatHistory[chatIdx] };

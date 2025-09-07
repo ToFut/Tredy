@@ -1418,7 +1418,7 @@
   resolved "https://registry.npmjs.org/@lancedb/lancedb-darwin-arm64/-/lancedb-darwin-arm64-0.15.0.tgz"
   integrity sha512-e6eiS1dUdSx3G3JXFEn5bk6I26GR7UM2QwQ1YMrTsg7IvGDqKmXc/s5j4jpJH0mzm7rwqh+OAILPIjr7DoUCDA==
 
-"@lancedb/lancedb@0.15.0":
+"@lancedb/lancedb@^0.15.0":
   version "0.15.0"
   resolved "https://registry.npmjs.org/@lancedb/lancedb/-/lancedb-0.15.0.tgz"
   integrity sha512-qm3GXLA17/nFGUwrOEuFNW0Qg2gvCtp+yAs6qoCM6vftIreqzp8d4Hio6eG/YojS9XqPnR2q+zIeIFy12Ywvxg==

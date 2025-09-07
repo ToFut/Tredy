@@ -1,0 +1,249 @@
+{
+  "mcpServers": {
+    "whatsapp": {
+      "package": "whatsapp-mcp",
+      "command": "npx",
+      "args": ["-y", "whatsapp-mcp"],
+      "auth": "qr_code",
+      "description": "WhatsApp messaging"
+    },
+    "instagram": {
+      "package": "@jlbadano/ig-mcp",
+      "command": "npx",
+      "args": ["-y", "ig-mcp"],
+      "auth": "nango:instagram-business",
+      "description": "Instagram posts and insights"
+    },
+    "meta-ads": {
+      "package": "meta-ads-mcp",
+      "command": "npx",
+      "args": ["-y", "meta-ads-mcp"],
+      "auth": "nango:meta-ads",
+      "description": "Facebook/Instagram Ads"
+    },
+    "slack": {
+      "package": "@modelcontextprotocol/server-slack",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "auth": "nango:slack",
+      "description": "Slack messaging"
+    },
+    "notion": {
+      "package": "@modelcontextprotocol/server-notion",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-notion"],
+      "auth": "api_key:NOTION_API_KEY",
+      "description": "Notion pages and databases"
+    },
+    "github": {
+      "package": "@modelcontextprotocol/server-github",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "auth": "token:GITHUB_TOKEN",
+      "description": "GitHub repos and issues"
+    },
+    "stripe": {
+      "package": "@modelcontextprotocol/server-stripe",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-stripe"],
+      "auth": "api_key:STRIPE_API_KEY",
+      "description": "Stripe payments"
+    },
+    "airtable": {
+      "package": "@modelcontextprotocol/server-airtable",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-airtable"],
+      "auth": "api_key:AIRTABLE_API_KEY",
+      "description": "Airtable bases"
+    },
+    "discord": {
+      "package": "discord-mcp",
+      "command": "npx",
+      "args": ["-y", "discord-mcp"],
+      "auth": "token:DISCORD_BOT_TOKEN",
+      "description": "Discord messaging"
+    },
+    "telegram": {
+      "package": "telegram-mcp",
+      "command": "npx",
+      "args": ["-y", "telegram-mcp"],
+      "auth": "token:TELEGRAM_BOT_TOKEN",
+      "description": "Telegram messaging"
+    },
+    "twitter": {
+      "package": "@modelcontextprotocol/server-twitter",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-twitter"],
+      "auth": "nango:twitter",
+      "description": "Twitter/X posts"
+    },
+    "shopify": {
+      "package": "@modelcontextprotocol/server-shopify",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-shopify"],
+      "auth": "nango:shopify",
+      "description": "Shopify store management"
+    },
+    "hubspot": {
+      "package": "@modelcontextprotocol/server-hubspot",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-hubspot"],
+      "auth": "nango:hubspot",
+      "description": "HubSpot CRM"
+    },
+    "salesforce": {
+      "package": "@modelcontextprotocol/server-salesforce",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-salesforce"],
+      "auth": "nango:salesforce",
+      "description": "Salesforce CRM"
+    },
+    "jira": {
+      "package": "@modelcontextprotocol/server-atlassian",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-atlassian"],
+      "auth": "nango:atlassian",
+      "description": "Jira issues and projects"
+    },
+    "google-sheets": {
+      "package": "@modelcontextprotocol/server-google-sheets",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-google-sheets"],
+      "auth": "nango:google-sheets",
+      "description": "Google Sheets"
+    },
+    "postgres": {
+      "package": "@modelcontextprotocol/server-postgres",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "auth": "connection_string",
+      "description": "PostgreSQL database"
+    },
+    "mongodb": {
+      "package": "@modelcontextprotocol/server-mongodb",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-mongodb"],
+      "auth": "connection_string",
+      "description": "MongoDB database"
+    },
+    "docker": {
+      "package": "@modelcontextprotocol/server-docker",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-docker"],
+      "auth": "local",
+      "description": "Docker containers"
+    },
+    "kubernetes": {
+      "package": "@modelcontextprotocol/server-kubernetes",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-kubernetes"],
+      "auth": "kubeconfig",
+      "description": "Kubernetes clusters"
+    },
+    "aws": {
+      "package": "@modelcontextprotocol/server-aws",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-aws"],
+      "auth": "aws_credentials",
+      "description": "AWS services"
+    },
+    "azure": {
+      "package": "@modelcontextprotocol/server-azure",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-azure"],
+      "auth": "azure_credentials",
+      "description": "Azure services"
+    },
+    "twilio": {
+      "package": "@modelcontextprotocol/server-twilio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-twilio"],
+      "auth": "api_key:TWILIO_AUTH_TOKEN",
+      "description": "Twilio SMS/calls"
+    },
+    "sendgrid": {
+      "package": "@modelcontextprotocol/server-sendgrid",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sendgrid"],
+      "auth": "api_key:SENDGRID_API_KEY",
+      "description": "SendGrid email"
+    },
+    "mailchimp": {
+      "package": "@modelcontextprotocol/server-mailchimp",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-mailchimp"],
+      "auth": "api_key:MAILCHIMP_API_KEY",
+      "description": "Mailchimp campaigns"
+    },
+    "zendesk": {
+      "package": "@modelcontextprotocol/server-zendesk",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-zendesk"],
+      "auth": "nango:zendesk",
+      "description": "Zendesk support tickets"
+    },
+    "reddit": {
+      "package": "@modelcontextprotocol/server-reddit",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-reddit"],
+      "auth": "nango:reddit",
+      "description": "Reddit posts"
+    },
+    "youtube": {
+      "package": "@modelcontextprotocol/server-youtube",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-youtube"],
+      "auth": "api_key:YOUTUBE_API_KEY",
+      "description": "YouTube videos"
+    },
+    "openai": {
+      "package": "@modelcontextprotocol/server-openai",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-openai"],
+      "auth": "api_key:OPENAI_API_KEY",
+      "description": "OpenAI GPT"
+    },
+    "anthropic": {
+      "package": "@modelcontextprotocol/server-anthropic",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-anthropic"],
+      "auth": "api_key:ANTHROPIC_API_KEY",
+      "description": "Anthropic Claude"
+    },
+    "puppeteer": {
+      "package": "@modelcontextprotocol/server-puppeteer",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
+      "auth": "none",
+      "description": "Browser automation"
+    },
+    "filesystem": {
+      "package": "@modelcontextprotocol/server-filesystem",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem"],
+      "auth": "none",
+      "description": "File system access"
+    },
+    "git": {
+      "package": "@modelcontextprotocol/server-git",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git"],
+      "auth": "none",
+      "description": "Git operations"
+    },
+    "sqlite": {
+      "package": "@modelcontextprotocol/server-sqlite",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sqlite"],
+      "auth": "file_path",
+      "description": "SQLite database"
+    },
+    "redis": {
+      "package": "@modelcontextprotocol/server-redis",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-redis"],
+      "auth": "connection_string",
+      "description": "Redis cache"
+    }
+  }
+}

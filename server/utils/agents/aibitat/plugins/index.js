@@ -11,6 +11,7 @@ const { stockMarket } = require("./stock-market.js");
 const { nangoCalendar } = require("./nango-calendar.js");
 const { universalIntegrator } = require("./universal-integrator.js");
 const { multiActionHandler } = require("./multi-action-handler.js");
+const { unifiedWorkflow } = require("./unified-workflow.js");
 
 module.exports = {
   webScraping,
@@ -26,6 +27,7 @@ module.exports = {
   nangoCalendar,
   universalIntegrator,
   multiActionHandler,
+  unifiedWorkflow,
 
   // Plugin name aliases so they can be pulled by slug as well.
   [webScraping.name]: webScraping,
@@ -41,4 +43,5 @@ module.exports = {
   [nangoCalendar.name]: nangoCalendar,
   [universalIntegrator.name]: universalIntegrator,
   [multiActionHandler.name]: multiActionHandler,
+  [unifiedWorkflow.name]: unifiedWorkflow,
 };

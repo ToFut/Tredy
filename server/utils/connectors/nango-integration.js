@@ -109,18 +109,16 @@ class NangoIntegration {
         }
       }
       
-      // Fall back to development config patterns
+      // Simplified provider mapping - always try the verbose name if simple name fails
       const possibleKeys = [
-        provider, // exact match
-        `${provider}-getting-started`,
-        `${provider}_getting_started`,
-        // Special mappings based on your actual Nango configs
+        provider, // exact match first
+        `${provider}-getting-started`, // Nango template pattern
+        // Google services mappings
         provider === 'gmail' ? 'google-mail' : null,
-        provider === 'gmail' ? 'google' : null,
+        provider === 'gcalendar' ? 'google-calendar-getting-started' : null,
         provider === 'google-calendar' ? 'google-calendar-getting-started' : null,
-        provider === 'google-calendar' ? 'google' : null,
+        provider === 'gdrive' ? 'google-drive' : null,
         provider === 'google-drive' ? 'google-drive' : null,
-        provider === 'google-drive' ? 'google' : null,
       ].filter(Boolean);
       
       // Find the first matching key

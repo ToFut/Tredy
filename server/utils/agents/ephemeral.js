@@ -347,6 +347,7 @@ class EphemeralAgentHandler extends AgentHandler {
       provider: this.provider ?? "openai",
       model: this.model ?? "gpt-4o",
       chats: await this.#chatHistory(20),
+      maxRounds: 2, // Limit to 2 rounds to prevent ping-pong loops
       handlerProps: {
         invocation: {
           workspace: this.#workspace,

@@ -120,6 +120,12 @@ export default function handleChat(
     const chatIdx = _chatHistory.findIndex((chat) => chat.uuid === uuid);
     if (chatIdx !== -1) {
       const existingHistory = { ..._chatHistory[chatIdx] };
+      
+      // Skip if already finalized (prevents duplicates)
+      if (existingHistory.closed && existingHistory.chatId === chatId) {
+        return;
+      }
+      
       const updatedHistory = {
         ...existingHistory,
         closed: true,

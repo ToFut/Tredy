@@ -1,0 +1,782 @@
+{
+  "mcpServers": {
+    "gmail_ws7": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/gmail-mcp-server.js"
+      ],
+      "env": {
+        "NANGO_PROVIDER": "gmail",
+        "NANGO_PROVIDER_CONFIG_KEY": "gmail-getting-started",
+        "NANGO_SECRET_KEY": "7aac4fec-c1fa-4eba-9100-4b2ef9bc2b91",
+        "NANGO_HOST": "https://api.nango.dev",
+        "NANGO_CONNECTION_ID": "workspace_7"
+      },
+      "anythingllm": {
+        "autoStart": true
+      }
+    },
+    "linkedin_ws7": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/linkedin-mcp.js"
+      ],
+      "env": {
+        "NANGO_PROVIDER": "linkedin",
+        "NANGO_PROVIDER_CONFIG_KEY": "linkedin-getting-started",
+        "NANGO_SECRET_KEY": "7aac4fec-c1fa-4eba-9100-4b2ef9bc2b91",
+        "NANGO_HOST": "https://api.nango.dev",
+        "NANGO_CONNECTION_ID": "workspace_7"
+      },
+      "anythingllm": {
+        "autoStart": true
+      }
+    },
+    "linkedin_ws5": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/linkedin-mcp.js"
+      ],
+      "env": {
+        "NANGO_PROVIDER": "linkedin",
+        "NANGO_PROVIDER_CONFIG_KEY": "linkedin-getting-started",
+        "NANGO_SECRET_KEY": "7aac4fec-c1fa-4eba-9100-4b2ef9bc2b91",
+        "NANGO_HOST": "https://api.nango.dev",
+        "NANGO_CONNECTION_ID": "workspace_5"
+      },
+      "anythingllm": {
+        "autoStart": true
+      }
+    },
+    "gmail_ws5": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/gmail-mcp-server.js"
+      ],
+      "env": {
+        "NANGO_PROVIDER": "gmail",
+        "NANGO_PROVIDER_CONFIG_KEY": "gmail-getting-started",
+        "NANGO_SECRET_KEY": "7aac4fec-c1fa-4eba-9100-4b2ef9bc2b91",
+        "NANGO_HOST": "https://api.nango.dev",
+        "NANGO_CONNECTION_ID": "workspace_5"
+      },
+      "anythingllm": {
+        "autoStart": true
+      }
+    },
+    "gmail_ws13": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/gmail-mcp-server.js"
+      ],
+      "env": {
+        "NANGO_PROVIDER": "gmail",
+        "NANGO_PROVIDER_CONFIG_KEY": "gmail-getting-started",
+        "NANGO_SECRET_KEY": "7aac4fec-c1fa-4eba-9100-4b2ef9bc2b91",
+        "NANGO_HOST": "https://api.nango.dev",
+        "NANGO_CONNECTION_ID": "workspace_13"
+      },
+      "anythingllm": {
+        "autoStart": true
+      }
+    },
+    "google-calendar_ws13": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/simple-google-calendar-mcp.js"
+      ],
+      "env": {
+        "NANGO_PROVIDER": "google-calendar",
+        "NANGO_PROVIDER_CONFIG_KEY": "google-calendar-getting-started",
+        "NANGO_SECRET_KEY": "7aac4fec-c1fa-4eba-9100-4b2ef9bc2b91",
+        "NANGO_HOST": "https://api.nango.dev",
+        "NANGO_CONNECTION_ID": "workspace_13"
+      },
+      "anythingllm": {
+        "autoStart": true
+      }
+    },
+    "gmail": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/universal-gmail-mcp.js"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "7aac4fec-c1fa-4eba-9100-4b2ef9bc2b91",
+        "NANGO_HOST": "https://api.nango.dev"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "Gmail - Send and receive emails"
+      }
+    },
+    "google-calendar": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/simple-google-calendar-mcp.js"
+      ],
+      "env": {
+        "NANGO_PROVIDER": "google-calendar",
+        "NANGO_PROVIDER_CONFIG_KEY": "google-calendar-getting-started",
+        "NANGO_SECRET_KEY": "7aac4fec-c1fa-4eba-9100-4b2ef9bc2b91",
+        "NANGO_HOST": "https://api.nango.dev"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "Google Calendar - Manage events and schedules"
+      }
+    },
+    "google-drive": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/google-drive-generated-mcp.js"
+      ],
+      "env": {
+        "NANGO_PROVIDER": "google-drive",
+        "NANGO_PROVIDER_CONFIG_KEY": "google-drive",
+        "NANGO_SECRET_KEY": "7aac4fec-c1fa-4eba-9100-4b2ef9bc2b91",
+        "NANGO_HOST": "https://api.nango.dev"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "Google Drive - Access and manage files"
+      }
+    },
+    "linkedin": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/linkedin-mcp.js"
+      ],
+      "env": {
+        "NANGO_PROVIDER": "linkedin",
+        "NANGO_PROVIDER_CONFIG_KEY": "linkedin-getting-started",
+        "NANGO_SECRET_KEY": "7aac4fec-c1fa-4eba-9100-4b2ef9bc2b91",
+        "NANGO_HOST": "https://api.nango.dev"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "LinkedIn - Professional networking"
+      }
+    },
+    "facebook": {
+      "type": "streamable",
+      "url": "https://mcp.zapier.com/api/mcp/s/NGY2YjM5NzItYWM2YS00ZTgzLTk1ZWItNWZhZjA5NTFkZjYxOmJlM2ZiYWM5LTEyNjUtNGM0Zi1iZjBkLWI3NjdlMTg4NDAxZg==/mcp",
+      "headers": {
+        "Accept": "application/json, text/event-stream",
+        "Content-Type": "application/json",
+        "User-Agent": "AnythingLLM-MCP/1.0"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "description": "Facebook - Social media integration"
+      }
+    },
+    "whatsapp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "whatsapp-mcp"
+      ],
+      "env": {},
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "WhatsApp messaging",
+        "toolPrefix": "whatsapp"
+      }
+    },
+    "instagram": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "ig-mcp"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_CONNECTION_ID": "workspace_null"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Instagram posts and insights",
+        "toolPrefix": "instagram"
+      }
+    },
+    "meta-ads": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "meta-ads-mcp"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_CONNECTION_ID": "workspace_null"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Facebook/Instagram Ads",
+        "toolPrefix": "meta-ads"
+      }
+    },
+    "slack": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-slack"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_CONNECTION_ID": "workspace_null"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Slack messaging",
+        "toolPrefix": "slack"
+      }
+    },
+    "notion": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-notion"
+      ],
+      "env": {
+        "NOTION_API_KEY": "${NOTION_API_KEY}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Notion pages and databases",
+        "toolPrefix": "notion"
+      }
+    },
+    "github": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "GitHub repos and issues",
+        "toolPrefix": "github"
+      }
+    },
+    "stripe": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-stripe"
+      ],
+      "env": {
+        "STRIPE_API_KEY": "${STRIPE_API_KEY}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Stripe payments",
+        "toolPrefix": "stripe"
+      }
+    },
+    "airtable": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-airtable"
+      ],
+      "env": {
+        "AIRTABLE_API_KEY": "${AIRTABLE_API_KEY}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Airtable bases",
+        "toolPrefix": "airtable"
+      }
+    },
+    "discord": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "discord-mcp"
+      ],
+      "env": {
+        "DISCORD_BOT_TOKEN": "${DISCORD_BOT_TOKEN}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Discord messaging",
+        "toolPrefix": "discord"
+      }
+    },
+    "telegram": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "telegram-mcp"
+      ],
+      "env": {
+        "TELEGRAM_BOT_TOKEN": "${TELEGRAM_BOT_TOKEN}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Telegram messaging",
+        "toolPrefix": "telegram"
+      }
+    },
+    "twitter": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-twitter"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_CONNECTION_ID": "workspace_null"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Twitter/X posts",
+        "toolPrefix": "twitter"
+      }
+    },
+    "shopify": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-shopify"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_CONNECTION_ID": "workspace_null"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Shopify store management",
+        "toolPrefix": "shopify"
+      }
+    },
+    "hubspot": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-hubspot"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_CONNECTION_ID": "workspace_null"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "HubSpot CRM",
+        "toolPrefix": "hubspot"
+      }
+    },
+    "salesforce": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-salesforce"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_CONNECTION_ID": "workspace_null"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Salesforce CRM",
+        "toolPrefix": "salesforce"
+      }
+    },
+    "jira": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-atlassian"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_CONNECTION_ID": "workspace_null"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Jira issues and projects",
+        "toolPrefix": "jira"
+      }
+    },
+    "google-sheets": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-google-sheets"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_CONNECTION_ID": "workspace_null"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Google Sheets",
+        "toolPrefix": "google-sheets"
+      }
+    },
+    "postgres": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres"
+      ],
+      "env": {},
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "PostgreSQL database",
+        "toolPrefix": "postgres"
+      }
+    },
+    "mongodb": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-mongodb"
+      ],
+      "env": {},
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "MongoDB database",
+        "toolPrefix": "mongodb"
+      }
+    },
+    "docker": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-docker"
+      ],
+      "env": {},
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Docker containers",
+        "toolPrefix": "docker"
+      }
+    },
+    "kubernetes": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-kubernetes"
+      ],
+      "env": {},
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Kubernetes clusters",
+        "toolPrefix": "kubernetes"
+      }
+    },
+    "aws": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-aws"
+      ],
+      "env": {},
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "AWS services",
+        "toolPrefix": "aws"
+      }
+    },
+    "azure": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-azure"
+      ],
+      "env": {},
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Azure services",
+        "toolPrefix": "azure"
+      }
+    },
+    "twilio": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-twilio"
+      ],
+      "env": {
+        "TWILIO_AUTH_TOKEN": "${TWILIO_AUTH_TOKEN}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Twilio SMS/calls",
+        "toolPrefix": "twilio"
+      }
+    },
+    "sendgrid": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sendgrid"
+      ],
+      "env": {
+        "SENDGRID_API_KEY": "${SENDGRID_API_KEY}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "SendGrid email",
+        "toolPrefix": "sendgrid"
+      }
+    },
+    "mailchimp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-mailchimp"
+      ],
+      "env": {
+        "MAILCHIMP_API_KEY": "${MAILCHIMP_API_KEY}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Mailchimp campaigns",
+        "toolPrefix": "mailchimp"
+      }
+    },
+    "zendesk": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-zendesk"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_CONNECTION_ID": "workspace_null"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Zendesk support tickets",
+        "toolPrefix": "zendesk"
+      }
+    },
+    "reddit": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-reddit"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_CONNECTION_ID": "workspace_null"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Reddit posts",
+        "toolPrefix": "reddit"
+      }
+    },
+    "youtube": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-youtube"
+      ],
+      "env": {
+        "YOUTUBE_API_KEY": "${YOUTUBE_API_KEY}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "YouTube videos",
+        "toolPrefix": "youtube"
+      }
+    },
+    "openai": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-openai"
+      ],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "OpenAI GPT",
+        "toolPrefix": "openai"
+      }
+    },
+    "anthropic": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-anthropic"
+      ],
+      "env": {
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Anthropic Claude",
+        "toolPrefix": "anthropic"
+      }
+    },
+    "puppeteer": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ],
+      "env": {},
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Browser automation",
+        "toolPrefix": "puppeteer"
+      }
+    },
+    "filesystem": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem"
+      ],
+      "env": {},
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "File system access",
+        "toolPrefix": "filesystem"
+      }
+    },
+    "git": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-git"
+      ],
+      "env": {},
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Git operations",
+        "toolPrefix": "git"
+      }
+    },
+    "sqlite": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sqlite"
+      ],
+      "env": {},
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "SQLite database",
+        "toolPrefix": "sqlite"
+      }
+    },
+    "redis": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-redis"
+      ],
+      "env": {},
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": false,
+        "description": "Redis cache",
+        "toolPrefix": "redis"
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "Demo Multi-Step Workflow",
+  "description": "Demonstration workflow showing sequential task execution with variable passing",
+  "active": true,
+  "steps": [
+    {
+      "type": "start",
+      "config": {
+        "variables": [
+          {
+            "name": "userEmail",
+            "value": "demo@example.com"
+          },
+          {
+            "name": "projectName",
+            "value": "AnythingLLM Enhancement"
+          }
+        ]
+      }
+    },
+    {
+      "type": "llmInstruction",
+      "config": {
+        "instruction": "Generate a project status report for {{projectName}}. Include current progress, upcoming milestones, and any blockers. Make it professional and detailed.",
+        "resultVariable": "statusReport"
+      }
+    },
+    {
+      "type": "llmInstruction",
+      "config": {
+        "instruction": "Based on the status report ({{statusReport}}), identify 3 key action items that need immediate attention. Format as a prioritized list.",
+        "resultVariable": "actionItems"
+      }
+    },
+    {
+      "type": "llmInstruction",
+      "config": {
+        "instruction": "Create a comprehensive email to {{userEmail}} about {{projectName}}. Include the status report: {{statusReport}} and action items: {{actionItems}}. Make it executive-ready with clear next steps.",
+        "resultVariable": "finalEmail"
+      }
+    }
+  ]
+}

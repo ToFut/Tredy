@@ -408,6 +408,9 @@ Return the tool to use and parameters, or indicate if this should be handled by 
  */
 const unifiedWorkflow = {
   name: "unified-workflow",
+  startupConfig: {
+    params: {},
+  },
   description: "Unified workflow system for task planning, orchestration, and automation",
   plugin: function () {
     return {

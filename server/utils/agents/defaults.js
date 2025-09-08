@@ -19,7 +19,7 @@ const USER_AGENT = {
   name: "USER",
   getDefinition: async () => {
     return {
-      interrupt: "ALWAYS",
+      interrupt: "NEVER", // Changed from ALWAYS to prevent duplicate responses and feedback loops
       role: "I am the human monitor and oversee this chat. Any questions on action or decision making should be directed to me.",
     };
   },
@@ -71,14 +71,15 @@ async function agentSkillsFromSystemSettings() {
   );
   _setting.forEach((skillName) => {
     // Handle workflow skills that map to unified-workflow plugin
-    if (["task-planner", "flow-orchestrator", "auto-workflow"].includes(skillName)) {
-      // These skills all use the unified-workflow plugin
-      // The plugin will detect which mode to use based on the skill name
-      if (!systemFunctions.includes("unified-workflow")) {
-        systemFunctions.push("unified-workflow");
-      }
-      return;
-    }
+    // TEMPORARILY DISABLED - causing params error
+    // if (["task-planner", "flow-orchestrator", "auto-workflow"].includes(skillName)) {
+    //   // These skills all use the unified-workflow plugin
+    //   // The plugin will detect which mode to use based on the skill name
+    //   if (!systemFunctions.includes("unified-workflow")) {
+    //     systemFunctions.push("unified-workflow");
+    //   }
+    //   return;
+    // }
 
     if (!AgentPlugins.hasOwnProperty(skillName)) return;
 

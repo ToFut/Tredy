@@ -87,6 +87,9 @@ const websocket = {
           if (message.from !== "USER")
             Telemetry.sendTelemetry("agent_chat_sent");
           if (message.from === "USER" && muteUserReply) return;
+          
+          // Debug: Log message being sent to identify duplicates
+          console.log(`[WebSocket Plugin] Sending message from ${message.from} to ${message.to}: ${message.content?.substring(0, 50)}...`);
           socket.send(JSON.stringify(message));
         });
 

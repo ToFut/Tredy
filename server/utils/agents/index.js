@@ -496,6 +496,14 @@ class AgentHandler {
         continue;
       }
 
+      // Skip websocket and chat-history plugins as they're already added as standard plugins
+      if (name === "websocket" || name === "chat-history") {
+        this.log(
+          `${name} is a standard plugin already attached. Skipping duplicate inclusion.`
+        );
+        continue;
+      }
+
       const callOpts = this.parseCallOptions(
         args,
         AgentPlugins[name].startupConfig.params
@@ -536,6 +544,7 @@ class AgentHandler {
       provider: this.provider ?? "openai",
       model: this.model ?? "gpt-4o",
       chats: await this.#chatHistory(20),
+      maxRounds: 2, // Limit to 2 rounds to prevent ping-pong loops
       handlerProps: {
         invocation: this.invocation,
         log: this.log,

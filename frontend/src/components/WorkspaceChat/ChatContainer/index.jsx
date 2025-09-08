@@ -247,17 +247,24 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
 
   // TODO: Simplify this WSS stuff
   useEffect(() => {
+    // Clean up previous websocket if it exists
+    if (websocket) {
+      websocket.close();
+      setWebsocket(null);
+    }
+    
     function handleWSS() {
       try {
-        if (!socketId || !!websocket) return;
+        if (!socketId) return;
         const socket = new WebSocket(
           `${websocketURI()}/api/agent-invocation/${socketId}`
         );
 
-        window.addEventListener(ABORT_STREAM_EVENT, () => {
+        const handleAbort = () => {
           window.dispatchEvent(new CustomEvent(AGENT_SESSION_END));
-          websocket.close();
-        });
+          socket.close();
+        };
+        window.addEventListener(ABORT_STREAM_EVENT, handleAbort);
 
         socket.addEventListener("message", (event) => {
           setLoadingResponse(true);
@@ -341,6 +348,12 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
         // Initialize agent status
         setAgentStatus('connecting');
         setAgentOperations([{ type: 'processing', name: 'Initializing agent', status: 'active' }]);
+        
+        // Return cleanup function
+        return () => {
+          window.removeEventListener(ABORT_STREAM_EVENT, handleAbort);
+          socket.close();
+        };
       } catch (e) {
         setChatHistory((prev) => [
           ...prev.filter((msg) => !!msg.content),
@@ -361,7 +374,12 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
         setSocketId(null);
       }
     }
-    handleWSS();
+    const cleanup = handleWSS();
+    
+    // Return cleanup function for useEffect
+    return () => {
+      if (cleanup) cleanup();
+    };
   }, [socketId]);
 
   // Determine if we should use mobile UI (viewport width < 768px is more reliable than isMobile)

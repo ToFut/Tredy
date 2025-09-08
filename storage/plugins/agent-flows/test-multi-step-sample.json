@@ -1,0 +1,44 @@
+{
+  "name": "Multi-Step Email and Calendar Test",
+  "description": "Sample flow to test multi-step orchestration - checks calendar, gets weather, and creates summary",
+  "active": true,
+  "steps": [
+    {
+      "type": "start",
+      "config": {
+        "variables": [
+          {
+            "name": "recipient",
+            "value": "segev@futuirxs.com"
+          },
+          {
+            "name": "date",
+            "value": "today"
+          }
+        ]
+      }
+    },
+    {
+      "type": "llmInstruction",
+      "config": {
+        "instruction": "Check the calendar for {{date}} and provide a summary of scheduled events. If no real calendar access, simulate with 2-3 sample meetings.",
+        "resultVariable": "calendarSummary"
+      }
+    },
+    {
+      "type": "llmInstruction",
+      "config": {
+        "instruction": "Get current weather information for today. If no real weather access, simulate with sample weather data for a business day.",
+        "resultVariable": "weatherInfo"
+      }
+    },
+    {
+      "type": "llmInstruction",
+      "config": {
+        "instruction": "Create a comprehensive daily brief combining the calendar summary ({{calendarSummary}}) and weather information ({{weatherInfo}}). Format it as a professional email to {{recipient}}. Include recommendations based on the schedule and weather.",
+        "resultVariable": "dailyBrief",
+        "directOutput": true
+      }
+    }
+  ]
+}

@@ -98,14 +98,21 @@ ${JSON.stringify(def.parameters.properties, null, 4)}\n`;
       ["user", "assistant"].includes(msg.role)
     );
     if (history[history.length - 1].role !== "user") return null;
+    console.log(`[UnTooled] Checking ${functions.length} functions for user request`);
     const response = await chatCb({
       messages: [
         {
-          content: `You are a program which picks the most optimal function and parameters to call.
-      DO NOT HAVE TO PICK A FUNCTION IF IT WILL NOT HELP ANSWER OR FULFILL THE USER'S QUERY.
-      When a function is selection, respond in JSON with no additional text.
-      When there is no relevant function to call - return with a regular chat text response.
-      Your task is to pick a **single** function that we will use to call, if any seem useful or relevant for the user query.
+          content: `You are a function selector. Analyze the user's request and determine if any function should be called.
+
+CRITICAL RULES:
+1. If the user wants to PERFORM AN ACTION (send email, book meeting, create post, etc.) → ALWAYS return JSON
+2. If a function CAN help fulfill the request → ALWAYS return JSON
+3. Only return plain text if the user is asking a question that needs no action
+
+When selecting a function, respond ONLY with JSON in this exact format:
+{"name": "function_name", "arguments": {...}}
+
+Your task is to pick the MOST RELEVANT function for the user's request.
 
       All JSON responses should have two keys.
       'name': this is the name of the function name to call. eg: 'web-scraper', 'rag-memory', etc..

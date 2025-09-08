@@ -65,10 +65,16 @@ function userConnectorEndpoints(app) {
         });
       }
 
+      // Normalize provider name: Google_calendar -> google-calendar
+      const normalizedProvider = provider
+        .toLowerCase()
+        .replace(/_/g, '-')
+        .replace(/\s+/g, '-');
+
       // Check if already connected
       const existingConnector = response.locals.user?.id 
-        ? await ConnectorTokens.get({ userId: response.locals.user.id, provider })
-        : await ConnectorTokens.getByProvider(provider);
+        ? await ConnectorTokens.get({ userId: response.locals.user.id, provider: normalizedProvider })
+        : await ConnectorTokens.getByProvider(normalizedProvider);
         
       if (existingConnector) {
         return response.status(400).json({
@@ -91,7 +97,7 @@ function userConnectorEndpoints(app) {
         : `system`;
       
       try {
-        const authConfig = await bridge.generateAuthUrl(provider, connectionId);
+        const authConfig = await bridge.generateAuthUrl(normalizedProvider, connectionId);
         
         response.status(200).json({
           success: true,

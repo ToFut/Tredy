@@ -1,0 +1,65 @@
+{
+  "name": "Email Processing & Invite Workflow",
+  "description": "Read emails, create urgency chart, send summary, and schedule invite",
+  "steps": [
+    {
+      "type": "start",
+      "config": {
+        "variables": [
+          {
+            "name": "recipient1",
+            "value": "segev@sinosciences.com"
+          },
+          {
+            "name": "recipient2",
+            "value": "segev@futurixs.com"
+          }
+        ]
+      }
+    },
+    {
+      "type": "llmInstruction",
+      "config": {
+        "instruction": "Read last 5 emails and summarize their contents",
+        "resultVariable": "step_1_result"
+      }
+    },
+    {
+      "type": "llmInstruction",
+      "config": {
+        "instruction": "Create urgency chart and action items from {{step_1_result}}",
+        "resultVariable": "step_2_result"
+      }
+    },
+    {
+      "type": "llmInstruction",
+      "config": {
+        "instruction": "Create visualization of {{step_2_result}} with charts and graphs",
+        "resultVariable": "step_3_result"
+      }
+    },
+    {
+      "type": "llmInstruction",
+      "config": {
+        "instruction": "Send email to {{recipient1}} with summary {{step_1_result}} and visualization {{step_3_result}}",
+        "resultVariable": "step_4_result"
+      }
+    },
+    {
+      "type": "llmInstruction",
+      "config": {
+        "instruction": "Create calendar invite for {{recipient2}} based on action items in {{step_2_result}}",
+        "resultVariable": "step_5_result"
+      }
+    },
+    {
+      "type": "llmInstruction",
+      "config": {
+        "instruction": "Send confirmation email to {{recipient2}} about invite {{step_5_result}}",
+        "resultVariable": "step_6_result",
+        "directOutput": true
+      }
+    }
+  ],
+  "active": true
+}

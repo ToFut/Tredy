@@ -5,17 +5,128 @@
  */
 
 const { v4: uuidv4 } = require("uuid");
+const { Deduplicator } = require("../utils/dedupe");
 
 // Simple function to check if plugin loads
 console.log("🔧 [WorkflowCreator] Plugin file loaded successfully");
 const { AgentFlows } = require("../../../agentFlows");
-const { DynamicFlowBuilder } = require("../../flowBuilder/dynamicFlowBuilder");
+const { FLOW_TYPES } = require("../../../agentFlows/flowTypes");
 
 class WorkflowCreatorSession {
   constructor(conversationId) {
     this.conversationId = conversationId;
     this.draftWorkflows = new Map(); // workflowId -> workflow data
-    this.flowBuilder = new DynamicFlowBuilder();
+    // Use existing AgentFlows infrastructure for workflow management
+  }
+
+  /**
+   * Parse natural language description into workflow steps
+   * Inspired by claude-task-master's AI-driven task decomposition
+   */
+  parseDescriptionToWorkflowSteps(description) {
+    console.log("🔧 [WorkflowCreator] Parsing description:", description);
+    
+    const steps = [];
+    const lowerDesc = description.toLowerCase();
+    
+    // Module: Parse sequential steps with "then" keyword
+    if (lowerDesc.includes('then')) {
+      const parts = description.split(/\s+then\s+/i);
+      parts.forEach((part, index) => {
+        steps.push(this.parseGenericStep(part.trim(), index));
+      });
+    } 
+    // Module: Parse comma-separated steps
+    else if (lowerDesc.includes(',')) {
+      const parts = description.split(',');
+      parts.forEach((part, index) => {
+        steps.push(this.parseGenericStep(part.trim(), index));
+      });
+    }
+    // Single step workflow
+    else {
+      steps.push(this.parseGenericStep(description, 0));
+    }
+    
+    console.log("🔧 [WorkflowCreator] Parsed", steps.length, "workflow steps");
+    return steps;
+  }
+
+  parseGenericStep(stepText, index) {
+    const lower = stepText.toLowerCase();
+    
+    // Determine step type based on keywords
+    let stepType = FLOW_TYPES.LLM_INSTRUCTION.type;
+    let config = {};
+    
+    // Email detection (if contains @ symbol)
+    if (stepText.includes('@')) {
+      const emailMatch = stepText.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+      if (emailMatch) {
+        stepType = FLOW_TYPES.API_CALL.type;
+        config = {
+          url: "MCP://gmail:send_email",
+          method: "POST", 
+          body: JSON.stringify({
+            to: emailMatch[0],
+            subject: `Workflow Step ${index + 1}`,
+            message: stepText
+          }),
+          responseVariable: `step${index + 1}Response`
+        };
+      }
+    }
+    // API/Integration keywords
+    else if (lower.includes('fetch') || lower.includes('api') || lower.includes('get') || lower.includes('post')) {
+      stepType = FLOW_TYPES.API_CALL.type;
+      config = {
+        url: "CONFIGURE_URL",
+        method: lower.includes('post') ? "POST" : "GET",
+        responseVariable: `apiResponse${index + 1}`
+      };
+    }
+    // Data processing keywords
+    else if (lower.includes('analyze') || lower.includes('process') || lower.includes('transform')) {
+      stepType = FLOW_TYPES.LLM_INSTRUCTION.type;
+      config = {
+        instruction: stepText,
+        resultVariable: `processedData${index + 1}`
+      };
+    }
+    // Report/Summary generation
+    else if (lower.includes('report') || lower.includes('summary') || lower.includes('generate')) {
+      stepType = FLOW_TYPES.LLM_INSTRUCTION.type;
+      config = {
+        instruction: stepText,
+        resultVariable: `generatedContent${index + 1}`
+      };
+    }
+    // Database operations
+    else if (lower.includes('save') || lower.includes('store') || lower.includes('database')) {
+      stepType = FLOW_TYPES.API_CALL.type;
+      config = {
+        url: "DATABASE://operation",
+        method: "POST",
+        body: JSON.stringify({ action: stepText }),
+        responseVariable: `dbResult${index + 1}`
+      };
+    }
+    // Default: Generic LLM instruction
+    else {
+      stepType = FLOW_TYPES.LLM_INSTRUCTION.type;
+      config = {
+        instruction: stepText,
+        resultVariable: `result${index + 1}`
+      };
+    }
+    
+    return {
+      type: stepType,
+      config: {
+        ...config,
+        directOutput: false
+      }
+    };
   }
 
   createDraftWorkflow(description, name = null) {
@@ -38,11 +149,13 @@ class WorkflowCreatorSession {
   }
 
   formatWorkflowPreview(workflow, steps) {
+    const boxWidth = Math.max(50, workflow.name.length + 20);
+    const innerWidth = boxWidth - 2;
+    
     const preview = [
-      "┌─" + "─".repeat(workflow.name.length + 20) + "─┐",
-      `│ 📋 ${workflow.name}${" ".repeat(20 - workflow.name.length + 2)}│`,
-      "├─" + "─".repeat(workflow.name.length + 20) + "─┤",
-      "│" + " ".repeat(workflow.name.length + 22) + "│"
+      "┌" + "─".repeat(boxWidth) + "┐",
+      `│ 📋 ${workflow.name}${" ".repeat(Math.max(0, innerWidth - workflow.name.length - 3))}│`,
+      "├" + "─".repeat(boxWidth) + "┤"
     ];
 
     steps.forEach((step, index) => {
@@ -53,16 +166,19 @@ class WorkflowCreatorSession {
       const title = this.getStepTitle(step);
       const detail = this.getStepDetail(step);
       
-      preview.push(`│ ${stepNum}️⃣ ${emoji} ${title}${" ".repeat(Math.max(0, workflow.name.length + 15 - title.length))}│`);
+      const stepLine = ` ${stepNum}️⃣ ${emoji} ${title}`;
+      preview.push(`│${stepLine}${" ".repeat(Math.max(0, innerWidth - stepLine.length))}│`);
+      
       if (detail) {
-        preview.push(`│    └─> ${detail}${" ".repeat(Math.max(0, workflow.name.length + 10 - detail.length))}│`);
+        const detailLine = `    └─> ${detail}`;
+        preview.push(`│${detailLine}${" ".repeat(Math.max(0, innerWidth - detailLine.length))}│`);
       }
-      preview.push("│" + " ".repeat(workflow.name.length + 22) + "│");
     });
 
-    preview.push("├─" + "─".repeat(workflow.name.length + 20) + "─┤");
-    preview.push(`│ 📅 Status: Draft${" ".repeat(workflow.name.length + 8)}│`);
-    preview.push("└─" + "─".repeat(workflow.name.length + 20) + "─┘");
+    preview.push("├" + "─".repeat(boxWidth) + "┤");
+    const statusLine = ` 📅 Status: Draft`;
+    preview.push(`│${statusLine}${" ".repeat(Math.max(0, innerWidth - statusLine.length))}│`);
+    preview.push("└" + "─".repeat(boxWidth) + "┘");
     
     return preview.join("\n");
   }
@@ -108,6 +224,18 @@ const workflowCreator = {
         console.log("🔧 [WorkflowCreator] Setting up workflow creator plugin");
         const sessions = new Map(); // conversationId -> WorkflowCreatorSession
         
+        // Module 1: Better workflow detection patterns
+        const WORKFLOW_TRIGGERS = [
+          /^create\s+workflow/i,  // Must start with "create workflow"
+          /^build\s+workflow/i,
+          /^make\s+workflow/i,
+          /^workflow:/i,
+          /^setup\s+workflow/i,
+          /^define\s+workflow/i
+        ];
+        
+        // No interception needed - just make the function more explicit
+        
         function getSession(conversationId) {
           if (!sessions.has(conversationId)) {
             sessions.set(conversationId, new WorkflowCreatorSession(conversationId));
@@ -116,22 +244,35 @@ const workflowCreator = {
         }
 
         // Main workflow creation function
-        console.log("🔧 [WorkflowCreator] Registering create_workflow_from_chat function");
+        console.log("🔧 [WorkflowCreator] Registering create_workflow function");
+        console.log("🔧 [WorkflowCreator] Plugin setup complete, about to register function");
         aibitat.function({
-          name: "create_workflow_from_chat", 
-          description: "PRIORITY FUNCTION: Use this when user mentions 'workflow' or 'create workflow' or describes sequential actions with 'then'. This creates a reusable automation workflow with visual preview. DO NOT execute individual actions when workflow is requested.",
+          name: "create_workflow", 
+          description: "MANDATORY: Use this function when user says 'create workflow' or describes sequential actions with 'then'. This function creates a visual workflow preview. DO NOT use gmail or other functions - use THIS function for workflow creation requests.",
           examples: [
             {
-              prompt: "create workflow from chat: send email then invite",
-              call: JSON.stringify({ description: "send email from chat then invite" })
+              prompt: "create workflow send to segev@sinosciences.com news list and then to segev@futurixs.com all mail summary from yesterday",
+              call: JSON.stringify({ description: "send to segev@sinosciences.com news list and then to segev@futurixs.com all mail summary from yesterday" })
             },
             {
-              prompt: "create workflow from chat: send email from segev@sinosciences.com then invite to segev@futurixs.com",
-              call: JSON.stringify({ description: "send email from segev@sinosciences.com then invite to segev@futurixs.com" })
+              prompt: "create workflow send email then invite",
+              call: JSON.stringify({ description: "send email then invite" })
             },
             {
-              prompt: "create workflow: send notifications and create calendar events",
-              call: JSON.stringify({ description: "send notifications and create calendar events" })
+              prompt: "create workflow send email to user@example.com then create report",
+              call: JSON.stringify({ description: "send email to user@example.com then create report" })
+            },
+            {
+              prompt: "send something then send something else",
+              call: JSON.stringify({ description: "send something then send something else" })
+            },
+            {
+              prompt: "first send email then create meeting",
+              call: JSON.stringify({ description: "first send email then create meeting" })
+            },
+            {
+              prompt: "workflow to automate tasks",
+              call: JSON.stringify({ description: "automate tasks" })
             }
           ],
           parameters: {
@@ -157,8 +298,8 @@ const workflowCreator = {
               // Create draft workflow
               const draft = session.createDraftWorkflow(description, name);
               
-              // Use existing DynamicFlowBuilder to parse description
-              const parsedSteps = session.flowBuilder.parsePromptToSteps(description);
+              // Parse description into workflow steps using AI-driven approach
+              const parsedSteps = session.parseDescriptionToWorkflowSteps(description);
               
               // Add start block
               const steps = [
@@ -206,21 +347,39 @@ const workflowCreator = {
               
               aibitat.introspect("📋 Workflow preview generated! Review and save when ready.");
               
-              // Return structured data that can be parsed by frontend
-              return {
-                success: true,
-                type: "workflowPreview",
-                data: workflowData,
-                message: `📋 **Workflow Created: "${draft.name}"**\n\nUse the commands below to interact with the workflow.`
-              };
+              // Return the visual preview directly as the message
+              const fullMessage = `📋 **Workflow Created: "${draft.name}"**\n\n${preview}\n\n**Available Commands:**\n${workflowData.actions.join('\n')}\n\n---\n*Workflow ID: ${draft.id}*`;
+              
+              return fullMessage;
               
             } catch (error) {
               aibitat.introspect(`Error creating workflow: ${error.message}`);
-              return {
-                success: false,
-                error: `Failed to create workflow: ${error.message}`
-              };
+              return `❌ Failed to create workflow: ${error.message}`;
             }
+          }
+        });
+        console.log("🔧 [WorkflowCreator] create_workflow function registered successfully");
+
+        // Test function to verify plugin is working
+        aibitat.function({
+          name: "test_workflow_plugin",
+          description: "Simple test function to verify the workflow plugin is working. Use this when user says 'test' or 'test workflow'.",
+          parameters: {
+            type: "object",
+            properties: {
+              message: {
+                type: "string",
+                description: "Test message"
+              }
+            },
+            required: ["message"]
+          },
+          handler: async ({ message }) => {
+            console.log("🔧 [WorkflowCreator] TEST FUNCTION CALLED:", message);
+            return {
+              success: true,
+              message: "✅ Workflow plugin is working! Test successful: " + message
+            };
           }
         });
 
@@ -390,17 +549,23 @@ const workflowCreator = {
               
               aibitat.introspect(`Test running workflow: ${draft.name}`);
               
-              // Create temporary workflow for testing
-              const testConfig = {
+              // Execute the draft workflow directly using FlowExecutor
+              const { FlowExecutor } = require("../../../agentFlows/executor");
+              const flowExecutor = new FlowExecutor();
+              
+              // Create temporary workflow config for testing
+              const testFlow = {
                 name: `TEST: ${draft.name}`,
                 uuid: workflowId,
                 config: {
+                  name: draft.name,
+                  description: draft.description,
                   steps: draft.steps
                 }
               };
               
-              // Use existing AgentFlows executor
-              const result = await AgentFlows.executeFlow(workflowId, {}, aibitat);
+              // Execute the draft workflow directly
+              const result = await flowExecutor.executeFlow(testFlow, {}, aibitat);
               
               return {
                 success: result.success,
@@ -450,6 +615,55 @@ const workflowCreator = {
           }
         });
 
+        // Run workflow by name function
+        aibitat.function({
+          name: "run_workflow",
+          description: "Run a saved workflow by name. Use this when user says 'run [workflow name]' or 'execute [workflow name]'",
+          parameters: {
+            type: "object",
+            properties: {
+              workflowName: {
+                type: "string",
+                description: "Name of the workflow to run"
+              }
+            },
+            required: ["workflowName"]
+          },
+          handler: async ({ workflowName }) => {
+            try {
+              const flows = AgentFlows.listFlows();
+              const flow = flows.find(f => f.name.toLowerCase() === workflowName.toLowerCase());
+              
+              if (!flow) {
+                const availableFlows = flows.map(f => f.name).join(', ');
+                return `❌ Workflow "${workflowName}" not found. Available workflows: ${availableFlows}`;
+              }
+              
+              aibitat.introspect(`Running workflow: ${flow.name}`);
+              
+              // Execute the workflow
+              const result = await AgentFlows.executeFlow(flow.uuid, {}, aibitat);
+              
+              if (!result.success) {
+                const error = result.results?.[0]?.error || "Unknown error";
+                return `❌ Workflow "${flow.name}" failed: ${error}`;
+              }
+              
+              aibitat.introspect(`Workflow "${flow.name}" completed successfully`);
+              
+              // If the flow has directOutput, return it directly
+              if (result.directOutput) {
+                return AgentFlows.stringifyResult(result.directOutput);
+              }
+              
+              return `✅ Workflow "${flow.name}" completed successfully!\n\nResults: ${AgentFlows.stringifyResult(result)}`;
+              
+            } catch (error) {
+              return `❌ Error running workflow "${workflowName}": ${error.message}`;
+            }
+          }
+        });
+
         // List my workflows function
         aibitat.function({
           name: "list_my_workflows",
@@ -466,7 +680,7 @@ const workflowCreator = {
             }
             
             const flowList = flows.map(f => 
-              `📋 **${f.name}**\n   ${f.description || 'No description'}\n   Usage: @agent run ${f.name}`
+              `📋 **${f.name}**\n   ${f.description || 'No description'}\n   Usage: @agent run workflow ${f.name}`
             ).join('\n\n');
             
             return `📋 **Your Workflows (${flows.length}):**\n\n${flowList}`;
@@ -477,4 +691,4 @@ const workflowCreator = {
   }
 };
 
-module.exports = { workflowCreator };
+module.exports = { workflowCreator, WorkflowCreatorSession };

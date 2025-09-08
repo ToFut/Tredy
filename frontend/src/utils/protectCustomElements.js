@@ -8,24 +8,44 @@ const originalDefine = window.customElements?.define;
 
 // Override customElements.define to prevent duplicate registrations
 if (window.customElements && originalDefine) {
+  // Pre-register the problematic element to prevent errors
+  const problematicElements = ['mce-autosize-textarea'];
+  problematicElements.forEach(name => {
+    if (!window.customElements.get(name)) {
+      // Register a dummy element to prevent the actual one from being registered
+      class DummyElement extends HTMLElement {}
+      try {
+        window.customElements.define(name, DummyElement);
+      } catch (e) {
+        // Element might already be defined
+      }
+    }
+  });
+
   window.customElements.define = function(name, constructor, options) {
     try {
       // Check if element is already defined
       if (window.customElements.get(name)) {
-        console.warn(`Custom element '${name}' is already defined. Skipping duplicate registration.`);
+        // Silently skip instead of warning for known extension elements
+        if (!name.includes('mce-') && !name.includes('tinymce')) {
+          console.warn(`Custom element '${name}' is already defined. Skipping duplicate registration.`);
+        }
         return;
       }
       
       // Prevent TinyMCE or other external scripts from registering elements
       if (name.includes('mce-') || name.includes('tinymce')) {
-        console.warn(`Blocking external custom element registration: ${name}`);
+        // Silently block without warning to reduce console noise
         return;
       }
       
       // Call original define method
       return originalDefine.call(this, name, constructor, options);
     } catch (error) {
-      console.error(`Error registering custom element '${name}':`, error);
+      // Silently handle errors for external scripts
+      if (!name.includes('mce-') && !name.includes('tinymce')) {
+        console.error(`Error registering custom element '${name}':`, error);
+      }
     }
   };
 }

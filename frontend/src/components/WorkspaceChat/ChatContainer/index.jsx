@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import ChatHistory from "./ChatHistory";
 import { CLEAR_ATTACHMENTS_EVENT, DndUploaderContext } from "./DnDWrapper";
 import PromptInput, {
@@ -83,7 +83,7 @@ function formatSummaryForChat(summary) {
   return content;
 }
 
-export default function ChatContainer({ workspace, knownHistory = [] }) {
+export default function ChatContainer({ workspace, knownHistory = [], onSendCommandReady }) {
   const { threadSlug = null } = useParams();
   const [message, setMessage] = useState("");
   const [loadingResponse, setLoadingResponse] = useState(false);
@@ -114,7 +114,6 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
    * @param {'replace' | 'append'} writeMode - Replace current text or append to existing text (default: replace)
    */
   function setMessageEmit(messageContent = "", writeMode = "replace") {
-    console.log("[setMessageEmit] Received:", { messageContent, writeMode });
     if (writeMode === "append") setMessage((prev) => prev + messageContent);
     else setMessage(messageContent ?? "");
 
@@ -189,7 +188,7 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
    * @param {'replace' | 'append'} options.writeMode - Replace current text or append to existing text (default: replace)
    * @returns {void}
    */
-  const sendCommand = async ({
+  const sendCommand = useCallback(async ({
     text = "",
     autoSubmit = false,
     history = [],
@@ -249,7 +248,7 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
     setChatHistory(prevChatHistory);
     setMessageEmit("");
     setLoadingResponse(true);
-  };
+  }, [workspace, chatHistory, files, setLoadingResponse, setChatHistory]);
 
   useEffect(() => {
     async function fetchReply() {
@@ -509,6 +508,19 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
       if (cleanup) cleanup();
     };
   }, [socketId]);
+
+  // Expose sendCommand to parent component
+  useEffect(() => {
+    if (onSendCommandReady) {
+      // Ensure sendCommand is fully initialized before exposing it
+      const timer = setTimeout(() => {
+        if (sendCommand) {
+          onSendCommandReady(sendCommand);
+        }
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [onSendCommandReady, sendCommand]);
 
   // Determine if we should use mobile UI (viewport width < 768px is more reliable than isMobile)
   const useMobileUI = window.innerWidth < 768 || isMobile;

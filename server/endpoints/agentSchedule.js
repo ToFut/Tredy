@@ -17,7 +17,7 @@ function agentScheduleEndpoints(app) {
    */
   app.get(
     "/api/workspace/:slug/agent-schedules",
-    [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager])],
+    [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default])],
     async (request, response) => {
       try {
         const { slug } = request.params;

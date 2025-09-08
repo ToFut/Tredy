@@ -100,15 +100,16 @@ ${JSON.stringify(def.parameters.properties, null, 4)}\n`;
     if (history[history.length - 1].role !== "user") return null;
     console.log(`[UnTooled] Checking ${functions.length} functions for user request`);
     console.log("[UnTooled] Available functions:", functions.map(f => f.name).join(", "));
+    console.log("[UnTooled] Last user message:", history[history.length - 1].content);
     const response = await chatCb({
       messages: [
         {
           content: `You are a function selector. Analyze the user's request and determine if any function should be called.
 
-CRITICAL RULES:
-1. If the user wants to PERFORM AN ACTION (send email, book meeting, create post, etc.) → ALWAYS return JSON
-2. If a function CAN help fulfill the request → ALWAYS return JSON
-3. Only return plain text if the user is asking a question that needs no action
+PRIORITY RULES:
+1. If user mentions "workflow", "create workflow", or "automate" → ALWAYS use create_workflow_from_chat
+2. If user describes multiple steps with "then", "after", "and then" → use create_workflow_from_chat
+3. Only use direct action functions (gmail_send_email, etc.) if NO workflow is requested
 
 When selecting a function, respond ONLY with JSON in this exact format:
 {"name": "function_name", "arguments": {...}}
@@ -129,8 +130,12 @@ Your task is to pick the MOST RELEVANT function for the user's request.
         ...history,
       ],
     });
+    console.log("[UnTooled] LLM response:", response.substring(0, 200));
     const call = safeJsonParse(response, null);
-    if (call === null) return { toolCall: null, text: response }; // failed to parse, so must be text.
+    if (call === null) {
+      console.log("[UnTooled] Failed to parse JSON, treating as text response");
+      return { toolCall: null, text: response }; // failed to parse, so must be text.
+    }
 
     const { valid, reason } = this.validFuncCall(call, functions);
     if (!valid) {

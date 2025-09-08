@@ -1064,6 +1064,54 @@ function workspaceEndpoints(app) {
 
   // Parsed Files in separate endpoint just to keep the workspace endpoints clean
   workspaceParsedFilesEndpoints(app);
+
+  // Get workspace members/users
+  app.get(
+    "/api/workspace/:slug/users",
+    [validatedRequest, flexUserRoleValid([ROLES.all])],
+    async (request, response) => {
+      try {
+        const { slug } = request.params;
+        const workspace = await Workspace.get({ slug });
+        
+        if (!workspace) {
+          return response.status(404).json({ 
+            success: false, 
+            error: "Workspace not found" 
+          });
+        }
+
+        // Get workspace users if multi-user mode is enabled
+        const { WorkspaceUser } = require("../models/workspaceUsers");
+        const workspaceUsers = await WorkspaceUser.where({ workspace_id: workspace.id });
+        
+        // Get full user details for each workspace user
+        const { User } = require("../models/user");
+        const users = await Promise.all(
+          workspaceUsers.map(async (wu) => {
+            const user = await User.get({ id: wu.user_id });
+            return user ? {
+              id: user.id,
+              username: user.username,
+              role: user.role,
+              createdAt: wu.createdAt
+            } : null;
+          })
+        );
+
+        response.status(200).json({ 
+          success: true, 
+          users: users.filter(u => u !== null)
+        });
+      } catch (error) {
+        console.error("Error fetching workspace users:", error);
+        response.status(500).json({ 
+          success: false, 
+          error: "Failed to fetch workspace users" 
+        });
+      }
+    }
+  );
 }
 
 module.exports = { workspaceEndpoints };

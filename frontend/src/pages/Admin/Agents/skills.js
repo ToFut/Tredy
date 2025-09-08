@@ -81,6 +81,15 @@ export const defaultSkills = {
     image: SummarizeImage,
     skill: "summary-generator",
   },
+  "workflow-creator": {
+    title: "Workflow Creator",
+    description:
+      "Create and manage workflows directly from chat. Parse natural language descriptions into executable workflow steps with visual previews. Use '@agent create workflow' to get started.",
+    component: DefaultSkillPanel,
+    icon: Plugs,
+    image: RAGImage,
+    skill: "workflow-creator",
+  },
 };
 
 export const configurableSkills = {

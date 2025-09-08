@@ -14,6 +14,7 @@ const { multiActionHandler } = require("./multi-action-handler.js");
 const { unifiedWorkflow } = require("./unified-workflow.js");
 const { workflowCreator } = require("./workflow-creator.js");
 const { summaryGenerator } = require("./summary-generator.js");
+const { simpleWorkflow } = require("./simple-workflow.js");
 
 module.exports = {
   webScraping,
@@ -32,6 +33,7 @@ module.exports = {
   unifiedWorkflow,
   workflowCreator,
   summaryGenerator,
+  simpleWorkflow,
 
   // Plugin name aliases so they can be pulled by slug as well.
   [webScraping.name]: webScraping,
@@ -50,4 +52,5 @@ module.exports = {
   [unifiedWorkflow.name]: unifiedWorkflow,
   [workflowCreator.name]: workflowCreator,
   [summaryGenerator.name]: summaryGenerator,
+  [simpleWorkflow.name]: simpleWorkflow,
 };

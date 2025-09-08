@@ -12,8 +12,11 @@ const DEFAULT_SKILLS = [
   AgentPlugins.docSummarizer.name,
   AgentPlugins.webScraping.name,
   AgentPlugins.universalIntegrator.name,
-  AgentPlugins.workflowCreator.name, // Enable workflow creation from chat
-  AgentPlugins.summaryGenerator.name, // Chat summary generation
+  AgentPlugins.websocket.name, // Enable websocket for real-time flow updates
+  AgentPlugins.simpleWorkflow.name, // Simple unified workflow system
+  // AgentPlugins.workflowCreator.name, // Disabled - replaced with simple workflow
+  // AgentPlugins.unifiedWorkflow.name, // Disabled - replaced with simple workflow  
+  // AgentPlugins.summaryGenerator.name, // Temporarily disabled - causing setup issues
   // AgentPlugins.multiActionHandler.name, // Temporarily disabled - causing infinite loops
 ];
 
@@ -29,15 +32,33 @@ const USER_AGENT = {
 
 const WORKSPACE_AGENT = {
   name: "@agent",
+  
+  // Deduplicate functions by name to prevent duplicate tool calls
+  dedupeFunctions: async (functions) => {
+    const seen = new Set();
+    const deduped = [];
+    
+    for (const func of functions) {
+      const key = func.name || func;
+      if (!seen.has(key)) {
+        seen.add(key);
+        deduped.push(func);
+      }
+    }
+    
+    console.log(`[WORKSPACE_AGENT] Deduped ${functions.length} functions to ${deduped.length} unique functions`);
+    return deduped;
+  },
+  
   getDefinition: async (provider = null, workspaceId = null) => {
     return {
       role: Provider.systemPrompt(provider),
-      functions: [
+      functions: await WORKSPACE_AGENT.dedupeFunctions([
         ...(await new MCPCompatibilityLayer().activeMCPServers(workspaceId)),
-        ...AgentFlows.activeFlowPlugins(),
         ...ImportedPlugin.activeImportedPlugins(),
-        ...(await agentSkillsFromSystemSettings()), // Load built-in skills LAST to override MCP
-      ],
+        ...(await agentSkillsFromSystemSettings()), // Load built-in skills to override MCP
+        ...AgentFlows.activeFlowPlugins(), // Load flows LAST (lowest priority)
+      ]),
     };
   },
 };
@@ -60,7 +81,7 @@ async function agentSkillsFromSystemSettings() {
   );
   DEFAULT_SKILLS.forEach((skill) => {
     if (!_disabledDefaultSkills.includes(skill))
-      systemFunctions.push(AgentPlugins[skill].name);
+      systemFunctions.push(skill); // skill is already the name
   });
 
   // Load non-imported built-in skills that are configurable.

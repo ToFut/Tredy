@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { default as WorkspaceChatContainer } from "@/components/WorkspaceChat";
 import Sidebar, { SidebarMobileHeader } from "@/components/Sidebar";
-import NotesPanel from "@/components/NotesPanel";
+import FlowPanel from "@/components/FlowPanel";
 import { useParams } from "react-router-dom";
 import Workspace from "@/models/workspace";
 import PasswordModal, { usePasswordModal } from "@/components/Modals/Password";
@@ -24,8 +24,15 @@ function ShowWorkspaceChat() {
   const [workspace, setWorkspace] = useState(null);
   const [loading, setLoading] = useState(true);
   const [workspaceData, setWorkspaceData] = useState(null);
-  const [showNotesPanel, setShowNotesPanel] = useState(true);
+  const [showFlowPanel, setShowFlowPanel] = useState(true);
   const [showSidebar, setShowSidebar] = useState(true);
+  const [sendCommand, setSendCommand] = useState(null);
+  
+  // Wrap setSendCommand to avoid setState during render warning
+  const handleSendCommandReady = React.useCallback((command) => {
+    setSendCommand(() => command);
+  }, []);
+
 
   useEffect(() => {
     async function getWorkspace() {
@@ -97,11 +104,11 @@ function ShowWorkspaceChat() {
                   <span className="text-sm text-gray-500">Jump Straight Into the Conversation</span>
                   <span className="px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">New</span>
                   <button 
-                    onClick={() => setShowNotesPanel(!showNotesPanel)}
+                    onClick={() => setShowFlowPanel(!showFlowPanel)}
                     className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                   >
                     <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                   </button>
                 </div>
@@ -111,16 +118,18 @@ function ShowWorkspaceChat() {
               <div className="flex-1 overflow-hidden">
                 <WorkspaceChatContainer 
                   loading={loading} 
-                  workspace={workspace || workspaceData} 
+                  workspace={workspace || workspaceData}
+                  onSendCommandReady={handleSendCommandReady}
                 />
               </div>
             </div>
             
-            {/* Right Sidebar - Notes Panel */}
-            <div className={`transition-all duration-300 ${showNotesPanel ? 'w-80' : 'w-0'} flex-shrink-0`}>
-              <NotesPanel 
+            {/* Right Sidebar - Flow Panel */}
+            <div className={`transition-all duration-300 ${showFlowPanel ? 'w-80' : 'w-0'} flex-shrink-0`}>
+              <FlowPanel 
                 workspace={workspace || workspaceData}
-                isVisible={showNotesPanel}
+                isVisible={showFlowPanel}
+                sendCommand={sendCommand}
               />
             </div>
           </>

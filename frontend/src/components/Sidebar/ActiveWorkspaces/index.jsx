@@ -182,17 +182,20 @@ export default function ActiveWorkspaces() {
                         relative transition-all duration-300
                         ${isActive || isHovered ? "scale-[1.02]" : "scale-100"}
                       `}>
-                        <button
+                        <div
                           onClick={(e) => {
-                            if (isActive) {
-                              e.preventDefault();
-                              toggleWorkspace(workspace.slug);
-                            } else {
-                              navigate(paths.workspace.chat(workspace.slug));
+                            // Only navigate if not clicking on action buttons
+                            if (!e.target.closest('.action-button')) {
+                              if (isActive) {
+                                e.preventDefault();
+                                toggleWorkspace(workspace.slug);
+                              } else {
+                                navigate(paths.workspace.chat(workspace.slug));
+                              }
                             }
                           }}
                           className={`
-                            w-full transition-all duration-300 flex items-center gap-x-2 py-2 px-2.5 rounded-lg
+                            w-full transition-all duration-300 flex items-center gap-x-2 py-2 px-2.5 rounded-lg cursor-pointer
                             backdrop-blur-xl border
                             ${isActive 
                               ? "bg-gradient-to-r from-blue-50/90 to-purple-50/90 border-blue-200 shadow-md" 
@@ -267,7 +270,7 @@ export default function ActiveWorkspaces() {
                                   showModal();
                                 }}
                                 className={`
-                                  p-1.5 rounded-lg transition-all duration-200
+                                  action-button p-1.5 rounded-lg transition-all duration-200
                                   ${isActive 
                                     ? "hover:bg-blue-100 text-blue-600 hover:scale-110" 
                                     : "hover:bg-gray-100 text-gray-500 hover:scale-110"
@@ -287,7 +290,7 @@ export default function ActiveWorkspaces() {
                                   );
                                 }}
                                 className={`
-                                  p-1.5 rounded-lg transition-all duration-200
+                                  action-button p-1.5 rounded-lg transition-all duration-200
                                   ${isActive 
                                     ? "hover:bg-blue-100 text-blue-600 hover:scale-110" 
                                     : "hover:bg-gray-100 text-gray-500 hover:scale-110"
@@ -304,7 +307,7 @@ export default function ActiveWorkspaces() {
                               </button>
                             </div>
                           )}
-                        </button>
+                        </div>
                       </div>
 
                       {/* Threads Container with Animation */}

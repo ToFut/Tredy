@@ -62,7 +62,6 @@ export default function PromptInput({
    */
   function handlePromptUpdate(e) {
     const { messageContent, writeMode = "replace" } = e?.detail ?? {};
-    console.log("[PromptInput] handlePromptUpdate:", { messageContent, writeMode });
     if (writeMode === "append") setPromptInput((prev) => prev + messageContent);
     else setPromptInput(messageContent ?? "");
   }
@@ -289,12 +288,12 @@ export default function PromptInput({
   }
 
   function handleChange(e) {
+    setPromptInput(e.target.value); // Set state first
     debouncedSaveState(-1);
     onChange(e);
     watchForSlash(e);
     watchForAt(e);
     adjustTextArea(e);
-    setPromptInput(e.target.value);
   }
 
   function handleGamifyClick() {
@@ -311,7 +310,7 @@ export default function PromptInput({
         break;
       case 'workflow':
         prompt = "@agent Create a workflow from this conversation that captures the key steps and processes we discussed.";
-        // Also trigger workflow creation in NotesPanel
+        // Also trigger workflow creation in FlowPanel
         triggerWorkflowCreation();
         break;
       case 'summary':
@@ -331,7 +330,7 @@ export default function PromptInput({
   }
 
   function triggerWorkflowCreation() {
-    // Trigger workflow creation in NotesPanel
+    // Trigger workflow creation in FlowPanel
     window.dispatchEvent(new CustomEvent('createWorkflowFromChat', {
       detail: {
         chatContext: promptInput,

@@ -5,6 +5,7 @@ import { Plus, CircleNotch, Trash } from "@phosphor-icons/react";
 import { useEffect, useState, useRef } from "react";
 import ThreadItem from "./ThreadItem";
 import { useParams } from "react-router-dom";
+import ThreadSummary from "@/components/SummaryTooltip/ThreadSummary";
 export const THREAD_RENAME_EVENT = "renameThread";
 
 export default function ThreadContainer({ workspace, isExpanded }) {
@@ -130,9 +131,11 @@ export default function ThreadContainer({ workspace, isExpanded }) {
     <div className="flex flex-col transition-all duration-500">
       {/* Tredys Header with + button */}
       <div className="flex items-center justify-between px-2 py-1 mb-2">
-        <span className="text-xs text-gray-600 font-semibold">
-          Tredys ({threads.length})
-        </span>
+        <ThreadSummary workspace={workspace} threadSlug={null}>
+          <span className="text-xs text-gray-600 font-semibold cursor-help">
+            Tredys ({threads.length})
+          </span>
+        </ThreadSummary>
         <button
           onClick={handleCreateThread}
           className="p-1 hover:bg-gray-100 rounded transition-colors"

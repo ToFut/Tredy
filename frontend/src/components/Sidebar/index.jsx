@@ -6,8 +6,10 @@ import useLogo from "@/hooks/useLogo";
 import useUser from "@/hooks/useUser";
 import Footer from "../Footer";
 import SettingsButton from "../SettingsButton";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import paths from "@/utils/paths";
+import Workspace from "@/models/workspace";
+import showToast from "@/utils/toast";
 import { useTranslation } from "react-i18next";
 import { useSidebarToggle, ToggleSidebarButton } from "./SidebarToggle";
 import SearchBox from "./SearchBox";
@@ -18,6 +20,7 @@ const NewWorkspaceModal = lazy(() => import("../Modals/NewWorkspace").then(modul
 export default function Sidebar() {
   const { user } = useUser();
   const { logo } = useLogo();
+  const { slug } = useParams();
   const sidebarRef = useRef(null);
   const { showSidebar, setShowSidebar, canToggleSidebar } = useSidebarToggle();
   const {
@@ -26,6 +29,36 @@ export default function Sidebar() {
     hideModal: hideNewWsModal,
   } = useNewWorkspaceModal();
   const { t } = useTranslation();
+
+  const handleCreateTredy = async () => {
+    console.log("Creating Tredy - slug:", slug);
+    
+    if (!slug) {
+      showToast("No workspace selected", "error");
+      return;
+    }
+    
+    try {
+      showToast("Creating new Tredy...", "info");
+      const { thread, error } = await Workspace.threads.new(slug);
+      console.log("Thread creation result:", { thread, error });
+      
+      if (error) {
+        showToast(`Could not create Tredy - ${error}`, "error");
+        return;
+      }
+      
+      if (thread) {
+        showToast("Tredy created successfully!", "success");
+        window.location.replace(paths.workspace.thread(slug, thread.slug));
+      } else {
+        showToast("Failed to create Tredy - no thread returned", "error");
+      }
+    } catch (error) {
+      console.error("Error creating Tredy:", error);
+      showToast(`Failed to create Tredy - ${error.message}`, "error");
+    }
+  };
 
   return (
     <>
@@ -62,22 +95,29 @@ export default function Sidebar() {
           }}
         >
           <div className="flex flex-col h-full overflow-x-hidden">
-            {/* Search and Filter Buttons at Top */}
+            {/* Search, Filter, and Create Tredys Buttons at Top */}
             <div className="flex gap-2 mb-4">
               <button
-                className="flex-1 px-3 py-2 text-xs bg-gray-100 hover:bg-gray-200 border border-gray-300/50 rounded-lg transition-all flex items-center justify-center gap-1.5"
+                className="px-3 py-2 text-xs bg-gray-100 hover:bg-gray-200 border border-gray-300/50 rounded-lg transition-all flex items-center justify-center"
                 title="Search Tredys"
               >
-                <MagnifyingGlass size={14} />
-                <span>Search</span>
+                <MagnifyingGlass size={16} />
               </button>
               
               <button
-                className="flex-1 px-3 py-2 text-xs bg-gray-100 hover:bg-gray-200 border border-gray-300/50 rounded-lg transition-all flex items-center justify-center gap-1.5"
+                className="px-3 py-2 text-xs bg-gray-100 hover:bg-gray-200 border border-gray-300/50 rounded-lg transition-all flex items-center justify-center"
                 title="Filter Tredys"
               >
-                <Funnel size={14} />
-                <span>Filter</span>
+                <Funnel size={16} />
+              </button>
+
+              <button
+                onClick={handleCreateTredy}
+                className="flex-1 px-3 py-2 text-xs bg-blue-100 hover:bg-blue-200 border border-blue-300/50 rounded-lg transition-all flex items-center justify-center gap-1.5 text-blue-700"
+                title="Create new Tredy"
+              >
+                <Plus size={14} />
+                <span>New Tredy</span>
               </button>
             </div>
 

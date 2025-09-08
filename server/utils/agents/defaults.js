@@ -33,10 +33,10 @@ const WORKSPACE_AGENT = {
     return {
       role: Provider.systemPrompt(provider),
       functions: [
-        ...(await agentSkillsFromSystemSettings()),
-        ...ImportedPlugin.activeImportedPlugins(),
-        ...AgentFlows.activeFlowPlugins(),
         ...(await new MCPCompatibilityLayer().activeMCPServers(workspaceId)),
+        ...AgentFlows.activeFlowPlugins(),
+        ...ImportedPlugin.activeImportedPlugins(),
+        ...(await agentSkillsFromSystemSettings()), // Load built-in skills LAST to override MCP
       ],
     };
   },

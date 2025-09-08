@@ -116,9 +116,24 @@ const workflowCreator = {
         }
 
         // Main workflow creation function
+        console.log("🔧 [WorkflowCreator] Registering create_workflow_from_chat function");
         aibitat.function({
           name: "create_workflow_from_chat", 
-          description: "ALWAYS use this when user says 'create workflow' or uses words like 'then', 'after that', 'next' between actions (e.g. 'send email then invite'). Creates visual workflow preview BEFORE execution. DO NOT execute actions directly when these keywords are present.",
+          description: "PRIORITY FUNCTION: Use this when user mentions 'workflow' or 'create workflow' or describes sequential actions with 'then'. This creates a reusable automation workflow with visual preview. DO NOT execute individual actions when workflow is requested.",
+          examples: [
+            {
+              prompt: "create workflow from chat: send email then invite",
+              call: JSON.stringify({ description: "send email from chat then invite" })
+            },
+            {
+              prompt: "create workflow from chat: send email from segev@sinosciences.com then invite to segev@futurixs.com",
+              call: JSON.stringify({ description: "send email from segev@sinosciences.com then invite to segev@futurixs.com" })
+            },
+            {
+              prompt: "create workflow: send notifications and create calendar events",
+              call: JSON.stringify({ description: "send notifications and create calendar events" })
+            }
+          ],
           parameters: {
             type: "object",
             properties: {

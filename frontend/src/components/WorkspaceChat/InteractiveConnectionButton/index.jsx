@@ -14,6 +14,7 @@ export default function InteractiveConnectionButton({
   const [error, setError] = useState(null);
   const [mounted, setMounted] = useState(false);
   const [providerInfo, setProviderInfo] = useState(null);
+  const [mappedProvider, setMappedProvider] = useState(provider);
 
   console.log("🔌 InteractiveConnectionButton rendering for:", provider, workspace?.slug);
 
@@ -27,16 +28,36 @@ export default function InteractiveConnectionButton({
     // Load provider info and check status on mount
     console.log("🔌 Component mounted, loading provider info for:", provider);
     loadProviderInfo();
-    checkConnectionStatus();
   }, []);
+
+  useEffect(() => {
+    // Check connection status when mappedProvider changes
+    if (mappedProvider) {
+      checkConnectionStatus();
+    }
+  }, [mappedProvider]);
 
   const loadProviderInfo = async () => {
     try {
       // Get available providers list using workspace endpoint (same as settings)
       const response = await Workspace.connectors.getAvailable(workspace?.slug);
-      const info = response.providers?.find(p => p.id === provider);
+      
+      // Map common names to actual provider IDs
+      const providerMap = {
+        'calendar': 'google-calendar',
+        'gmail': 'gmail',
+        'linkedin': 'linkedin',
+        'shopify': 'shopify',
+        'github': 'github'
+      };
+      
+      const actualProviderId = providerMap[provider] || provider;
+      const info = response.providers?.find(p => p.id === actualProviderId);
+      
       if (info) {
         setProviderInfo(info);
+        // Update the provider to use the actual ID for connection calls
+        setMappedProvider(actualProviderId);
       }
     } catch (err) {
       console.error("Failed to load provider info:", err);
@@ -47,7 +68,7 @@ export default function InteractiveConnectionButton({
     try {
       // Use workspace endpoint to check connection status (same as settings)
       const response = await Workspace.connectors.list(workspace?.slug);
-      const connector = response.connectors?.find(c => c.provider === provider);
+      const connector = response.connectors?.find(c => c.provider === mappedProvider);
       setIsConnected(connector?.status === "connected");
     } catch (err) {
       console.error("Failed to check connection status:", err);
@@ -61,13 +82,13 @@ export default function InteractiveConnectionButton({
     try {
       // Use EXACT same approach as workspace settings
       const response = await Workspace.connectors.connect(workspace?.slug, {
-        provider: provider,
+        provider: mappedProvider,
       });
 
       if (response.authConfig) {
         const { connectionId, providerConfigKey } = response.authConfig;
         
-        console.log(`[InteractiveButton] Starting OAuth for ${provider}:`, {
+        console.log(`[InteractiveButton] Starting OAuth for ${mappedProvider}:`, {
           providerConfigKey,
           connectionId
         });
@@ -75,12 +96,12 @@ export default function InteractiveConnectionButton({
         // Use Nango SDK EXACTLY like workspace settings does
         const result = await nangoService.connect(providerConfigKey, connectionId);
         
-        console.log(`[InteractiveButton] OAuth completed for ${provider}:`, result);
+        console.log(`[InteractiveButton] OAuth completed for ${mappedProvider}:`, result);
         
         // Notify backend that connection is established
         try {
           await Workspace.connectors.callback(workspace?.slug, {
-            provider: provider,
+            provider: mappedProvider,
             connectionId: connectionId,
           });
         } catch (e) {
@@ -119,7 +140,7 @@ export default function InteractiveConnectionButton({
   const handleDisconnect = async () => {
     setIsConnecting(true);
     try {
-      await Workspace.connectors.disconnect(workspace?.slug, provider);
+      await Workspace.connectors.disconnect(workspace?.slug, mappedProvider);
       setIsConnected(false);
       showToast(`Disconnected from ${providerInfo?.name || provider}`, "success");
       

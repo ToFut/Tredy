@@ -10,6 +10,7 @@ import {
 } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import ThreadSummary from "@/components/SummaryTooltip/ThreadSummary";
 
 const THREAD_CALLOUT_DETAIL_WIDTH = 26;
 export default function ThreadItem({
@@ -31,23 +32,24 @@ export default function ThreadItem({
     : paths.workspace.thread(slug, thread.slug);
 
   return (
-    <div
-      className="w-full relative flex h-[42px] items-center border-none rounded-lg transition-all duration-200 thread-item-animate"
-      role="listitem"
-    >
-      {/* Curved line Element and leader if required */}
+    <ThreadSummary workspace={workspace} threadSlug={thread.slug}>
       <div
-        style={{ width: THREAD_CALLOUT_DETAIL_WIDTH / 2 }}
-        className={`${
-          isActive
-            ? "border-l-2 border-b-2 border-blue-400 z-[2]"
-            : "border-l border-b border-gray-300 z-[1]"
-        } h-[50%] absolute top-0 left-3 rounded-bl-lg transition-colors duration-200`}
-      ></div>
-      {/* Downstroke border for next item */}
-      {hasNext && (
+        className="w-full relative flex h-[42px] items-center border-none rounded-lg transition-all duration-200 thread-item-animate"
+        role="listitem"
+      >
+        {/* Curved line Element and leader if required */}
         <div
           style={{ width: THREAD_CALLOUT_DETAIL_WIDTH / 2 }}
+          className={`${
+            isActive
+              ? "border-l-2 border-b-2 border-blue-400 z-[2]"
+              : "border-l border-b border-gray-300 z-[1]"
+          } h-[50%] absolute top-0 left-3 rounded-bl-lg transition-colors duration-200`}
+        ></div>
+        {/* Downstroke border for next item */}
+        {hasNext && (
+          <div
+            style={{ width: THREAD_CALLOUT_DETAIL_WIDTH / 2 }}
           className={`${
             idx <= activeIdx && !isActive
               ? "border-l-2 border-blue-400 z-[2]"
@@ -152,6 +154,7 @@ export default function ThreadItem({
         )}
       </div>
     </div>
+    </ThreadSummary>
   );
 }
 

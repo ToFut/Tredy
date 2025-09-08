@@ -63,23 +63,28 @@ DETAILS: [2-3 key points or actions - max 30 words total]
 
 Be EXTREMELY brief and direct.`;
 
-    const response = await LLMConnector.getChatCompletion(
-      [
-        {
-          role: "system",
-          content: "You are a ultra-concise summarizer. Maximum 100 words total. Be extremely brief."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      workspace
+    const messages = [
+      {
+        role: "system",
+        content: "You are a ultra-concise summarizer. Maximum 100 words total. Be extremely brief."
+      },
+      {
+        role: "user",
+        content: prompt
+      }
+    ];
+
+    const { textResponse } = await LLMConnector.getChatCompletion(
+      messages,
+      {
+        temperature: 0.3
+      }
     );
 
     // Parse response
-    const overviewMatch = response.match(/OVERVIEW:\s*(.+?)(?=DETAILS:|$)/s);
-    const detailsMatch = response.match(/DETAILS:\s*(.+?)$/s);
+    console.log("[Summary Generator] Response:", textResponse);
+    const overviewMatch = textResponse.match(/OVERVIEW:\s*(.+?)(?=DETAILS:|$)/s);
+    const detailsMatch = textResponse.match(/DETAILS:\s*(.+?)$/s);
     
     const summary = {
       overview: overviewMatch ? overviewMatch[1].trim().substring(0, 100) : "Ongoing conversation",

@@ -99,6 +99,7 @@ ${JSON.stringify(def.parameters.properties, null, 4)}\n`;
     );
     if (history[history.length - 1].role !== "user") return null;
     console.log(`[UnTooled] Checking ${functions.length} functions for user request`);
+    console.log("[UnTooled] Available functions:", functions.map(f => f.name).join(", "));
     const response = await chatCb({
       messages: [
         {

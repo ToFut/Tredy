@@ -5,6 +5,7 @@ const { WorkspaceParsedFiles } = require("../../models/workspaceParsedFiles");
 const { getVectorDbClass, getLLMProvider } = require("../helpers");
 const { writeResponseChunk } = require("../helpers/chat/responses");
 const { grepAgents } = require("./agents");
+const { generateAutoSummary } = require("./summaryGenerator");
 const {
   grepCommand,
   VALID_COMMANDS,
@@ -223,6 +224,12 @@ async function streamChatWithWorkspace(
       include: false,
       user,
     });
+
+    // Generate summary in background (non-blocking)
+    generateAutoSummary(workspace, thread?.id || null).catch(err => {
+      console.error("Failed to generate auto summary:", err);
+    });
+
     return;
   }
 
@@ -285,6 +292,11 @@ async function streamChatWithWorkspace(
       },
       threadId: thread?.id || null,
       user,
+    });
+
+    // Generate summary in background (non-blocking)
+    generateAutoSummary(workspace, thread?.id || null).catch(err => {
+      console.error("Failed to generate auto summary:", err);
     });
 
     writeResponseChunk(response, {

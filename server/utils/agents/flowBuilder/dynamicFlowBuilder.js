@@ -146,6 +146,12 @@ class DynamicFlowBuilder {
     // Extract parameters from segment
     step.config = this.extractParameters(segment, pattern, toolConfig.tool);
     
+    // Add provider info for tools that need authentication
+    if (toolConfig.tool === 'gmail_send' || toolConfig.tool === 'gmail_read') {
+      step.config.provider = 'gmail';
+      step.config.requiresAuth = true;
+    }
+    
     return step;
   }
 

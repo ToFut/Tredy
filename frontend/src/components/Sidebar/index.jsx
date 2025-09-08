@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, Suspense, lazy } from "react";
-import { List, Plus, House, Gear, MagnifyingGlass, Brain } from "@phosphor-icons/react";
+import { List, Plus, House, Gear, MagnifyingGlass, Brain, Funnel } from "@phosphor-icons/react";
 import { useNewWorkspaceModal } from "../Modals/NewWorkspace";
 import ActiveWorkspaces from "./ActiveWorkspaces";
 import useLogo from "@/hooks/useLogo";
@@ -55,21 +55,39 @@ export default function Sidebar() {
         </div>
         <div
           ref={sidebarRef}
-          className="relative m-[16px] rounded-[20px] bg-theme-bg-sidebar backdrop-blur-xl border border-theme-sidebar-border shadow-xl min-w-[250px] p-[12px] h-[calc(100%-76px)] transition-all duration-300 hover:shadow-2xl"
+          className="relative m-4 rounded-2xl bg-white/95 backdrop-blur-xl border border-gray-200/50 shadow-lg min-w-[280px] p-4 h-[calc(100%-92px)] transition-all duration-300 hover:shadow-xl"
           style={{
-            background: 'rgba(255, 255, 255, 0.02)',
+            background: 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(20px)',
           }}
         >
           <div className="flex flex-col h-full overflow-x-hidden">
-            <div className="flex-grow flex flex-col min-w-[235px]">
-              <div className="relative h-[calc(100%-60px)] flex flex-col w-full justify-between pt-[10px] overflow-y-scroll no-scroll">
-                <div className="flex flex-col gap-y-2 pb-[60px] gap-y-[14px] overflow-y-scroll no-scroll">
-                  <SearchBox user={user} showNewWsModal={showNewWsModal} />
+            {/* Search and Filter Buttons at Top */}
+            <div className="flex gap-2 mb-4">
+              <button
+                className="flex-1 px-3 py-2 text-xs bg-gray-100 hover:bg-gray-200 border border-gray-300/50 rounded-lg transition-all flex items-center justify-center gap-1.5"
+                title="Search Tredys"
+              >
+                <MagnifyingGlass size={14} />
+                <span>Search</span>
+              </button>
+              
+              <button
+                className="flex-1 px-3 py-2 text-xs bg-gray-100 hover:bg-gray-200 border border-gray-300/50 rounded-lg transition-all flex items-center justify-center gap-1.5"
+                title="Filter Tredys"
+              >
+                <Funnel size={14} />
+                <span>Filter</span>
+              </button>
+            </div>
+
+            <div className="flex-grow flex flex-col min-w-[260px] overflow-hidden">
+              <div className="relative h-full flex flex-col w-full">
+                <div className="flex flex-col gap-y-3 pb-[60px] overflow-y-auto custom-scrollbar">
                   <ActiveWorkspaces />
                 </div>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 pt-4 pb-3 rounded-b-[20px] bg-gradient-to-t from-theme-bg-sidebar to-transparent backdrop-blur-xl z-10">
+              <div className="absolute bottom-0 left-0 right-0 pt-4 pb-3 rounded-b-2xl bg-gradient-to-t from-white/95 to-transparent backdrop-blur-xl z-10">
                 <Footer />
               </div>
             </div>
@@ -197,7 +215,7 @@ export function SidebarMobileHeader() {
               </div>
               
               {/* Workspaces List */}
-              <div className="flex-1 overflow-y-auto px-4 py-4">
+              <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-4">
                 <ActiveWorkspaces />
               </div>
               

@@ -687,6 +687,37 @@ const Workspace = {
       return [];
     }
   },
+
+  // Chat Summary Methods
+  getChatSummary: async function (slug, threadSlug = null, forceRefresh = false) {
+    try {
+      const response = await fetch(`${API_BASE}/workspace/${slug}/chat-summary`, {
+        method: "POST",
+        headers: baseHeaders(),
+        body: JSON.stringify({ threadSlug, forceRefresh })
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Failed to fetch chat summary:", error);
+      return { summary: null, error: error.message };
+    }
+  },
+
+  getQuickSummary: async function (slug, threadSlug = null) {
+    try {
+      const params = threadSlug ? `?threadSlug=${threadSlug}` : '';
+      const response = await fetch(`${API_BASE}/workspace/${slug}/quick-summary${params}`, {
+        method: "GET",
+        headers: baseHeaders()
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Failed to fetch quick summary:", error);
+      return { summary: null, error: error.message };
+    }
+  },
 };
 
 export default Workspace;

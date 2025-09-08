@@ -71,6 +71,17 @@ const websocket = {
           );
         };
 
+        // Add method to send workflow preview
+        aibitat.sendWorkflowPreview = (workflowData) => {
+          socket.send(
+            JSON.stringify({
+              type: "workflowPreview",
+              content: workflowData,
+              uuid: require("uuid").v4(),
+            })
+          );
+        };
+
         // expose function for sockets across aibitat
         // type param must be set or else msg will not be shown or handled in UI.
         aibitat.socket = {

@@ -43,10 +43,11 @@ yarn verify:translations  # Verify frontend translation files
 
 - **Workspace Isolation**: Each workspace has isolated documents, chats, and settings with configurable `agentProvider` and `agentModel`
 - **Agent Invocation**: Messages must start with `@agent` to trigger agent mode (parsed in `/server/models/workspaceAgentInvocation.js`)
-- **MCP Integration**: Model Context Protocol servers for external tool capabilities (Gmail, Calendar, LinkedIn, etc.)
+- **MCP Integration**: Full Model Context Protocol compatibility for external tools (Gmail, Calendar, LinkedIn, etc.)
 - **Plugin Architecture**: Swappable LLM providers, vector databases, and embedders via `/server/utils/` modules
 - **WebSocket Communication**: Agent interactions use WebSocket at `/agent-invocation/:uuid` endpoint
 - **UnTooled Providers**: TogetherAI, LMStudio use natural language function calling via UnTooled helper
+- **Agent Flow System**: No-code workflow builder with directOutput support for bypassing LLM processing
 
 ### Database Schema
 
@@ -119,6 +120,12 @@ UPDATE workspaces SET agentProvider='provider', agentModel='model' WHERE slug='w
 3. Implement workspace ID detection logic
 4. Add Nango integration if needed for OAuth
 
+#### New Agent Flow/Workflow
+1. Create flow definition in `/server/storage/plugins/agent-flows/` as JSON
+2. Use FlowExecutor class from `/server/utils/agentFlows/executor.js`
+3. Flows loaded as plugins with `@@flow_{uuid}` format
+4. Set `directOutput: true` in step config to return results without LLM processing
+
 ### Environment Variables
 - Copy `.env.example` files in each service directory
 - Required: 
@@ -145,6 +152,7 @@ UPDATE workspaces SET agentProvider='provider', agentModel='model' WHERE slug='w
 2. **Agent not triggered**: Message must START with `@agent`
 3. **Function not called**: Check if provider supports function calling
 4. **MCP fails**: Check workspace ID detection and Nango connection
+5. **Duplicate messages**: Often caused by multiple WebSocket connections or plugin duplication; check WebSocket cleanup and plugin loading logic
 
 ### Docker Development
 ```bash
@@ -167,3 +175,5 @@ docker build -t anything-llm -f docker/Dockerfile .
 - **Telemetry**: Anonymous usage tracking (disable with `DISABLE_TELEMETRY`)
 - **Agent Session**: Uses UUID-based invocation tracking
 - **WebSocket Timeout**: 5 minutes (300 seconds) for agent sessions
+- **Plugin Duplication**: WebSocket and chat-history plugins are added as standard plugins; avoid adding them again via skills to prevent duplicates
+- **Agent Interrupts**: USER agent has `interrupt: "NEVER"` to prevent message duplication from interrupt/continue cycles

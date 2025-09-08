@@ -72,6 +72,15 @@ export const defaultSkills = {
     image: RAGImage,
     skill: "auto-workflow",
   },
+  "summary-generator": {
+    title: "Chat Summary Generator",
+    description:
+      "Generate comprehensive summaries of chat conversations including key topics, action items, and insights. Works with @summary command or agent requests.",
+    component: DefaultSkillPanel,
+    icon: File,
+    image: SummarizeImage,
+    skill: "summary-generator",
+  },
 };
 
 export const configurableSkills = {

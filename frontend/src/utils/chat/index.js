@@ -24,7 +24,7 @@ export default function handleChat(
     metrics = {},
   } = chatResult;
 
-  if (type === "abort" || type === "statusResponse") {
+  if (type === "abort" || type === "statusResponse" || type === "workflowPreview") {
     setLoadingResponse(false);
     setChatHistory([
       ...remHistory,

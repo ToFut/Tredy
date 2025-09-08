@@ -2,12 +2,12 @@ import Workspace from "@/models/workspace";
 import paths from "@/utils/paths";
 import showToast from "@/utils/toast";
 import { Plus, CircleNotch, Trash } from "@phosphor-icons/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import ThreadItem from "./ThreadItem";
 import { useParams } from "react-router-dom";
 export const THREAD_RENAME_EVENT = "renameThread";
 
-export default function ThreadContainer({ workspace }) {
+export default function ThreadContainer({ workspace, isExpanded }) {
   const { threadSlug = null } = useParams();
   const [threads, setThreads] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,9 +54,6 @@ export default function ThreadContainer({ workspace }) {
     const handleKeyUp = (event) => {
       if (["Control", "Meta"].includes(event.key)) {
         setCtrlPressed(false);
-        // when toggling, unset bulk progress so
-        // previously marked threads that were never deleted
-        // come back to life.
         setThreads((prev) =>
           prev.map((t) => {
             return { ...t, deleted: false };
@@ -88,7 +85,6 @@ export default function ThreadContainer({ workspace }) {
     await Workspace.threads.deleteBulk(workspace.slug, slugs);
     setThreads((prev) => prev.filter((t) => !t.deleted));
 
-    // Only redirect if current thread is being deleted
     if (slugs.includes(threadSlug)) {
       window.location.href = paths.workspace.chat(workspace.slug);
     }
@@ -102,17 +98,24 @@ export default function ThreadContainer({ workspace }) {
       })
     );
 
-    // Show thread was deleted, but then remove from threads entirely so it will
-    // not appear in bulk-selection.
     setTimeout(() => {
       setThreads((prev) => prev.filter((t) => !t.deleted));
     }, 500);
   }
 
+  const handleCreateThread = async () => {
+    const { thread, error } = await Workspace.threads.new(workspace.slug);
+    if (error) {
+      showToast(`Could not create Tredy - ${error}`, "error");
+      return;
+    }
+    window.location.replace(paths.workspace.thread(workspace.slug, thread.slug));
+  };
+
   if (loading) {
     return (
-      <div className="flex flex-col bg-pulse w-full h-10 items-center justify-center">
-        <p className="text-xs text-white animate-pulse">loading threads....</p>
+      <div className="flex flex-col w-full h-10 items-center justify-center">
+        <CircleNotch className="animate-spin text-gray-400" size={20} />
       </div>
     );
   }
@@ -124,110 +127,69 @@ export default function ThreadContainer({ workspace }) {
     : 0;
 
   return (
-    <div className="flex flex-col" role="list" aria-label="Threads">
-      <ThreadItem
-        idx={0}
-        activeIdx={activeThreadIdx}
-        isActive={activeThreadIdx === 0}
-        thread={{ slug: null, name: "default" }}
-        hasNext={threads.length > 0}
-      />
-      {threads.map((thread, i) => (
-        <ThreadItem
-          key={thread.slug}
-          idx={i + 1}
-          ctrlPressed={ctrlPressed}
-          toggleMarkForDeletion={toggleForDeletion}
-          activeIdx={activeThreadIdx}
-          isActive={activeThreadIdx === i + 1}
-          workspace={workspace}
-          onRemove={removeThread}
-          thread={thread}
-          hasNext={i !== threads.length - 1}
-        />
-      ))}
-      <DeleteAllThreadButton
-        ctrlPressed={ctrlPressed}
-        threads={threads}
-        onDelete={handleDeleteAll}
-      />
-      <NewThreadButton workspace={workspace} />
-    </div>
-  );
-}
+    <div className="flex flex-col transition-all duration-500">
+      {/* Tredys Header with + button */}
+      <div className="flex items-center justify-between px-2 py-1 mb-2">
+        <span className="text-xs text-gray-600 font-semibold">
+          Tredys ({threads.length})
+        </span>
+        <button
+          onClick={handleCreateThread}
+          className="p-1 hover:bg-gray-100 rounded transition-colors"
+          title="Create new Tredy"
+        >
+          <Plus size={14} className="text-gray-600" />
+        </button>
+      </div>
 
-function NewThreadButton({ workspace }) {
-  const [loading, setLoading] = useState(false);
-  const onClick = async () => {
-    setLoading(true);
-    const { thread, error } = await Workspace.threads.new(workspace.slug);
-    if (!!error) {
-      showToast(`Could not create thread - ${error}`, "error", { clear: true });
-      setLoading(false);
-      return;
-    }
-    window.location.replace(
-      paths.workspace.thread(workspace.slug, thread.slug)
-    );
-  };
-
-  return (
-    <button
-      onClick={onClick}
-      className="w-full relative flex h-[40px] items-center border-none hover:bg-[var(--theme-sidebar-thread-selected)] hover:light:bg-theme-sidebar-subitem-hover rounded-lg"
-    >
-      <div className="flex w-full gap-x-2 items-center pl-4">
-        <div className="bg-white/20 p-2 rounded-lg h-[24px] w-[24px] flex items-center justify-center">
-          {loading ? (
-            <CircleNotch
-              weight="bold"
-              size={14}
-              className="shrink-0 animate-spin text-white light:text-theme-text-primary"
+      {/* Tredy List */}
+      <div className={`
+        relative transition-all duration-500
+        ${isExpanded ? "max-h-[400px]" : "max-h-[200px]"} 
+        overflow-y-auto custom-scrollbar space-y-1
+      `}>
+        {threads.map((thread, i) => (
+          <div
+            key={thread.slug}
+            className="transition-all duration-300"
+            style={{
+              animation: `fadeIn 0.3s ease-out ${i * 0.05}s both`
+            }}
+          >
+            <ThreadItem
+              idx={i + 1}
+              ctrlPressed={ctrlPressed}
+              toggleMarkForDeletion={toggleForDeletion}
+              activeIdx={activeThreadIdx}
+              isActive={thread.slug === threadSlug}
+              workspace={workspace}
+              onRemove={removeThread}
+              thread={thread}
+              hasNext={i !== threads.length - 1}
             />
-          ) : (
-            <Plus
-              weight="bold"
-              size={14}
-              className="shrink-0 text-white light:text-theme-text-primary"
-            />
-          )}
-        </div>
-
-        {loading ? (
-          <p className="text-left text-white light:text-theme-text-primary text-sm">
-            Starting Thread...
-          </p>
-        ) : (
-          <p className="text-left text-white light:text-theme-text-primary text-sm">
-            New Thread
-          </p>
+          </div>
+        ))}
+        
+        {threads.length === 0 && (
+          <div className="text-center py-4 text-xs text-gray-400">
+            No Tredys yet. Click + to create one.
+          </div>
         )}
       </div>
-    </button>
-  );
-}
 
-function DeleteAllThreadButton({ ctrlPressed, threads, onDelete }) {
-  if (!ctrlPressed || threads.filter((t) => t.deleted).length === 0)
-    return null;
-  return (
-    <button
-      type="button"
-      onClick={onDelete}
-      className="w-full relative flex h-[40px] items-center border-none hover:bg-red-400/20 rounded-lg group"
-    >
-      <div className="flex w-full gap-x-2 items-center pl-4">
-        <div className="bg-transparent p-2 rounded-lg h-[24px] w-[24px] flex items-center justify-center">
-          <Trash
-            weight="bold"
-            size={14}
-            className="shrink-0 text-white light:text-red-500/50 group-hover:text-red-400"
-          />
+      {/* Delete All Button - only show when items are marked */}
+      {ctrlPressed && threads.filter((t) => t.deleted).length > 0 && (
+        <div className="mt-2">
+          <button
+            type="button"
+            onClick={handleDeleteAll}
+            className="w-full px-3 py-2 text-xs bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg text-red-600 transition-all"
+          >
+            <Trash size={14} className="inline mr-1" />
+            Delete {threads.filter((t) => t.deleted).length} Tredys
+          </button>
         </div>
-        <p className="text-white light:text-theme-text-secondary text-left text-sm group-hover:text-red-400">
-          Delete Selected
-        </p>
-      </div>
-    </button>
+      )}
+    </div>
   );
 }

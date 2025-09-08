@@ -30,6 +30,59 @@ import MobileOptimizedChat from "./MobileOptimizedChat";
 import EnhancedMobileInput from "./EnhancedMobileInput";
 import "./EnhancedMobileInput/styles.css";
 
+// Format summary for display in chat
+function formatSummaryForChat(summary) {
+  let content = "## 📊 Chat Summary\n\n";
+  
+  if (summary.brief) {
+    content += `**Overview:** ${summary.brief}\n\n`;
+  }
+  
+  if (summary.topics && summary.topics.length > 0) {
+    content += "**Topics Discussed:**\n";
+    summary.topics.forEach(topic => {
+      content += `• ${topic}\n`;
+    });
+    content += "\n";
+  }
+  
+  if (summary.keyPoints && summary.keyPoints.length > 0) {
+    content += "**Key Points:**\n";
+    summary.keyPoints.forEach((point, idx) => {
+      content += `${idx + 1}. ${point}\n`;
+    });
+    content += "\n";
+  }
+  
+  if (summary.actionItems && summary.actionItems.length > 0) {
+    content += "**Action Items:**\n";
+    summary.actionItems.forEach(item => {
+      content += `☐ ${item}\n`;
+    });
+    content += "\n";
+  }
+  
+  if (summary.insights) {
+    content += `**Insights:** ${summary.insights}\n\n`;
+  }
+  
+  if (summary.sentiment) {
+    const sentimentEmoji = {
+      positive: "😊",
+      negative: "😔",
+      neutral: "😐",
+      productive: "🚀"
+    }[summary.sentiment] || "💬";
+    content += `**Sentiment:** ${sentimentEmoji} ${summary.sentiment}\n`;
+  }
+  
+  if (summary.messageCount) {
+    content += `\n*Based on ${summary.messageCount} messages*`;
+  }
+  
+  return content;
+}
+
 export default function ChatContainer({ workspace, knownHistory = [] }) {
   const { threadSlug = null } = useParams();
   const [message, setMessage] = useState("");
@@ -219,6 +272,81 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
       }
 
       if (!promptMessage || !promptMessage?.userMessage) return false;
+
+      // Check for @summary command
+      if (promptMessage.userMessage.trim().toLowerCase() === "@summary") {
+        setLoadingResponse(true);
+        
+        // Add user message to history
+        _chatHistory.push({
+          content: promptMessage.userMessage,
+          role: "user",
+        });
+
+        try {
+          // Fetch comprehensive summary
+          const summaryResponse = await Workspace.getChatSummary(
+            workspace.slug,
+            threadSlug,
+            true // Force refresh for @summary command
+          );
+
+          if (summaryResponse.summary) {
+            const summaryContent = formatSummaryForChat(summaryResponse.summary);
+            
+            // Add summary as assistant response
+            const summaryMessage = {
+              uuid: window.crypto.randomUUID(),
+              content: summaryContent,
+              role: "assistant",
+              type: "textResponse",
+              sources: [],
+              closed: true,
+              error: null,
+              animate: false,
+              pending: false,
+            };
+
+            setChatHistory([..._chatHistory, summaryMessage]);
+            setLoadingResponse(false);
+          } else {
+            // Error response
+            setChatHistory([
+              ..._chatHistory,
+              {
+                uuid: window.crypto.randomUUID(),
+                content: "Unable to generate summary at this time. Please try again later.",
+                role: "assistant",
+                type: "textResponse",
+                sources: [],
+                closed: true,
+                error: true,
+                animate: false,
+                pending: false,
+              },
+            ]);
+            setLoadingResponse(false);
+          }
+        } catch (error) {
+          console.error("Error generating summary:", error);
+          setChatHistory([
+            ..._chatHistory,
+            {
+              uuid: window.crypto.randomUUID(),
+              content: "Failed to generate summary. Please try again.",
+              role: "assistant",
+              type: "textResponse",
+              sources: [],
+              closed: true,
+              error: true,
+              animate: false,
+              pending: false,
+            },
+          ]);
+          setLoadingResponse(false);
+        }
+        return;
+      }
 
       // If running and edit or regeneration, this history will already have attachments
       // so no need to parse the current state.

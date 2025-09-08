@@ -86,10 +86,26 @@ class MCPCompatibilityLayer extends MCPHypervisor {
                 handler: async function (args = {}) {
                   try {
                     // Always include workspace context in args
-                    if (!args.workspaceId && aibitat.handlerProps?.invocation) {
-                      args.workspaceId = aibitat.handlerProps.invocation.workspace_id || 
-                                        aibitat.handlerProps.invocation.workspace?.id;
+                    // If workspaceId is provided but looks like an email, override it
+                    const providedWorkspaceId = args.workspaceId;
+                    const isInvalidWorkspaceId = providedWorkspaceId && 
+                      (typeof providedWorkspaceId === 'string' && 
+                       (providedWorkspaceId.includes('@') || providedWorkspaceId.includes('.')));
+                    
+                    if (!args.workspaceId || isInvalidWorkspaceId) {
+                      if (aibitat.handlerProps?.invocation) {
+                        args.workspaceId = aibitat.handlerProps.invocation.workspace_id || 
+                                          aibitat.handlerProps.invocation.workspace?.id;
+                        
+                        // Log if we're overriding an invalid workspace ID
+                        if (isInvalidWorkspaceId) {
+                          aibitat.handlerProps.log(
+                            `Overriding invalid workspaceId "${providedWorkspaceId}" with actual workspace ID: ${args.workspaceId}`
+                          );
+                        }
+                      }
                     }
+                    
                     if (!args.workspaceSlug && aibitat.handlerProps?.invocation?.workspace) {
                       args.workspaceSlug = aibitat.handlerProps.invocation.workspace.slug;
                     }

@@ -146,10 +146,10 @@ export default function SpeechToText({ sendCommand }) {
         data-tooltip-content={window.innerWidth >= 640 ? `${t("chat_window.microphone")} (CTRL + M)` : t("chat_window.microphone")}
         aria-label={t("chat_window.microphone")}
         onClick={listening ? endSTTSession : startSTTSession}
-        className={`border-none relative flex justify-center items-center cursor-pointer touch-manipulation transition-all ${
+        className={`border-none relative flex justify-center items-center cursor-pointer touch-manipulation transition-all duration-200 rounded-xl ${
           listening 
-            ? "text-red-500 dark:text-red-400 scale-110" 
-            : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+            ? "text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20 scale-110 shadow-lg" 
+            : "text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:scale-105 active:scale-95"
         }`}
         style={{
           WebkitTapHighlightColor: 'transparent',
@@ -164,7 +164,10 @@ export default function SpeechToText({ sendCommand }) {
           }`}
         />
         {listening && (
-          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+          <>
+            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            <div className="absolute inset-0 rounded-xl bg-red-500/10 animate-ping"></div>
+          </>
         )}
       </button>
       <Tooltip

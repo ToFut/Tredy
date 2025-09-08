@@ -8,6 +8,7 @@ import { ArrowDown, Brain, Sparkle, Lightning, ChatsCircle } from "@phosphor-ico
 import debounce from "lodash.debounce";
 import useUser from "@/hooks/useUser";
 import Chartable from "./Chartable";
+import WorkflowPreview from "./WorkflowPreview";
 import Workspace from "@/models/workspace";
 import { useParams } from "react-router-dom";
 import paths from "@/utils/paths";
@@ -393,6 +394,30 @@ function buildMessages({
     if (props.type === "rechartVisualize" && !!props.content) {
       acc.push(
         <Chartable key={props.uuid} workspace={workspace} props={props} />
+      );
+    } else if (props.type === "workflowPreview" && !!props.content) {
+      const workflowData = typeof props.content === 'string' 
+        ? JSON.parse(props.content) 
+        : props.content;
+      
+      acc.push(
+        <WorkflowPreview 
+          key={props.uuid} 
+          workflowData={workflowData}
+          onSave={async (workflowId, name) => {
+            // Handle save via sendMessage
+            await sendMessage(`@agent save workflow ${workflowId} as ${name}`, true);
+          }}
+          onTest={async (workflowId) => {
+            await sendMessage(`@agent test workflow ${workflowId}`, true);
+          }}
+          onEdit={async (workflowId) => {
+            await sendMessage(`@agent edit workflow ${workflowId}`, true);
+          }}
+          onCancel={async (workflowId) => {
+            await sendMessage(`@agent cancel workflow creation ${workflowId}`, true);
+          }}
+        />
       );
     } else if (isLastBotReply && props.animate) {
       acc.push(

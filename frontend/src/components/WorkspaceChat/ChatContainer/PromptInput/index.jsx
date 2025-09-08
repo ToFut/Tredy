@@ -4,7 +4,7 @@ import SlashCommandsButton, {
   useSlashCommands,
 } from "./SlashCommands";
 import debounce from "lodash.debounce";
-import { PaperPlaneRight, Lightning, Sparkle, Brain, ArrowUp } from "@phosphor-icons/react";
+import { PaperPlaneRight, Lightning, Sparkle, Brain, ArrowUp, GameController } from "@phosphor-icons/react";
 import StopGenerationButton from "./StopGenerationButton";
 import AvailableAgentsButton, {
   AvailableAgents,
@@ -25,6 +25,7 @@ import useTextSize from "@/hooks/useTextSize";
 import { useTranslation } from "react-i18next";
 import Appearance from "@/models/appearance";
 import ResponseModeSelector, { useResponseMode } from "./ResponseModeSelector";
+import ActionButtonsBar from "./ActionButtonsBar";
 
 export const PROMPT_INPUT_ID = "primary-prompt-input";
 export const PROMPT_INPUT_EVENT = "set_prompt_input";
@@ -46,6 +47,8 @@ export default function PromptInput({
   const formRef = useRef(null);
   const textareaRef = useRef(null);
   const [isFocused, setFocused] = useState(false);
+  const [showGamifyTooltip, setShowGamifyTooltip] = useState(false);
+  const [showGamifyMenu, setShowGamifyMenu] = useState(false);
   const undoStack = useRef([]);
   const redoStack = useRef([]);
   const { textSizeClass } = useTextSize();
@@ -294,6 +297,49 @@ export default function PromptInput({
     setPromptInput(e.target.value);
   }
 
+  function handleGamifyClick() {
+    // Show gamify options menu
+    setShowGamifyMenu(!showGamifyMenu);
+  }
+
+  function handleGamifyOption(option) {
+    let prompt = "";
+    
+    switch(option) {
+      case 'interactive':
+        prompt = "Transform this conversation into an interactive learning experience with quizzes, challenges, and engaging elements.";
+        break;
+      case 'workflow':
+        prompt = "@agent Create a workflow from this conversation that captures the key steps and processes we discussed.";
+        // Also trigger workflow creation in NotesPanel
+        triggerWorkflowCreation();
+        break;
+      case 'summary':
+        prompt = "Create a gamified summary of our conversation with key insights, action items, and interactive elements.";
+        break;
+      case 'quiz':
+        prompt = "Generate an interactive quiz based on the topics and information discussed in this conversation.";
+        break;
+    }
+
+    setPromptInput(prompt);
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+      adjustTextArea({ target: textareaRef.current });
+    }
+    setShowGamifyMenu(false);
+  }
+
+  function triggerWorkflowCreation() {
+    // Trigger workflow creation in NotesPanel
+    window.dispatchEvent(new CustomEvent('createWorkflowFromChat', {
+      detail: {
+        chatContext: promptInput,
+        timestamp: new Date().toISOString()
+      }
+    }));
+  }
+
   return (
     <div className="w-full flex-shrink-0 flex flex-col justify-center items-center backdrop-blur-lg relative z-10">
       <SlashCommands
@@ -338,51 +384,27 @@ export default function PromptInput({
               <AttachmentManager attachments={attachments} />
               
               <div className="flex items-end w-full">
-                {/* Compact mobile tools with smart layout */}
-                <div className={`flex items-center gap-0.5 sm:gap-1 md:gap-1.5 p-1.5 sm:p-2 md:p-3 transition-all duration-300 ${
+                {/* Enhanced Action Buttons Bar */}
+                <div className={`p-1.5 sm:p-2 md:p-3 transition-all duration-300 ${
                   isFocused && window.innerWidth < 640 && promptInput.length > 0 
                     ? 'scale-0 w-0 opacity-0 pointer-events-none' 
-                    : isFocused && window.innerWidth < 640 
-                      ? 'scale-75 origin-left' 
-                      : ''
+                    : ''
                 }`}>
-                  <div className="hidden sm:block">
-                    <AttachItem />
-                  </div>
-                  <div className="sm:hidden">
-                    <AttachItem compact />
-                  </div>
-                  <SlashCommandsButton
-                    showing={showSlashCommand}
+                  <ActionButtonsBar
+                    sendCommand={sendCommand}
+                    showSlashCommand={showSlashCommand}
                     setShowSlashCommand={setShowSlashCommand}
-                    compact
+                    showAgents={showAgents}
+                    setShowAgents={setShowAgents}
+                    responseMode={responseMode}
+                    setShowModeSelector={setShowModeSelector}
+                    showModeSelector={showModeSelector}
+                    isFocused={isFocused}
+                    onGamifyClick={handleGamifyClick}
+                    showGamifyMenu={showGamifyMenu}
+                    onGamifyOption={handleGamifyOption}
+                    compact={window.innerWidth < 640}
                   />
-                  <AvailableAgentsButton
-                    showing={showAgents}
-                    setShowing={setShowAgents}
-                    compact
-                  />
-                  {/* Speech-to-Text Button - Show on mobile but smaller */}
-                  <div className="p-1.5 sm:p-2 md:p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation"
-                       style={{ minWidth: isFocused && window.innerWidth < 640 ? '32px' : '40px', minHeight: isFocused && window.innerWidth < 640 ? '32px' : '40px' }}>
-                    <SpeechToText sendCommand={sendCommand} />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowModeSelector(!showModeSelector)}
-                    className={`p-1.5 sm:p-2 md:p-2.5 rounded-lg sm:rounded-xl transition-all touch-manipulation ${
-                      responseMode === "agent"
-                        ? "bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 text-purple-600 dark:text-purple-400"
-                        : "hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
-                    }`}
-                    style={{ minWidth: '36px', minHeight: '36px' }}
-                  >
-                    {responseMode === "agent" ? (
-                      <Brain className="w-4 h-4 sm:w-5 sm:h-5" weight="bold" />
-                    ) : (
-                      <Lightning className="w-4 h-4 sm:w-5 sm:h-5" />
-                    )}
-                  </button>
                 </div>
                 
                 {/* Enhanced textarea with improved mobile support */}

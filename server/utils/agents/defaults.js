@@ -12,6 +12,8 @@ const DEFAULT_SKILLS = [
   AgentPlugins.docSummarizer.name,
   AgentPlugins.webScraping.name,
   AgentPlugins.universalIntegrator.name,
+  AgentPlugins.workflowCreator.name, // Enable workflow creation from chat
+  AgentPlugins.summaryGenerator.name, // Chat summary generation
   // AgentPlugins.multiActionHandler.name, // Temporarily disabled - causing infinite loops
 ];
 

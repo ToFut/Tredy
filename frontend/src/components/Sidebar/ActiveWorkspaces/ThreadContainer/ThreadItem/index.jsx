@@ -32,7 +32,7 @@ export default function ThreadItem({
 
   return (
     <div
-      className="w-full relative flex h-[38px] items-center border-none rounded-lg"
+      className="w-full relative flex h-[42px] items-center border-none rounded-lg transition-all duration-200 thread-item-animate"
       role="listitem"
     >
       {/* Curved line Element and leader if required */}
@@ -40,9 +40,9 @@ export default function ThreadItem({
         style={{ width: THREAD_CALLOUT_DETAIL_WIDTH / 2 }}
         className={`${
           isActive
-            ? "border-l-2 border-b-2 border-white light:border-theme-sidebar-border z-[2]"
-            : "border-l border-b border-[#6F6F71] light:border-theme-sidebar-border z-[1]"
-        } h-[50%] absolute top-0 left-3 rounded-bl-lg`}
+            ? "border-l-2 border-b-2 border-blue-400 z-[2]"
+            : "border-l border-b border-gray-300 z-[1]"
+        } h-[50%] absolute top-0 left-3 rounded-bl-lg transition-colors duration-200`}
       ></div>
       {/* Downstroke border for next item */}
       {hasNext && (
@@ -50,9 +50,9 @@ export default function ThreadItem({
           style={{ width: THREAD_CALLOUT_DETAIL_WIDTH / 2 }}
           className={`${
             idx <= activeIdx && !isActive
-              ? "border-l-2 border-white light:border-theme-sidebar-border z-[2]"
-              : "border-l border-[#6F6F71] light:border-theme-sidebar-border z-[1]"
-          } h-[100%] absolute top-0 left-3`}
+              ? "border-l-2 border-blue-400 z-[2]"
+              : "border-l border-gray-300 z-[1]"
+          } h-[100%] absolute top-0 left-3 transition-colors duration-200`}
         ></div>
       )}
 
@@ -62,7 +62,11 @@ export default function ThreadItem({
         className="h-full"
       />
       <div
-        className={`flex w-full items-center justify-between pr-2 group relative ${isActive ? "bg-[var(--theme-sidebar-thread-selected)] border border-solid border-transparent light:border-blue-400" : "hover:bg-theme-sidebar-subitem-hover"} rounded-[4px]`}
+        className={`flex w-full items-center justify-between pr-2 group relative ${
+          isActive 
+            ? "bg-blue-50 border border-blue-200 shadow-sm" 
+            : "hover:bg-gray-50 border border-transparent hover:border-gray-200"
+        } rounded-lg transition-all duration-200`}
       >
         {thread.deleted ? (
           <div className="w-full flex justify-between">
@@ -96,8 +100,8 @@ export default function ThreadItem({
           >
             <p
               className={`text-left text-sm truncate max-w-[150px] ${
-                isActive ? "font-medium text-white" : "text-theme-text-primary"
-              }`}
+                isActive ? "font-medium text-blue-700" : "text-gray-700"
+              } transition-colors duration-200`}
             >
               {thread.name}
             </p>

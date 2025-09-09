@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechCorp Solutions - AI-Powered Support</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Header */
+        .header {
+            background: #1a1a1a;
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #4CAF50;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 120px 0 80px;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .cta-button:hover {
+            background: #45a049;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .feature-card p {
+            color: #666;
+        }
+
+        /* Products Section */
+        .products {
+            padding: 80px 0;
+        }
+
+        .products h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .product-header {
+            background: #4CAF50;
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .product-header h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .product-body {
+            padding: 2rem;
+        }
+
+        .product-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .product-features li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .product-features li::before {
+            content: "✓ ";
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        /* Support Section */
+        .support {
+            background: #f8f9fa;
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .support h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+
+        .support-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .support p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .support-highlight {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+
+        .support-highlight h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #4CAF50;
+        }
+
+        /* Chat Widget Styling Override */
+        .anythingllm-chat-widget-container {
+            z-index: 9999 !important;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .features-grid,
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo">🚀 TechCorp Solutions</div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#products">Products</a></li>
+                    <li><a href="#support">Support</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>AI-Powered Business Solutions</h1>
+            <p>Transform your business with cutting-edge artificial intelligence technology. Get instant support, automate workflows, and boost productivity.</p>
+            <a href="#products" class="cta-button">Explore Solutions</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2>Why Choose TechCorp?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI-Powered</h3>
+                    <p>Leverage advanced machine learning algorithms to automate complex business processes and gain intelligent insights.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Get instant responses and real-time processing. Our systems are optimized for speed and reliability.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Enterprise Security</h3>
+                    <p>Bank-level security with end-to-end encryption. Your data is protected with the highest security standards.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>Scalable Growth</h3>
+                    <p>Solutions that grow with your business. From startups to enterprises, we've got you covered.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products" id="products">
+        <div class="container">
+            <h2>Our Solutions</h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-header">
+                        <h3>Starter AI</h3>
+                        <div class="product-price">$49/mo</div>
+                    </div>
+                    <div class="product-body">
+                        <ul class="product-features">
+                            <li>AI Chat Support</li>
+                            <li>Document Processing</li>
+                            <li>Basic Analytics</li>
+                            <li>Email Support</li>
+                            <li>5GB Storage</li>
+                        </ul>
+                        <a href="#" class="cta-button">Get Started</a>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-header">
+                        <h3>Business AI</h3>
+                        <div class="product-price">$149/mo</div>
+                    </div>
+                    <div class="product-body">
+                        <ul class="product-features">
+                            <li>Advanced AI Models</li>
+                            <li>Workflow Automation</li>
+                            <li>Custom Integrations</li>
+                            <li>Priority Support</li>
+                            <li>100GB Storage</li>
+                        </ul>
+                        <a href="#" class="cta-button">Upgrade Now</a>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-header">
+                        <h3>Enterprise AI</h3>
+                        <div class="product-price">$499/mo</div>
+                    </div>
+                    <div class="product-body">
+                        <ul class="product-features">
+                            <li>Custom AI Training</li>
+                            <li>Dedicated Infrastructure</li>
+                            <li>24/7 Phone Support</li>
+                            <li>SLA Guarantees</li>
+                            <li>Unlimited Storage</li>
+                        </ul>
+                        <a href="#" class="cta-button">Contact Sales</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Support Section -->
+    <section class="support" id="support">
+        <div class="container">
+            <h2>Need Help? We're Here 24/7</h2>
+            <div class="support-content">
+                <p>Our AI-powered support system can answer your questions instantly. Get help with billing, technical issues, product information, and more.</p>
+                
+                <div class="support-highlight">
+                    <h3>🎯 Try Our AI Assistant!</h3>
+                    <p>Look for the chat bubble in the bottom-right corner. Our AI assistant has been trained on all our documentation and can help you with:</p>
+                    <ul style="text-align: left; margin-top: 1rem;">
+                        <li>✅ Product information and pricing</li>
+                        <li>✅ Technical setup and integration</li>
+                        <li>✅ Billing and account questions</li>
+                        <li>✅ Troubleshooting and support</li>
+                    </ul>
+                </div>
+
+                <p><strong>Available Methods:</strong></p>
+                <p>📞 Phone: 1-800-TECHCORP | 📧 Email: support@techcorp.com | 💬 Live Chat (bottom-right corner)</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Documentation</a>
+                <a href="#">API</a>
+                <a href="#">Status</a>
+                <a href="#">Blog</a>
+            </div>
+            <p>&copy; 2024 TechCorp Solutions. All rights reserved. | Powered by AnythingLLM</p>
+        </div>
+    </footer>
+
+    <!-- AnythingLLM Embedded Chat Widget -->
+    <!-- This creates the floating chat bubble that appears in bottom-right corner -->
+    <script
+      data-embed-id="demo-embed-uuid-12345"
+      data-base-api-url="http://localhost:3001/api/embed"
+      data-chat-icon="support"
+      data-button-color="#4CAF50"
+      data-chat-bubble-color="#667eea"
+      data-text-color="#ffffff"
+      data-assistant-name="TechCorp AI Assistant"
+      data-greeting="👋 Hi! I'm your TechCorp AI assistant. I can help you with products, pricing, technical questions, and more. What would you like to know?"
+      data-support-email="support@techcorp.com"
+      data-window-height="600px"
+      data-window-width="400px"
+      data-position="bottom-right"
+      data-open-on-load="false"
+      data-brand-image-url=""
+      data-collect-user-email="false"
+      data-show-citations="true"
+      src="http://localhost:3000/embed/anythingllm-chat-widget.min.js">
+    </script>
+</body>
+</html>

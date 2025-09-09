@@ -42,7 +42,7 @@ import ResponseModeSelector from "../PromptInput/ResponseModeSelector";
 import { useResponseMode } from "../PromptInput/ResponseModeSelector";
 // import AgentActivityIndicator from "../../AgentActivityIndicator";
 // import SmartContextPills from "../../SmartContextPills";
-import ChatWidgetHeader from "@/components/ChatWidgetHeader";
+// ChatWidgetHeader removed - using fixed header from parent ChatContainer
 
 export default function MobileOptimizedChat({ 
   workspace,
@@ -192,12 +192,7 @@ export default function MobileOptimizedChat({
           paddingBottom: keyboardHeight > 0 ? '0' : 'env(safe-area-inset-bottom)',
         }}
       >
-      {/* ChatWidgetHeader - positioned to avoid whitespace */}
-      <ChatWidgetHeader 
-        workspace={workspace}
-        connectors={[]} 
-        enabledWidgets={["members", "connectors", "schedule", "share"]}
-      />
+      {/* Header is now handled by parent ChatContainer as fixed header */}
       
       {/* Response Mode Indicator */}
       {responseMode === "agent" && (
@@ -205,7 +200,7 @@ export default function MobileOptimizedChat({
           <div className="px-4 py-2">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full border border-purple-500/20">
               <Bot className="w-4 h-4 text-purple-600 dark:text-purple-400 animate-pulse" />
-              <span className="text-xs font-medium text-purple-700 dark:text-purple-300">
+              <span className="text-sm sm:text-xs font-medium text-purple-700 dark:text-purple-300">
                 Agent Mode Active
               </span>
             </div>

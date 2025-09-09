@@ -28,9 +28,9 @@ async function grepFlow({
   // Extract the flow description after @flow
   const flowDescription = message.replace(/^@flow\s*/i, '').trim();
   
-  // Convert to agent command with explicit function call instruction
-  // Format: @agent [INSTRUCTION] to ensure the LLM understands to use the function
-  const agentMessage = `@agent [SYSTEM: You MUST call the create_workflow function] Create a workflow that: ${flowDescription}`;
+  // Convert to agent command that ONLY allows create-workflow function
+  // This format forces the LLM to use the function and nothing else
+  const agentMessage = `@agent You must ONLY use the 'create-workflow' function to create a visual workflow. Do NOT execute any tasks directly. The workflow description is: "${flowDescription}". Call create-workflow with description parameter.`;
 
   // Create agent invocation for workflow-creator
   const { invocation: newInvocation } = await WorkspaceAgentInvocation.new({

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnythingLLM Widget - Client View States</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .demo-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .demo-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 20px;
+            font-weight: bold;
+        }
+
+        .demo-content {
+            padding: 20px;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Chat Widget States */
+        .widget-closed {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .widget-closed:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3); }
+            50% { box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3), 0 0 0 10px rgba(76, 175, 80, 0.1); }
+            100% { box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3); }
+        }
+
+        .widget-open {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header h3 {
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .chat-header .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .message.bot {
+            flex-direction: row;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message.bot .message-avatar {
+            background: #667eea;
+            color: white;
+        }
+
+        .message.user .message-avatar {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .message-content {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 250px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .message.user .message-content {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .chat-input {
+            padding: 15px 20px;
+            border-top: 1px solid #e0e0e0;
+            background: white;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .input-group button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #999;
+            font-size: 14px;
+            padding: 10px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 3px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #999;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Mobile version */
+        .widget-mobile {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-demo {
+            background: #333;
+            padding: 10px;
+            border-radius: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mobile-screen {
+            background: white;
+            border-radius: 20px;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .features-list {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .features-list h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .features-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .features-list li:last-child {
+            border-bottom: none;
+        }
+
+        .features-list li::before {
+            content: "✨";
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 AnythingLLM Widget: Client Experience</h1>
+            <p>See exactly what your website visitors experience with the embedded chat widget</p>
+        </div>
+
+        <div class="demo-grid">
+            <!-- State 1: Closed Widget -->
+            <div class="demo-card">
+                <div class="demo-header">
+                    1️⃣ Widget Closed (Initial State)
+                </div>
+                <div class="demo-content">
+                    <p style="color: #666; margin-bottom: 20px;">This is what visitors see when they first land on your website:</p>
+                    
+                    <!-- Simulated website content -->
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <h3>Welcome to Our Website</h3>
+                        <p>Browse our products and services...</p>
+                        <div style="height: 60px; background: #e0e0e0; border-radius: 4px; margin-top: 10px;"></div>
+                    </div>
+
+                    <!-- Chat widget closed -->
+                    <div class="widget-closed">
+                        💬
+                    </div>
+                    
+                    <div class="status-badge">Pulsing & Ready</div>
+                </div>
+            </div>
+
+            <!-- State 2: Widget Opening -->
+            <div class="demo-card">
+                <div class="demo-header">
+                    2️⃣ Widget Expanded (User Clicks)
+                </div>
+                <div class="demo-content">
+                    <p style="color: #666; margin-bottom: 20px;">When visitor clicks the chat bubble:</p>
+
+                    <div class="widget-open">
+                        <div class="chat-header">
+                            <div>
+                                <h3>🤖 TechCorp AI Assistant</h3>
+                                <div style="font-size: 12px; opacity: 0.9;">Online • Usually replies instantly</div>
+                            </div>
+                            <button class="close-btn">✕</button>
+                        </div>
+
+                        <div class="chat-messages">
+                            <div class="message bot">
+                                <div class="message-avatar">🤖</div>
+                                <div>
+                                    <div class="message-content">
+                                        👋 Hi! I'm your TechCorp AI assistant. I can help you with products, pricing, technical questions, and more. What would you like to know?
+                                    </div>
+                                    <div class="message-time">Just now</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-input">
+                            <div class="input-group">
+                                <input type="text" placeholder="Type your message...">
+                                <button>➤</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- State 3: Active Conversation -->
+            <div class="demo-card">
+                <div class="demo-header">
+                    3️⃣ Active Conversation
+                </div>
+                <div class="demo-content">
+                    <p style="color: #666; margin-bottom: 20px;">User asking questions and getting AI responses:</p>
+
+                    <div class="widget-open">
+                        <div class="chat-header">
+                            <div>
+                                <h3>🤖 TechCorp AI Assistant</h3>
+                                <div style="font-size: 12px; opacity: 0.9;">Online</div>
+                            </div>
+                            <button class="close-btn">✕</button>
+                        </div>
+
+                        <div class="chat-messages">
+                            <div class="message bot">
+                                <div class="message-avatar">🤖</div>
+                                <div>
+                                    <div class="message-content">
+                                        👋 Hi! How can I help you today?
+                                    </div>
+                                    <div class="message-time">2:30 PM</div>
+                                </div>
+                            </div>
+
+                            <div class="message user">
+                                <div class="message-avatar">👤</div>
+                                <div>
+                                    <div class="message-content">
+                                        What are your pricing plans?
+                                    </div>
+                                    <div class="message-time">2:31 PM</div>
+                                </div>
+                            </div>
+
+                            <div class="message bot">
+                                <div class="message-avatar">🤖</div>
+                                <div>
+                                    <div class="message-content">
+                                        We offer 3 plans: Starter AI ($49/mo), Business AI ($149/mo), and Enterprise AI ($499/mo). Each includes different features and storage. Would you like details about a specific plan?
+                                    </div>
+                                    <div class="message-time">2:31 PM</div>
+                                </div>
+                            </div>
+
+                            <div class="typing-indicator">
+                                <span>AI is typing</span>
+                                <div class="typing-dots">
+                                    <div class="typing-dot"></div>
+                                    <div class="typing-dot"></div>
+                                    <div class="typing-dot"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-input">
+                            <div class="input-group">
+                                <input type="text" placeholder="Type your message...">
+                                <button>➤</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- State 4: Mobile View -->
+            <div class="demo-card">
+                <div class="demo-header">
+                    4️⃣ Mobile Experience
+                </div>
+                <div class="demo-content mobile-demo">
+                    <div class="mobile-screen">
+                        <div class="widget-mobile">
+                            <div class="chat-header">
+                                <div>
+                                    <h3>🤖 Support Chat</h3>
+                                    <div style="font-size: 12px; opacity: 0.9;">AI Assistant</div>
+                                </div>
+                                <button class="close-btn">✕</button>
+                            </div>
+
+                            <div class="chat-messages" style="flex: 1;">
+                                <div class="message bot">
+                                    <div class="message-avatar">🤖</div>
+                                    <div>
+                                        <div class="message-content">
+                                            Hello! I'm here to help with any questions about our services.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="message user">
+                                    <div class="message-avatar">📱</div>
+                                    <div>
+                                        <div class="message-content">
+                                            Do you have a mobile app?
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="message bot">
+                                    <div class="message-avatar">🤖</div>
+                                    <div>
+                                        <div class="message-content">
+                                            Yes! Our mobile apps are available on both iOS and Android. They include all core features optimized for mobile use.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="chat-input">
+                                <div class="input-group">
+                                    <input type="text" placeholder="Ask me anything..." style="font-size: 16px;">
+                                    <button>📤</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="features-list">
+            <h3>🎨 What Clients Experience:</h3>
+            <ul>
+                <li><strong>Instant Availability:</strong> Chat bubble appears immediately when page loads</li>
+                <li><strong>Smooth Animation:</strong> Widget expands/collapses with nice transitions</li>
+                <li><strong>Professional Design:</strong> Matches your brand colors and style</li>
+                <li><strong>Smart Responses:</strong> AI searches your documents to give accurate answers</li>
+                <li><strong>Session Memory:</strong> Remembers conversation context throughout the visit</li>
+                <li><strong>Mobile Optimized:</strong> Works perfectly on all device sizes</li>
+                <li><strong>No Registration:</strong> Visitors can chat immediately without signing up</li>
+                <li><strong>Typing Indicators:</strong> Shows when AI is processing their question</li>
+                <li><strong>Citation Support:</strong> Can show sources from your documents</li>
+                <li><strong>Customizable Greeting:</strong> Welcome message matches your business tone</li>
+            </ul>
+        </div>
+
+        <div class="features-list">
+            <h3>🔧 Behind the Scenes (Admin Benefits):</h3>
+            <ul>
+                <li><strong>Real-time Analytics:</strong> See all conversations and popular questions</li>
+                <li><strong>No Maintenance:</strong> AI handles responses automatically</li>
+                <li><strong>Document Integration:</strong> Automatically searches your uploaded files</li>
+                <li><strong>Cost Effective:</strong> Reduces support tickets by 70-80%</li>
+                <li><strong>24/7 Availability:</strong> Never miss a customer question</li>
+                <li><strong>Easy Updates:</strong> Change responses by updating documents</li>
+                <li><strong>Multi-language:</strong> Supports conversations in multiple languages</li>
+                <li><strong>Escalation Ready:</strong> Can provide contact info when needed</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

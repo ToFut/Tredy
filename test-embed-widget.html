@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnythingLLM Embedded Chat Widget Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .demo-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .demo-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .feature-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-demo {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .chat-demo-note {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .chat-demo-note strong {
+            font-size: 1.1rem;
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AnythingLLM Widget Demo</h1>
+            <p>Experience the power of embedded AI chat on your website</p>
+            <span class="status-indicator status-demo">Demo Mode</span>
+        </div>
+
+        <div class="demo-section">
+            <h2>🚀 What You're Seeing</h2>
+            <p>This page demonstrates how the AnythingLLM embedded chat widget works when integrated into any website. The widget appears as a floating chat bubble (typically in the bottom-right corner).</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>💬 Smart Chat Interface</h3>
+                    <p>Users can ask questions and get AI-powered responses based on your workspace's documents and knowledge base.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📚 Document-Aware</h3>
+                    <p>The AI searches through your uploaded documents to provide accurate, contextual answers.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🎨 Fully Customizable</h3>
+                    <p>Match your brand colors, customize the icon, position, and behavior to fit your website perfectly.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔒 Secure & Private</h3>
+                    <p>Each visitor gets their own session. No login required, but all conversations are isolated.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔧 Integration Code</h2>
+            <p>To add this widget to your website, simply paste this code before the closing <code>&lt;/body&gt;</code> tag:</p>
+            
+            <div class="code-block">
+&lt;!-- AnythingLLM Embedded Chat Widget --&gt;
+&lt;script
+  data-embed-id="your-workspace-embed-id"
+  data-base-api-url="http://localhost:3001/api/embed"
+  src="http://localhost:3000/embed/anythingllm-chat-widget.min.js"&gt;
+&lt;/script&gt;
+&lt;!-- Powered by AnythingLLM --&gt;
+            </div>
+
+            <p><strong>Configuration Options:</strong> You can customize colors, position, greetings, and behavior through data attributes or via the admin panel.</p>
+        </div>
+
+        <div class="demo-section">
+            <h2>💡 Use Cases</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Customer Support</h3>
+                    <p>"How do I return an item?" → Searches your return policy docs</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Documentation Helper</h3>
+                    <p>"How do I use your API?" → Searches your technical docs</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Sales Assistant</h3>
+                    <p>"What are your prices?" → Searches your pricing information</p>
+                </div>
+                <div class="feature-card">
+                    <h3>FAQ Bot</h3>
+                    <p>"What are your hours?" → Searches your business information</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-demo-note">
+            <strong>🎯 Look for the chat bubble!</strong><br>
+            If AnythingLLM is running and configured, you'll see a chat widget appear in the corner of this page.
+            Try asking it questions about your workspace documents!
+        </div>
+
+        <div class="footer">
+            <p>Powered by AnythingLLM • Open Source AI Chat Platform</p>
+        </div>
+    </div>
+
+    <!-- AnythingLLM Embedded Chat Widget -->
+    <!-- NOTE: This will only work if:
+         1. AnythingLLM server is running on localhost:3001
+         2. You have created an embed config in the admin panel
+         3. You replace 'demo-embed-id' with your actual embed ID
+    -->
+    <script
+      data-embed-id="demo-embed-id"
+      data-base-api-url="http://localhost:3001/api/embed"
+      data-chat-icon="support"
+      data-button-color="#667eea"
+      data-chat-bubble-color="#764ba2"
+      data-text-color="#ffffff"
+      data-assistant-name="AnythingLLM Demo"
+      data-greeting="👋 Hi there! I'm your AI assistant. How can I help you today?"
+      data-support-email="demo@anythingllm.com"
+      data-window-height="600px"
+      data-window-width="400px"
+      data-position="bottom-right"
+      src="http://localhost:3000/embed/anythingllm-chat-widget.min.js">
+    </script>
+</body>
+</html>

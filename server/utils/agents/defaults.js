@@ -13,8 +13,8 @@ const DEFAULT_SKILLS = [
   AgentPlugins.webScraping.name,
   AgentPlugins.universalIntegrator.name,
   AgentPlugins.websocket.name, // Enable websocket for real-time flow updates
-  AgentPlugins.simpleWorkflow.name, // Simple unified workflow system
-  // AgentPlugins.workflowCreator.name, // Disabled - replaced with simple workflow
+  AgentPlugins.workflowCreator.name, // Enhanced workflow creation system
+  AgentPlugins.createWorkflow.name, // Simple create-workflow function
   // AgentPlugins.unifiedWorkflow.name, // Disabled - replaced with simple workflow  
   // AgentPlugins.summaryGenerator.name, // Temporarily disabled - causing setup issues
   // AgentPlugins.multiActionHandler.name, // Temporarily disabled - causing infinite loops

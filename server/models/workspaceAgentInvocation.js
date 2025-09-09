@@ -9,14 +9,34 @@ const WorkspaceAgentInvocation = {
     return promptString.split(/\s+/).filter((v) => v.startsWith("@"));
   },
 
-  close: async function (uuid) {
+  close: async function (uuid, retryCount = 0) {
     if (!uuid) return;
+    const maxRetries = 3;
+    const retryDelay = 1000; // 1 second
+    
     try {
       await prisma.workspace_agent_invocations.update({
         where: { uuid: String(uuid) },
         data: { closed: true },
       });
-    } catch {}
+    } catch (error) {
+      // Log the error for debugging
+      if (error.message?.includes("Timed out") || error.message?.includes("ConnectionError")) {
+        console.error(`[WorkspaceAgentInvocation] Database timeout error closing invocation ${uuid}:`, error.message);
+        
+        // Retry logic for timeout errors
+        if (retryCount < maxRetries) {
+          console.log(`[WorkspaceAgentInvocation] Retrying close operation (attempt ${retryCount + 1}/${maxRetries})...`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          return await this.close(uuid, retryCount + 1);
+        } else {
+          console.error(`[WorkspaceAgentInvocation] Failed to close invocation ${uuid} after ${maxRetries} retries`);
+        }
+      } else {
+        // Log other errors but don't retry
+        console.error(`[WorkspaceAgentInvocation] Error closing invocation ${uuid}:`, error.message);
+      }
+    }
   },
 
   new: async function ({ prompt, workspace, user = null, thread = null }) {

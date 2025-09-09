@@ -40,103 +40,89 @@ export default function ChatHistory({
   const { textSizeClass } = useTextSize();
   const { getMessageAlignment } = useChatMessageAlignment();
 
-  // Simplified scroll state management
-  const scrollTimeoutRef = useRef(null);
-  const lastScrollTime = useRef(0);
+  // Modern chat scroll management
+  const scrollAnchorRef = useRef(null);
+  const shouldAutoScrollRef = useRef(true);
+  const lastMessageCountRef = useRef(0);
 
-  // Check if user is at bottom
-  const checkIsAtBottom = useCallback(() => {
-    if (!chatHistoryRef.current) return false;
+  // Modern auto-scroll implementation like ChatGPT/Claude
+  const SCROLL_THRESHOLD = 100; // Distance from bottom to trigger auto-scroll
+  
+  // Check if user is near bottom (within threshold)
+  const checkIsNearBottom = useCallback(() => {
+    if (!chatHistoryRef.current) return true;
     const { scrollTop, scrollHeight, clientHeight } = chatHistoryRef.current;
-    return scrollHeight - scrollTop - clientHeight <= 5; // Tighter tolerance
+    return scrollHeight - scrollTop - clientHeight <= SCROLL_THRESHOLD;
   }, []);
 
-  // Enhanced scroll to bottom with guaranteed visibility
-  const scrollToBottom = useCallback((force = false) => {
+  // Smooth scroll to bottom - only called when needed
+  const scrollToBottom = useCallback((instant = false) => {
     if (!chatHistoryRef.current) return;
     
     const element = chatHistoryRef.current;
-    
-    // Always scroll to bottom for new messages
-    requestAnimationFrame(() => {
-      element.scrollTo({
-        top: element.scrollHeight,
-        behavior: force ? 'auto' : 'smooth'
-      });
-      
-      // Double-check scroll position after a brief delay
-      setTimeout(() => {
-        if (!checkIsAtBottom()) {
-          element.scrollTo({
-            top: element.scrollHeight,
-            behavior: 'auto'
-          });
-        }
-      }, 100);
-      
-      setIsUserScrolling(false);
+    element.scrollTo({
+      top: element.scrollHeight,
+      behavior: instant ? 'instant' : 'smooth'
     });
-  }, [checkIsAtBottom]);
+  }, []);
 
-  // Always ensure last message is visible
-  useEffect(() => {
-    // Immediately scroll to bottom when new messages arrive
-    if (history.length > 0) {
-      scrollToBottom(true); // Force scroll to show new messages
-    }
-  }, [history]);
-
-  // Handle streaming updates
-  useEffect(() => {
-    if (isStreaming || hasStatusResponse) {
-      scrollToBottom(true);
-    }
-  }, [isStreaming, hasStatusResponse]);
-
-  // Unified scroll handler with passive listening
-  const handleScroll = useCallback(() => {
-    if (!chatHistoryRef.current) return;
-    
-    lastScrollTime.current = Date.now();
-    const isAtBottom = checkIsAtBottom();
-    
-    // Clear any existing timeout
-    if (scrollTimeoutRef.current) {
-      clearTimeout(scrollTimeoutRef.current);
-    }
-    
-    // Update states immediately for responsive UI
-    setIsAtBottom(isAtBottom);
-    
-    // Set user scrolling state with delay to avoid flickering
-    if (!isAtBottom) {
-      setIsUserScrolling(true);
-      
-      // Reset user scrolling state after user stops scrolling
-      scrollTimeoutRef.current = setTimeout(() => {
-        if (checkIsAtBottom()) {
-          setIsUserScrolling(false);
-        }
-      }, 150);
-    } else {
-      setIsUserScrolling(false);
-    }
-  }, [checkIsAtBottom]);
-
+  // Handle scroll position tracking
   useEffect(() => {
     const element = chatHistoryRef.current;
     if (!element) return;
 
-    // Use passive listener for better performance
-    element.addEventListener("scroll", handleScroll, { passive: true });
-    
-    return () => {
-      element.removeEventListener("scroll", handleScroll);
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
+    const handleScroll = () => {
+      const nearBottom = checkIsNearBottom();
+      setIsAtBottom(nearBottom);
+      shouldAutoScrollRef.current = nearBottom;
+      setIsUserScrolling(!nearBottom);
     };
-  }, [handleScroll]);
+
+    element.addEventListener("scroll", handleScroll, { passive: true });
+    return () => element.removeEventListener("scroll", handleScroll);
+  }, [checkIsNearBottom]);
+
+  // Auto-scroll for new messages (like ChatGPT)
+  useEffect(() => {
+    // Only scroll if:
+    // 1. New message added (not just updated)
+    // 2. User is near bottom
+    const isNewMessage = history.length > lastMessageCountRef.current;
+    lastMessageCountRef.current = history.length;
+
+    if (isNewMessage && shouldAutoScrollRef.current) {
+      // Use requestAnimationFrame for smooth performance
+      requestAnimationFrame(() => {
+        scrollToBottom();
+      });
+    }
+  }, [history.length, scrollToBottom]);
+
+  // Handle streaming messages smoothly
+  useEffect(() => {
+    if (!isStreaming) return;
+
+    // Only auto-scroll during streaming if user was already at bottom
+    if (!shouldAutoScrollRef.current) return;
+
+    // Use Intersection Observer for efficient streaming scroll
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const lastMessage = entries[0];
+        if (!lastMessage.isIntersecting && shouldAutoScrollRef.current) {
+          scrollToBottom();
+        }
+      },
+      { root: chatHistoryRef.current, threshold: 0.1 }
+    );
+
+    // Observe the scroll anchor at the bottom
+    if (scrollAnchorRef.current) {
+      observer.observe(scrollAnchorRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [isStreaming, scrollToBottom]);
 
   // Manual scroll to bottom for button click
   const manualScrollToBottom = useCallback(() => {
@@ -284,6 +270,7 @@ export default function ChatHistory({
         className="flex-1 overflow-y-auto overflow-x-hidden"
         style={{ 
           scrollBehavior: 'smooth',
+          overflowAnchor: 'auto', // Modern scroll anchoring
           WebkitOverflowScrolling: 'touch',
           // Better mobile scroll performance
           transform: 'translate3d(0,0,0)',
@@ -299,6 +286,8 @@ export default function ChatHistory({
           {showing && (
             <ManageWorkspace hideModal={hideModal} providedSlug={workspace.slug} />
           )}
+          {/* Scroll anchor for Intersection Observer */}
+          <div ref={scrollAnchorRef} style={{ height: 1 }} />
         </div>
       </div>
       {!isAtBottom && (

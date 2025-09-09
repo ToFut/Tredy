@@ -528,7 +528,7 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
   // Use mobile-optimized chat for mobile devices
   if (useMobileUI) {
     return (
-      <div className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] overflow-hidden safe-area-inset">
+      <div className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] overflow-hidden safe-area-inset pt-16">
         <DnDFileUploaderWrapper>
           <MobileOptimizedChat
             workspace={workspace}
@@ -559,7 +559,7 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
   // Desktop layout
   return (
     <div
-      className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] overflow-hidden safe-area-inset"
+      className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] overflow-hidden safe-area-inset pt-16 sm:pt-14"
     >
       <ChatWidgetHeader 
         workspace={workspace}

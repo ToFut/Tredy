@@ -43,10 +43,10 @@ yarn verify:translations  # Verify frontend translation files
 
 - **Workspace Isolation**: Each workspace has isolated documents, chats, and settings with configurable `agentProvider` and `agentModel`
 - **Agent Invocation**: Messages must start with `@agent` to trigger agent mode (parsed in `/server/models/workspaceAgentInvocation.js`)
-- **MCP Integration**: Full Model Context Protocol compatibility for external tools (Gmail, Calendar, LinkedIn, etc.)
+- **MCP Integration**: Full Model Context Protocol compatibility for external tools (Gmail, Calendar, LinkedIn, Google Drive)
 - **Plugin Architecture**: Swappable LLM providers, vector databases, and embedders via `/server/utils/` modules
 - **WebSocket Communication**: Agent interactions use WebSocket at `/agent-invocation/:uuid` endpoint
-- **UnTooled Providers**: TogetherAI, LMStudio use natural language function calling via UnTooled helper
+- **UnTooled Providers**: TogetherAI, LMStudio, Ollama use natural language function calling via UnTooled helper
 - **Agent Flow System**: No-code workflow builder with directOutput support for bypassing LLM processing
 
 ### Database Schema
@@ -70,7 +70,7 @@ yarn verify:translations  # Verify frontend translation files
 
 **MCP Server Integration**
 - Config: `/server/storage/plugins/anythingllm_mcp_servers_production.json`
-- Universal Gmail: `/server/universal-gmail-mcp.js`
+- Universal servers: Gmail, Google Calendar, LinkedIn, Google Drive
 - Workspace detection priority: args.workspaceId > MCP_SERVER_NAME > NANGO_CONNECTION_ID
 
 ## Common Development Tasks
@@ -115,7 +115,7 @@ UPDATE workspaces SET agentProvider='provider', agentModel='model' WHERE slug='w
 5. Add frontend settings UI in `/frontend/src/pages/GeneralSettings/LLMPreference/`
 
 #### New MCP Server
-1. Create MCP server file following `/server/universal-gmail-mcp.js` pattern
+1. Create MCP server file following existing patterns (e.g., `/server/universal-gmail-mcp.js`)
 2. Register in `/server/storage/plugins/anythingllm_mcp_servers_production.json`
 3. Implement workspace ID detection logic
 4. Add Nango integration if needed for OAuth
@@ -136,6 +136,7 @@ UPDATE workspaces SET agentProvider='provider', agentModel='model' WHERE slug='w
   - `TOGETHER_AI_API_KEY` - For TogetherAI models
   - `OPEN_AI_KEY` - For OpenAI models  
   - `NANGO_SECRET_KEY` - For MCP OAuth integrations
+  - `NANGO_HOST` - Nango API host URL
 - Storage: `STORAGE_DIR` (default: `/server/storage/`)
 
 ## Debugging
@@ -145,7 +146,7 @@ UPDATE workspaces SET agentProvider='provider', agentModel='model' WHERE slug='w
 - Verify workspace agent settings in database
 - Monitor WebSocket connection in browser Network tab
 - Check server logs for `[AgentHandler]` entries
-- Verify MCP server is running: `ps aux | grep universal-gmail`
+- Verify MCP servers are running: `ps aux | grep mcp`
 
 ### Common Agent Problems
 1. **"No auth token found"**: Normal for unauthenticated requests
@@ -177,3 +178,4 @@ docker build -t anything-llm -f docker/Dockerfile .
 - **WebSocket Timeout**: 5 minutes (300 seconds) for agent sessions
 - **Plugin Duplication**: WebSocket and chat-history plugins are added as standard plugins; avoid adding them again via skills to prevent duplicates
 - **Agent Interrupts**: USER agent has `interrupt: "NEVER"` to prevent message duplication from interrupt/continue cycles
+- **Default Agent Skills**: memory, docSummarizer, webScraping, universalIntegrator, websocket, workflowCreator

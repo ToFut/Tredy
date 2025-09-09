@@ -877,7 +877,7 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showConnectorModal, setShowConnectorModal] = useState(false);
   const [showExpanded, setShowExpanded] = useState(false);
-  const avatarSize = isMobile ? 28 : 40;
+  const avatarSize = isMobile ? 44 : 40; // Minimum 44px for proper touch targets
 
   // Check for openConnectors query parameter on mount
   useEffect(() => {
@@ -915,7 +915,7 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
 
   return (
     <>
-      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/40 dark:border-gray-700/40 sticky top-[48px] md:top-0 z-40 safe-area-inset-top">
+      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/40 dark:border-gray-700/40 fixed top-0 left-0 right-0 z-50 safe-area-inset-top">
         <div className="px-2 sm:px-4 lg:px-5 py-1.5 sm:py-2">
           <div className="flex items-center justify-between gap-1 sm:gap-2">
             {/* Left: Workspace Info - More Compact */}

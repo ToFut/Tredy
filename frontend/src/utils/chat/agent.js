@@ -13,6 +13,9 @@ const handledEvents = [
   "awaitingFeedback",
   "wssFailure",
   "rechartVisualize",
+  "toolCall",
+  "toolCallUpdate",
+  "toolUsageSummary",
 ];
 
 export function websocketURI() {
@@ -157,6 +160,47 @@ export default function handleSocketResponse(event, setChatHistory) {
           pending: false,
         },
       ];
+    });
+  }
+
+  // Handle tool tracking events
+  if (data.type === "toolCall") {
+    // Store tool call in the last assistant message
+    return setChatHistory((prev) => {
+      const messages = [...prev];
+      const lastAssistantMsg = messages.filter(m => m.role === "assistant").pop();
+      if (lastAssistantMsg) {
+        if (!lastAssistantMsg.toolCalls) lastAssistantMsg.toolCalls = [];
+        lastAssistantMsg.toolCalls.push(data.content);
+      }
+      return messages;
+    });
+  }
+
+  if (data.type === "toolCallUpdate") {
+    // Update existing tool call status
+    return setChatHistory((prev) => {
+      const messages = [...prev];
+      const lastAssistantMsg = messages.filter(m => m.role === "assistant").pop();
+      if (lastAssistantMsg && lastAssistantMsg.toolCalls) {
+        const toolCall = lastAssistantMsg.toolCalls.find(tc => tc.id === data.content.id);
+        if (toolCall) {
+          Object.assign(toolCall, data.content);
+        }
+      }
+      return messages;
+    });
+  }
+
+  if (data.type === "toolUsageSummary") {
+    // Add tool usage summary to the last message
+    return setChatHistory((prev) => {
+      const messages = [...prev];
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg) {
+        lastMsg.toolUsageSummary = data.content;
+      }
+      return messages;
     });
   }
 

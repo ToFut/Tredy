@@ -46,6 +46,7 @@ const websocket = {
   }) {
     return {
       name: this.name,
+      toolCalls: [], // Track all tool calls for this session
       setup(aibitat) {
         aibitat.onError(async (error) => {
           let errorMessage =
@@ -82,6 +83,40 @@ const websocket = {
           );
         };
 
+        // Add method to track tool calls
+        aibitat.trackToolCall = (toolName, params, status = 'pending') => {
+          const toolCall = {
+            id: require("uuid").v4(),
+            name: toolName,
+            params: params,
+            status: status,
+            timestamp: Date.now()
+          };
+          
+          if (!this.toolCalls) this.toolCalls = [];
+          this.toolCalls.push(toolCall);
+          
+          // Send tool tracking update to frontend
+          socket.send(JSON.stringify({
+            type: "toolCall",
+            content: toolCall
+          }));
+          
+          return toolCall.id;
+        };
+        
+        // Update tool call status
+        aibitat.updateToolCall = (toolId, updates) => {
+          const toolCall = this.toolCalls?.find(tc => tc.id === toolId);
+          if (toolCall) {
+            Object.assign(toolCall, updates);
+            socket.send(JSON.stringify({
+              type: "toolCallUpdate", 
+              content: { id: toolId, ...updates }
+            }));
+          }
+        };
+        
         // expose function for sockets across aibitat
         // type param must be set or else msg will not be shown or handled in UI.
         aibitat.socket = {
@@ -105,6 +140,18 @@ const websocket = {
         });
 
         aibitat.onTerminate(() => {
+          // Send final tool usage summary before closing
+          if (this.toolCalls && this.toolCalls.length > 0) {
+            socket.send(JSON.stringify({
+              type: "toolUsageSummary",
+              content: {
+                tools: this.toolCalls,
+                totalCount: this.toolCalls.length,
+                successCount: this.toolCalls.filter(t => t.status === 'success').length,
+                errorCount: this.toolCalls.filter(t => t.status === 'error').length
+              }
+            }));
+          }
           // console.log("🚀 chat finished");
           socket.close();
         });

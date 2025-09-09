@@ -210,6 +210,47 @@ class WorkflowCreatorSession {
     }
     return null;
   }
+
+  /**
+   * Send progressive update as each block is established
+   */
+  async sendProgressiveUpdate(aibitat, draft, currentSteps, stepNumber, totalSteps) {
+    const preview = this.formatWorkflowPreview(draft, currentSteps);
+    const progress = Math.round((stepNumber / totalSteps) * 100);
+    
+    // Send progress message
+    const progressMessage = `🏗️ **Building Workflow: "${draft.name}"**\n\n` +
+      `📊 Progress: ${stepNumber}/${totalSteps} blocks (${progress}%)\n\n` +
+      `${preview}\n\n` +
+      `⏳ *Adding next block...*`;
+    
+    // Use introspect to show progress in chat
+    aibitat.introspect(`Progress: ${stepNumber}/${totalSteps} blocks established`);
+    
+    return progressMessage;
+  }
+
+  /**
+   * Send final completion update
+   */
+  async sendCompletionUpdate(aibitat, draft, steps, uuid) {
+    const preview = this.formatWorkflowPreview(draft, steps);
+    
+    aibitat.introspect(`🎯 Workflow ready! Saved with UUID: ${uuid}`);
+    
+    return {
+      type: "workflowComplete",
+      workflowId: draft.id,
+      uuid,
+      preview,
+      workflow: {
+        name: draft.name,
+        description: draft.description,
+        stepsCount: steps.length - 1,
+        saved: true
+      }
+    };
+  }
 }
 
 const workflowCreator = {
@@ -298,59 +339,97 @@ const workflowCreator = {
               // Create draft workflow
               const draft = session.createDraftWorkflow(description, name);
               
+              // Send initial workflow creation notification
+              aibitat.introspect(`🏗️ Starting workflow creation: "${draft.name}"`);
+              
               // Parse description into workflow steps using AI-driven approach
               const parsedSteps = session.parseDescriptionToWorkflowSteps(description);
               
-              // Add start block
-              const steps = [
-                {
-                  type: "start",
-                  config: { variables: [] }
-                },
-                ...parsedSteps
-              ];
+              // Progressive rendering: Add blocks one by one with real-time updates
+              const steps = [];
               
-              // Store parsed workflow
-              draft.steps = steps;
+              // Step 1: Add start block and show immediate preview
+              steps.push({
+                type: "start",
+                config: { variables: [] }
+              });
               
-              // Create visual preview
-              const preview = session.formatWorkflowPreview(draft, steps);
+              aibitat.introspect(`✅ Block 1 established: Flow Variables`);
+              await session.sendProgressiveUpdate(aibitat, draft, steps, 1, parsedSteps.length + 1);
               
-              // Create structured workflow data
-              const workflowData = {
-                type: "workflowPreview",
-                workflowId: draft.id,
-                preview,
-                workflow: {
-                  name: draft.name,
-                  description: draft.description,
-                  stepsCount: steps.length - 1, // Exclude start block
-                  steps: steps.map((step, index) => ({
-                    index,
-                    type: step.type,
-                    title: session.getStepTitle(step),
-                    detail: session.getStepDetail(step)
-                  }))
-                },
-                actions: [
-                  `To save: "@agent save workflow ${draft.id} as [name]"`,
-                  `To edit step: "@agent edit workflow step [number] to [description]"`,
-                  `To test: "@agent test workflow ${draft.id}"`,
-                  `To cancel: "@agent cancel workflow ${draft.id}"`
-                ]
-              };
-              
-              // Send workflow preview via WebSocket 
-              if (aibitat.sendWorkflowPreview) {
-                aibitat.sendWorkflowPreview(workflowData);
+              // Step 2-N: Add each parsed step with progressive updates
+              for (let i = 0; i < parsedSteps.length; i++) {
+                const step = parsedSteps[i];
+                steps.push(step);
+                
+                const stepNum = i + 2; // +2 because we have start block
+                const stepTitle = session.getStepTitle(step);
+                aibitat.introspect(`✅ Block ${stepNum} established: ${stepTitle}`);
+                
+                // Send progressive update for this step
+                await session.sendProgressiveUpdate(aibitat, draft, steps, stepNum, parsedSteps.length + 1);
+                
+                // Small delay for visual effect (simulate processing)
+                await new Promise(resolve => setTimeout(resolve, 500));
               }
               
-              aibitat.introspect("📋 Workflow preview generated! Review and save when ready.");
+              // Store final parsed workflow
+              draft.steps = steps;
               
-              // Return the visual preview directly as the message
-              const fullMessage = `📋 **Workflow Created: "${draft.name}"**\n\n${preview}\n\n**Available Commands:**\n${workflowData.actions.join('\n')}\n\n---\n*Workflow ID: ${draft.id}*`;
+              // Create final visual preview
+              const preview = session.formatWorkflowPreview(draft, steps);
               
-              return fullMessage;
+              // Auto-save the workflow immediately after creation
+              const workflowConfig = {
+                name: draft.name,
+                description: `Chat-created workflow: ${draft.description}`,
+                active: true,
+                created_via: "chat",
+                created_at: new Date().toISOString(),
+                steps: draft.steps
+              };
+              
+              try {
+                const uuid = require("uuid").v4();
+                const result = await AgentFlows.saveFlow(workflowConfig.name, workflowConfig, uuid);
+                
+                if (result.success) {
+                  aibitat.introspect(`🎉 Workflow "${workflowConfig.name}" auto-saved successfully!`);
+                  
+                  // Send final completion update
+                  await session.sendCompletionUpdate(aibitat, draft, steps, uuid);
+                  
+                  // Clean up draft
+                  session.draftWorkflows.delete(draft.id);
+                  
+                  return `🎉 **Workflow "${draft.name}" Created & Saved!**\n\n${preview}\n\n✅ **Auto-saved and ready to use!**\n🎯 **Run it with:** \`@agent run workflow ${draft.name}\`\n\n📁 *Check the Agent Flows panel to see your new workflow*`;
+                } else {
+                  aibitat.introspect(`⚠️ Auto-save failed: ${result.error}`);
+                  
+                  // Create structured workflow data for manual save
+                  const workflowData = {
+                    type: "workflowPreview",
+                    workflowId: draft.id,
+                    preview,
+                    workflow: {
+                      name: draft.name,
+                      description: draft.description,
+                      stepsCount: steps.length - 1,
+                      steps: steps.map((step, index) => ({
+                        index,
+                        type: step.type,
+                        title: session.getStepTitle(step),
+                        detail: session.getStepDetail(step)
+                      }))
+                    }
+                  };
+                  
+                  return `📋 **Workflow Created: "${draft.name}"**\n\n${preview}\n\n⚠️ **Auto-save failed.** Use: \`@agent save workflow ${draft.id} as "${draft.name}"\``;
+                }
+              } catch (saveError) {
+                aibitat.introspect(`❌ Auto-save error: ${saveError.message}`);
+                return `📋 **Workflow Created: "${draft.name}"**\n\n${preview}\n\n❌ **Auto-save failed.** Use: \`@agent save workflow ${draft.id} as "${draft.name}"\``;
+              }
               
             } catch (error) {
               aibitat.introspect(`Error creating workflow: ${error.message}`);

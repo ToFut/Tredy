@@ -645,7 +645,35 @@ ${this.getHistory({ to: route.to })
         `[debug]: ${fn.caller} is attempting to call \`${name}\` tool`
       );
 
-      let result = await fn.handler(args);
+      // Track tool call start
+      let toolCallId = null;
+      if (this.trackToolCall) {
+        toolCallId = this.trackToolCall(name, args, 'running');
+      }
+
+      let result;
+      try {
+        result = await fn.handler(args);
+        // Update tool call status to success
+        if (toolCallId && this.updateToolCall) {
+          this.updateToolCall(toolCallId, { 
+            status: 'success',
+            response: result,
+            completedAt: Date.now()
+          });
+        }
+      } catch (error) {
+        // Update tool call status to error
+        if (toolCallId && this.updateToolCall) {
+          this.updateToolCall(toolCallId, { 
+            status: 'error',
+            error: error.message,
+            completedAt: Date.now()
+          });
+        }
+        throw error;
+      }
+      
       Telemetry.sendTelemetry("agent_tool_call", { tool: name }, null, true);
 
       // Intercept MCP connection tools and add button patterns

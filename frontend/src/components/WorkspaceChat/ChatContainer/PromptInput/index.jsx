@@ -124,12 +124,20 @@ export default function PromptInput({
     e.preventDefault();
     setFocused(false);
     
-    // Modify the textarea value to include @agent prefix if in agent mode
+    // Add appropriate @ prefix based on response mode
     // This needs to happen BEFORE the parent's submit handler reads the value
+    let finalMessage = promptInput;
+    
     if (responseMode === "agent" && !promptInput.startsWith("@agent")) {
-      const messageWithAgent = "@agent " + promptInput;
-      textareaRef.current.value = messageWithAgent;
-      setPromptInput(messageWithAgent);
+      finalMessage = "@agent " + promptInput;
+    } else if (responseMode === "flow" && !promptInput.startsWith("@flow")) {
+      finalMessage = "@flow " + promptInput;
+    }
+    // chat mode doesn't need any prefix
+    
+    if (finalMessage !== promptInput) {
+      textareaRef.current.value = finalMessage;
+      setPromptInput(finalMessage);
     }
     
     submit(e);

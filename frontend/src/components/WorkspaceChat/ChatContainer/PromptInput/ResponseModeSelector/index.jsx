@@ -15,19 +15,27 @@ export default function ResponseModeSelector({
   const modes = [
     {
       id: "agent",
-      label: "Intelligence",
+      label: "Agent Mode",
       icon: Brain,
-      description: "Advanced reasoning with visual intelligence",
+      description: "Use AI agent with tools and functions",
       color: "text-purple-400",
       gradient: "from-purple-500 to-pink-500"
     },
     {
-      id: "regular", 
-      label: "Standard",
+      id: "chat", 
+      label: "Chat Mode",
       icon: ChatCircle,
-      description: "Direct conversational responses",
-      color: "text-gray-400",
-      gradient: "from-gray-500 to-gray-600"
+      description: "Regular chat without agent tools",
+      color: "text-blue-400",
+      gradient: "from-blue-500 to-cyan-500"
+    },
+    {
+      id: "flow",
+      label: "Flow Mode",
+      icon: Sparkle,
+      description: "Create and execute workflows",
+      color: "text-green-400",
+      gradient: "from-green-500 to-emerald-500"
     }
   ];
 
@@ -139,7 +147,7 @@ export default function ResponseModeSelector({
 }
 
 export function useResponseMode() {
-  const [responseMode, setResponseMode] = useState("agent"); // Default to agent
+  const [responseMode, setResponseMode] = useState("chat"); // Default to chat mode, not agent
   const [showModeSelector, setShowModeSelector] = useState(false);
   return { responseMode, setResponseMode, showModeSelector, setShowModeSelector };
 }

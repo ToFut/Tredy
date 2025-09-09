@@ -5,6 +5,7 @@ const { WorkspaceParsedFiles } = require("../../models/workspaceParsedFiles");
 const { getVectorDbClass, getLLMProvider } = require("../helpers");
 const { writeResponseChunk } = require("../helpers/chat/responses");
 const { grepAgents } = require("./agents");
+const { grepFlow } = require("./flows");
 const { generateAutoSummary } = require("./summaryGenerator");
 const {
   grepCommand,
@@ -39,6 +40,17 @@ async function streamChatWithWorkspace(
     writeResponseChunk(response, data);
     return;
   }
+
+  // Check if this is a @flow command first
+  const isFlowCommand = await grepFlow({
+    uuid,
+    response,
+    message: updatedMessage,
+    user,
+    workspace,
+    thread,
+  });
+  if (isFlowCommand) return;
 
   // If is agent enabled chat we will exit this flow early.
   const isAgentChat = await grepAgents({

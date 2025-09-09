@@ -284,36 +284,73 @@ const workflowCreator = {
           return sessions.get(conversationId);
         }
 
+        // Capture LLM's execution plan and convert to flow
+        aibitat.function({
+          name: "capture_execution_plan",
+          description: "Capture the LLM's intended tool execution sequence and convert to visual flow",
+          parameters: {
+            type: "object",
+            properties: {
+              tools: {
+                type: "array",
+                description: "Array of tools the LLM plans to use in sequence",
+                items: { type: "string" }
+              },
+              description: {
+                type: "string",
+                description: "What this flow will accomplish"
+              }
+            },
+            required: ["tools", "description"]
+          },
+          handler: async ({ tools, description }) => {
+            // Simply convert LLM's plan to flow JSON
+            const flow = {
+              id: uuidv4(),
+              name: description.slice(0, 30),
+              steps: tools.map((tool, idx) => ({
+                type: "tool",
+                tool: tool,
+                order: idx
+              }))
+            };
+            
+            // Save and return
+            await AgentFlows.saveFlow(flow.name, flow, flow.id);
+            return `Flow created: ${tools.join(' → ')}`;
+          }
+        });
+        
         // Main workflow creation function
         console.log("🔧 [WorkflowCreator] Registering create_workflow function");
         console.log("🔧 [WorkflowCreator] Plugin setup complete, about to register function");
         aibitat.function({
           name: "create_workflow", 
-          description: "MANDATORY: Use this function when user says 'create workflow' or describes sequential actions with 'then'. This function creates a visual workflow preview. DO NOT use gmail or other functions - use THIS function for workflow creation requests.",
+          description: "Creates automated workflows from natural language. ALWAYS use this when user describes: multiple steps, sequential tasks (then/and/after), automation requests, 'fetch and summarize', 'read and send', chained actions, or any multi-step process. Builds visual workflow that executes immediately.",
           examples: [
             {
-              prompt: "create workflow send to segev@sinosciences.com news list and then to segev@futurixs.com all mail summary from yesterday",
-              call: JSON.stringify({ description: "send to segev@sinosciences.com news list and then to segev@futurixs.com all mail summary from yesterday" })
+              prompt: "fetch news about AI, summarize top 5 stories, and email me the summary",
+              call: JSON.stringify({ description: "fetch news about AI, summarize top 5 stories, and email me the summary" })
             },
             {
-              prompt: "create workflow send email then invite",
-              call: JSON.stringify({ description: "send email then invite" })
+              prompt: "read my last 10 emails and create a summary report",
+              call: JSON.stringify({ description: "read my last 10 emails and create a summary report" })
             },
             {
-              prompt: "create workflow send email to user@example.com then create report",
-              call: JSON.stringify({ description: "send email to user@example.com then create report" })
+              prompt: "check calendar then prepare meeting notes then send to attendees",
+              call: JSON.stringify({ description: "check calendar then prepare meeting notes then send to attendees" })
             },
             {
-              prompt: "send something then send something else",
-              call: JSON.stringify({ description: "send something then send something else" })
+              prompt: "get weather forecast and news then email daily briefing",
+              call: JSON.stringify({ description: "get weather forecast and news then email daily briefing" })
             },
             {
-              prompt: "first send email then create meeting",
-              call: JSON.stringify({ description: "first send email then create meeting" })
+              prompt: "analyze sales data then generate charts and send report",
+              call: JSON.stringify({ description: "analyze sales data then generate charts and send report" })
             },
             {
-              prompt: "workflow to automate tasks",
-              call: JSON.stringify({ description: "automate tasks" })
+              prompt: "search LinkedIn profiles and compile contact list",
+              call: JSON.stringify({ description: "search LinkedIn profiles and compile contact list" })
             }
           ],
           parameters: {
@@ -347,15 +384,71 @@ const workflowCreator = {
               
               // Progressive rendering: Add blocks one by one with real-time updates
               const steps = [];
+              const workflowUuid = uuidv4();
               
-              // Step 1: Add start block and show immediate preview
-              steps.push({
+              // Create visual blocks for the tree animation
+              const visualBlocks = [];
+              
+              // Create initial workflow structure that will be progressively updated
+              let workflowConfig = {
+                name: draft.name,
+                description: `Chat-created workflow: ${draft.description}`,
+                active: false, // Start as inactive during building
+                status: 'building',
+                created_via: "chat",
+                created_at: new Date().toISOString(),
+                steps: [],
+                visualBlocks: [], // For tree animation
+                buildProgress: {
+                  current: 0,
+                  total: parsedSteps.length + 1,
+                  message: 'Initializing workflow...'
+                }
+              };
+              
+              // Save initial workflow state (empty)
+              await AgentFlows.saveFlow(workflowConfig.name, workflowConfig, workflowUuid);
+              aibitat.introspect(`🏗️ Creating workflow: "${draft.name}"`);
+              
+              // Step 1: Add start block
+              const startStep = {
                 type: "start",
                 config: { variables: [] }
-              });
+              };
+              steps.push(startStep);
               
-              aibitat.introspect(`✅ Block 1 established: Flow Variables`);
+              // Create visual start block
+              const startBlock = {
+                id: 'start',
+                type: 'start',
+                name: 'Start',
+                description: 'Workflow begins here',
+                x: 100,
+                y: 50,
+                status: 'building',
+                connections: []
+              };
+              visualBlocks.push(startBlock);
+              
+              // Update workflow with start block
+              workflowConfig.steps = [...steps];
+              workflowConfig.visualBlocks = [...visualBlocks];
+              workflowConfig.buildProgress = {
+                current: 1,
+                total: parsedSteps.length + 1,
+                message: '🏁 Added start block'
+              };
+              await AgentFlows.saveFlow(workflowConfig.name, workflowConfig, workflowUuid);
+              
+              aibitat.introspect(`✅ Block 1 established: Start Block`);
               await session.sendProgressiveUpdate(aibitat, draft, steps, 1, parsedSteps.length + 1);
+              
+              // Mark start block as complete
+              startBlock.status = 'complete';
+              workflowConfig.visualBlocks = [...visualBlocks];
+              await AgentFlows.saveFlow(workflowConfig.name, workflowConfig, workflowUuid);
+              
+              await new Promise(resolve => setTimeout(resolve, 500));
               
               // Step 2-N: Add each parsed step with progressive updates
               for (let i = 0; i < parsedSteps.length; i++) {
@@ -364,14 +457,64 @@ const workflowCreator = {
                 
                 const stepNum = i + 2; // +2 because we have start block
                 const stepTitle = session.getStepTitle(step);
+                const blockId = `block_${i + 1}`;
+                
+                // Create visual block for tree
+                const visualBlock = {
+                  id: blockId,
+                  type: step.type,
+                  name: stepTitle,
+                  description: step.config?.instruction || stepTitle,
+                  x: 100,
+                  y: 50 + (stepNum * 120), // Stack vertically
+                  status: 'building',
+                  connections: [visualBlocks[visualBlocks.length - 1].id] // Connect to previous block
+                };
+                visualBlocks.push(visualBlock);
+                
+                // Update workflow configuration with new step
+                workflowConfig.steps = [...steps];
+                workflowConfig.visualBlocks = [...visualBlocks];
+                workflowConfig.buildProgress = {
+                  current: stepNum,
+                  total: parsedSteps.length + 1,
+                  message: `🔧 Building ${stepTitle}...`
+                };
+                
+                // Save updated workflow state - block appears
+                await AgentFlows.saveFlow(workflowConfig.name, workflowConfig, workflowUuid);
+                
                 aibitat.introspect(`✅ Block ${stepNum} established: ${stepTitle}`);
+                
+                // Delay to show building animation
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                // Mark block as complete
+                visualBlock.status = 'complete';
+                workflowConfig.buildProgress.message = `✅ Completed ${stepTitle}`;
+                workflowConfig.visualBlocks = [...visualBlocks];
+                await AgentFlows.saveFlow(workflowConfig.name, workflowConfig, workflowUuid);
                 
                 // Send progressive update for this step
                 await session.sendProgressiveUpdate(aibitat, draft, steps, stepNum, parsedSteps.length + 1);
                 
-                // Small delay for visual effect (simulate processing)
-                await new Promise(resolve => setTimeout(resolve, 500));
+                // Small delay before next block
+                await new Promise(resolve => setTimeout(resolve, 400));
               }
+              
+              // Mark workflow as complete and active
+              workflowConfig.active = true;
+              workflowConfig.status = 'complete';
+              workflowConfig.buildProgress.message = '🎉 Workflow completed!';
+              
+              // Final save - all blocks complete
+              await AgentFlows.saveFlow(workflowConfig.name, workflowConfig, workflowUuid);
+              
+              // Clean up build progress after 2 seconds
+              setTimeout(async () => {
+                delete workflowConfig.buildProgress;
+                await AgentFlows.saveFlow(workflowConfig.name, workflowConfig, workflowUuid);
+              }, 2000);
               
               // Store final parsed workflow
               draft.steps = steps;
@@ -379,57 +522,16 @@ const workflowCreator = {
               // Create final visual preview
               const preview = session.formatWorkflowPreview(draft, steps);
               
-              // Auto-save the workflow immediately after creation
-              const workflowConfig = {
-                name: draft.name,
-                description: `Chat-created workflow: ${draft.description}`,
-                active: true,
-                created_via: "chat",
-                created_at: new Date().toISOString(),
-                steps: draft.steps
-              };
+              // Workflow already saved progressively above
+              aibitat.introspect(`🎉 Workflow "${workflowConfig.name}" created successfully!`);
               
-              try {
-                const uuid = require("uuid").v4();
-                const result = await AgentFlows.saveFlow(workflowConfig.name, workflowConfig, uuid);
-                
-                if (result.success) {
-                  aibitat.introspect(`🎉 Workflow "${workflowConfig.name}" auto-saved successfully!`);
-                  
-                  // Send final completion update
-                  await session.sendCompletionUpdate(aibitat, draft, steps, uuid);
-                  
-                  // Clean up draft
-                  session.draftWorkflows.delete(draft.id);
-                  
-                  return `🎉 **Workflow "${draft.name}" Created & Saved!**\n\n${preview}\n\n✅ **Auto-saved and ready to use!**\n🎯 **Run it with:** \`@agent run workflow ${draft.name}\`\n\n📁 *Check the Agent Flows panel to see your new workflow*`;
-                } else {
-                  aibitat.introspect(`⚠️ Auto-save failed: ${result.error}`);
-                  
-                  // Create structured workflow data for manual save
-                  const workflowData = {
-                    type: "workflowPreview",
-                    workflowId: draft.id,
-                    preview,
-                    workflow: {
-                      name: draft.name,
-                      description: draft.description,
-                      stepsCount: steps.length - 1,
-                      steps: steps.map((step, index) => ({
-                        index,
-                        type: step.type,
-                        title: session.getStepTitle(step),
-                        detail: session.getStepDetail(step)
-                      }))
-                    }
-                  };
-                  
-                  return `📋 **Workflow Created: "${draft.name}"**\n\n${preview}\n\n⚠️ **Auto-save failed.** Use: \`@agent save workflow ${draft.id} as "${draft.name}"\``;
-                }
-              } catch (saveError) {
-                aibitat.introspect(`❌ Auto-save error: ${saveError.message}`);
-                return `📋 **Workflow Created: "${draft.name}"**\n\n${preview}\n\n❌ **Auto-save failed.** Use: \`@agent save workflow ${draft.id} as "${draft.name}"\``;
-              }
+              // Send final completion update
+              await session.sendCompletionUpdate(aibitat, draft, steps, workflowUuid);
+              
+              // Clean up draft
+              session.draftWorkflows.delete(draft.id);
+              
+              return `🎉 **Workflow "${draft.name}" Created & Saved!**\n\n${preview}\n\n✅ **Auto-saved and ready to use!**\n🎯 **Run it with:** \`@agent run workflow ${draft.name}\`\n\n📁 *Check the Agent Flows panel to see your new workflow*`;
               
             } catch (error) {
               aibitat.introspect(`Error creating workflow: ${error.message}`);

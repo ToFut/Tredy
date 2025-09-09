@@ -45,28 +45,15 @@ export default function FlowPanel({ workspace, isVisible, sendCommand }) {
     return () => clearInterval(interval);
   }, [isVisible, isCreatingWorkflow]);
 
-  // Listen for workflow creation activity in chat
+  // Check if any flows are being built
   useEffect(() => {
-    const handleMessage = (event) => {
-      const message = event.detail?.message?.toLowerCase() || "";
-      
-      if (message.includes("creating workflow") || message.includes("building workflow")) {
-        setIsCreatingWorkflow(true);
-        setIsExpanded(true); // Auto-expand during creation
-        
-        // Stop creation mode after 30 seconds
-        setTimeout(() => setIsCreatingWorkflow(false), 30000);
-      }
-      
-      if (message.includes("workflow created") || message.includes("auto-saved")) {
-        setIsCreatingWorkflow(false);
-        loadFlows(false); // Immediate refresh when workflow is complete
-      }
-    };
-
-    window.addEventListener("workflowActivity", handleMessage);
-    return () => window.removeEventListener("workflowActivity", handleMessage);
-  }, []);
+    const buildingFlow = flows.find(f => f.status === 'building');
+    setIsCreatingWorkflow(!!buildingFlow);
+    
+    if (buildingFlow) {
+      setIsExpanded(true); // Auto-expand when building
+    }
+  }, [flows]);
 
   const loadFlows = async (showLoadingIndicator = true) => {
     if (showLoadingIndicator) setIsLoading(true);
@@ -337,39 +324,66 @@ export default function FlowPanel({ workspace, isVisible, sendCommand }) {
 
 function FlowItem({ flow, onEdit, onRun, onToggle, onDelete, formatLastUsed }) {
   const [showMenu, setShowMenu] = useState(false);
+  const isBuilding = flow.status === 'building';
+  const buildProgress = flow.buildProgress;
 
   return (
-    <div className="group hover:bg-theme-bg-primary/30 transition-colors">
+    <div className={`group hover:bg-theme-bg-primary/30 transition-colors ${
+      isBuilding ? 'bg-yellow-500/5 border-l-4 border-yellow-500' : ''
+    }`}>
       <div className="p-4 flex items-center justify-between">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-1">
-            <button
-              onClick={onToggle}
-              className={`w-3 h-3 rounded-full border-2 transition-all ${
-                flow.active
-                  ? 'bg-green-500 border-green-500'
-                  : 'bg-transparent border-gray-400 hover:border-gray-300'
-              }`}
-              title={flow.active ? 'Active' : 'Inactive'}
-            />
+            {isBuilding ? (
+              <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse" />
+            ) : (
+              <button
+                onClick={onToggle}
+                className={`w-3 h-3 rounded-full border-2 transition-all ${
+                  flow.active
+                    ? 'bg-green-500 border-green-500'
+                    : 'bg-transparent border-gray-400 hover:border-gray-300'
+                }`}
+                title={flow.active ? 'Active' : 'Inactive'}
+              />
+            )}
             <h3 
               className="font-medium text-theme-text-primary truncate cursor-pointer hover:text-primary-button transition-colors"
-              onClick={onEdit}
+              onClick={!isBuilding ? onEdit : undefined}
               title={flow.name}
             >
               {flow.name}
+              {isBuilding && (
+                <span className="ml-2 text-xs text-yellow-500 animate-pulse">
+                  (Building...)
+                </span>
+              )}
             </h3>
           </div>
           <div className="flex items-center gap-4 text-xs text-theme-text-secondary ml-6">
-            <span className="flex items-center gap-1">
-              <Clock size={12} />
-              {formatLastUsed(flow.updatedAt || flow.createdAt)}
-            </span>
-            {flow.active && (
-              <span className="flex items-center gap-1 text-green-400">
-                <CheckCircle size={12} />
-                Active
-              </span>
+            {isBuilding && buildProgress ? (
+              <>
+                <span className="flex items-center gap-1 text-yellow-500">
+                  <ArrowsClockwise size={12} className="animate-spin" />
+                  {buildProgress.message}
+                </span>
+                <span className="text-yellow-500">
+                  {buildProgress.current}/{buildProgress.total} blocks
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="flex items-center gap-1">
+                  <Clock size={12} />
+                  {formatLastUsed(flow.updatedAt || flow.createdAt)}
+                </span>
+                {flow.active && (
+                  <span className="flex items-center gap-1 text-green-400">
+                    <CheckCircle size={12} />
+                    Active
+                  </span>
+                )}
+              </>
             )}
           </div>
         </div>

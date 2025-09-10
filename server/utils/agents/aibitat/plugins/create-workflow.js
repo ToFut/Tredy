@@ -176,13 +176,18 @@ const createWorkflow = {
                                   ? action.parameters 
                                   : extractParameters(action);
                     
+                    // Use AI-provided resultVariable if available
+                    const resultVar = action.resultVariable || `step_${index + 1}_result`;
+                    
                     console.log(`✅ [CreateWorkflow] Creating TOOL_CALL for ${bestTool} with params:`, params);
+                    console.log(`✅ [CreateWorkflow] Result will be saved to: ${resultVar}`);
+                    
                     return {
                       type: 'toolCall',
                       config: {
                         toolName: bestTool,
                         parameters: params,
-                        resultVariable: `step_${index + 1}_result`,
+                        resultVariable: resultVar,
                         directOutput: false  // Allow workflow to continue to next steps
                       }
                     };
@@ -190,24 +195,27 @@ const createWorkflow = {
                     // For processing/summarization tasks, use LLM instruction
                     console.log(`📊 [CreateWorkflow] Creating LLM instruction for processing:`, action.text || action.action);
                     
-                    // Build instruction with reference to previous step results
-                    let instruction = action.text || action.action || 'Process data';
-                    // Reference ALL previous steps that might contain relevant data
-                    const previousSteps = [];
-                    for (let i = 0; i < index; i++) {
-                      if (actions[i].type === 'email' || actions[i].type === 'process') {
-                        previousSteps.push(`{{step_${i + 1}_result}}`);
+                    // Use AI-provided instruction if available in parameters, otherwise build one
+                    let instruction;
+                    if (action.parameters && action.parameters.instruction) {
+                      instruction = action.parameters.instruction;
+                    } else {
+                      // Build instruction with reference to required steps from AI analysis
+                      instruction = action.text || action.action || 'Process data';
+                      if (action.requires && action.requires.length > 0) {
+                        const requiredVars = action.requires.map(stepNum => `{{step_${stepNum}_result}}`);
+                        instruction += `\n\nUse the data from: ${requiredVars.join(', ')}`;
                       }
                     }
-                    if (previousSteps.length > 0) {
-                      instruction += `\n\nUse the data from: ${previousSteps.join(', ')}`;
-                    }
+                    
+                    const resultVar = action.resultVariable || `step_${index + 1}_result`;
+                    console.log(`📊 [CreateWorkflow] LLM instruction will save to: ${resultVar}`);
                     
                     return {
                       type: 'llmInstruction',
                       config: {
                         instruction: instruction,
-                        resultVariable: `step_${index + 1}_result`,
+                        resultVariable: resultVar,
                         directOutput: false
                       }
                     };
@@ -389,16 +397,23 @@ Return a JSON array where each step has:
   "tool": "exact tool name from list OR null for LLM",
   "type": "email|calendar|linkedin|process|file|web",
   "parameters": {
-    // Tool-specific parameters
-    // For emails: to, subject, body (can use {{step_X_result}} placeholders)
+    // Tool-specific parameters with CORRECT variable references
+    // For emails: to, subject, body (use {{step_X_result}} where X is the step number that produces the data)
     // For get_emails: num_emails
-    // For calendar: title, date, attendees
+    // For analysis steps: reference previous step data as {{step_X_result}}
     // etc.
   },
   "description": "What this step accomplishes",
-  "requires": [1, 2], // Array of step numbers this depends on (optional)
-  "output": "what this step produces for other steps"
+  "requires": [1, 2], // Array of step numbers this depends on
+  "output": "what this step produces for other steps",
+  "resultVariable": "step_X_result" // The variable name this step will save its output to
 }
+
+CRITICAL: When a step needs data from a previous step, use the EXACT variable reference {{step_X_result}} in parameters.
+For example:
+- Step 1 gets emails → saves to "step_1_result" 
+- Step 2 analyzes emails → instruction: "Analyze these emails: {{step_1_result}}" 
+- Step 3 sends summary → body: "{{step_2_result}}"
 
 Be INTELLIGENT - understand the user's intent, not just keywords.`;
 
@@ -465,15 +480,18 @@ Be INTELLIGENT - understand the user's intent, not just keywords.`;
                   const aiActions = JSON.parse(jsonMatch[0]);
                   console.log(`✅ [IntelligentDecomposition] AI extracted ${aiActions.length} actions`);
                   
-                  // Convert to our action format
-                  return aiActions.map(item => ({
+                  // Convert to our action format with enhanced dependency info
+                  return aiActions.map((item, index) => ({
                     type: item.type || 'generic',
                     action: item.action,
                     tool: item.tool,
                     parameters: item.parameters || {},
                     text: item.description,
                     target: item.parameters?.to || '',
-                    content: item.parameters?.body || item.description || ''
+                    content: item.parameters?.body || item.description || '',
+                    requires: item.requires || [], // Step dependencies
+                    resultVariable: item.resultVariable || `step_${index + 1}_result`, // Variable name for this step's output
+                    output: item.output || item.description
                   }));
                   
                 } catch (error) {

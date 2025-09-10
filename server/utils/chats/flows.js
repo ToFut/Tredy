@@ -24,6 +24,8 @@ async function grepFlow({
 }) {
   // Check if message starts with @flow
   if (!message.startsWith("@flow")) return false;
+  
+  console.log("🌊 [grepFlow] Detected @flow command:", message);
 
   // Extract the flow description after @flow
   const flowDescription = message.replace(/^@flow\s*/i, '').trim();

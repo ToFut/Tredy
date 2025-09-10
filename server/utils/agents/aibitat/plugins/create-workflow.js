@@ -40,6 +40,7 @@ const createWorkflow = {
           handler: async function ({ description }) {
             try {
               console.log("🎉 [CreateWorkflow] Handler called with:", description);
+              console.log("🎉 [CreateWorkflow] Function is working!");
               
               const workflowName = `Workflow ${Date.now()}`;
               const workflowUuid = uuidv4();

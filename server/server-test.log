@@ -347,3 +347,1917 @@ We are instructed to ONLY use the 'create-...
 prisma:info Starting a sqlite pool with 17 connections.
 Child process exited with code 0 and signal null
 Worker for job "cleanup-orphan-documents" exited with code 0 undefined
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+Puppeteer MCP Server closed
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+yarn run v1.22.22
+$ node ./swagger/init.js
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+🔧 [WorkflowCreator] Plugin file loaded successfully
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 6.98s.
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Environment variables loaded from .env
+Done in 7.46s.
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 1.94s
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:53145) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:53145) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+[33m[TELEMETRY STUBBED][0m Anonymous Telemetry stubbed in development.
+[36m[CommunicationKey][0m RSA key pair generated for signed payloads within AnythingLLM services.
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+Primary server in HTTP mode listening on port 3001
+prisma:info Starting a sqlite pool with 17 connections.
+[36m[BackgroundWorkerService][0m Starting...
+[36m[BackgroundWorkerService][0m Service started with 2 jobs [ 'cleanup-orphan-documents', 'agent-scheduler' ]
+[Database] Multi-user mode already enabled
+[32m[nodemon] restarting due to changes...[39m
+Gracefully exiting { code: 'SIGUSR2', ignore_hook: true, hide_meta: true }
+Gracefully exited { code: 'SIGUSR2', ignore_hook: true, hide_meta: true }
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+yarn run v1.22.22
+$ node ./swagger/init.js
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+🔧 [WorkflowCreator] Plugin file loaded successfully
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 3.02s.
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 4.71s.
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 1.15s
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:54138) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:54138) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+[33m[TELEMETRY STUBBED][0m Anonymous Telemetry stubbed in development.
+[36m[CommunicationKey][0m RSA key pair generated for signed payloads within AnythingLLM services.
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+Primary server in HTTP mode listening on port 3001
+prisma:info Starting a sqlite pool with 17 connections.
+[36m[BackgroundWorkerService][0m Starting...
+[36m[BackgroundWorkerService][0m Service started with 2 jobs [ 'cleanup-orphan-documents', 'agent-scheduler' ]
+[Database] Multi-user mode already enabled
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+(node:55203) Warning: Accessing non-existent property 'Document' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/vectorStore/resetAllVectorStores.js:1:23)
+(node:55203) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+(node:55203) Warning: Accessing non-existent property 'Document' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/vectorStore/resetAllVectorStores.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/helpers/updateENV.js:5:34)
+(node:55203) Warning: Accessing non-existent property 'Document' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/vectors.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/vectorStore/resetAllVectorStores.js:3:29)
+(node:55203) Warning: Accessing non-existent property 'Document' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/files/index.js:4:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/vectorStore/resetAllVectorStores.js:5:36)
+prisma:info Starting a sqlite pool with 17 connections.
+Child process exited with code 0 and signal null
+Worker for job "cleanup-orphan-documents" exited with code 0 undefined
+[36m[NativeEmbedder][0m Initialized Xenova/all-MiniLM-L6-v2
+[36m[fillSourceWindow][0m Need to backfill 4 chunks to fill in the source window for RAG!
+[35m[TokenManager][0m Initialized new TokenManager instance for model: meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo
+BadRequestError: 400 Input validation error
+    at APIError.generate (/Users/segevbin/anything-llm/server/node_modules/openai/error.js:45:20)
+    at OpenAI.makeStatusError (/Users/segevbin/anything-llm/server/node_modules/openai/core.js:302:33)
+    at OpenAI.makeRequest (/Users/segevbin/anything-llm/server/node_modules/openai/core.js:346:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async LLMPerformanceMonitor.measureStream (/Users/segevbin/anything-llm/server/utils/helpers/chat/LLMPerformanceMonitor.js:67:20)
+    at async TogetherAiLLM.streamGetChatCompletion (/Users/segevbin/anything-llm/server/utils/AiProviders/togetherAi/index.js:222:35)
+    at async streamChatWithWorkspace (/Users/segevbin/anything-llm/server/utils/chats/stream.js:284:20)
+    at async /Users/segevbin/anything-llm/server/endpoints/chat.js:150:9 {
+  status: 400,
+  headers: {
+    'access-control-allow-origin': '*',
+    'alt-svc': 'h3=":443"; ma=86400',
+    'cf-cache-status': 'DYNAMIC',
+    'cf-ray': '97ca702f58bd43aa-EWR',
+    connection: 'keep-alive',
+    'content-length': '177',
+    'content-type': 'application/json; charset=utf-8',
+    date: 'Tue, 09 Sep 2025 23:24:17 GMT',
+    etag: 'W/"b1-k5ncALdFchcWblM0PKEnv4umvBY"',
+    'retry-after': '2',
+    server: 'cloudflare',
+    'strict-transport-security': 'max-age=15552000; includeSubDomains',
+    vary: 'Accept-Encoding',
+    'x-amzn-trace-id': '605bde8d-b962-4091-be10-56306b17592a-noamzn',
+    'x-api-received': '2025-09-09T23:24:17.920Z',
+    'x-inference-version': 'v2',
+    'x-ratelimit': 'false',
+    'x-ratelimit-limit': '30',
+    'x-ratelimit-limit-tokens': '3000',
+    'x-ratelimit-remaining': '59',
+    'x-ratelimit-remaining-tokens': '3000',
+    'x-ratelimit-reset': '2',
+    'x-request-id': 'oAbkCga-4YNCb4-97ca702f58bd43aa'
+  },
+  request_id: 'oAbkCga-4YNCb4-97ca702f58bd43aa',
+  error: {
+    message: 'Input validation error',
+    type: 'invalid_request_error',
+    param: null,
+    code: null
+  },
+  code: null,
+  param: null,
+  type: 'invalid_request_error'
+}
+[32m[nodemon] restarting due to changes...[39m
+Gracefully exiting { code: 'SIGUSR2', ignore_hook: true, hide_meta: true }
+Gracefully exited { code: 'SIGUSR2', ignore_hook: true, hide_meta: true }
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+yarn run v1.22.22
+$ node ./swagger/init.js
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+🔧 [WorkflowCreator] Plugin file loaded successfully
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 6.01s.
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 6.50s.
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 836ms
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+┌─────────────────────────────────────────────────────────┐
+│  Update available 5.3.1 -> 6.15.0                       │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:60523) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:60523) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.serverListen [as listen] (/Users/segevbin/anything-llm/server/node_modules/@mintplex-labs/express-ws/dist/index.js:91:21)
+    at bootHTTP (/Users/segevbin/anything-llm/server/utils/boot/index.js:58:6)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/index.js:185:32)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:536:35)
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v20.19.3
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+yarn run v1.22.22
+$ node ./swagger/init.js
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 5.94s.
+🔧 [WorkflowCreator] Plugin file loaded successfully
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+Swagger-autogen: [32m Success ✔ [0m
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 6.80s.
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 3.70s
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:65233) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:65233) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.serverListen [as listen] (/Users/segevbin/anything-llm/server/node_modules/@mintplex-labs/express-ws/dist/index.js:91:21)
+    at bootHTTP (/Users/segevbin/anything-llm/server/utils/boot/index.js:58:6)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/index.js:185:32)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:536:35)
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v20.19.3
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+yarn run v1.22.22
+$ node ./swagger/init.js
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+🔧 [WorkflowCreator] Plugin file loaded successfully
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 7.92s.
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 7.99s.
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 1.35s
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+┌─────────────────────────────────────────────────────────┐
+│  Update available 5.3.1 -> 6.15.0                       │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:68404) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:68404) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.serverListen [as listen] (/Users/segevbin/anything-llm/server/node_modules/@mintplex-labs/express-ws/dist/index.js:91:21)
+    at bootHTTP (/Users/segevbin/anything-llm/server/utils/boot/index.js:58:6)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/index.js:185:32)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:536:35)
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v20.19.3
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+yarn run v1.22.22
+$ node ./swagger/init.js
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+🔧 [WorkflowCreator] Plugin file loaded successfully
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 5.93s.
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 5.99s.
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 704ms
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+┌─────────────────────────────────────────────────────────┐
+│  Update available 5.3.1 -> 6.15.0                       │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:69943) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:69943) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+[33m[TELEMETRY STUBBED][0m Anonymous Telemetry stubbed in development.
+[36m[CommunicationKey][0m RSA key pair generated for signed payloads within AnythingLLM services.
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+Primary server in HTTP mode listening on port 3001
+prisma:info Starting a sqlite pool with 17 connections.
+[36m[BackgroundWorkerService][0m Starting...
+[36m[BackgroundWorkerService][0m Service started with 2 jobs [ 'cleanup-orphan-documents', 'agent-scheduler' ]
+[Database] Multi-user mode already enabled
+[32m[nodemon] restarting due to changes...[39m
+Gracefully exiting { code: 'SIGUSR2', ignore_hook: true, hide_meta: true }
+Gracefully exited { code: 'SIGUSR2', ignore_hook: true, hide_meta: true }
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+$ node ./swagger/init.js
+yarn run v1.22.22
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+🔧 [WorkflowCreator] Plugin file loaded successfully
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 3.76s.
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 5.43s.
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 637ms
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:70789) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:70789) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.serverListen [as listen] (/Users/segevbin/anything-llm/server/node_modules/@mintplex-labs/express-ws/dist/index.js:91:21)
+    at bootHTTP (/Users/segevbin/anything-llm/server/utils/boot/index.js:58:6)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/index.js:185:32)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:536:35)
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v20.19.3
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+$ node ./swagger/init.js
+yarn run v1.22.22
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+🔧 [WorkflowCreator] Plugin file loaded successfully
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 5.98s.
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 6.71s.
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 713ms
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+┌─────────────────────────────────────────────────────────┐
+│  Update available 5.3.1 -> 6.15.0                       │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:71245) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:71245) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+[33m[TELEMETRY STUBBED][0m Anonymous Telemetry stubbed in development.
+[36m[CommunicationKey][0m RSA key pair generated for signed payloads within AnythingLLM services.
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+Primary server in HTTP mode listening on port 3001
+prisma:info Starting a sqlite pool with 17 connections.
+[36m[BackgroundWorkerService][0m Starting...
+[36m[BackgroundWorkerService][0m Service started with 2 jobs [ 'cleanup-orphan-documents', 'agent-scheduler' ]
+[Database] Multi-user mode already enabled
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+(node:72314) Warning: Accessing non-existent property 'Document' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/vectorStore/resetAllVectorStores.js:1:23)
+(node:72314) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+(node:72314) Warning: Accessing non-existent property 'Document' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/vectorStore/resetAllVectorStores.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/helpers/updateENV.js:5:34)
+(node:72314) Warning: Accessing non-existent property 'Document' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/vectors.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/vectorStore/resetAllVectorStores.js:3:29)
+(node:72314) Warning: Accessing non-existent property 'Document' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/files/index.js:4:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/vectorStore/resetAllVectorStores.js:5:36)
+prisma:info Starting a sqlite pool with 17 connections.
+Child process exited with code 0 and signal null
+Worker for job "cleanup-orphan-documents" exited with code 0 undefined
+[32m[Event Logged][0m - sent_chat
+[36m[AgentHandler][0m Start 6745112a-c5e7-46e1-8c13-47be9950c452::openai:gpt-4o
+[36m[AgentHandler][0m Attached websocket plugin to Agent cluster
+[36m[AgentHandler][0m Attached chat-history plugin to Agent cluster
+[36m[AgentHandler][0m Attaching user and default agent to Agent cluster.
+[36m[MCPCompatibilityLayer][0m Initializing MCP Hypervisor - subsequent calls will boot faster
+[36m[MCPCompatibilityLayer][0m MCP Config File: /Users/segevbin/anything-llm/server/storage/plugins/anythingllm_mcp_servers.json
+[36m[MCPCompatibilityLayer][0m Attempting to start MCP server: gmail_ws11
+Gmail MCP Server started
+[36m[MCPCompatibilityLayer][0m Attempting to start MCP server: linkedin_ws4
+(node:74767) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/segevbin/anything-llm/server/linkedin-mcp.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/segevbin/anything-llm/server/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[LinkedIn MCP] Nango initialized
+[LinkedIn MCP] Server running on stdio
+[36m[MCPCompatibilityLayer][0m Attempting to start MCP server: google-calendar_ws4
+Simple Google Calendar MCP Server started
+[36m[MCPCompatibilityLayer][0m Attempting to start MCP server: gmail_ws4
+Gmail MCP Server started
+[36m[MCPCompatibilityLayer][0m Attempting to start MCP server: gmail_ws10
+Gmail MCP Server started
+[36m[MCPCompatibilityLayer][0m Attempting to start MCP server: gmail_ws7
+Gmail MCP Server started
+[36m[MCPCompatibilityLayer][0m Attempting to start MCP server: linkedin_ws7
+(node:74821) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/segevbin/anything-llm/server/linkedin-mcp.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/segevbin/anything-llm/server/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[LinkedIn MCP] Nango initialized
+[LinkedIn MCP] Server running on stdio
+[36m[MCPCompatibilityLayer][0m Attempting to start MCP server: linkedin_ws5
+(node:74833) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/segevbin/anything-llm/server/linkedin-mcp.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/segevbin/anything-llm/server/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[LinkedIn MCP] Nango initialized
+[LinkedIn MCP] Server running on stdio
+[36m[MCPCompatibilityLayer][0m Attempting to start MCP server: linkedin_ws13
+(node:74847) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/segevbin/anything-llm/server/linkedin-mcp.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/segevbin/anything-llm/server/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[LinkedIn MCP] Nango initialized
+[LinkedIn MCP] Server running on stdio
+[36m[MCPCompatibilityLayer][0m Attempting to start MCP server: gmail
+Universal Gmail MCP Server started
+[36m[MCPCompatibilityLayer][0m Attempting to start MCP server: gcalendar
+Simple Google Calendar MCP Server started
+[36m[MCPCompatibilityLayer][0m Attempting to start MCP server: whatsapp
+Usage: whatsapp-mcp [options] [command]
+
+WhatsApp Multi-Channel Platform CLI
+
+Options:
+  -V, --version        output the version number
+  -h, --help           display help for command
+
+Commands:
+  start                Start the WhatsApp MCP bridge
+  configure [options]  Configure WhatsApp MCP for Claude Desktop or Cursor
+  help [command]       display help for command
+[36m[MCPCompatibilityLayer][0m Failed to start MCP server: whatsapp {
+  error: 'MCP error -32000: Connection closed',
+  code: -32000,
+  syscall: undefined,
+  path: undefined,
+  stack: 'McpError: MCP error -32000: Connection closed\n' +
+    '    at Client._onclose (/Users/segevbin/anything-llm/server/node_modules/@modelcontextprotocol/sdk/dist/cjs/shared/protocol.js:101:23)\n' +
+    '    at _transport.onclose (/Users/segevbin/anything-llm/server/node_modules/@modelcontextprotocol/sdk/dist/cjs/shared/protocol.js:73:18)\n' +
+    '    at ChildProcess.<anonymous> (/Users/segevbin/anything-llm/server/node_modules/@modelcontextprotocol/sdk/dist/cjs/client/stdio.js:97:77)\n' +
+    '    at ChildProcess.emit (node:events:524:28)\n' +
+    '    at maybeClose (node:internal/child_process:1104:16)\n' +
+    '    at ChildProcess._handle.onexit (node:internal/child_process:304:5)'
+}
+[36m[MCPCompatibilityLayer][0m MCP server discord has anythingllm.autoStart property set to false, skipping boot!
+[36m[MCPCompatibilityLayer][0m MCP server telegram has anythingllm.autoStart property set to false, skipping boot!
+[36m[MCPCompatibilityLayer][0m Attempting to start MCP server: filesystem
+Usage: mcp-server-filesystem [allowed-directory] [additional-directories...]
+Note: Allowed directories can be provided via:
+  1. Command-line arguments (shown above)
+  2. MCP roots protocol (if client supports it)
+At least one directory must be provided by EITHER method for the server to operate.
+Secure MCP Filesystem Server running on stdio
+Started without allowed directories - waiting for client to provide roots via MCP protocol
+[36m[MCPCompatibilityLayer][0m Attempting to start MCP server: puppeteer
+[36m[MCPCompatibilityLayer][0m Successfully started 13 MCP servers: [
+  'gmail_ws11',
+  'linkedin_ws4',
+  'google-calendar_ws4',
+  'gmail_ws4',
+  'gmail_ws10',
+  'gmail_ws7',
+  'linkedin_ws7',
+  'linkedin_ws5',
+  'linkedin_ws13',
+  'gmail',
+  'gcalendar',
+  'filesystem',
+  'puppeteer'
+]
+[WORKSPACE_AGENT] Deduped 31 functions to 27 unique functions
+[36m[MCPCompatibilityLayer][0m MCP Servers already running, skipping boot.
+[WORKSPACE_AGENT] Deduped 31 functions to 27 unique functions
+[36m[AgentHandler][0m Attached MCP::gmail:send_email MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::gmail:get_emails MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::gcalendar:get_calendar_events MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::gcalendar:book_meeting MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:read_file MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:read_text_file MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:read_media_file MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:read_multiple_files MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:write_file MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:edit_file MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:create_directory MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:list_directory MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:list_directory_with_sizes MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:directory_tree MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:move_file MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:search_files MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:get_file_info MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:list_allowed_directories MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::puppeteer:puppeteer_navigate MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::puppeteer:puppeteer_screenshot MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::puppeteer:puppeteer_click MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::puppeteer:puppeteer_fill MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::puppeteer:puppeteer_select MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::puppeteer:puppeteer_hover MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::puppeteer:puppeteer_evaluate MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached rag-memory plugin to Agent cluster
+[36m[AgentHandler][0m Attached document-summarizer plugin to Agent cluster
+[36m[AgentHandler][0m Attached web-scraping plugin to Agent cluster
+[36m[AgentHandler][0m Attached universal-integrator plugin to Agent cluster
+[36m[AgentHandler][0m websocket is a standard plugin already attached. Skipping duplicate inclusion.
+🔧 [WorkflowCreator] Setting up workflow creator plugin
+🔧 [WorkflowCreator] Registering create_workflow function
+🔧 [WorkflowCreator] Plugin setup complete, about to register function
+🔧 [WorkflowCreator] create_workflow function registered successfully
+[36m[AgentHandler][0m Attached workflow-creator plugin to Agent cluster
+🔧 [CreateWorkflow] Setting up create-workflow plugin
+✅ [CreateWorkflow] Plugin setup complete
+[36m[AgentHandler][0m Attached create-workflow plugin to Agent cluster
+[36m[AgentHandler][0m Attached web-browsing plugin to Agent cluster
+[36m[AgentHandler][0m chat-history is a standard plugin already attached. Skipping duplicate inclusion.
+[36m[AgentHandler][0m Attached create-chart plugin to Agent cluster
+[36m[AgentHandler][0m Attached sql-agent:sql-list-databases plugin to Agent cluster
+[36m[AgentHandler][0m Attached sql-agent:sql-list-tables plugin to Agent cluster
+[36m[AgentHandler][0m Attached sql-agent:sql-get-table-schema plugin to Agent cluster
+[36m[AgentHandler][0m Attached sql-agent:sql-query plugin to Agent cluster
+[36m[AgentHandler][0m Attached stock-market plugin to Agent cluster
+[36m[AgentHandler][0m Attached flow flow_39dc6c95-90d4-41e7-a3fa-e5fb2b8f43dc (segev) plugin to Agent cluster
+[36m[AgentHandler][0m Attached flow flow_447bd12e-3d32-4d71-9199-6eae55b420a7 (Flow Test 1757453340734) plugin to Agent cluster
+[36m[AgentHandler][0m Attached flow flow_4708ffb0-4cbb-4572-939d-098a472e37bd (Flow Test 1757453340734) plugin to Agent cluster
+[36m[AgentHandler][0m Attached flow flow_483a1e73-c54c-4a0e-8c34-8eb059122724 (Workflow 1757460743670) plugin to Agent cluster
+[36m[AgentHandler][0m Attached flow flow_5f44a940-3e1a-47bc-81ae-64382f2a2fe0 (Workflow 1757457889490) plugin to Agent cluster
+[36m[AgentHandler][0m Attached flow flow_99a8f235-d845-4d0f-a091-d1abe58ab8a3 (Test Visual Flow 1757454199662) plugin to Agent cluster
+[36m[AgentHandler][0m Attached flow flow_e7c07b2f-042e-43c1-8e50-72fbfa0bc8de (Workflow 1757458168068) plugin to Agent cluster
+[36m[AgentHandler][0m Attached flow flow_test-multi-step-sample (Multi-Step Email and Calendar Test) plugin to Agent cluster
+[Aibitat Core] New message registered from USER to @agent: @agent Execute the "Flow Test 1757453340734" workf...
+[Aibitat Core] Total chats: 11, Listeners: 2
+[32m[Event Logged][0m - sent_chat
+[36m[AgentHandler][0m Start 7b8b6441-a812-433c-a9ba-b80fdc8138e4::togetherai:deepseek-ai/DeepSeek-R1
+[36m[AgentHandler][0m Attached websocket plugin to Agent cluster
+[36m[AgentHandler][0m Attached chat-history plugin to Agent cluster
+[36m[AgentHandler][0m Attaching user and default agent to Agent cluster.
+[36m[MCPCompatibilityLayer][0m MCP Servers already running, skipping boot.
+[WORKSPACE_AGENT] Deduped 34 functions to 30 unique functions
+[36m[MCPCompatibilityLayer][0m MCP Servers already running, skipping boot.
+[WORKSPACE_AGENT] Deduped 34 functions to 30 unique functions
+[36m[AgentHandler][0m Attached MCP::linkedin_ws4:linkedin_get_profile MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::linkedin_ws4:linkedin_search_posts MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::linkedin_ws4:linkedin_create_post MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::linkedin_ws4:linkedin_send_message MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::linkedin_ws4:linkedin_get_connections MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::linkedin_ws4:linkedin_connect MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::google-calendar_ws4:get_calendar_events MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::google-calendar_ws4:book_meeting MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::gmail_ws4:connect_gmail MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::gmail_ws4:send_email MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::gmail_ws4:get_emails MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::gmail_ws4:search_emails MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::gmail_ws4:get_email_details MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::gmail_ws4:mark_as_read MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::gmail_ws4:delete_emails MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::gmail:send_email MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::gmail:get_emails MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::gcalendar:get_calendar_events MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::gcalendar:book_meeting MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:read_file MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:read_text_file MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:read_media_file MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:read_multiple_files MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:write_file MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:edit_file MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:create_directory MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:list_directory MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:list_directory_with_sizes MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:directory_tree MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:move_file MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:search_files MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:get_file_info MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::filesystem:list_allowed_directories MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::puppeteer:puppeteer_navigate MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::puppeteer:puppeteer_screenshot MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::puppeteer:puppeteer_click MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::puppeteer:puppeteer_fill MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::puppeteer:puppeteer_select MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::puppeteer:puppeteer_hover MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached MCP::puppeteer:puppeteer_evaluate MCP tool to Agent cluster
+[36m[AgentHandler][0m Attached rag-memory plugin to Agent cluster
+[36m[AgentHandler][0m Attached document-summarizer plugin to Agent cluster
+[36m[AgentHandler][0m Attached web-scraping plugin to Agent cluster
+[36m[AgentHandler][0m Attached universal-integrator plugin to Agent cluster
+[36m[AgentHandler][0m websocket is a standard plugin already attached. Skipping duplicate inclusion.
+🔧 [WorkflowCreator] Setting up workflow creator plugin
+🔧 [WorkflowCreator] Registering create_workflow function
+🔧 [WorkflowCreator] Plugin setup complete, about to register function
+🔧 [WorkflowCreator] create_workflow function registered successfully
+[36m[AgentHandler][0m Attached workflow-creator plugin to Agent cluster
+🔧 [CreateWorkflow] Setting up create-workflow plugin
+✅ [CreateWorkflow] Plugin setup complete
+[36m[AgentHandler][0m Attached create-workflow plugin to Agent cluster
+[36m[AgentHandler][0m Attached web-browsing plugin to Agent cluster
+[36m[AgentHandler][0m chat-history is a standard plugin already attached. Skipping duplicate inclusion.
+[36m[AgentHandler][0m Attached create-chart plugin to Agent cluster
+[36m[AgentHandler][0m Attached sql-agent:sql-list-databases plugin to Agent cluster
+[36m[AgentHandler][0m Attached sql-agent:sql-list-tables plugin to Agent cluster
+[36m[AgentHandler][0m Attached sql-agent:sql-get-table-schema plugin to Agent cluster
+[36m[AgentHandler][0m Attached sql-agent:sql-query plugin to Agent cluster
+[36m[AgentHandler][0m Attached stock-market plugin to Agent cluster
+[36m[AgentHandler][0m Attached flow flow_39dc6c95-90d4-41e7-a3fa-e5fb2b8f43dc (segev) plugin to Agent cluster
+[36m[AgentHandler][0m Attached flow flow_447bd12e-3d32-4d71-9199-6eae55b420a7 (Flow Test 1757453340734) plugin to Agent cluster
+[36m[AgentHandler][0m Attached flow flow_4708ffb0-4cbb-4572-939d-098a472e37bd (Flow Test 1757453340734) plugin to Agent cluster
+[36m[AgentHandler][0m Attached flow flow_483a1e73-c54c-4a0e-8c34-8eb059122724 (Workflow 1757460743670) plugin to Agent cluster
+[36m[AgentHandler][0m Attached flow flow_5f44a940-3e1a-47bc-81ae-64382f2a2fe0 (Workflow 1757457889490) plugin to Agent cluster
+[36m[AgentHandler][0m Attached flow flow_99a8f235-d845-4d0f-a091-d1abe58ab8a3 (Test Visual Flow 1757454199662) plugin to Agent cluster
+[36m[AgentHandler][0m Attached flow flow_e7c07b2f-042e-43c1-8e50-72fbfa0bc8de (Workflow 1757458168068) plugin to Agent cluster
+[36m[AgentHandler][0m Attached flow flow_test-multi-step-sample (Multi-Step Email and Calendar Test) plugin to Agent cluster
+[Aibitat Core] New message registered from USER to @agent: @agent Execute the "Workflow 1757460743670" workfl...
+[Aibitat Core] Total chats: 1, Listeners: 2
+[UnTooled] Checking 59 functions for user request
+[UnTooled] Available functions: rag-memory, document-summarizer, web-scraping, create-workflow, web-browsing, create-chart, sql-list-databases, sql-list-tables, sql-get-table-schema, sql-query, stock-market, flow_39dc6c95-90d4-41e7-a3fa-e5fb2b8f43dc, flow_447bd12e-3d32-4d71-9199-6eae55b420a7, flow_4708ffb0-4cbb-4572-939d-098a472e37bd, flow_483a1e73-c54c-4a0e-8c34-8eb059122724, flow_5f44a940-3e1a-47bc-81ae-64382f2a2fe0, flow_99a8f235-d845-4d0f-a091-d1abe58ab8a3, flow_e7c07b2f-042e-43c1-8e50-72fbfa0bc8de, flow_test-multi-step-sample, linkedin_ws4-linkedin_get_profile, linkedin_ws4-linkedin_search_posts, linkedin_ws4-linkedin_create_post, linkedin_ws4-linkedin_send_message, linkedin_ws4-linkedin_get_connections, linkedin_ws4-linkedin_connect, google-calendar_ws4-get_calendar_events, google-calendar_ws4-book_meeting, gmail_ws4-connect_gmail, gmail_ws4-send_email, gmail_ws4-get_emails, gmail_ws4-search_emails, gmail_ws4-get_email_details, gmail_ws4-mark_as_read, gmail_ws4-delete_emails, gmail-send_email, gmail-get_emails, gcalendar-get_calendar_events, gcalendar-book_meeting, filesystem-read_file, filesystem-read_text_file, filesystem-read_media_file, filesystem-read_multiple_files, filesystem-write_file, filesystem-edit_file, filesystem-create_directory, filesystem-list_directory, filesystem-list_directory_with_sizes, filesystem-directory_tree, filesystem-move_file, filesystem-search_files, filesystem-get_file_info, filesystem-list_allowed_directories, puppeteer-puppeteer_navigate, puppeteer-puppeteer_screenshot, puppeteer-puppeteer_click, puppeteer-puppeteer_fill, puppeteer-puppeteer_select, puppeteer-puppeteer_hover, puppeteer-puppeteer_evaluate
+[UnTooled] Last user message: @agent Execute the "Workflow 1757460743670" workflow
+[36m[AgentHandler][0m End 6745112a-c5e7-46e1-8c13-47be9950c452::openai:gpt-4o
+[UnTooled] LLM response: <think>
+We are given a user message: "Execute the \"Workflow 1757460743670\" workflow"
+
+ From the available functions, note that there is a function named "flow_483a1e73-c54c-4a0e-8c34-8eb059122724" w
+[36m[AgentLLM - deepseek-ai/DeepSeek-R1][0m Invalid function tool call: Missing name or arguments in function call..
+[36m[AgentLLM - deepseek-ai/DeepSeek-R1][0m Will assume chat completion without tool call inputs.
+[36m[AgentHandler][0m [debug]: @agent is attempting to call `flow_447bd12e-3d32-4d71-9199-6eae55b420a7` tool
+[36m[AgentHandler][0m [43m[AgentFlowToolExecutor][0m - executing LLM Instruction block
+[36m[AgentHandler][0m Sending request to LLM (openai::gpt-4o)
+[36m[AgentHandler][0m [debug] Final completion result: {
+  result: 'The "Flow Test 1757453340734" workflow has been executed. If there are any specific results or further assistance needed, please let me know!',
+  cost: 0.02526
+}
+[Aibitat Core] New message registered from @agent to USER: The "Flow Test 1757453340734" workflow has been ex...
+[Aibitat Core] Total chats: 12, Listeners: 2
+[WebSocket Plugin] Sending message from @agent to USER: The "Flow Test 1757453340734" workflow has been ex...
+Puppeteer MCP Server closed
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+$ node ./swagger/init.js
+yarn run v1.22.22
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 11.34s.
+🔧 [WorkflowCreator] Plugin file loaded successfully
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 11.70s.
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 1.44s
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:93205) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:93205) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.serverListen [as listen] (/Users/segevbin/anything-llm/server/node_modules/@mintplex-labs/express-ws/dist/index.js:91:21)
+    at bootHTTP (/Users/segevbin/anything-llm/server/utils/boot/index.js:58:6)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/index.js:185:32)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:536:35)
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v20.19.3
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+yarn run v1.22.22
+$ node ./swagger/init.js
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 6.98s.
+🔧 [WorkflowCreator] Plugin file loaded successfully
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 7.95s.
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 1.66s
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:93964) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:93964) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.serverListen [as listen] (/Users/segevbin/anything-llm/server/node_modules/@mintplex-labs/express-ws/dist/index.js:91:21)
+    at bootHTTP (/Users/segevbin/anything-llm/server/utils/boot/index.js:58:6)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/index.js:185:32)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:536:35)
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v20.19.3
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+yarn run v1.22.22
+$ node ./swagger/init.js
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+🔧 [WorkflowCreator] Plugin file loaded successfully
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 12.39s.
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 2.12s
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+[Database] Deploying database migrations...
+Done in 12.83s.
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+┌─────────────────────────────────────────────────────────┐
+│  Update available 5.3.1 -> 6.15.0                       │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:99375) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:99375) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+[33m[TELEMETRY STUBBED][0m Anonymous Telemetry stubbed in development.
+[36m[CommunicationKey][0m RSA key pair generated for signed payloads within AnythingLLM services.
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+Primary server in HTTP mode listening on port 3001
+prisma:info Starting a sqlite pool with 17 connections.
+[36m[BackgroundWorkerService][0m Starting...
+[36m[BackgroundWorkerService][0m Service started with 2 jobs [ 'cleanup-orphan-documents', 'agent-scheduler' ]
+[Database] Multi-user mode already enabled
+[32m[nodemon] restarting due to changes...[39m
+Gracefully exiting { code: 'SIGUSR2', ignore_hook: true, hide_meta: true }
+Gracefully exited { code: 'SIGUSR2', ignore_hook: true, hide_meta: true }
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+yarn run v1.22.22
+$ node ./swagger/init.js
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 9.25s.
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+🔧 [WorkflowCreator] Plugin file loaded successfully
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 11.02s.
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 1.34s
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:415) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:415) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.serverListen [as listen] (/Users/segevbin/anything-llm/server/node_modules/@mintplex-labs/express-ws/dist/index.js:91:21)
+    at bootHTTP (/Users/segevbin/anything-llm/server/utils/boot/index.js:58:6)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/index.js:185:32)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:536:35)
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v20.19.3
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+yarn run v1.22.22
+$ node ./swagger/init.js
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+🔧 [WorkflowCreator] Plugin file loaded successfully
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 7.87s.
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 8.12s.
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 723ms
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:26963) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:26963) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.serverListen [as listen] (/Users/segevbin/anything-llm/server/node_modules/@mintplex-labs/express-ws/dist/index.js:91:21)
+    at bootHTTP (/Users/segevbin/anything-llm/server/utils/boot/index.js:58:6)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/index.js:185:32)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:536:35)
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v20.19.3
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+yarn run v1.22.22
+$ node ./swagger/init.js
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+🔧 [WorkflowCreator] Plugin file loaded successfully
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 7.52s.
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 8.17s.
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 1.15s
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:29709) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:29709) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.serverListen [as listen] (/Users/segevbin/anything-llm/server/node_modules/@mintplex-labs/express-ws/dist/index.js:91:21)
+    at bootHTTP (/Users/segevbin/anything-llm/server/utils/boot/index.js:58:6)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/index.js:185:32)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:536:35)
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v20.19.3
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+$ node ./swagger/init.js
+yarn run v1.22.22
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+🔧 [WorkflowCreator] Plugin file loaded successfully
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 17.72s.
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 17.67s.
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 747ms
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+┌─────────────────────────────────────────────────────────┐
+│  Update available 5.3.1 -> 6.15.0                       │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:32628) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:32628) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.serverListen [as listen] (/Users/segevbin/anything-llm/server/node_modules/@mintplex-labs/express-ws/dist/index.js:91:21)
+    at bootHTTP (/Users/segevbin/anything-llm/server/utils/boot/index.js:58:6)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/index.js:185:32)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:536:35)
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v20.19.3
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m

@@ -54,17 +54,33 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
     
     if (buildingFlow) {
       setIsExpanded(true); // Auto-expand when building
+      
+      // Auto-open panel if a workflow is being built
+      if (!isVisible && onAutoOpen) {
+        console.log('[FlowPanel] Auto-opening for building workflow:', buildingFlow.name);
+        onAutoOpen();
+      }
     }
     
     // Trigger auto-open if a flow has the openFlowPanel flag
-    if (shouldAutoOpen && onAutoOpen && !isVisible) {
-      onAutoOpen();
-      // Clear the flag after opening
+    if (shouldAutoOpen) {
+      console.log('[FlowPanel] Flow requesting auto-open:', shouldAutoOpen.name);
+      
+      // Always expand if we have this flag
+      setIsExpanded(true);
+      
+      // Open panel if not visible
+      if (!isVisible && onAutoOpen) {
+        console.log('[FlowPanel] Opening panel for workflow:', shouldAutoOpen.name);
+        onAutoOpen();
+      }
+      
+      // Clear the flag after a delay
       setTimeout(() => {
         const updatedFlow = { ...shouldAutoOpen };
         delete updatedFlow.openFlowPanel;
-        AgentFlows.saveFlow(updatedFlow.name, updatedFlow, updatedFlow.workflowUuid);
-      }, 1000);
+        AgentFlows.saveFlow(updatedFlow.name, updatedFlow, updatedFlow.workflowUuid).catch(console.error);
+      }, 2000);
     }
   }, [flows, isVisible, onAutoOpen]);
 

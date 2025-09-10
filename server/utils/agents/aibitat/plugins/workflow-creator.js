@@ -124,7 +124,7 @@ class WorkflowCreatorSession {
       type: stepType,
       config: {
         ...config,
-        directOutput: false
+        directOutput: false // Never use directOutput so agent can process results
       }
     };
   }

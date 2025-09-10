@@ -164,7 +164,7 @@ Use these step types:
                   config: {
                     instruction: prompt,
                     resultVariable: "step_1_result",
-                    directOutput: true
+                    directOutput: false // Allow agent to process and act on results
                   }
                 }
               ]

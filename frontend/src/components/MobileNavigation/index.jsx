@@ -81,7 +81,7 @@ export default function MobileNavigation() {
                   <span className="text-white text-sm font-medium">AI</span>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">AnythingLLM</p>
+                  <p className="text-sm font-medium text-gray-900">Tredy</p>
                   <p className="text-xs text-gray-500">v2.0 Mobile</p>
                 </div>
               </div>

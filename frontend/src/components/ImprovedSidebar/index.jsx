@@ -71,7 +71,7 @@ export default function ImprovedSidebar() {
       <div className="p-4 border-b border-gray-200">
         <Link to="/" className="flex items-center gap-3">
           <img src={logo} alt="Logo" className="h-8 w-auto" />
-          <span className="font-semibold text-lg text-gray-900">AnythingLLM</span>
+          <span className="font-semibold text-lg text-gray-900">Tredy</span>
         </Link>
       </div>
 
@@ -225,7 +225,7 @@ export function ImprovedMobileHeader() {
       <div className="md:hidden sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
         <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="Logo" className="h-8 w-auto" />
-          <span className="font-semibold text-lg text-gray-900">AnythingLLM</span>
+          <span className="font-semibold text-lg text-gray-900">Tredy</span>
         </Link>
         
         <button

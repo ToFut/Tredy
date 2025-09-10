@@ -20,7 +20,7 @@ export default function CommunityHub() {
                   Community Hub
                 </p>
                 <p className="text-xs leading-[18px] font-base text-theme-text-secondary">
-                  Share and collaborate with the AnythingLLM community.
+                  Share and collaborate with the Tredy community.
                 </p>
               </div>
               <div className="flex gap-2">

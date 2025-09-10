@@ -392,7 +392,7 @@ export function MobileSlideOutSidebar({ isOpen, onClose }) {
                     onClick={() => {
                       navigator.vibrate?.([10]);
                       // Open docs in new tab
-                      window.open('https://docs.anythingllm.com', '_blank');
+                      window.open('https://docs.tredy.com', '_blank');
                       onClose();
                     }}
                     className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-xl transition-all"

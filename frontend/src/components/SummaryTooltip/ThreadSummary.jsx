@@ -14,7 +14,7 @@ export default function ThreadSummary({ workspace, threadSlug, children }) {
       
       setLoading(true);
       try {
-        const authToken = window.localStorage.getItem('anythingllm_authToken');
+        const authToken = window.localStorage.getItem('tredy_authToken');
         const headers = {
           'Content-Type': 'application/json'
         };

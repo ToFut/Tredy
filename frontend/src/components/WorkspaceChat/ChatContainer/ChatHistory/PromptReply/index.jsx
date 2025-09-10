@@ -88,9 +88,8 @@ const PromptReply = ({
                 <>
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <Loader2 className="w-4 h-4 animate-spin text-purple-500" />
-                    <span>Processing your request...</span>
+                    <span>Processing request...</span>
                   </div>
-                  <div className="mt-3 ml-5 dot-falling light:invert"></div>
                 </>
               )}
             </div>

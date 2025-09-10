@@ -33,7 +33,7 @@ export const logout = async () => {
     window.localStorage.removeItem(AUTH_USER);
     window.localStorage.removeItem(AUTH_TOKEN);
     window.localStorage.removeItem(AUTH_TIMESTAMP);
-    window.localStorage.removeItem('anythingllm_supabase_token');
+    window.localStorage.removeItem('tredy_supabase_token');
     
     console.log('[LOGOUT] Cleared local authentication data');
     console.log('[LOGOUT] Redirecting to login page...');

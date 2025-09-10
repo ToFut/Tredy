@@ -91,12 +91,12 @@ export default function SupabaseLogin() {
         throw new Error('Invalid auth response from backend');
       }
       
-      // Store the AnythingLLM JWT token and update AuthContext
-      window.localStorage.setItem('anythingllm_authToken', authData.token);
-      window.localStorage.setItem('anythingllm_authTimestamp', String(Date.now()));
+      // Store the Tredy JWT token and update AuthContext
+      window.localStorage.setItem('tredy_authToken', authData.token);
+      window.localStorage.setItem('tredy_authTimestamp', String(Date.now()));
       
       if (authData.user) {
-        window.localStorage.setItem('anythingllm_user', JSON.stringify(authData.user));
+        window.localStorage.setItem('tredy_user', JSON.stringify(authData.user));
         // TODO: Update AuthContext when available
         // actions.updateUser(authData.user, authData.token);
       }
@@ -207,8 +207,8 @@ export default function SupabaseLogin() {
           </h2>
           <p className="mt-2 text-sm text-theme-text-secondary">
             {isSignUp 
-              ? 'Sign up to get started with AnythingLLM' 
-              : 'Sign in to your AnythingLLM account'}
+              ? 'Sign up to get started with Tredy' 
+              : 'Sign in to your Tredy account'}
           </p>
         </div>
 

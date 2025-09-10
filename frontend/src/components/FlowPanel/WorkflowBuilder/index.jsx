@@ -20,6 +20,7 @@ import {
   Warning,
   Copy,
   ArrowsClockwise,
+  Lightning,
 } from "@phosphor-icons/react";
 import AnythingInfinityLogo from "@/media/logo/Tredy Full.png";
 import { Tooltip } from "react-tooltip";
@@ -102,6 +103,18 @@ const BLOCK_INFO = {
       directOutput: false,
     },
     getSummary: (config) => config.url || "No URL specified",
+  },
+  [BLOCK_TYPES.TOOL_CALL]: {
+    label: "Tool Call",
+    icon: <Lightning className="w-5 h-5 text-theme-text-primary" />,
+    description: "Execute MCP/Agent tools and functions",
+    defaultConfig: {
+      toolName: "",
+      parameters: {},
+      resultVariable: "",
+      directOutput: false,
+    },
+    getSummary: (config) => config.toolName || "No tool specified",
   },
   [BLOCK_TYPES.FINISH]: {
     label: "Flow Complete",
@@ -278,7 +291,7 @@ function HeaderMenu({
           )}
           
           <a
-            href="https://docs.anythingllm.com/agent-flows/overview"
+            href="https://docs.tredy.com/agent-flows/overview"
             target="_blank"
             rel="noopener noreferrer"
             className="text-theme-text-secondary text-xs hover:text-cta-button flex items-center gap-x-1 transition-colors"
@@ -628,6 +641,85 @@ function BlockNode({
           </div>
         );
 
+      case BLOCK_TYPES.TOOL_CALL:
+        return (
+          <div className="space-y-3">
+            {/* Show metadata if available */}
+            {block.metadata && (
+              <div className="p-2 bg-theme-bg-primary/50 rounded-lg text-xs text-theme-text-secondary mb-3">
+                <div className="flex items-center gap-2">
+                  {block.metadata.icon && <span>{block.metadata.icon}</span>}
+                  {block.metadata.name && <span className="font-medium">{block.metadata.name}</span>}
+                </div>
+                {block.metadata.description && (
+                  <div className="mt-1 text-[10px] opacity-80">{block.metadata.description}</div>
+                )}
+              </div>
+            )}
+            
+            <div>
+              <label className="block text-xs font-medium mb-1 text-theme-text-primary">
+                Tool Name *
+              </label>
+              <input
+                type="text"
+                value={block.config.toolName || ""}
+                onChange={(e) =>
+                  updateBlockConfig(block.id, { toolName: e.target.value })
+                }
+                className="w-full border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2.5"
+                placeholder="e.g., gmail_ws6-send_email"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1 text-theme-text-primary">
+                Parameters (JSON)
+              </label>
+              <textarea
+                value={JSON.stringify(block.config.parameters || {}, null, 2)}
+                onChange={(e) => {
+                  try {
+                    const params = JSON.parse(e.target.value);
+                    updateBlockConfig(block.id, { parameters: params });
+                  } catch (error) {
+                    // Invalid JSON, don't update
+                  }
+                }}
+                className="w-full border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2.5 font-mono"
+                rows={4}
+                placeholder='{"to": "user@example.com", "body": "Message"}'
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1 text-theme-text-primary">
+                Result Variable
+              </label>
+              <input
+                type="text"
+                value={block.config.resultVariable || ""}
+                onChange={(e) =>
+                  updateBlockConfig(block.id, { resultVariable: e.target.value })
+                }
+                className="w-full border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2.5"
+                placeholder="Variable to store tool result"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={block.config.directOutput || false}
+                onChange={(e) =>
+                  updateBlockConfig(block.id, { directOutput: e.target.checked })
+                }
+                className="w-4 h-4"
+              />
+              <label className="text-xs text-theme-text-primary">
+                Direct output (bypass LLM processing)
+              </label>
+            </div>
+          </div>
+        );
+
       case BLOCK_TYPES.FINISH:
         return (
           <div className="text-sm text-theme-text-secondary">
@@ -665,7 +757,7 @@ function BlockNode({
           </div>
           <div>
             <h4 className="text-theme-text-primary font-medium flex items-center gap-2">
-              {blockInfo.label}
+              {block.metadata?.name || blockInfo.label}
               {hasErrors && (
                 <Warning 
                   size={14} 
@@ -676,7 +768,7 @@ function BlockNode({
               )}
             </h4>
             <p className="text-theme-text-secondary text-xs mt-0.5">
-              {blockInfo.getSummary(block.config)}
+              {block.metadata?.description || blockInfo.getSummary(block.config)}
             </p>
           </div>
         </div>
@@ -983,6 +1075,76 @@ export default function WorkflowBuilder({ workspace, noteData, onClose }) {
   };
 
   const convertAgentFlowBlocks = (agentFlow) => {
+    console.log("[WorkflowBuilder] Converting agent flow:", agentFlow);
+    
+    // Check for visualBlocks first (new format with better metadata)
+    if (agentFlow?.visualBlocks && Array.isArray(agentFlow.visualBlocks)) {
+      console.log("[WorkflowBuilder] Using visualBlocks:", agentFlow.visualBlocks);
+      
+      const convertedBlocks = [
+        {
+          id: "flow_info",
+          type: BLOCK_TYPES.FLOW_INFO,
+          config: {
+            name: agentFlow?.name || "",
+            description: agentFlow?.description || "",
+          },
+          isExpanded: true,
+        },
+      ];
+      
+      // Convert visual blocks, filtering out start/complete blocks
+      agentFlow.visualBlocks.forEach((vBlock, index) => {
+        if (vBlock.type === 'start' || vBlock.type === 'complete') {
+          return; // Skip start and complete blocks
+        }
+        
+        // Map visual block type to WorkflowBuilder block type
+        let blockType = BLOCK_TYPES.LLM_INSTRUCTION; // default
+        if (vBlock.type === 'toolCall') {
+          blockType = BLOCK_TYPES.TOOL_CALL;
+        } else if (vBlock.type === 'apiCall') {
+          blockType = BLOCK_TYPES.API_CALL;
+        } else if (vBlock.type === 'webScraping') {
+          blockType = BLOCK_TYPES.WEB_SCRAPING;
+        } else if (vBlock.type === 'llmInstruction') {
+          blockType = BLOCK_TYPES.LLM_INSTRUCTION;
+        }
+        
+        // Find corresponding step config
+        const stepIndex = parseInt(vBlock.id.replace('step_', '')) - 1;
+        const step = agentFlow.steps?.[stepIndex + 1]; // +1 to skip start step
+        
+        const block = {
+          id: vBlock.id || `block_${index}`,
+          type: blockType,
+          config: step?.config || {},
+          metadata: {
+            name: vBlock.name,
+            description: vBlock.description,
+            icon: vBlock.icon,
+            tool: vBlock.tool,
+            status: vBlock.status
+          },
+          isExpanded: index < 2, // Expand first few blocks
+        };
+        
+        convertedBlocks.push(block);
+      });
+      
+      // Add finish block
+      convertedBlocks.push({
+        id: "finish",
+        type: BLOCK_TYPES.FINISH,
+        config: {},
+        isExpanded: false,
+      });
+      
+      console.log("[WorkflowBuilder] Converted blocks from visualBlocks:", convertedBlocks);
+      return convertedBlocks;
+    }
+    
+    // Fallback to steps array
     const steps = agentFlow?.config?.steps || agentFlow?.steps || [];
 
     if (!steps || steps.length === 0) {
@@ -1006,10 +1168,24 @@ export default function WorkflowBuilder({ workspace, noteData, onClose }) {
     ];
 
     steps.forEach((step, index) => {
-      const blockId = step.type === "start" ? "start" : `block_${index}`;
+      // Skip start step
+      if (step.type === "start") return;
+      
+      // Map step type to block type
+      let blockType = BLOCK_TYPES.LLM_INSTRUCTION; // default
+      if (step.type === 'toolCall') {
+        blockType = BLOCK_TYPES.TOOL_CALL;
+      } else if (step.type === 'apiCall') {
+        blockType = BLOCK_TYPES.API_CALL;
+      } else if (step.type === 'webScraping') {
+        blockType = BLOCK_TYPES.WEB_SCRAPING;
+      } else if (step.type === 'llmInstruction') {
+        blockType = BLOCK_TYPES.LLM_INSTRUCTION;
+      }
+      
       const block = {
-        id: blockId,
-        type: step.type,
+        id: `block_${index}`,
+        type: blockType,
         config: { ...step.config },
         isExpanded: index < 2, // Expand first few blocks
       };
@@ -1026,6 +1202,7 @@ export default function WorkflowBuilder({ workspace, noteData, onClose }) {
       });
     }
 
+    console.log("[WorkflowBuilder] Converted blocks from steps:", convertedBlocks);
     return convertedBlocks;
   };
 

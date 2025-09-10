@@ -13,11 +13,11 @@ export default function ImportedSkillList({
         <p>
           Learn about agent skills in the{" "}
           <a
-            href="https://docs.anythingllm.com/agent/custom/developer-guide"
+            href="https://docs.tredy.com/agent/custom/developer-guide"
             target="_blank"
             className="text-theme-text-secondary underline hover:text-cta-button"
           >
-            AnythingLLM Agent Docs
+            Tredy Agent Docs
           </a>
           .
         </p>

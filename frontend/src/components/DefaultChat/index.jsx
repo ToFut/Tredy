@@ -31,7 +31,7 @@ export default function DefaultChatContainer() {
     showModal: showNewWsModal,
     hideModal: hideNewWsModal,
   } = useNewWorkspaceModal();
-  const popMsg = !window.localStorage.getItem("anythingllm_intro");
+  const popMsg = !window.localStorage.getItem("tredy_intro");
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -181,7 +181,7 @@ export default function DefaultChatContainer() {
     function processMsgs() {
       // If we have custom welcome messages, animate them
       if (fetchedMessages.length > 0) {
-        if (!!window.localStorage.getItem("anythingllm_intro")) {
+        if (!!window.localStorage.getItem("tredy_intro")) {
           // Show all messages immediately if user has seen intro
           const allMessages = [];
           fetchedMessages.forEach((fetchedMessage, index) => {
@@ -261,12 +261,12 @@ export default function DefaultChatContainer() {
           }
         });
 
-        window.localStorage.setItem("anythingllm_intro", 1);
+        window.localStorage.setItem("tredy_intro", 1);
         return;
       }
 
       // Fallback to original MESSAGES if no custom messages
-      if (!!window.localStorage.getItem("anythingllm_intro")) {
+      if (!!window.localStorage.getItem("tredy_intro")) {
         setMockMessages([...MESSAGES]);
         return false;
       } else {
@@ -283,7 +283,7 @@ export default function DefaultChatContainer() {
         }, timer);
         timer += 2_500;
       });
-      window.localStorage.setItem("anythingllm_intro", 1);
+      window.localStorage.setItem("tredy_intro", 1);
     }
 
     processMsgs();

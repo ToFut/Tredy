@@ -16,7 +16,7 @@ export const SupabaseAuthProvider = ({ children }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session) {
-        localStorage.setItem('anythingllm_supabase_token', session.access_token);
+        localStorage.setItem('tredy_supabase_token', session.access_token);
       }
       setLoading(false);
     });
@@ -34,7 +34,7 @@ export const SupabaseAuthProvider = ({ children }) => {
       } else if (event === 'TOKEN_REFRESHED') {
         console.log('Token refreshed');
         if (session) {
-          localStorage.setItem('anythingllm_supabase_token', session.access_token);
+          localStorage.setItem('tredy_supabase_token', session.access_token);
         }
       }
     });
@@ -74,8 +74,8 @@ export const SupabaseAuthProvider = ({ children }) => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (!error) {
-      localStorage.removeItem('anythingllm_supabase_token');
-      localStorage.removeItem('anythingllm_user');
+      localStorage.removeItem('tredy_supabase_token');
+      localStorage.removeItem('tredy_user');
     }
     return { error };
   };

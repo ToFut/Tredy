@@ -1,14 +1,14 @@
 export const API_BASE = import.meta.env.VITE_API_BASE || "/api";
-export const ONBOARDING_SURVEY_URL = "https://onboarding.anythingllm.com";
+export const ONBOARDING_SURVEY_URL = "https://onboarding.tredy.com";
 
-export const AUTH_USER = "anythingllm_user";
-export const AUTH_TOKEN = "anythingllm_authToken";
-export const AUTH_TIMESTAMP = "anythingllm_authTimestamp";
-export const COMPLETE_QUESTIONNAIRE = "anythingllm_completed_questionnaire";
-export const SEEN_DOC_PIN_ALERT = "anythingllm_pinned_document_alert";
-export const SEEN_WATCH_ALERT = "anythingllm_watched_document_alert";
+export const AUTH_USER = "tredy_user";
+export const AUTH_TOKEN = "tredy_authToken";
+export const AUTH_TIMESTAMP = "tredy_authTimestamp";
+export const COMPLETE_QUESTIONNAIRE = "tredy_completed_questionnaire";
+export const SEEN_DOC_PIN_ALERT = "tredy_pinned_document_alert";
+export const SEEN_WATCH_ALERT = "tredy_watched_document_alert";
 
-export const APPEARANCE_SETTINGS = "anythingllm_appearance_settings";
+export const APPEARANCE_SETTINGS = "tredy_appearance_settings";
 
 export const OLLAMA_COMMON_URLS = [
   "http://127.0.0.1:11434",

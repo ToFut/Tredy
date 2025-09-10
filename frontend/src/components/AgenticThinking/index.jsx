@@ -6,11 +6,9 @@ export default function AgenticThinking({ stage = 'thinking', context = '', isAc
   const [dots, setDots] = useState('');
   
   const processes = [
-    { icon: Brain, label: "Understanding your request", color: "from-purple-500 to-pink-500" },
-    { icon: MagnifyingGlass, label: "Searching relevant information", color: "from-blue-500 to-cyan-500" },
-    { icon: Database, label: "Gathering context", color: "from-emerald-500 to-teal-500" },
-    { icon: Code, label: "Working on your task", color: "from-amber-500 to-orange-500" },
-    { icon: ChartLine, label: "Preparing response", color: "from-indigo-500 to-purple-500" }
+    { icon: Brain, label: "Processing request", color: "from-purple-500 to-pink-500" },
+    { icon: Code, label: "Executing task", color: "from-amber-500 to-orange-500" },
+    { icon: CheckCircle, label: "Completing operation", color: "from-green-500 to-emerald-500" }
   ];
 
   // Tool icons mapping

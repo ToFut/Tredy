@@ -1,6 +1,6 @@
-// Service Worker for AnythingLLM PWA
-const CACHE_NAME = 'anythingllm-v1';
-const RUNTIME_CACHE = 'anythingllm-runtime-v1';
+// Service Worker for Tredy PWA
+const CACHE_NAME = 'tredy-v1';
+const RUNTIME_CACHE = 'tredy-runtime-v1';
 
 // Files to cache on install
 const STATIC_CACHE_URLS = [
@@ -119,7 +119,7 @@ async function sendQueuedMessages() {
 // Push notification handling
 self.addEventListener('push', (event) => {
   const options = {
-    body: event.data ? event.data.text() : 'New message from AnythingLLM',
+    body: event.data ? event.data.text() : 'New message from Tredy',
     icon: '/icon-192x192.png',
     badge: '/icon-72x72.png',
     vibrate: [100, 50, 100],
@@ -142,7 +142,7 @@ self.addEventListener('push', (event) => {
   };
 
   event.waitUntil(
-    self.registration.showNotification('AnythingLLM', options)
+    self.registration.showNotification('Tredy', options)
   );
 });
 

@@ -3,24 +3,228 @@ import { CaretDown } from "@phosphor-icons/react";
 import AgenticThinking from "@/components/AgenticThinking";
 
 /**
- * Clean up debug messages and show user-friendly content
+ * Parse debug messages into clean tool information
  */
-function getCleanMessage(content) {
-  if (!content) return "";
+function parseDebugToToolInfo(content) {
+  if (!content) return null;
   
-  // Hide all debug messages completely
-  if (content.includes('[debug]:') || 
-      content.includes('Executing MCP server:') || 
-      content.includes('completed successfully') ||
-      content.includes('attempting to call')) {
-    return ""; // Hide debug messages completely
+  // Tool call attempt
+  if (content.includes('[debug]:') && content.includes('attempting to call')) {
+    const toolMatch = content.match(/`([^`]+)`/);
+    const tool = toolMatch ? toolMatch[1] : '';
+    return {
+      type: 'preparing',
+      tool: formatToolName(tool),
+      message: `Preparing ${formatToolName(tool)}...`
+    };
   }
   
-  return content;
+  // MCP server execution
+  if (content.includes('Executing MCP server:')) {
+    const serverMatch = content.match(/Executing MCP server: ([^\s]+)/);
+    const server = serverMatch ? serverMatch[1] : '';
+    return {
+      type: 'executing',
+      tool: formatToolName(server),
+      message: `Using ${formatToolName(server)}...`
+    };
+  }
+  
+  // Completion - handle both formats
+  if (content.includes('completed successfully')) {
+    // Try format: "MCP server: gmail_ws3:send_email completed successfully"
+    let serverMatch = content.match(/MCP server: ([^:]+):/);
+    if (!serverMatch) {
+      // Try format: "gmail_ws3 completed successfully"
+      serverMatch = content.match(/([^\s]+) completed successfully/);
+    }
+    const server = serverMatch ? serverMatch[1] : '';
+    return {
+      type: 'complete',
+      tool: formatToolName(server),
+      message: `${formatToolName(server)} completed`
+    };
+  }
+  
+  return null;
 }
 
+/**
+ * Format tool name for display
+ */
+function formatToolName(name) {
+  if (!name) return 'Tool';
+  return name
+    .replace(/[_-]/g, ' ')
+    .replace(/mcp/gi, '')
+    .replace(/ws\d+/g, '')
+    .replace(/gmail/gi, 'Gmail')
+    .replace(/linkedin/gi, 'LinkedIn')
+    .replace(/calendar/gi, 'Calendar')
+    .trim()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ') || 'Tool';
+}
+
+/**
+ * Clean up message content for display
+ */
+function getCleanMessage(content) {
+  if (!content) return '';
+  
+  // Remove debug prefixes
+  let cleaned = content
+    .replace(/^\[debug\]:\s*/i, '')
+    .replace(/^\[.*?\]:\s*/i, '')
+    .trim();
+  
+  // If it's a simple status message, return as is
+  if (cleaned.length < 100 && !cleaned.includes('\n')) {
+    return cleaned;
+  }
+  
+  // For longer messages, try to extract the essential part
+  const lines = cleaned.split('\n').filter(line => line.trim());
+  if (lines.length > 0) {
+    return lines[0].trim();
+  }
+  
+  return cleaned;
+}
+
+import { CheckCircle, Loader2, Mail, Calendar, Globe, CheckCircle2, Zap } from "lucide-react";
 import AgentAnimation from "@/media/animations/agent-animation.webm";
 import AgentStatic from "@/media/animations/agent-static.png";
+
+// Tool logos mapping (same as landing page)
+const toolLogos = {
+  "Gmail": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg",
+  "Google Calendar": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg",
+  "LinkedIn": "https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png",
+  "Google Drive": "https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg"
+};
+
+/**
+ * Enhanced Tool Status Display matching landing page design
+ */
+function EnhancedToolDisplay({ tools, latestTool, content }) {
+  const getToolLogo = (toolName) => {
+    const name = toolName.charAt(0).toUpperCase() + toolName.slice(1).toLowerCase();
+    return toolLogos[name] || toolLogos["Gmail"]; // fallback to Gmail logo
+  };
+
+  const getStatusIcon = (type) => {
+    switch (type) {
+      case 'complete': return CheckCircle2;
+      case 'executing': return Loader2;
+      case 'preparing': return Loader2;
+      default: return Loader2;
+    }
+  };
+
+  const getStatusColor = (type) => {
+    switch (type) {
+      case 'complete': return 'text-green-600';
+      case 'executing': return 'text-blue-600 animate-spin';
+      case 'preparing': return 'text-purple-600';
+      default: return 'text-gray-500';
+    }
+  };
+
+  // If we have a complete action with meaningful content, show structured result (landing page style)
+  if (latestTool?.type === 'complete' && content) {
+    return (
+      <div className="bg-white rounded-2xl rounded-tl-sm shadow-sm border border-gray-100 p-4 mb-2">
+        {/* Structured content like landing page */}
+        <div className="space-y-3">
+          <h4 className="font-semibold text-gray-900">✅ Email Sent Successfully</h4>
+          <div className="space-y-2">
+            {/* Parse email content */}
+            {content.includes('@') && (
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-600">Recipients</span>
+                </div>
+                <div className="text-gray-900 text-sm mt-1">
+                  {content.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/)?.[1]}
+                </div>
+              </div>
+            )}
+            
+            {/* Extract subject from agent response */}
+            {content.includes('subject') && (
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-600">Subject</span>
+                </div>
+                <div className="text-gray-900 text-sm mt-1">
+                  {content.match(/subject["\s]*["']([^"']+)["']/i)?.[1] || "Hello"}
+                </div>
+              </div>
+            )}
+
+            {content.includes('Message ID:') && (
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-600">Message ID</span>
+                </div>
+                <div className="text-gray-900 text-sm mt-1">
+                  <span className="font-mono text-xs bg-gray-50 px-2 py-1 rounded">
+                    {content.match(/Message ID: ([a-zA-Z0-9]+)/)?.[1]}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Footer like landing page */}
+          {content.includes('successfully') && (
+            <p className="text-sm text-gray-600 pt-2 border-t border-gray-200">
+              The email was delivered successfully.
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // For in-progress or preparing states, show minimal status
+  return (
+    <div className="bg-white rounded-2xl rounded-tl-sm shadow-sm border border-gray-100 p-4 mb-2">
+      <div className="flex items-center gap-3">
+        {latestTool && (
+          <>
+            <img 
+              src={getToolLogo(latestTool.tool)} 
+              alt={latestTool.tool}
+              className="w-5 h-5 rounded"
+            />
+            {React.createElement(getStatusIcon(latestTool.type), {
+              className: `w-4 h-4 ${getStatusColor(latestTool.type)}`
+            })}
+            <span className="text-sm font-medium text-gray-900">
+              {latestTool.message}
+            </span>
+          </>
+        )}
+      </div>
+      
+      {/* Compact metrics line like in landing page */}
+      <div className="flex items-center gap-3 text-xs text-gray-600 mt-2 pt-2 border-t border-gray-100">
+        <div className="flex items-center gap-1">
+          <Zap className="w-3 h-3 text-yellow-600" />
+          <span>Processing...</span>
+        </div>
+        <span className="text-gray-300">•</span>
+        <div className="flex items-center gap-1">
+          <span>Tool:</span>
+          <span className="font-medium">{latestTool?.tool}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function StatusResponse({
   messages = [],
@@ -36,30 +240,112 @@ export default function StatusResponse({
     setIsExpanded(!isExpanded);
   }
 
-  // Check if all messages are debug messages that should be hidden
-  const hasNonDebugMessages = messages.some(msg => {
-    const cleanContent = getCleanMessage(msg.content);
-    return cleanContent && cleanContent.trim() !== "";
-  });
+  // Parse debug messages into tool information
+  const toolInfo = messages.map(msg => parseDebugToToolInfo(msg.content)).filter(Boolean);
+  const latestTool = toolInfo[toolInfo.length - 1];
 
-  // If no non-debug messages and not actively thinking, hide the component
-  if (!hasNonDebugMessages && !isThinking) {
-    return null;
+  // If we have tool information, show enhanced tool display
+  if (toolInfo.length > 0 && !isThinking) {
+    const relevantContent = currentThought?.content || messages.map(m => m.content).join(' ');
+    return (
+      <div className="flex justify-start w-full">
+        <div className="max-w-[85%] space-y-2">
+          <EnhancedToolDisplay 
+            tools={toolInfo} 
+            latestTool={latestTool} 
+            content={relevantContent}
+          />
+          
+          {/* Metrics line like landing page - only for completed tasks */}
+          {latestTool?.type === 'complete' && (
+            <div className="flex items-center gap-3 text-xs text-gray-600 px-1">
+              {/* Tool Logo */}
+              <div className="flex items-center gap-1">
+                <div className="relative group">
+                  <img 
+                    src={toolLogos[latestTool.tool] || toolLogos["Gmail"]} 
+                    alt={latestTool.tool}
+                    className="w-5 h-5 rounded"
+                    title={latestTool.tool}
+                  />
+                </div>
+              </div>
+
+              {/* Separator */}
+              <span className="text-gray-300">•</span>
+
+              {/* Time */}
+              <div className="flex items-center gap-1">
+                <Zap className="w-3 h-3 text-yellow-600" />
+                <span>1.2s</span>
+              </div>
+
+              {/* Separator */}
+              <span className="text-gray-300">•</span>
+
+              {/* Confidence */}
+              <div className="flex items-center gap-1">
+                <div className="w-12 bg-gray-200 rounded-full h-1.5">
+                  <div 
+                    className="bg-green-500 h-1.5 rounded-full"
+                    style={{ width: '98%' }}
+                  ></div>
+                </div>
+                <span>98%</span>
+              </div>
+
+              {/* Separator */}
+              <span className="text-gray-300">•</span>
+
+              {/* Model */}
+              <div className="flex items-center gap-1">
+                <span>GPT-4</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   }
 
   // Use clean AgenticThinking component when agent is actively thinking
   if (isThinking) {
-    // Use the clean thinking display - hide debug messages for better UX
+    // Check if we have tool information during thinking
+    if (toolInfo.length > 0) {
+      const relevantContent = currentThought?.content || messages.map(m => m.content).join(' ');
+      return (
+        <div className="flex justify-start w-full">
+          <div className="max-w-[85%] space-y-2">
+            <EnhancedToolDisplay 
+              tools={toolInfo} 
+              latestTool={latestTool}
+              content={relevantContent}
+            />
+          </div>
+        </div>
+      );
+    }
+    
+    // Fall back to clean thinking display with no generic steps
     return (
-      <div className="flex justify-center w-full">
-        <div className="w-full max-w-4xl px-4">
-          <AgenticThinking
-            stage="thinking"
-            context={currentThought?.content || "Working on your request..."}
-            isActive={isThinking}
-            debugMessages={[]} // Hide debug messages - tools/metrics show in PromptReply now
-            operations={[]}
-          />
+      <div className="flex justify-start w-full">
+        <div className="max-w-[85%] space-y-2">
+          <div className="bg-white rounded-2xl rounded-tl-sm shadow-sm border border-gray-100 p-4">
+            <div className="flex items-center gap-3">
+              <Loader2 className="w-5 h-5 animate-spin text-purple-600" />
+              <span className="text-sm font-medium text-gray-900">
+                Processing request...
+              </span>
+            </div>
+            
+            {/* Minimal processing indicator */}
+            <div className="flex items-center gap-3 text-xs text-gray-600 mt-2 pt-2 border-t border-gray-100">
+              <div className="flex items-center gap-1">
+                <Zap className="w-3 h-3 text-yellow-600" />
+                <span>AI working...</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );

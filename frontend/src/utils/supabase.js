@@ -42,7 +42,7 @@ export const signOut = async () => {
     return false;
   }
   // Clear local storage
-  localStorage.removeItem('anythingllm_user');
+  localStorage.removeItem('tredy_user');
   window.location.href = '/login';
   return true;
 };
@@ -51,10 +51,10 @@ export const signOut = async () => {
 export const onAuthStateChange = (callback) => {
   return supabase.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_IN' && session) {
-      // Store the JWT token for AnythingLLM API calls
-      localStorage.setItem('anythingllm_supabase_token', session.access_token);
+      // Store the JWT token for Tredy API calls
+      localStorage.setItem('tredy_supabase_token', session.access_token);
     } else if (event === 'SIGNED_OUT') {
-      localStorage.removeItem('anythingllm_supabase_token');
+      localStorage.removeItem('tredy_supabase_token');
     }
     callback(event, session);
   });

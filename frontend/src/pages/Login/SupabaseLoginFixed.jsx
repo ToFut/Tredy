@@ -93,12 +93,12 @@ export default function SupabaseLogin() {
         throw new Error('Invalid auth response from backend');
       }
       
-      // Store the AnythingLLM JWT token and update AuthContext
-      window.localStorage.setItem('anythingllm_authToken', authData.token);
-      window.localStorage.setItem('anythingllm_authTimestamp', String(Date.now()));
+      // Store the Tredy JWT token and update AuthContext
+      window.localStorage.setItem('tredy_authToken', authData.token);
+      window.localStorage.setItem('tredy_authTimestamp', String(Date.now()));
       
       if (authData.user) {
-        window.localStorage.setItem('anythingllm_user', JSON.stringify(authData.user));
+        window.localStorage.setItem('tredy_user', JSON.stringify(authData.user));
         // Update AuthContext so UserButton appears immediately
         actions.updateUser(authData.user, authData.token);
       }

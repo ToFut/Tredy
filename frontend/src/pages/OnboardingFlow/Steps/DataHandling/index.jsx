@@ -1,6 +1,6 @@
 import PreLoader from "@/components/Preloader";
 import System from "@/models/system";
-import AnythingLLMIcon from "@/media/logo/Tredy Full.png";
+import TredyIcon from "@/media/logo/Tredy Full.png";
 import OpenAiLogo from "@/media/llmprovider/openai.png";
 import GenericOpenAiLogo from "@/media/llmprovider/generic-openai.png";
 import AzureOpenAiLogo from "@/media/llmprovider/azure.png";
@@ -325,7 +325,7 @@ export const VECTOR_DB_PRIVACY = {
   lancedb: {
     name: "LanceDB",
     description: [
-      "Your vectors and document text are stored privately on this instance of AnythingLLM",
+      "Your vectors and document text are stored privately on this instance of Tredy",
     ],
     logo: LanceDbLogo,
   },
@@ -333,11 +333,11 @@ export const VECTOR_DB_PRIVACY = {
 
 export const EMBEDDING_ENGINE_PRIVACY = {
   native: {
-    name: "AnythingLLM Embedder",
+    name: "Tredy Embedder",
     description: [
-      "Your document text is embedded privately on this instance of AnythingLLM",
+      "Your document text is embedded privately on this instance of Tredy",
     ],
-    logo: AnythingLLMIcon,
+    logo: TredyIcon,
   },
   openai: {
     name: "OpenAI",
@@ -425,23 +425,23 @@ export const FALLBACKS = {
   LLM: (provider) => ({
     name: "Unknown",
     description: [
-      `"${provider}" has no known data handling policy defined in AnythingLLM`,
+      `"${provider}" has no known data handling policy defined in Tredy`,
     ],
-    logo: AnythingLLMIcon,
+    logo: TredyIcon,
   }),
   EMBEDDING: (provider) => ({
     name: "Unknown",
     description: [
-      `"${provider}" has no known data handling policy defined in AnythingLLM`,
+      `"${provider}" has no known data handling policy defined in Tredy`,
     ],
-    logo: AnythingLLMIcon,
+    logo: TredyIcon,
   }),
   VECTOR: (provider) => ({
     name: "Unknown",
     description: [
-      `"${provider}" has no known data handling policy defined in AnythingLLM`,
+      `"${provider}" has no known data handling policy defined in Tredy`,
     ],
-    logo: AnythingLLMIcon,
+    logo: TredyIcon,
   }),
 };
 

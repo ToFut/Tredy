@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
-import AnythingLLM from "./media/logo/Tredy Full.png";
-import AnythingLLMDark from "./media/logo/Tredy Full.png";
+import Tredy from "./media/logo/Tredy Full.png";
+import TredyDark from "./media/logo/Tredy Full.png";
 import DefaultLoginLogoLight from "./media/illustrations/login-logo.svg";
 import DefaultLoginLogoDark from "./media/illustrations/login-logo-light.svg";
 import System from "./models/system";
@@ -26,15 +26,15 @@ export function LogoProvider({ children }) {
         setIsCustomLogo(isCustomLogo);
       } else {
         localStorage.getItem("theme") !== "default"
-          ? setLogo(AnythingLLMDark)
-          : setLogo(AnythingLLM);
+          ? setLogo(TredyDark)
+          : setLogo(Tredy);
         setLoginLogo(DefaultLoginLogo);
         setIsCustomLogo(false);
       }
     } catch (err) {
       localStorage.getItem("theme") !== "default"
-        ? setLogo(AnythingLLMDark)
-        : setLogo(AnythingLLM);
+        ? setLogo(TredyDark)
+        : setLogo(Tredy);
       setLoginLogo(DefaultLoginLogo);
       setIsCustomLogo(false);
       console.error("Failed to fetch logo:", err);

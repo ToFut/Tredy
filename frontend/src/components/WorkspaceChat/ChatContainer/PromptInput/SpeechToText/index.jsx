@@ -46,7 +46,7 @@ export default function SpeechToText({ sendCommand }) {
     
     if (!isMicrophoneAvailable) {
       alert(
-        "AnythingLLM does not have access to microphone. Please enable for this site to use this feature."
+        "Tredy does not have access to microphone. Please enable for this site to use this feature."
       );
       return;
     }

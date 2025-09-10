@@ -20,36 +20,339 @@ class WorkflowCreatorSession {
   }
 
   /**
-   * Parse natural language description into workflow steps
-   * Inspired by claude-task-master's AI-driven task decomposition
+   * Parse natural language description into workflow steps using LLM-powered decomposition
    */
-  parseDescriptionToWorkflowSteps(description) {
+  async parseDescriptionToWorkflowSteps(description, aibitat) {
     console.log("🔧 [WorkflowCreator] Parsing description:", description);
     
+    try {
+      // Get available tools for context
+      const availableTools = this.getAvailableTools(aibitat);
+      
+      // Use LLM to decompose task into logical steps
+      const decompositionPrompt = `You are a workflow planning expert. Break down this task into logical, sequential steps:
+
+"${description}"
+
+Available tools: ${availableTools.slice(0, 20).join(', ')}${availableTools.length > 20 ? '...' : ''}
+
+Rules:
+1. Each step should be a single, specific action
+2. Identify the exact tool needed for each step
+3. Extract specific parameters (emails, names, etc.)
+4. Consider data flow between steps
+5. Be precise about what each step accomplishes
+
+Return a JSON array of steps with this format:
+[
+  {
+    "action": "send email",
+    "target": "user@example.com",
+    "content": "Hello",
+    "tool": "gmail_ws6-send_email",
+    "parameters": {"to": "user@example.com", "subject": "Message", "body": "Hello"}
+  }
+]
+
+Only return the JSON array, no other text.`;
+      
+      console.log("🔧 [WorkflowCreator] Using LLM for task decomposition");
+      const response = await aibitat.llm.chat([{
+        role: "user",
+        content: decompositionPrompt
+      }], { temperature: 0.1 });
+      
+      // Parse LLM response
+      let parsedSteps;
+      try {
+        const jsonMatch = response.match(/\[.*\]/s);
+        if (jsonMatch) {
+          parsedSteps = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("No JSON array found in response");
+        }
+      } catch (parseError) {
+        console.log("🔧 [WorkflowCreator] LLM parsing failed, using fallback:", parseError.message);
+        return this.parseDescriptionToWorkflowStepsFallback(description, availableTools);
+      }
+      
+      // Convert LLM response to workflow steps with dependency tracking
+      const steps = [];
+      for (let i = 0; i < parsedSteps.length; i++) {
+        const step = parsedSteps[i];
+        steps.push(this.createWorkflowStep(step, i, availableTools, steps));
+      }
+      
+      console.log("🔧 [WorkflowCreator] Created", steps.length, "workflow steps via LLM");
+      return steps;
+      
+    } catch (error) {
+      console.log("🔧 [WorkflowCreator] LLM decomposition failed, using fallback:", error.message);
+      return this.parseDescriptionToWorkflowStepsFallback(description, aibitat ? this.getAvailableTools(aibitat) : []);
+    }
+  }
+
+  /**
+   * Get available tools from aibitat instance
+   */
+  getAvailableTools(aibitat) {
+    if (!aibitat || !aibitat.functions) {
+      return [];
+    }
+    
+    const tools = Array.from(aibitat.functions.keys());
+    console.log(`🔧 [WorkflowCreator] Found ${tools.length} available tools`);
+    return tools;
+  }
+
+  /**
+   * Create workflow step from LLM-parsed action with improved variable passing
+   */
+  createWorkflowStep(stepData, index, availableTools, allSteps = []) {
+    const { action, target, content, tool, parameters, dependsOn } = stepData;
+    
+    // Try to find the best matching tool
+    const bestTool = this.findBestTool(action, target, availableTools);
+    
+    // Handle variable substitution for parameters
+    const processedParams = this.processParametersWithVariables(parameters || this.extractParameters(action, target, content), allSteps, index);
+    
+    if (bestTool) {
+      // Create TOOL_CALL step
+      return {
+        type: FLOW_TYPES.TOOL_CALL.type,
+        config: {
+          toolName: bestTool,
+          parameters: processedParams,
+          resultVariable: `step_${index + 1}_result`,
+          directOutput: this.shouldUseDirectOutput(action),
+          dependsOn: dependsOn || (index > 0 ? [`step_${index}_result`] : [])
+        }
+      };
+    } else if (action?.toLowerCase().includes('api') || target?.includes('http')) {
+      // Create API_CALL step
+      return {
+        type: FLOW_TYPES.API_CALL.type,
+        config: {
+          url: target || "https://api.example.com",
+          method: "POST",
+          body: JSON.stringify(processedParams),
+          responseVariable: `step_${index + 1}_result`,
+          directOutput: false,
+          dependsOn: dependsOn || (index > 0 ? [`step_${index}_result`] : [])
+        }
+      };
+    } else {
+      // Enhanced LLM_INSTRUCTION with variable context
+      let instruction = `${action}: ${target || ''} ${content || ''}`.trim();
+      
+      // Add context from previous steps if available
+      if (index > 0) {
+        instruction += `\n\nContext from previous steps: Use the results from previous workflow steps as needed.`;
+      }
+      
+      return {
+        type: FLOW_TYPES.LLM_INSTRUCTION.type,
+        config: {
+          instruction,
+          resultVariable: `step_${index + 1}_result`,
+          directOutput: false,
+          dependsOn: dependsOn || (index > 0 ? [`step_${index}_result`] : [])
+        }
+      };
+    }
+  }
+  
+  /**
+   * Process parameters to include variable references from previous steps
+   */
+  processParametersWithVariables(params, allSteps, currentIndex) {
+    if (!params || typeof params !== 'object') {
+      return params;
+    }
+    
+    const processedParams = { ...params };
+    
+    // Look for parameters that might reference previous step results
+    Object.keys(processedParams).forEach(key => {
+      let value = processedParams[key];
+      
+      // If value contains placeholder text that suggests it should use previous results
+      if (typeof value === 'string') {
+        // Replace dynamic content markers with variable references
+        if (value.includes('{{previous}}') || value.includes('{{result}}')) {
+          if (currentIndex > 0) {
+            value = value.replace(/{{previous}}/g, `{{step_${currentIndex}_result}}`);
+            value = value.replace(/{{result}}/g, `{{step_${currentIndex}_result}}`);
+          }
+        }
+        
+        // For email subjects, make them more specific
+        if (key === 'subject' && (!value || value.length < 5)) {
+          value = `Workflow Step ${currentIndex + 1} - ${value || 'Automated Message'}`;
+        }
+        
+        processedParams[key] = value;
+      }
+    });
+    
+    return processedParams;
+  }
+  
+  /**
+   * Determine if step should use direct output (bypass LLM processing)
+   */
+  shouldUseDirectOutput(action) {
+    const actionLower = (action || '').toLowerCase();
+    
+    // Actions that should show direct results
+    const directOutputActions = ['send', 'create', 'book', 'schedule', 'connect', 'invite'];
+    
+    return directOutputActions.some(directAction => actionLower.includes(directAction));
+  }
+
+  /**
+   * Find best matching tool for an action
+   */
+  findBestTool(action, target, availableTools) {
+    const actionLower = (action || '').toLowerCase();
+    const targetLower = (target || '').toLowerCase();
+    
+    // Email actions
+    if (actionLower.includes('send') && (actionLower.includes('email') || actionLower.includes('mail') || targetLower.includes('@'))) {
+      return availableTools.find(tool => tool.includes('gmail') && tool.includes('send_email'));
+    }
+    
+    // LinkedIn actions
+    if (actionLower.includes('linkedin') || actionLower.includes('invite') || actionLower.includes('connect')) {
+      if (actionLower.includes('invite') || actionLower.includes('connect')) {
+        return availableTools.find(tool => tool.includes('linkedin') && tool.includes('connect'));
+      }
+      if (actionLower.includes('message')) {
+        return availableTools.find(tool => tool.includes('linkedin') && tool.includes('send_message'));
+      }
+      return availableTools.find(tool => tool.includes('linkedin'));
+    }
+    
+    // Calendar actions
+    if (actionLower.includes('calendar') || actionLower.includes('meeting') || actionLower.includes('schedule')) {
+      if (actionLower.includes('book') || actionLower.includes('schedule')) {
+        return availableTools.find(tool => tool.includes('calendar') && tool.includes('book'));
+      }
+      return availableTools.find(tool => tool.includes('calendar'));
+    }
+    
+    // File operations
+    if (actionLower.includes('read') || actionLower.includes('file') || actionLower.includes('write')) {
+      return availableTools.find(tool => tool.includes('filesystem'));
+    }
+    
+    // Web scraping
+    if (actionLower.includes('scrape') || actionLower.includes('web') || targetLower.includes('http')) {
+      return availableTools.find(tool => tool.includes('web'));
+    }
+    
+    return null;
+  }
+
+  /**
+   * Extract parameters from action components
+   */
+  extractParameters(action, target, content) {
+    const actionLower = (action || '').toLowerCase();
+    const params = {};
+    
+    // Email parameters
+    if (actionLower.includes('email') || actionLower.includes('mail')) {
+      if (target && target.includes('@')) {
+        params.to = target;
+      }
+      if (content) {
+        params.body = content;
+        params.subject = content.length > 50 ? content.substring(0, 50) + '...' : content;
+      }
+    }
+    
+    // LinkedIn parameters
+    if (actionLower.includes('linkedin')) {
+      if (target) {
+        params.name = target;
+      }
+      if (content) {
+        params.message = content;
+      }
+    }
+    
+    // Calendar parameters
+    if (actionLower.includes('calendar') || actionLower.includes('meeting')) {
+      if (target) {
+        params.title = target;
+      }
+      if (content) {
+        params.description = content;
+      }
+    }
+    
+    return params;
+  }
+
+  /**
+   * Fallback parsing method for when LLM fails
+   */
+  parseDescriptionToWorkflowStepsFallback(description, availableTools) {
+    console.log("🔧 [WorkflowCreator] Using fallback parsing");
+    
     const steps = [];
-    const lowerDesc = description.toLowerCase();
     
-    // Module: Parse sequential steps with "then" keyword
-    if (lowerDesc.includes('then')) {
-      const parts = description.split(/\s+then\s+/i);
-      parts.forEach((part, index) => {
-        steps.push(this.parseGenericStep(part.trim(), index));
+    // Try to extract multiple actions using improved regex
+    const actions = this.extractActionsFromText(description);
+    
+    if (actions.length > 0) {
+      actions.forEach((action, index) => {
+        steps.push(this.createWorkflowStep(action, index, availableTools));
       });
-    } 
-    // Module: Parse comma-separated steps
-    else if (lowerDesc.includes(',')) {
-      const parts = description.split(',');
-      parts.forEach((part, index) => {
-        steps.push(this.parseGenericStep(part.trim(), index));
+    } else {
+      // Single step fallback
+      steps.push({
+        type: FLOW_TYPES.LLM_INSTRUCTION.type,
+        config: {
+          instruction: description,
+          resultVariable: 'step_1_result',
+          directOutput: false
+        }
       });
     }
-    // Single step workflow
-    else {
-      steps.push(this.parseGenericStep(description, 0));
-    }
     
-    console.log("🔧 [WorkflowCreator] Parsed", steps.length, "workflow steps");
     return steps;
+  }
+
+  /**
+   * Extract actions from text using improved pattern matching
+   */
+  extractActionsFromText(text) {
+    const actions = [];
+    
+    // Email pattern: send email/mail to X with Y
+    const emailMatches = text.matchAll(/send\s+(?:email|mail)\s+to\s+([^\s]+@[^\s]+)\s+with\s+([^,]+?)(?:\s+and|$)/gi);
+    for (const match of emailMatches) {
+      actions.push({
+        action: 'send email',
+        target: match[1],
+        content: match[2].trim()
+      });
+    }
+    
+    // LinkedIn pattern: send invite/connect on linkedin to X
+    const linkedinMatches = text.matchAll(/send\s+(?:invite|connection)\s+(?:on|in)\s+(?:linkedin|linkdin)\s+to\s+([^,]+?)(?:\s+and|$)/gi);
+    for (const match of linkedinMatches) {
+      actions.push({
+        action: 'linkedin connect',
+        target: match[1].trim(),
+        content: ''
+      });
+    }
+    
+    return actions;
   }
 
   parseGenericStep(stepText, index) {
@@ -379,8 +682,8 @@ const workflowCreator = {
               // Send initial workflow creation notification
               aibitat.introspect(`🏗️ Starting workflow creation: "${draft.name}"`);
               
-              // Parse description into workflow steps using AI-driven approach
-              const parsedSteps = session.parseDescriptionToWorkflowSteps(description);
+              // Parse description into workflow steps using LLM-powered approach
+              const parsedSteps = await session.parseDescriptionToWorkflowSteps(description, aibitat);
               
               // Progressive rendering: Add blocks one by one with real-time updates
               const steps = [];

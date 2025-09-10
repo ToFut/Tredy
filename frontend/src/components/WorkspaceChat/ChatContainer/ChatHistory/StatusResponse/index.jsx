@@ -2,6 +2,23 @@ import React, { useState } from "react";
 import { CaretDown } from "@phosphor-icons/react";
 import AgenticThinking from "@/components/AgenticThinking";
 
+/**
+ * Clean up debug messages and show user-friendly content
+ */
+function getCleanMessage(content) {
+  if (!content) return "";
+  
+  // Hide all debug messages completely
+  if (content.includes('[debug]:') || 
+      content.includes('Executing MCP server:') || 
+      content.includes('completed successfully') ||
+      content.includes('attempting to call')) {
+    return ""; // Hide debug messages completely
+  }
+  
+  return content;
+}
+
 import AgentAnimation from "@/media/animations/agent-animation.webm";
 import AgentStatic from "@/media/animations/agent-static.png";
 
@@ -19,16 +36,20 @@ export default function StatusResponse({
     setIsExpanded(!isExpanded);
   }
 
-  // Use enhanced AgenticThinking component when agent is actively thinking
-  if (isThinking) {
-    // Collect debug messages from all thinking messages
-    const allDebugMessages = messages.reduce((acc, msg) => {
-      if (msg.debugMessages) {
-        acc.push(...msg.debugMessages);
-      }
-      return acc;
-    }, []);
+  // Check if all messages are debug messages that should be hidden
+  const hasNonDebugMessages = messages.some(msg => {
+    const cleanContent = getCleanMessage(msg.content);
+    return cleanContent && cleanContent.trim() !== "";
+  });
 
+  // If no non-debug messages and not actively thinking, hide the component
+  if (!hasNonDebugMessages && !isThinking) {
+    return null;
+  }
+
+  // Use clean AgenticThinking component when agent is actively thinking
+  if (isThinking) {
+    // Use the clean thinking display - hide debug messages for better UX
     return (
       <div className="flex justify-center w-full">
         <div className="w-full max-w-4xl px-4">
@@ -36,7 +57,7 @@ export default function StatusResponse({
             stage="thinking"
             context={currentThought?.content || "Working on your request..."}
             isActive={isThinking}
-            debugMessages={allDebugMessages}
+            debugMessages={[]} // Hide debug messages - tools/metrics show in PromptReply now
             operations={[]}
           />
         </div>
@@ -86,7 +107,7 @@ export default function StatusResponse({
                 <div className="text-theme-text-secondary font-mono leading-6">
                   {!isExpanded ? (
                     <span className="block w-full truncate mt-[2px]">
-                      {currentThought?.content || "Working on your request..."}
+                      {getCleanMessage(currentThought?.content) || "Working on your request..."}
                     </span>
                   ) : (
                     <>
@@ -95,10 +116,10 @@ export default function StatusResponse({
                           key={`cot-${thought.uuid || index}`}
                           className="mb-2"
                         >
-                          {thought.content}
+                          {getCleanMessage(thought.content)}
                         </div>
                       ))}
-                      <div>{currentThought?.content || ""}</div>
+                      <div>{getCleanMessage(currentThought?.content) || ""}</div>
                     </>
                   )}
                 </div>

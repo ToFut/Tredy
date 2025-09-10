@@ -2,6 +2,7 @@ const { FLOW_TYPES } = require("./flowTypes");
 const executeApiCall = require("./executors/api-call");
 const executeLLMInstruction = require("./executors/llm-instruction");
 const executeWebScraping = require("./executors/web-scraping");
+const executeToolCall = require("./executors/tool-call");
 const { Telemetry } = require("../../models/telemetry");
 const { safeJsonParse } = require("../http");
 
@@ -163,6 +164,9 @@ class FlowExecutor {
         break;
       case FLOW_TYPES.WEB_SCRAPING.type:
         result = await executeWebScraping(config, context);
+        break;
+      case FLOW_TYPES.TOOL_CALL.type:
+        result = await executeToolCall(config, context);
         break;
       default:
         throw new Error(`Unknown flow type: ${step.type}`);

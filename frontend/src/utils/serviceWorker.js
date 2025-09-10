@@ -53,7 +53,7 @@ function showUpdatePrompt() {
     <div class="flex justify-between items-center">
       <div>
         <p class="font-semibold">Update Available!</p>
-        <p class="text-sm opacity-90">A new version of AnythingLLM is ready.</p>
+        <p class="text-sm opacity-90">A new version of Tredy is ready.</p>
       </div>
       <button onclick="window.location.reload()" class="ml-4 px-4 py-2 bg-white text-blue-500 rounded-lg font-semibold">
         Update

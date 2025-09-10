@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import { Info, Warning } from "@phosphor-icons/react";
 import UserIcon from "../../../../UserIcon";
 import Actions from "./Actions";
@@ -21,6 +21,8 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { chatQueryRefusalResponse } from "@/utils/chat";
 import InteractiveConnectionButton from "../../../InteractiveConnectionButton";
+import { Zap, Cpu, Brain, ChevronRight } from "lucide-react";
+import { getToolLogo } from "../UnifiedMessage/utils/toolLogos";
 
 const HistoricalMessage = ({
   uuid = v4(),
@@ -139,6 +141,11 @@ const HistoricalMessage = ({
                 </Link>
               )}
               <ChatAttachments attachments={attachments} />
+              
+              {/* Metrics display for assistant messages */}
+              {role === "assistant" && Object.keys(metrics).length > 0 && (
+                <HistoricalMessageMetrics metrics={metrics} />
+              )}
             </div>
           )}
         </div>
@@ -340,3 +347,89 @@ const RenderChatContent = memo(
     );
   }
 );
+
+/**
+ * Historical Message Metrics Component
+ */
+function HistoricalMessageMetrics({ metrics }) {
+  const [showThinking, setShowThinking] = useState(false);
+  const hasThinking = metrics.thinking && metrics.thinking.length > 0;
+
+  return (
+    <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mt-3 px-1">
+      {/* Tools */}
+      {metrics.tools && metrics.tools.length > 0 && (
+        <>
+          <div className="flex items-center gap-1">
+            {metrics.tools.slice(0, 3).map((tool, idx) => {
+              const logo = getToolLogo(tool.name || tool);
+              return (
+                <div key={idx} className="w-4 h-4">
+                  {typeof logo === 'string' ? (
+                    <img src={logo} alt={tool.name || tool} className="w-4 h-4 rounded" />
+                  ) : (
+                    React.createElement(logo, { className: "w-4 h-4 text-gray-600 dark:text-gray-400" })
+                  )}
+                </div>
+              );
+            })}
+            {metrics.tools.length > 3 && (
+              <span className="text-gray-400">+{metrics.tools.length - 3}</span>
+            )}
+          </div>
+          <span className="text-gray-300 dark:text-gray-600">•</span>
+        </>
+      )}
+      
+      {/* Execution Time */}
+      {metrics.time && (
+        <>
+          <div className="flex items-center gap-1">
+            <Zap className="w-3 h-3 text-yellow-500" />
+            <span>{metrics.time}</span>
+          </div>
+          <span className="text-gray-300 dark:text-gray-600">•</span>
+        </>
+      )}
+      
+      {/* Model */}
+      {metrics.model && (
+        <>
+          <div className="flex items-center gap-1">
+            <Cpu className="w-3 h-3 text-purple-500" />
+            <span>{metrics.model}</span>
+          </div>
+        </>
+      )}
+      
+      {/* Thinking toggle */}
+      {hasThinking && (
+        <>
+          <span className="text-gray-300 dark:text-gray-600">•</span>
+          <button
+            onClick={() => setShowThinking(!showThinking)}
+            className="flex items-center gap-1 text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
+          >
+            <Brain className="w-3 h-3" />
+            <span>Details</span>
+            <ChevronRight className={`w-3 h-3 transition-transform ${showThinking ? 'rotate-90' : ''}`} />
+          </button>
+        </>
+      )}
+      
+      {/* Expanded thinking details */}
+      {showThinking && hasThinking && (
+        <div className="absolute mt-8 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 z-10">
+          <div className="space-y-1">
+            {metrics.thinking.map((step, idx) => (
+              <div key={idx} className="flex items-start gap-2">
+                <div className="w-1 h-1 bg-purple-400 rounded-full mt-1.5" />
+                <span className="text-xs text-gray-600 dark:text-gray-400">{step}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

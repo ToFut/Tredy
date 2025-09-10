@@ -75,6 +75,14 @@ class GmailMCP {
               bcc: {
                 type: 'string',
                 description: 'BCC recipients (optional)'
+              },
+              senderName: {
+                type: 'string',
+                description: 'Name of the person sending the email (for signature)'
+              },
+              workspaceName: {
+                type: 'string',
+                description: 'Name of the workspace/company (for signature)'
               }
             },
             required: ['to', 'subject', 'body']
@@ -300,6 +308,35 @@ After authorization, you can use Gmail commands like:
     return { nango, connectionId };
   }
 
+  /**
+   * Enhance email body by replacing placeholders and adding signature
+   */
+  enhanceEmailBody(body, senderName, workspaceName) {
+    let enhancedBody = body;
+    
+    // Replace common placeholders
+    if (senderName) {
+      enhancedBody = enhancedBody.replace(/\[Your Name\]/gi, senderName);
+      enhancedBody = enhancedBody.replace(/\[Sender Name\]/gi, senderName);
+    }
+    
+    if (workspaceName) {
+      enhancedBody = enhancedBody.replace(/\[Company\]/gi, workspaceName);
+      enhancedBody = enhancedBody.replace(/\[Company Name\]/gi, workspaceName);
+      enhancedBody = enhancedBody.replace(/\[Organization\]/gi, workspaceName);
+    }
+    
+    // Add signature if not already present and we have sender info
+    if (senderName && !enhancedBody.includes('Best regards') && !enhancedBody.includes('Sincerely')) {
+      enhancedBody += `\n\nBest regards,\n${senderName}`;
+      if (workspaceName) {
+        enhancedBody += `\n${workspaceName}`;
+      }
+    }
+    
+    return enhancedBody;
+  }
+
   async sendEmail(args) {
     console.error('[Gmail MCP] sendEmail called with args:', JSON.stringify(args));
     
@@ -307,7 +344,10 @@ After authorization, you can use Gmail commands like:
     const workspaceId = args.workspaceId || process.env.NANGO_CONNECTION_ID?.replace('workspace_', '') || '4';
     const { nango, connectionId } = this.getNangoClient(workspaceId);
 
-    const { to, subject = "Message from AnythingLLM", body = "This is an automated message.", cc, bcc } = args;
+    let { to, subject = "Message from AnythingLLM", body = "This is an automated message.", cc, bcc, senderName, workspaceName } = args;
+    
+    // Enhanced email body processing to replace placeholders and add signature
+    body = this.enhanceEmailBody(body, senderName, workspaceName);
     
     console.error('[Gmail MCP] Email details:', { to, subject, body: body.substring(0, 50), connectionId });
 

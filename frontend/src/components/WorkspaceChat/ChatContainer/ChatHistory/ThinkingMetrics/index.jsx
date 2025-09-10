@@ -2,18 +2,18 @@ import React, { useState, useEffect } from "react";
 import { 
   Clock, 
   Brain, 
-  Tool, 
+  Wrench, 
   ChartBar, 
-  ChevronDown, 
-  ChevronRight,
+  CaretDown, 
+  CaretRight,
   Copy,
-  RefreshCw,
+  ArrowClockwise,
   Code,
   Globe,
   Database,
   FileText,
-  Sparkles,
-  AlertCircle,
+  Sparkle,
+  WarningCircle,
   CheckCircle,
   ArrowRight,
   Activity
@@ -28,12 +28,12 @@ const TOOL_ICONS = {
   'rag-memory': Brain,
   'sql-query': Database,
   'create-chart': ChartBar,
-  'create-workflow': Sparkles,
+  'create-workflow': Sparkle,
   'filesystem': FileText,
   'gmail': Globe,
   'calendar': Clock,
   'linkedin': Globe,
-  'default': Tool
+  'default': Wrench
 };
 
 // Get tool icon
@@ -120,13 +120,13 @@ ${confidence ? `- Confidence: ${confidence.score}%` : ''}
               </span>
               {toolsUsed.length > 0 && (
                 <span className="flex items-center gap-1">
-                  <Tool className="w-3 h-3" />
+                  <Wrench className="w-3 h-3" />
                   {toolsUsed.length} tools
                 </span>
               )}
               {workflowCount > 0 && (
                 <span className="flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" />
+                  <Sparkle className="w-3 h-3" />
                   {workflowCount} workflows
                 </span>
               )}
@@ -138,9 +138,9 @@ ${confidence ? `- Confidence: ${confidence.score}%` : ''}
           </div>
           
           {expanded ? (
-            <ChevronDown className="w-4 h-4 text-theme-text-secondary" />
+            <CaretDown className="w-4 h-4 text-theme-text-secondary" />
           ) : (
-            <ChevronRight className="w-4 h-4 text-theme-text-secondary" />
+            <CaretRight className="w-4 h-4 text-theme-text-secondary" />
           )}
         </button>
 
@@ -207,7 +207,7 @@ ${confidence ? `- Confidence: ${confidence.score}%` : ''}
                   {errorCount > 0 && (
                     <div className="bg-red-50 dark:bg-red-900/20 rounded-md p-3">
                       <div className="flex items-center gap-2 mb-1">
-                        <AlertCircle className="w-3.5 h-3.5 text-red-500" />
+                        <WarningCircle className="w-3.5 h-3.5 text-red-500" />
                         <span className="text-xs text-red-600 dark:text-red-400">Errors</span>
                       </div>
                       <span className="text-sm font-medium text-red-700 dark:text-red-300">
@@ -309,7 +309,7 @@ ${confidence ? `- Confidence: ${confidence.score}%` : ''}
             onClick={onRegenerate}
             className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-theme-text-secondary hover:text-theme-text-primary hover:bg-theme-bg-secondary/50 rounded-md transition-colors"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
+            <ArrowClockwise className="w-3.5 h-3.5" />
             Regenerate
           </button>
         )}
@@ -323,10 +323,10 @@ function TimelineItem({ event }) {
   const getEventIcon = () => {
     switch(event.type) {
       case 'thinking': return <Brain className="w-3.5 h-3.5 text-purple-500" />;
-      case 'tool': return <Tool className="w-3.5 h-3.5 text-blue-500" />;
-      case 'workflow': return <Sparkles className="w-3.5 h-3.5 text-amber-500" />;
-      case 'error': return <AlertCircle className="w-3.5 h-3.5 text-red-500" />;
-      case 'retry': return <RefreshCw className="w-3.5 h-3.5 text-orange-500" />;
+      case 'tool': return <Wrench className="w-3.5 h-3.5 text-blue-500" />;
+      case 'workflow': return <Sparkle className="w-3.5 h-3.5 text-amber-500" />;
+      case 'error': return <WarningCircle className="w-3.5 h-3.5 text-red-500" />;
+      case 'retry': return <ArrowClockwise className="w-3.5 h-3.5 text-orange-500" />;
       default: return <ArrowRight className="w-3.5 h-3.5 text-theme-text-secondary" />;
     }
   };

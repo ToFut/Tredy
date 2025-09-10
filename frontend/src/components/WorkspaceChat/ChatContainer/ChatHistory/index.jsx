@@ -440,6 +440,8 @@ function buildMessages({
           error={props.error}
           workspace={workspace}
           closed={props.closed}
+          agentMetrics={props.agentMetrics}
+          debugInfo={props.debugInfo}
         />
       );
     } else {

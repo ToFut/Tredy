@@ -8,6 +8,7 @@ const {
 } = require("../utils/agents/aibitat/plugins/websocket");
 const { safeJsonParse } = require("../utils/http");
 const { registerConnection } = require("../utils/scheduleEvents");
+const { enhanceAgentHandler } = require("../utils/agents/websocket-emit-tools");
 
 // Setup listener for incoming messages to relay to socket so it can be handled by agent plugin.
 function relayToSocket(message) {
@@ -33,6 +34,9 @@ function agentWebsocket(app) {
       if (agentHandler.invocation?.workspace_id) {
         registerConnection(agentHandler.invocation.workspace_id, socket);
       }
+
+      // Enhance agent handler with WebSocket tool emissions
+      enhanceAgentHandler(agentHandler, socket);
       
       socket.on("message", relayToSocket);
       socket.on("close", () => {

@@ -189,7 +189,7 @@ export function MobileSlideOutSidebar({ isOpen, onClose }) {
                   <img src={logo} alt="Logo" className="h-10 w-10 rounded-xl" />
                   <div>
                     <h2 className="font-semibold text-gray-900 dark:text-white">
-                      AnythingLLM
+                      Tredy
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       {user?.username || 'Guest'}
@@ -443,7 +443,7 @@ export default function MobileSidebarWrapper({ children }) {
           
           <div className="flex items-center gap-2">
             <img src={logo} alt="Logo" className="h-8 w-8 rounded" />
-            <span className="font-semibold text-gray-900 dark:text-white">AnythingLLM</span>
+            <span className="font-semibold text-gray-900 dark:text-white">Tredy</span>
           </div>
           
           <div className="w-10 h-10" /> {/* Spacer for balance */}

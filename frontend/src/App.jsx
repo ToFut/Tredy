@@ -12,6 +12,7 @@ import Login from "@/pages/Login";
 import SupabaseLogin from "@/pages/Login/SupabaseLogin";
 import SimpleSSOPassthrough from "@/pages/Login/SSO/simple";
 import OnboardingFlow from "@/pages/OnboardingFlow";
+import LandingPage from "@/pages/LandingPage";
 import i18n from "./i18n";
 
 import { PfpProvider } from "./PfpContext";
@@ -111,7 +112,8 @@ export default function App() {
               <I18nextProvider i18n={i18n}>
                 {/* <DarkModeToggle /> */}
                 <Routes>
-                  <Route path="/" element={<PrivateRoute Component={Main} />} />
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/dashboard" element={<PrivateRoute Component={Main} />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/login/password" element={<Login />} />
                   <Route

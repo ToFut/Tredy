@@ -156,7 +156,7 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
   const showNotification = (message, type = "info") => {
     // Browser notification if permitted
     if ("Notification" in window && Notification.permission === "granted") {
-      new Notification("AnythingLLM Schedule", {
+      new Notification("Tredy Schedule", {
         body: message,
         icon: "/favicon.ico",
         tag: "schedule-notification"

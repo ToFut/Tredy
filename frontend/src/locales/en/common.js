@@ -7,7 +7,7 @@ const TRANSLATIONS = {
     llm: {
       title: "LLM Preference",
       description:
-        "AnythingLLM can work with many LLM providers. This will be the service which handles chatting.",
+        "Tredy can work with many LLM providers. This will be the service which handles chatting.",
     },
     userSetup: {
       title: "User Setup",
@@ -37,15 +37,15 @@ const TRANSLATIONS = {
         "These settings can be reconfigured at any time in the settings.",
     },
     survey: {
-      title: "Welcome to AnythingLLM",
-      description: "Help us make AnythingLLM built for your needs. Optional.",
+      title: "Welcome to Tredy",
+      description: "Help us make Tredy built for your needs. Optional.",
 
       email: "What's your email?",
-      useCase: "What will you use AnythingLLM for?",
+      useCase: "What will you use Tredy for?",
       useCaseWork: "For work",
       useCasePersonal: "For personal use",
       useCaseOther: "Other",
-      comment: "How did you hear about AnythingLLM?",
+      comment: "How did you hear about Tredy?",
       commentPlaceholder:
         "Reddit, Twitter, GitHub, YouTube, etc. - Let us know how you found us!",
       skip: "Skip Survey",
@@ -54,7 +54,7 @@ const TRANSLATIONS = {
     workspace: {
       title: "Create your first workspace",
       description:
-        "Create your first workspace and get started with AnythingLLM.",
+        "Create your first workspace and get started with Tredy.",
     },
   },
   common: {

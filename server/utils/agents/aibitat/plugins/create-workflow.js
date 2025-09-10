@@ -44,113 +44,62 @@ const createWorkflow = {
               const workflowName = `Workflow ${Date.now()}`;
               const workflowUuid = uuidv4();
               
-              // Parse description into logical workflow steps
-              function parseIntoSteps(desc) {
-                const steps = [];
-                const visualBlocks = [];
-                
-                // Split by common action words and conjunctions
+              // Parse description into logical workflow steps using available tools
+              function parseIntoSteps(desc, availableTools = []) {
+                // Split description into logical parts
                 const parts = desc.split(/(?:\bthen\b|\band then\b|\bafter that\b|\bfinally\b|\bnext\b)/i)
                   .map(p => p.trim())
                   .filter(p => p.length > 0);
                 
-                parts.forEach((part, index) => {
-                  let stepType = 'llmInstruction';
-                  let icon = '🤖';
-                  let tool = 'AI Processing';
-                  let config = {};
-                  
-                  // Detect email operations
-                  if (part.match(/(?:get|fetch|check|read).*?(?:email|mail|gmail)/i)) {
-                    stepType = 'llmInstruction';
-                    icon = '📧';
-                    tool = 'Gmail - Fetch';
-                    config = {
-                      instruction: `Use gmail_ws4-get_emails to ${part}`,
-                      resultVariable: `emails_${index}`,
-                      directOutput: false
-                    };
+                // For each part, create an LLM instruction that can use tools
+                const steps = parts.map((part, index) => ({
+                  type: 'llmInstruction',
+                  config: {
+                    instruction: `You MUST complete this task: ${part}
+
+IMPORTANT: You have access to these tools and MUST use them to complete the task:
+${availableTools.slice(0, 20).map(tool => `- ${tool}`).join('\n')}
+
+DO NOT just describe what you would do. ACTUALLY CALL the appropriate tool functions.
+For example:
+- If asked to get emails, CALL gmail_ws11-get_emails
+- If asked to send email, CALL gmail_ws11-send_email with proper parameters
+- If asked to search, CALL the appropriate search tool
+
+Execute the task NOW using the tools available.`,
+                    resultVariable: `step_${index}_result`,
+                    directOutput: false
                   }
-                  // Detect email sending
-                  else if (part.match(/send.*?(?:email|mail|report|summary).*?to\s+([^\s]+)/i)) {
-                    const match = part.match(/to\s+([^\s]+)/i);
-                    const recipient = match ? match[1] : 'user@example.com';
-                    stepType = 'llmInstruction';
-                    icon = '📤';
-                    tool = 'Gmail - Send';
-                    config = {
-                      instruction: `Use gmail_ws4-send_email to send to ${recipient}: ${part}`,
-                      resultVariable: `sent_${index}`,
-                      directOutput: false
-                    };
-                  }
-                  // Detect summarization
-                  else if (part.match(/summarize|summary/i)) {
-                    stepType = 'llmInstruction';
-                    icon = '📝';
-                    tool = 'AI - Summarize';
-                    config = {
-                      instruction: part,
-                      resultVariable: `summary_${index}`,
-                      directOutput: false
-                    };
-                  }
-                  // Detect priority/analysis
-                  else if (part.match(/identify|analyze|priorities|important/i)) {
-                    stepType = 'llmInstruction';
-                    icon = '🎯';
-                    tool = 'AI - Analyze';
-                    config = {
-                      instruction: part,
-                      resultVariable: `analysis_${index}`,
-                      directOutput: false
-                    };
-                  }
-                  // Detect search operations
-                  else if (part.match(/search|find|look for|specific.*?about/i)) {
-                    stepType = 'llmInstruction';
-                    icon = '🔍';
-                    tool = 'Search';
-                    config = {
-                      instruction: part,
-                      resultVariable: `search_${index}`,
-                      directOutput: false
-                    };
-                  }
-                  // Default AI processing
-                  else {
-                    stepType = 'llmInstruction';
-                    icon = '🤖';
-                    tool = 'AI Processing';
-                    config = {
-                      instruction: part,
-                      resultVariable: `result_${index}`,
-                      directOutput: false
-                    };
-                  }
-                  
-                  // Add to steps array
-                  steps.push({
-                    type: stepType,
-                    config: config
-                  });
-                  
-                  // Add to visual blocks
-                  visualBlocks.push({
-                    id: `step_${index}`,
-                    type: stepType,
-                    name: `${icon} ${tool}`,
-                    description: part.substring(0, 60) + (part.length > 60 ? '...' : ''),
-                    status: 'pending',
-                    icon: icon,
-                    tool: tool
-                  });
-                });
+                }));
+                
+                // Create visual blocks
+                const visualBlocks = parts.map((part, index) => ({
+                  id: `step_${index}`,
+                  type: 'llmInstruction', 
+                  name: `🔧 Smart Step ${index + 1}`,
+                  description: part.substring(0, 60) + (part.length > 60 ? '...' : ''),
+                  status: 'pending',
+                  icon: '🔧',
+                  tool: 'AI + Tools'
+                }));
                 
                 return { steps, visualBlocks };
               }
               
-              const { steps: workflowSteps, visualBlocks: parsedBlocks } = parseIntoSteps(description);
+              // Get available tools from aibitat context
+              let availableTools = [];
+              try {
+                if (aibitat && aibitat.functions) {
+                  availableTools = Array.from(aibitat.functions.keys())
+                    .filter(name => !name.startsWith('flow_') && name !== 'create-workflow') // Filter out workflow functions
+                    .slice(0, 30); // Limit to prevent prompt bloat
+                  console.log(`[CreateWorkflow] Found ${availableTools.length} available tools`);
+                }
+              } catch (error) {
+                console.warn('[CreateWorkflow] Could not load available tools:', error.message);
+              }
+              
+              const { steps: workflowSteps, visualBlocks: parsedBlocks } = parseIntoSteps(description, availableTools);
               
               // Create initial workflow with building status
               let config = {

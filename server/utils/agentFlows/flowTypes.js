@@ -80,6 +80,46 @@ const FLOW_TYPES = {
       },
     },
   },
+  TOOL_CALL: {
+    type: "toolCall",
+    description: "Execute MCP/Agent tools and functions",
+    parameters: {
+      toolName: {
+        type: "string",
+        description: "The name of the tool/function to call (e.g., gmail_ws4-get_emails)",
+      },
+      parameters: {
+        type: "object",
+        description: "Parameters to pass to the tool as key-value pairs",
+      },
+      resultVariable: {
+        type: "string",
+        description: "Variable to store the tool result",
+      },
+      directOutput: {
+        type: "boolean",
+        description: "Whether to return the tool result directly without LLM processing",
+      },
+    },
+    examples: [
+      {
+        toolName: "gmail_ws4-get_emails",
+        parameters: { limit: 10, unread: true },
+        resultVariable: "emails",
+        directOutput: false,
+      },
+      {
+        toolName: "gmail_ws4-send_email",
+        parameters: { 
+          to: "user@example.com", 
+          subject: "Report", 
+          body: "Email content" 
+        },
+        resultVariable: "sent_email",
+        directOutput: true,
+      },
+    ],
+  },
 };
 
 module.exports.FLOW_TYPES = FLOW_TYPES;

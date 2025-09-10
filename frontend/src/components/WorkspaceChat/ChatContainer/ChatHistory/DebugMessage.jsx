@@ -1,5 +1,5 @@
 import React from "react";
-import { Terminal, Play, CheckCircle, AlertCircle } from "@phosphor-icons/react";
+import { Terminal, Play, CheckCircle, WarningCircle } from "@phosphor-icons/react";
 
 export default function DebugMessage({ message }) {
   // Determine message type and styling
@@ -34,7 +34,7 @@ export default function DebugMessage({ message }) {
     } else if (content.includes('failed with error')) {
       return {
         type: 'error',
-        icon: AlertCircle,
+        icon: WarningCircle,
         color: 'text-red-400',
         bgColor: 'bg-red-500/5',
         borderColor: 'border-red-500/20',

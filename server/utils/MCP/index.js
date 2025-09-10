@@ -109,6 +109,22 @@ class MCPCompatibilityLayer extends MCPHypervisor {
                     if (!args.workspaceSlug && aibitat.handlerProps?.invocation?.workspace) {
                       args.workspaceSlug = aibitat.handlerProps.invocation.workspace.slug;
                     }
+
+                    // Add user context for tools that need it
+                    if (!args.senderName && aibitat.handlerProps?.invocation) {
+                      // First try to get username from user directly
+                      if (aibitat.handlerProps.invocation.user?.username) {
+                        args.senderName = aibitat.handlerProps.invocation.user.username;
+                      }
+                      // Fallback to workspace name or slug
+                      else if (aibitat.handlerProps.invocation.workspace?.name) {
+                        args.senderName = aibitat.handlerProps.invocation.workspace.name;
+                      }
+                    }
+
+                    if (!args.workspaceName && aibitat.handlerProps?.invocation?.workspace?.name) {
+                      args.workspaceName = aibitat.handlerProps.invocation.workspace.name;
+                    }
                     
                     aibitat.handlerProps.log(
                       `Executing MCP server: ${name}:${tool.name} with args:`,

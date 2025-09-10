@@ -9,6 +9,7 @@ const { USER_AGENT, WORKSPACE_AGENT } = require("./defaults");
 const ImportedPlugin = require("./imported");
 const { AgentFlows } = require("../agentFlows");
 const MCPCompatibilityLayer = require("../MCP");
+const { ThinkingTracker } = require("./ThinkingTracker");
 
 class AgentHandler {
   #invocationUUID;
@@ -18,6 +19,7 @@ class AgentHandler {
   channel = null;
   provider = null;
   model = null;
+  thinkingTracker = null;
 
   constructor({ uuid }) {
     this.#invocationUUID = uuid;
@@ -540,6 +542,14 @@ class AgentHandler {
       socket,
     }
   ) {
+    // Initialize ThinkingTracker
+    this.thinkingTracker = new ThinkingTracker(
+      this.#invocationUUID,
+      this.invocation?.workspace_id
+    );
+    this.thinkingTracker.setSocket(args.socket);
+    this.thinkingTracker.startThinking("Initializing agent session");
+    
     this.aibitat = new AIbitat({
       provider: this.provider ?? "openai",
       model: this.model ?? "gpt-4o",
@@ -548,8 +558,12 @@ class AgentHandler {
       handlerProps: {
         invocation: this.invocation,
         log: this.log,
+        thinkingTracker: this.thinkingTracker, // Pass tracker to handlers
       },
     });
+
+    // Track model usage
+    this.thinkingTracker.trackModelUse(this.model, this.provider, 0);
 
     // Attach standard websocket plugin for frontend communication.
     this.log(`Attached ${AgentPlugins.websocket.name} plugin to Agent cluster`);

@@ -40,10 +40,117 @@ const createWorkflow = {
           handler: async function ({ description }) {
             try {
               console.log("🎉 [CreateWorkflow] Handler called with:", description);
-              console.log("🎉 [CreateWorkflow] Function is working!");
               
               const workflowName = `Workflow ${Date.now()}`;
               const workflowUuid = uuidv4();
+              
+              // Parse description into logical workflow steps
+              function parseIntoSteps(desc) {
+                const steps = [];
+                const visualBlocks = [];
+                
+                // Split by common action words and conjunctions
+                const parts = desc.split(/(?:\bthen\b|\band then\b|\bafter that\b|\bfinally\b|\bnext\b)/i)
+                  .map(p => p.trim())
+                  .filter(p => p.length > 0);
+                
+                parts.forEach((part, index) => {
+                  let stepType = 'llmInstruction';
+                  let icon = '🤖';
+                  let tool = 'AI Processing';
+                  let config = {};
+                  
+                  // Detect email operations
+                  if (part.match(/(?:get|fetch|check|read).*?(?:email|mail|gmail)/i)) {
+                    stepType = 'llmInstruction';
+                    icon = '📧';
+                    tool = 'Gmail - Fetch';
+                    config = {
+                      instruction: `Use gmail_ws4-get_emails to ${part}`,
+                      resultVariable: `emails_${index}`,
+                      directOutput: false
+                    };
+                  }
+                  // Detect email sending
+                  else if (part.match(/send.*?(?:email|mail|report|summary).*?to\s+([^\s]+)/i)) {
+                    const match = part.match(/to\s+([^\s]+)/i);
+                    const recipient = match ? match[1] : 'user@example.com';
+                    stepType = 'llmInstruction';
+                    icon = '📤';
+                    tool = 'Gmail - Send';
+                    config = {
+                      instruction: `Use gmail_ws4-send_email to send to ${recipient}: ${part}`,
+                      resultVariable: `sent_${index}`,
+                      directOutput: false
+                    };
+                  }
+                  // Detect summarization
+                  else if (part.match(/summarize|summary/i)) {
+                    stepType = 'llmInstruction';
+                    icon = '📝';
+                    tool = 'AI - Summarize';
+                    config = {
+                      instruction: part,
+                      resultVariable: `summary_${index}`,
+                      directOutput: false
+                    };
+                  }
+                  // Detect priority/analysis
+                  else if (part.match(/identify|analyze|priorities|important/i)) {
+                    stepType = 'llmInstruction';
+                    icon = '🎯';
+                    tool = 'AI - Analyze';
+                    config = {
+                      instruction: part,
+                      resultVariable: `analysis_${index}`,
+                      directOutput: false
+                    };
+                  }
+                  // Detect search operations
+                  else if (part.match(/search|find|look for|specific.*?about/i)) {
+                    stepType = 'llmInstruction';
+                    icon = '🔍';
+                    tool = 'Search';
+                    config = {
+                      instruction: part,
+                      resultVariable: `search_${index}`,
+                      directOutput: false
+                    };
+                  }
+                  // Default AI processing
+                  else {
+                    stepType = 'llmInstruction';
+                    icon = '🤖';
+                    tool = 'AI Processing';
+                    config = {
+                      instruction: part,
+                      resultVariable: `result_${index}`,
+                      directOutput: false
+                    };
+                  }
+                  
+                  // Add to steps array
+                  steps.push({
+                    type: stepType,
+                    config: config
+                  });
+                  
+                  // Add to visual blocks
+                  visualBlocks.push({
+                    id: `step_${index}`,
+                    type: stepType,
+                    name: `${icon} ${tool}`,
+                    description: part.substring(0, 60) + (part.length > 60 ? '...' : ''),
+                    status: 'pending',
+                    icon: icon,
+                    tool: tool
+                  });
+                });
+                
+                return { steps, visualBlocks };
+              }
+              
+              const { steps: workflowSteps, visualBlocks: parsedBlocks } = parseIntoSteps(description);
               
               // Create initial workflow with building status
               let config = {
@@ -57,11 +164,12 @@ const createWorkflow = {
                 visualBlocks: [],
                 buildProgress: {
                   current: 0,
-                  total: 3,
+                  total: parsedBlocks.length + 2, // +2 for start and complete blocks
                   message: 'Starting workflow creation...'
                 },
-                // Signal to open Flow Panel
+                // Signal to open Flow Panel AND WorkflowBuilder
                 openFlowPanel: true,
+                openWorkflowBuilder: true,
                 workflowUuid: workflowUuid
               };
               
@@ -72,7 +180,7 @@ const createWorkflow = {
               // Simulate progressive building
               await new Promise(resolve => setTimeout(resolve, 1000));
               
-              // Add start block with animation
+              // Add start block
               config.steps.push({
                 type: "start",
                 config: { variables: [] }
@@ -82,101 +190,70 @@ const createWorkflow = {
                 type: 'start',
                 name: '🚀 Start',
                 description: 'Workflow entry point',
-                status: 'complete'
+                status: 'complete',
+                icon: '🚀',
+                tool: 'Start'
               });
               config.buildProgress = {
                 current: 1,
-                total: 5,
+                total: parsedBlocks.length + 2,
                 message: 'Initializing workflow...'
               };
               await AgentFlows.saveFlow(config.name, config, workflowUuid);
-              aibitat.introspect(`🚀 Initializing workflow structure...`);
+              aibitat.introspect(`🚀 Building workflow with ${parsedBlocks.length} steps...`);
               
-              await new Promise(resolve => setTimeout(resolve, 1500));
+              await new Promise(resolve => setTimeout(resolve, 1000));
               
-              // Add data collection block
-              config.visualBlocks.push({
-                id: 'collect',
-                type: 'dataCollection',
-                name: '📊 Collect Data',
-                description: 'Gathering required information',
-                status: 'building'
-              });
-              config.buildProgress = {
-                current: 2,
-                total: 5,
-                message: 'Setting up data collection...'
-              };
-              await AgentFlows.saveFlow(config.name, config, workflowUuid);
-              aibitat.introspect(`📊 Configuring data collection...`);
+              // Add each parsed block with animation
+              for (let i = 0; i < parsedBlocks.length; i++) {
+                const block = parsedBlocks[i];
+                
+                // Mark previous blocks as complete
+                if (i > 0) {
+                  config.visualBlocks[config.visualBlocks.length - 1].status = 'complete';
+                }
+                
+                // Add current block as building
+                block.status = 'building';
+                config.visualBlocks.push(block);
+                
+                // Add corresponding step
+                config.steps.push(workflowSteps[i]);
+                
+                config.buildProgress = {
+                  current: i + 2,
+                  total: parsedBlocks.length + 2,
+                  message: `Adding: ${block.tool}...`
+                };
+                
+                await AgentFlows.saveFlow(config.name, config, workflowUuid);
+                aibitat.introspect(`${block.icon} Adding ${block.tool}: ${block.description.substring(0, 30)}...`);
+                
+                await new Promise(resolve => setTimeout(resolve, 1200));
+              }
               
-              await new Promise(resolve => setTimeout(resolve, 1500));
+              // Mark last block as complete
+              if (config.visualBlocks.length > 1) {
+                config.visualBlocks[config.visualBlocks.length - 1].status = 'complete';
+              }
               
-              // Mark data collection as complete and add processing block
-              config.visualBlocks[1].status = 'complete';
-              config.visualBlocks.push({
-                id: 'process',
-                type: 'llmInstruction',
-                name: '🤖 AI Processing',
-                description: description.substring(0, 50) + (description.length > 50 ? '...' : ''),
-                status: 'building'
-              });
-              config.buildProgress = {
-                current: 3,
-                total: 5,
-                message: 'Adding AI processing...'
-              };
-              await AgentFlows.saveFlow(config.name, config, workflowUuid);
-              aibitat.introspect(`🤖 Setting up AI processing: ${description.substring(0, 50)}...`);
-              
-              await new Promise(resolve => setTimeout(resolve, 1500));
-              
-              // Mark processing as complete and add output block
-              config.visualBlocks[2].status = 'complete';
-              config.visualBlocks.push({
-                id: 'output',
-                type: 'output',
-                name: '📤 Generate Output',
-                description: 'Formatting results',
-                status: 'building'
-              });
-              config.buildProgress = {
-                current: 4,
-                total: 5,
-                message: 'Configuring output...'
-              };
-              await AgentFlows.saveFlow(config.name, config, workflowUuid);
-              aibitat.introspect(`📤 Preparing output formatting...`);
-              
-              await new Promise(resolve => setTimeout(resolve, 1500));
-              
-              // Add final completion block
-              config.visualBlocks[3].status = 'complete';
+              // Add complete block
               config.visualBlocks.push({
                 id: 'complete',
                 type: 'complete',
                 name: '✅ Complete',
                 description: 'Workflow ready!',
-                status: 'complete'
+                status: 'complete',
+                icon: '✅',
+                tool: 'Complete'
               });
               
-              // Add main instruction to steps
-              config.steps.push({
-                type: "llmInstruction",
-                config: {
-                  instruction: description,
-                  resultVariable: "result"
-                }
-              });
-              
-              await new Promise(resolve => setTimeout(resolve, 1000));
-              
-              // Complete workflow with celebration
+              // Complete workflow
               config.active = true;
               config.status = 'complete';
               config.buildProgress = {
-                current: 5,
-                total: 5,
+                current: parsedBlocks.length + 2,
+                total: parsedBlocks.length + 2,
                 message: '🎉 Workflow complete!'
               };
               await AgentFlows.saveFlow(config.name, config, workflowUuid);
@@ -187,10 +264,10 @@ const createWorkflow = {
                 await AgentFlows.saveFlow(config.name, config, workflowUuid);
               }, 2000);
               
-              aibitat.introspect(`🎉 Workflow "${workflowName}" created successfully!`);
+              aibitat.introspect(`🎉 Workflow "${workflowName}" created with ${parsedBlocks.length} steps!`);
               
               // Return a string message instead of object to avoid chat system errors
-              return `✅ Workflow "${workflowName}" created!\n\nDescription: ${description}\n\nThe workflow is now visible in your Flow Panel and ready to use!`;
+              return `✅ Workflow "${workflowName}" created with ${parsedBlocks.length} steps!\n\nSteps:\n${parsedBlocks.map((b, i) => `${i+1}. ${b.icon} ${b.tool}`).join('\n')}\n\nThe workflow is now visible in your Flow Panel and ready to use!`;
               
             } catch (error) {
               console.error("❌ [CreateWorkflow] Error:", error);

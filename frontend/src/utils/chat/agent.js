@@ -16,6 +16,7 @@ const handledEvents = [
   "toolCall",
   "toolCallUpdate",
   "toolUsageSummary",
+  "thinking_process", // New event for thinking tracker
 ];
 
 export function websocketURI() {
@@ -160,6 +161,29 @@ export default function handleSocketResponse(event, setChatHistory) {
           pending: false,
         },
       ];
+    });
+  }
+
+  // Handle thinking process events from ThinkingTracker
+  if (data.type === "thinking_process") {
+    return setChatHistory((prev) => {
+      const lastMessage = prev[prev.length - 1];
+      if (!lastMessage || lastMessage.role !== "assistant") return prev;
+      
+      // Update the last assistant message with thinking metrics
+      return prev.map((msg, idx) => {
+        if (idx === prev.length - 1) {
+          return {
+            ...msg,
+            thinkingMetrics: {
+              ...msg.thinkingMetrics,
+              [data.eventType]: data.data,
+              lastUpdate: data.timestamp
+            }
+          };
+        }
+        return msg;
+      });
     });
   }
 

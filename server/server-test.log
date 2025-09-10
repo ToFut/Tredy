@@ -2261,3 +2261,347 @@ Emitted 'error' event on WebSocketServer instance at:
 
 Node.js v20.19.3
 [31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+yarn run v1.22.22
+$ node ./swagger/init.js
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+🔧 [WorkflowCreator] Plugin file loaded successfully
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 9.18s.
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 9.18s.
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 847ms
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:61021) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:61021) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.serverListen [as listen] (/Users/segevbin/anything-llm/server/node_modules/@mintplex-labs/express-ws/dist/index.js:91:21)
+    at bootHTTP (/Users/segevbin/anything-llm/server/utils/boot/index.js:58:6)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/index.js:185:32)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:536:35)
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v20.19.3
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+yarn run v1.22.22
+$ node ./swagger/init.js
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+🔧 [WorkflowCreator] Plugin file loaded successfully
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 23.14s.
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 24.58s.
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 2.07s
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:64422) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:64422) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+[33m[TELEMETRY STUBBED][0m Anonymous Telemetry stubbed in development.
+[36m[CommunicationKey][0m RSA key pair generated for signed payloads within AnythingLLM services.
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+Primary server in HTTP mode listening on port 3001
+prisma:info Starting a sqlite pool with 17 connections.
+[36m[BackgroundWorkerService][0m Starting...
+[36m[BackgroundWorkerService][0m Service started with 2 jobs [ 'cleanup-orphan-documents', 'agent-scheduler' ]
+[Database] Multi-user mode already enabled
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+(node:66063) Warning: Accessing non-existent property 'Document' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/vectorStore/resetAllVectorStores.js:1:23)
+(node:66063) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+(node:66063) Warning: Accessing non-existent property 'Document' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/vectorStore/resetAllVectorStores.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/helpers/updateENV.js:5:34)
+(node:66063) Warning: Accessing non-existent property 'Document' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/vectors.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/vectorStore/resetAllVectorStores.js:3:29)
+(node:66063) Warning: Accessing non-existent property 'Document' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/files/index.js:4:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/vectorStore/resetAllVectorStores.js:5:36)
+prisma:info Starting a sqlite pool with 17 connections.
+Child process exited with code 0 and signal null
+Worker for job "cleanup-orphan-documents" exited with code 0 undefined
+[32m[nodemon] restarting due to changes...[39m
+Gracefully exiting { code: 'SIGUSR2', ignore_hook: true, hide_meta: true }
+Gracefully exited { code: 'SIGUSR2', ignore_hook: true, hide_meta: true }
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+yarn run v1.22.22
+yarn run v1.22.22
+$ node ./swagger/init.js
+$ node ./swagger/init.js
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+🔧 [WorkflowCreator] Plugin file loaded successfully
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Nango] Initialized successfully (development mode)
+[Database] Checking database initialization...
+[Database] Generating Prisma client...
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 6.22s.
+Swagger-autogen: [32m Success ✔ [0m
+Swagger-autogen:  [32mPatched servers.url ✔[0m
+Done in 6.96s.
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.3.1) to ./node_modules/@prisma/client in 829ms
+
+Start using Prisma Client in Node.js (See: https://pris.ly/d/client)
+```
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+or start using Prisma Client at the edge (See: https://pris.ly/d/accelerate)
+```
+import { PrismaClient } from '@prisma/client/edge'
+const prisma = new PrismaClient()
+```
+
+See other ways of importing Prisma Client: http://pris.ly/d/importing-client
+
+[Database] Deploying database migrations...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "anythingllm.db" at "file:../storage/anythingllm.db"
+
+41 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+[Database] Database initialization completed successfully
+[Database] Enabling multi-user mode for OAuth support...
+(node:66705) Warning: Accessing non-existent property 'safeJsonParse' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/documents.js:6:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:3:22)
+(node:66705) Warning: Accessing non-existent property 'userFromSession' of module exports inside circular dependency
+    at emitCircularRequireWarning (node:internal/modules/cjs/loader:935:11)
+    at Object.get (node:internal/modules/cjs/loader:951:5)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/utils/middleware/multiUserProtected.js:2:9)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/models/workspace.js:5:19)
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.serverListen [as listen] (/Users/segevbin/anything-llm/server/node_modules/@mintplex-labs/express-ws/dist/index.js:91:21)
+    at bootHTTP (/Users/segevbin/anything-llm/server/utils/boot/index.js:58:6)
+    at Object.<anonymous> (/Users/segevbin/anything-llm/server/index.js:185:32)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:536:35)
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v20.19.3
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m

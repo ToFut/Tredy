@@ -9,6 +9,7 @@ import debounce from "lodash.debounce";
 import useUser from "@/hooks/useUser";
 import Chartable from "./Chartable";
 import WorkflowPreview from "./WorkflowPreview";
+import ThinkingMetrics from "./ThinkingMetrics";
 import Workspace from "@/models/workspace";
 import { useParams } from "react-router-dom";
 import paths from "@/utils/paths";
@@ -195,11 +196,31 @@ export default function ChatHistory({
   const renderStatusResponse = useCallback(
     (item, index) => {
       const hasSubsequentMessages = index < compiledHistory.length - 1;
+      const isThinking = !hasSubsequentMessages && lastMessageInfo.isAnimating;
+      
+      // Check if we have thinking metrics from our new system
+      const lastMessage = history[history.length - 1];
+      const hasThinkingMetrics = lastMessage?.thinkingMetrics;
+      
+      // If we have thinking metrics and this is an active thinking state, use ThinkingMetrics
+      if (hasThinkingMetrics && isThinking) {
+        return (
+          <div key={`thinking-metrics-${index}`} className="flex justify-center w-full">
+            <ThinkingMetrics
+              metrics={lastMessage.thinkingMetrics}
+              isThinking={isThinking}
+              debugMessages={item.map(msg => msg.content).filter(Boolean)}
+            />
+          </div>
+        );
+      }
+      
+      // Fall back to old StatusResponse for compatibility
       return (
         <StatusResponse
           key={`status-group-${index}`}
           messages={item}
-          isThinking={!hasSubsequentMessages && lastMessageInfo.isAnimating}
+          isThinking={isThinking}
           showCheckmark={
             hasSubsequentMessages ||
             (!lastMessageInfo.isAnimating && !lastMessageInfo.isStatusResponse)
@@ -207,7 +228,7 @@ export default function ChatHistory({
         />
       );
     },
-    [compiledHistory.length, lastMessageInfo]
+    [compiledHistory.length, lastMessageInfo, history]
   );
 
   if (history.length === 0 && !hasAttachments) {
@@ -422,6 +443,19 @@ function buildMessages({
         />
       );
     } else {
+      // Add ThinkingMetrics for completed assistant messages with thinking data
+      if (props.role === "assistant" && props.thinkingMetrics) {
+        acc.push(
+          <div key={`${index}-thinking`} className="flex justify-center w-full mb-2">
+            <ThinkingMetrics
+              metrics={props.thinkingMetrics}
+              isThinking={false}
+              debugMessages={[]}
+            />
+          </div>
+        );
+      }
+      
       acc.push(
         <HistoricalMessage
           key={index}

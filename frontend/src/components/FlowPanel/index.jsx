@@ -49,6 +49,7 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
   useEffect(() => {
     const buildingFlow = flows.find(f => f.status === 'building');
     const shouldAutoOpen = flows.find(f => f.openFlowPanel === true);
+    const shouldOpenBuilder = flows.find(f => f.openWorkflowBuilder === true);
     
     setIsCreatingWorkflow(!!buildingFlow);
     
@@ -81,6 +82,26 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
         delete updatedFlow.openFlowPanel;
         AgentFlows.saveFlow(updatedFlow.name, updatedFlow, updatedFlow.workflowUuid).catch(console.error);
       }, 2000);
+    }
+    
+    // Open WorkflowBuilder if flag is set
+    if (shouldOpenBuilder) {
+      console.log('[FlowPanel] Opening WorkflowBuilder for:', shouldOpenBuilder.name);
+      
+      // Set the flow data for the builder
+      setSelectedFlow({
+        workflowData: {
+          agentFlowConfig: shouldOpenBuilder
+        }
+      });
+      setShowBuilder(true);
+      
+      // Clear the flag after opening
+      setTimeout(() => {
+        const updatedFlow = { ...shouldOpenBuilder };
+        delete updatedFlow.openWorkflowBuilder;
+        AgentFlows.saveFlow(updatedFlow.name, updatedFlow, updatedFlow.workflowUuid).catch(console.error);
+      }, 1000);
     }
   }, [flows, isVisible, onAutoOpen]);
 

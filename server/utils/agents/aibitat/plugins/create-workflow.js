@@ -58,7 +58,10 @@ const createWorkflow = {
                   current: 0,
                   total: 3,
                   message: 'Starting workflow creation...'
-                }
+                },
+                // Signal to open Flow Panel
+                openFlowPanel: true,
+                workflowUuid: workflowUuid
               };
               
               // Save initial state
@@ -68,7 +71,7 @@ const createWorkflow = {
               // Simulate progressive building
               await new Promise(resolve => setTimeout(resolve, 1000));
               
-              // Add start block
+              // Add start block with animation
               config.steps.push({
                 type: "start",
                 config: { variables: [] }
@@ -76,20 +79,87 @@ const createWorkflow = {
               config.visualBlocks.push({
                 id: 'start',
                 type: 'start',
-                name: 'Start',
+                name: '🚀 Start',
+                description: 'Workflow entry point',
                 status: 'complete'
               });
               config.buildProgress = {
                 current: 1,
-                total: 3,
-                message: 'Added start block...'
+                total: 5,
+                message: 'Initializing workflow...'
               };
               await AgentFlows.saveFlow(config.name, config, workflowUuid);
-              aibitat.introspect(`✅ Added start block`);
+              aibitat.introspect(`🚀 Initializing workflow structure...`);
               
-              await new Promise(resolve => setTimeout(resolve, 1000));
+              await new Promise(resolve => setTimeout(resolve, 1500));
               
-              // Add main instruction block
+              // Add data collection block
+              config.visualBlocks.push({
+                id: 'collect',
+                type: 'dataCollection',
+                name: '📊 Collect Data',
+                description: 'Gathering required information',
+                status: 'building'
+              });
+              config.buildProgress = {
+                current: 2,
+                total: 5,
+                message: 'Setting up data collection...'
+              };
+              await AgentFlows.saveFlow(config.name, config, workflowUuid);
+              aibitat.introspect(`📊 Configuring data collection...`);
+              
+              await new Promise(resolve => setTimeout(resolve, 1500));
+              
+              // Mark data collection as complete and add processing block
+              config.visualBlocks[1].status = 'complete';
+              config.visualBlocks.push({
+                id: 'process',
+                type: 'llmInstruction',
+                name: '🤖 AI Processing',
+                description: description.substring(0, 50) + (description.length > 50 ? '...' : ''),
+                status: 'building'
+              });
+              config.buildProgress = {
+                current: 3,
+                total: 5,
+                message: 'Adding AI processing...'
+              };
+              await AgentFlows.saveFlow(config.name, config, workflowUuid);
+              aibitat.introspect(`🤖 Setting up AI processing: ${description.substring(0, 50)}...`);
+              
+              await new Promise(resolve => setTimeout(resolve, 1500));
+              
+              // Mark processing as complete and add output block
+              config.visualBlocks[2].status = 'complete';
+              config.visualBlocks.push({
+                id: 'output',
+                type: 'output',
+                name: '📤 Generate Output',
+                description: 'Formatting results',
+                status: 'building'
+              });
+              config.buildProgress = {
+                current: 4,
+                total: 5,
+                message: 'Configuring output...'
+              };
+              await AgentFlows.saveFlow(config.name, config, workflowUuid);
+              aibitat.introspect(`📤 Preparing output formatting...`);
+              
+              await new Promise(resolve => setTimeout(resolve, 1500));
+              
+              // Add final completion block
+              config.visualBlocks[3].status = 'complete';
+              config.visualBlocks.push({
+                id: 'complete',
+                type: 'complete',
+                name: '✅ Complete',
+                description: 'Workflow ready!',
+                status: 'complete'
+              });
+              
+              // Add main instruction to steps
               config.steps.push({
                 type: "llmInstruction",
                 config: {
@@ -97,30 +167,15 @@ const createWorkflow = {
                   resultVariable: "result"
                 }
               });
-              config.visualBlocks.push({
-                id: 'main',
-                type: 'llmInstruction',
-                name: 'Process Task',
-                description: description,
-                status: 'complete',
-                connections: ['start']
-              });
-              config.buildProgress = {
-                current: 2,
-                total: 3,
-                message: 'Added task block...'
-              };
-              await AgentFlows.saveFlow(config.name, config, workflowUuid);
-              aibitat.introspect(`✅ Added task: ${description}`);
               
               await new Promise(resolve => setTimeout(resolve, 1000));
               
-              // Complete workflow
+              // Complete workflow with celebration
               config.active = true;
               config.status = 'complete';
               config.buildProgress = {
-                current: 3,
-                total: 3,
+                current: 5,
+                total: 5,
                 message: '🎉 Workflow complete!'
               };
               await AgentFlows.saveFlow(config.name, config, workflowUuid);
@@ -133,17 +188,13 @@ const createWorkflow = {
               
               aibitat.introspect(`🎉 Workflow "${workflowName}" created successfully!`);
               
-              return {
-                success: true,
-                message: `✅ Workflow "${workflowName}" created!\n\nDescription: ${description}\n\nThe workflow is now visible in your Flow Panel and ready to use!`
-              };
+              // Return a string message instead of object to avoid chat system errors
+              return `✅ Workflow "${workflowName}" created!\n\nDescription: ${description}\n\nThe workflow is now visible in your Flow Panel and ready to use!`;
               
             } catch (error) {
               console.error("❌ [CreateWorkflow] Error:", error);
-              return {
-                success: false,
-                message: `Failed to create workflow: ${error.message}`
-              };
+              // Return error as string to avoid chat system errors
+              return `Failed to create workflow: ${error.message}`;
             }
           }
         });

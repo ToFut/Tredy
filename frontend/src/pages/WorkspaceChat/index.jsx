@@ -130,6 +130,7 @@ function ShowWorkspaceChat() {
                 workspace={workspace || workspaceData}
                 isVisible={showFlowPanel}
                 sendCommand={sendCommand}
+                onAutoOpen={() => setShowFlowPanel(true)}
               />
             </div>
           </>

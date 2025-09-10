@@ -15,7 +15,7 @@ import WorkflowBuilder from "./WorkflowBuilder";
 import AgentFlows from "@/models/agentFlows";
 import showToast from "@/utils/toast";
 
-export default function FlowPanel({ workspace, isVisible, sendCommand }) {
+export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpen }) {
   const [flows, setFlows] = useState([]);
   const [isExpanded, setIsExpanded] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -45,15 +45,28 @@ export default function FlowPanel({ workspace, isVisible, sendCommand }) {
     return () => clearInterval(interval);
   }, [isVisible, isCreatingWorkflow]);
 
-  // Check if any flows are being built
+  // Check if any flows are being built or need to auto-open
   useEffect(() => {
     const buildingFlow = flows.find(f => f.status === 'building');
+    const shouldAutoOpen = flows.find(f => f.openFlowPanel === true);
+    
     setIsCreatingWorkflow(!!buildingFlow);
     
     if (buildingFlow) {
       setIsExpanded(true); // Auto-expand when building
     }
-  }, [flows]);
+    
+    // Trigger auto-open if a flow has the openFlowPanel flag
+    if (shouldAutoOpen && onAutoOpen && !isVisible) {
+      onAutoOpen();
+      // Clear the flag after opening
+      setTimeout(() => {
+        const updatedFlow = { ...shouldAutoOpen };
+        delete updatedFlow.openFlowPanel;
+        AgentFlows.saveFlow(updatedFlow.name, updatedFlow, updatedFlow.workflowUuid);
+      }, 1000);
+    }
+  }, [flows, isVisible, onAutoOpen]);
 
   const loadFlows = async (showLoadingIndicator = true) => {
     if (showLoadingIndicator) setIsLoading(true);
@@ -324,12 +337,16 @@ export default function FlowPanel({ workspace, isVisible, sendCommand }) {
 
 function FlowItem({ flow, onEdit, onRun, onToggle, onDelete, formatLastUsed }) {
   const [showMenu, setShowMenu] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(flow.status === 'building');
   const isBuilding = flow.status === 'building';
   const buildProgress = flow.buildProgress;
+  const visualBlocks = flow.visualBlocks || [];
 
   return (
-    <div className={`group hover:bg-theme-bg-primary/30 transition-colors ${
-      isBuilding ? 'bg-yellow-500/5 border-l-4 border-yellow-500' : ''
+    <div className={`group transition-all duration-300 ${
+      isBuilding 
+        ? 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-l-4 border-yellow-500 shadow-lg' 
+        : 'hover:bg-theme-bg-primary/30'
     }`}>
       <div className="p-4 flex items-center justify-between">
         <div className="flex-1 min-w-0">
@@ -431,6 +448,71 @@ function FlowItem({ flow, onEdit, onRun, onToggle, onDelete, formatLastUsed }) {
           </div>
         </div>
       </div>
+      
+      {/* Animated Visual Blocks */}
+      {isBuilding && visualBlocks.length > 0 && (
+        <div className="px-4 pb-4">
+          <div className="ml-6 p-3 bg-black/20 rounded-lg">
+            <div className="text-xs text-yellow-400 font-medium mb-2">🎨 Workflow Visualization</div>
+            <div className="flex flex-wrap gap-2">
+              {visualBlocks.map((block, index) => (
+                <div
+                  key={block.id}
+                  className="animate-slideIn"
+                  style={{
+                    animationDelay: `${index * 0.2}s`,
+                    opacity: 0,
+                    animationFillMode: 'forwards'
+                  }}
+                >
+                  <div className={`px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 ${
+                    block.status === 'complete' 
+                      ? 'bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 text-green-400'
+                      : block.status === 'building'
+                      ? 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 text-yellow-400 animate-pulse'
+                      : 'bg-gradient-to-r from-gray-500/20 to-slate-500/20 border border-gray-500/30 text-gray-400'
+                  }`}>
+                    <div className="flex items-center gap-2">
+                      {block.status === 'complete' ? (
+                        <CheckCircle size={12} className="animate-bounce" />
+                      ) : block.status === 'building' ? (
+                        <ArrowsClockwise size={12} className="animate-spin" />
+                      ) : (
+                        <Clock size={12} />
+                      )}
+                      <span>{block.name}</span>
+                    </div>
+                    {block.description && (
+                      <div className="text-[10px] mt-1 opacity-80">{block.description}</div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Connection Lines Animation */}
+            {visualBlocks.length > 1 && (
+              <div className="mt-2 flex items-center gap-1">
+                {visualBlocks.map((block, index) => (
+                  <React.Fragment key={`connection-${block.id}`}>
+                    {index > 0 && (
+                      <div 
+                        className="h-0.5 flex-1 bg-gradient-to-r from-yellow-500/50 to-orange-500/50 animate-expand"
+                        style={{
+                          animationDelay: `${index * 0.3}s`,
+                          transformOrigin: 'left',
+                          transform: 'scaleX(0)',
+                          animationFillMode: 'forwards'
+                        }}
+                      />
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

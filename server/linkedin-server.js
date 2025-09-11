@@ -41,12 +41,14 @@ class LinkedInMCPServer {
   }
 
   // Check if LinkedIn is connected
-  async checkConnection() {
-    if (!this.nango || !this.workspaceId) return false;
+  async checkConnection(workspaceId = null) {
+    if (!this.nango) return false;
+    
+    const connectionId = workspaceId ? `workspace_${workspaceId}` : process.env.NANGO_CONNECTION_ID;
+    if (!connectionId) return false;
     
     try {
       const provider = process.env.NANGO_PROVIDER || 'linkedin';
-      const connectionId = process.env.NANGO_CONNECTION_ID;
       await this.nango.getConnection(provider, connectionId);
       return true;
     } catch (error) {
@@ -257,11 +259,16 @@ Or run: \`@agent integrate linkedin\``
         throw new Error('Nango not configured. Please set NANGO_SECRET_KEY environment variable.');
       }
 
-      const provider = process.env.NANGO_PROVIDER || 'linkedin-getting-started';
-      const connectionId = process.env.NANGO_CONNECTION_ID;
-
+      // Get workspace ID from args to determine the connection
+      const workspaceId = args.workspaceId;
+      const connectionId = workspaceId ? `workspace_${workspaceId}` : process.env.NANGO_CONNECTION_ID;
+      
       if (!connectionId) {
-        throw new Error('NANGO_CONNECTION_ID not provided');
+        throw new Error('No workspace ID provided and no default connection configured');
+      }
+      
+      console.error(`[LinkedIn MCP] Using connectionId: ${connectionId}`);
+      const provider = process.env.NANGO_PROVIDER || 'linkedin-getting-started';
       }
 
       try {
@@ -297,7 +304,8 @@ Or run: \`@agent integrate linkedin\``
   async getProfile(provider, connectionId, fields = []) {
     try {
       // Check connection first
-      const isConnected = await this.checkConnection();
+      const workspaceId = connectionId ? connectionId.replace('workspace_', '') : null;
+      const isConnected = await this.checkConnection(workspaceId);
       if (!isConnected) {
         return {
           content: [{
@@ -440,7 +448,8 @@ Try reconnecting your LinkedIn account.`
   async sendMessage(provider, connectionId, recipientName, message) {
     try {
       // Check connection first
-      const isConnected = await this.checkConnection();
+      const workspaceId = connectionId ? connectionId.replace('workspace_', '') : null;
+      const isConnected = await this.checkConnection(workspaceId);
       if (!isConnected) {
         return {
           content: [{

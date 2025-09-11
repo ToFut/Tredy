@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   ArrowRight,
   ChevronDown,
@@ -24,10 +24,14 @@ import {
 import { useTranslation } from "react-i18next";
 import { useLanguageOptions } from "@/hooks/useLanguageOptions";
 import ChatDemo from "./ChatDemo";
+import Workspace from "@/models/workspace";
+import paths from "@/utils/paths";
+import showToast from "@/utils/toast";
 
 export default function LandingPage() {
   const { t } = useTranslation();
   const { currentLanguage, supportedLanguages, getLanguageName, changeLanguage } = useLanguageOptions();
+  const navigate = useNavigate();
   const [expandedFaq, setExpandedFaq] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -279,6 +283,27 @@ export default function LandingPage() {
   const skipOnboarding = () => {
     setShowOnboarding(false);
     setOnboardingStep(0);
+  };
+
+  // Function to create Tredy workspace
+  const handleCreateTredyWorkspace = async () => {
+    try {
+      const { workspace, message } = await Workspace.new({
+        name: "Tredy",
+        onboardingComplete: true,
+      });
+      
+      if (workspace) {
+        showToast("Creating Tredy workspace...", "success");
+        navigate(`/workspace/${workspace.slug}`);
+      } else {
+        showToast(message || "Failed to create workspace", "error");
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("Error creating workspace:", error);
+      navigate("/login");
+    }
   };
 
   // Tooltip component
@@ -560,38 +585,38 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className={`relative pt-32 pb-20 ${designSystem.spacing.container} min-h-screen flex items-center`}>
-        <div className="max-w-7xl mx-auto">
-          <div className={`grid lg:grid-cols-2 ${designSystem.spacing.gap.large} items-center`}>
+      <section className="relative pt-24 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6 min-h-screen flex items-center">
+        <div className="max-w-7xl mx-auto w-full">
+          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
             {/* Left: Hero Content */}
             <div className="text-center lg:text-left">
-              <div className={`inline-flex items-center ${designSystem.spacing.buttonPadding} mb-8 bg-gradient-to-r ${designSystem.colors.secondary} ${designSystem.colors.text.primary} rounded-full text-sm font-semibold border border-purple-200 ${designSystem.animations.fadeIn} hover:scale-105 transition-all duration-300 shadow-sm`}>
-                <Sparkles className="w-4 h-4 mr-2 animate-spin text-purple-600" />
-                #1 Enterprise AI Automation Platform
+              <div className="inline-flex items-center px-3 sm:px-4 py-2 mb-6 sm:mb-8 bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-700 rounded-full text-xs sm:text-sm font-semibold border border-purple-200 hover:scale-105 transition-all duration-300 shadow-sm">
+                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-spin text-purple-600" />
+                <span className="hidden sm:inline">#1 Enterprise </span>AI Platform
                 <div className="ml-2 w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
               </div>
               
-              <h1 className={`${designSystem.typography.hero} ${designSystem.colors.text.primary} mb-8 leading-[1.1]`}>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-6 sm:mb-8 leading-[1.1]">
                 <span className="block">{t('landing.hero.title')}</span>
                 <span className="bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 bg-clip-text text-transparent animate-gradient-x" style={{WebkitBackgroundClip: 'text', backgroundClip: 'text'}}>
                   {t('landing.hero.subtitle')}
                 </span>
               </h1>
               
-              <p className={`${designSystem.typography.body} ${designSystem.colors.text.secondary} mb-12 leading-relaxed max-w-2xl mx-auto lg:mx-0`}>
+              <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-8 sm:mb-12 leading-relaxed max-w-2xl mx-auto lg:mx-0">
                 {t('landing.hero.description')}
               </p>
               
-              <div id="hero-cta" className={`flex flex-col sm:flex-row ${designSystem.spacing.gap.small} justify-center lg:justify-start mb-16`}>
-                <Link 
-                  to="/workspace/tredy"
-                  className={`group inline-flex items-center px-10 py-5 ${designSystem.components.button.primary} text-xl hover:shadow-lg transition-all duration-200`}
+              <div id="hero-cta" className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-8 sm:mb-16">
+                <button 
+                  onClick={handleCreateTredyWorkspace}
+                  className="group inline-flex items-center justify-center px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-xl text-base sm:text-lg lg:text-xl hover:shadow-lg transition-all duration-200 font-bold w-full sm:w-auto"
                 >
                   Chat with Tredy
-                  <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <button className={`group inline-flex items-center px-10 py-5 bg-white/90 backdrop-blur-sm ${designSystem.components.button.secondary} text-xl hover:shadow-lg transition-all duration-200`}>
-                  <Play className="mr-3 w-6 h-6 group-hover:scale-110 transition-transform" />
+                  <ArrowRight className="ml-2 sm:ml-3 w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform" />
+                </button>
+                <button className="group inline-flex items-center justify-center px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 bg-white/90 backdrop-blur-sm border-2 border-purple-200 text-purple-700 hover:border-purple-300 hover:bg-purple-50 rounded-xl text-base sm:text-lg lg:text-xl hover:shadow-lg transition-all duration-200 font-bold w-full sm:w-auto">
+                  <Play className="mr-2 sm:mr-3 w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform" />
                   Watch Demo
                 </button>
               </div>
@@ -988,7 +1013,7 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Features Section */}
-      <section id="features-section" className={`${designSystem.spacing.section} ${designSystem.spacing.container} bg-gradient-to-br from-purple-50 via-white to-pink-50 relative overflow-hidden`}>
+      <section id="features-section" className="py-12 sm:py-16 lg:py-24 px-4 sm:px-6 bg-gradient-to-br from-purple-50 via-white to-pink-50 relative overflow-hidden">
         {/* Background Animation */}
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-20 left-20 w-64 h-64 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
@@ -1039,7 +1064,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {[
               {
                 id: 'integration',
@@ -1256,14 +1281,14 @@ export default function LandingPage() {
       </section>
 
       {/* Enterprise Pricing Section */}
-      <section id="pricing-section" className="py-24 px-6 bg-gradient-to-br from-gray-50 to-purple-50">
+      <section id="pricing-section" className="py-12 sm:py-16 lg:py-24 px-4 sm:px-6 bg-gradient-to-br from-gray-50 to-purple-50">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-8">
+          <div className="text-center mb-12 sm:mb-16 lg:mb-20">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 lg:mb-8">
               Enterprise-Grade
               <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent" style={{WebkitBackgroundClip: 'text', backgroundClip: 'text'}}> Pricing</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base lg:text-xl text-gray-600 max-w-3xl mx-auto px-4 sm:px-0">
               Transparent pricing that scales with your business. Start free, upgrade when you're ready.
             </p>
           </div>
@@ -1495,7 +1520,7 @@ export default function LandingPage() {
             ))}
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {[
               {
                 title: "Data Protection",
@@ -1687,19 +1712,19 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Footer */}
-      <footer className="py-20 px-6 bg-gray-900">
+      <footer className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 bg-gray-900">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
-            <div className="md:col-span-2">
-              <div className="flex items-center mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-12">
+            <div className="sm:col-span-2 lg:col-span-2">
+              <div className="flex items-center mb-4 sm:mb-6">
                 <img 
                   src="/tredy_logo_purple.png" 
                   alt="Tredy" 
-                  className="h-12 object-contain mr-3"
+                  className="h-10 sm:h-12 object-contain mr-2 sm:mr-3"
                 />
-                <span className="text-white font-bold text-2xl">Tredy</span>
+                <span className="text-white font-bold text-xl sm:text-2xl">Tredy</span>
               </div>
-              <p className="text-gray-400 text-lg mb-6 max-w-md">
+              <p className="text-gray-400 text-sm sm:text-base lg:text-lg mb-4 sm:mb-6 max-w-md">
                 The future of intelligent workflows. Connect, visualize, and execute through AI-powered threads.
               </p>
               <div className="flex space-x-4">
@@ -1735,11 +1760,11 @@ export default function LandingPage() {
             </div>
           </div>
           
-          <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
-            <div className="text-gray-400 text-sm mb-4 md:mb-0">
+          <div className="pt-6 sm:pt-8 border-t border-gray-800 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+            <div className="text-gray-400 text-xs sm:text-sm">
               © 2024 Tredy. All rights reserved.
             </div>
-            <div className="flex space-x-6 text-sm text-gray-400">
+            <div className="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6 text-xs sm:text-sm text-gray-400">
               <a href="#" className="hover:text-purple-400 transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-purple-400 transition-colors">Terms of Service</a>
               <a href="#" className="hover:text-purple-400 transition-colors">Cookie Policy</a>
@@ -1749,7 +1774,7 @@ export default function LandingPage() {
       </footer>
 
       {/* Custom Styles */}
-      <style jsx>{`
+      <style>{`
         @keyframes blob {
           0%, 100% {
             transform: translate(0px, 0px) scale(1);

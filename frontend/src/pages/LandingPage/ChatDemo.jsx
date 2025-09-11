@@ -8,10 +8,12 @@ import {
   ChevronRight,
   Clock,
   CheckCircle2,
+  CheckCircle,
   Loader2,
   Zap,
   Cpu,
-  Sparkles
+  Sparkles,
+  Shield
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -135,8 +137,63 @@ export default function ChatDemo() {
     },
     {
       type: "user",
-      message: "@tredy create a Jira ticket for the feedback from yesterday's client call and schedule a follow-up meeting for next week",
+      message: "@tredy show me our current compliance and security metrics",
       timestamp: "9:34 AM"
+    },
+    {
+      type: "assistant",
+      status: "processing",
+      message: "Analyzing compliance status and security metrics across all systems.",
+      tools: ["Security Hub", "Compliance Engine", "Audit Logs"],
+      metrics: {
+        time: "2.1s",
+        confidence: 98,
+        model: "GPT-4",
+        tokens: 189
+      },
+      thinking: [
+        "Scanning security configurations",
+        "Checking compliance requirements",
+        "Analyzing audit logs",
+        "Generating metrics report"
+      ],
+      timestamp: "9:34 AM"
+    },
+    {
+      type: "assistant",
+      status: "complete",
+      message: {
+        type: "structured",
+        content: {
+          title: "Compliance & Security Dashboard",
+          type: "compliance",
+          metrics: {
+            overall: { label: "Compliance Score", value: "94%", trend: "+12%", status: "success" },
+            security: { label: "Security Grade", value: "A+", subtitle: "Enterprise", status: "success" },
+            vulnerabilities: {
+              label: "Vulnerabilities",
+              critical: 0,
+              high: 2,
+              medium: 5,
+              low: 11
+            },
+            audit: {
+              label: "Audit Status",
+              validated: 156,
+              pending: 8,
+              failed: 0,
+              lastScan: "2 hours ago"
+            }
+          },
+          certifications: ["SOC 2", "ISO 27001", "GDPR", "HIPAA"]
+        }
+      },
+      timestamp: "9:34 AM"
+    },
+    {
+      type: "user",
+      message: "@tredy create a Jira ticket for the feedback from yesterday's client call and schedule a follow-up meeting for next week",
+      timestamp: "9:35 AM"
     },
     {
       type: "assistant",
@@ -311,6 +368,85 @@ export default function ChatDemo() {
                   {item.tag}
                 </span>
               </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (content.type === "compliance") {
+      return (
+        <div className="space-y-4">
+          <h4 className="font-bold text-gray-900 text-lg flex items-center gap-2">
+            <Shield className="w-5 h-5 text-green-600" />
+            {content.title}
+          </h4>
+          
+          {/* Metrics Grid */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Compliance Score */}
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-gray-600">{content.metrics.overall.label}</span>
+                <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full">
+                  {content.metrics.overall.trend}
+                </span>
+              </div>
+              <div className="text-2xl font-bold text-green-700">{content.metrics.overall.value}</div>
+            </div>
+
+            {/* Security Grade */}
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
+              <div className="text-xs font-medium text-gray-600 mb-2">{content.metrics.security.label}</div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-bold text-blue-700">{content.metrics.security.value}</span>
+                <span className="text-xs text-blue-600">{content.metrics.security.subtitle}</span>
+              </div>
+            </div>
+
+            {/* Vulnerabilities */}
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-200">
+              <div className="text-xs font-medium text-gray-600 mb-2">{content.metrics.vulnerabilities.label}</div>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1">
+                  <span className="text-xs font-medium text-red-600">Critical:</span>
+                  <span className="text-sm font-bold text-red-700">{content.metrics.vulnerabilities.critical}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-xs font-medium text-orange-600">High:</span>
+                  <span className="text-sm font-bold text-orange-700">{content.metrics.vulnerabilities.high}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 mt-1">
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-yellow-600">Med:</span>
+                  <span className="text-xs font-semibold text-yellow-700">{content.metrics.vulnerabilities.medium}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-gray-500">Low:</span>
+                  <span className="text-xs font-semibold text-gray-600">{content.metrics.vulnerabilities.low}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Audit Status */}
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
+              <div className="text-xs font-medium text-gray-600 mb-2">{content.metrics.audit.label}</div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span className="text-sm font-bold text-green-700">{content.metrics.audit.validated}</span>
+                <span className="text-xs text-gray-500">validated</span>
+              </div>
+              <div className="text-xs text-gray-600 mt-1">Last: {content.metrics.audit.lastScan}</div>
+            </div>
+          </div>
+
+          {/* Certifications */}
+          <div className="flex flex-wrap gap-2">
+            {content.certifications.map((cert, i) => (
+              <span key={i} className="px-3 py-1 text-xs font-medium bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 rounded-full border border-purple-300">
+                ✓ {cert}
+              </span>
             ))}
           </div>
         </div>
@@ -610,7 +746,7 @@ export default function ChatDemo() {
       </div>
       
       {/* Custom Styles */}
-      <style jsx>{`
+      <style>{`
         @keyframes messageSlide {
           from {
             opacity: 0;

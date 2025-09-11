@@ -71,7 +71,7 @@ export default function MobileOptimizedChat({
   const fileInputRef = useRef(null);
   const imageInputRef = useRef(null);
 
-  // Handle viewport changes for keyboard
+  // Handle viewport changes for keyboard and auto-scrolling
   useEffect(() => {
     if (!window.visualViewport) return;
     
@@ -101,6 +101,25 @@ export default function MobileOptimizedChat({
       window.visualViewport.removeEventListener('scroll', handleViewportChange);
     };
   }, []);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    const chatContainer = document.querySelector('.chat-history-container');
+    if (!chatContainer) return;
+
+    // Check if user is near bottom (within 100px)
+    const isNearBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 100;
+    
+    // Auto-scroll only if user is near bottom or it's a new conversation
+    if (isNearBottom || chatHistory.length <= 1) {
+      setTimeout(() => {
+        chatContainer.scrollTo({
+          top: chatContainer.scrollHeight,
+          behavior: 'smooth'
+        });
+      }, 50);
+    }
+  }, [chatHistory]);
 
   // Sync with parent message state
 
@@ -183,6 +202,10 @@ export default function MobileOptimizedChat({
     },
   ];
 
+  // Detect if we're in homepage context by checking for homepage elements
+  const isInHomepage = typeof window !== 'undefined' && 
+    (window.location.pathname === '/' || window.location.pathname === '/home');
+  
   return (
     <>
       <div 
@@ -190,9 +213,10 @@ export default function MobileOptimizedChat({
         className="flex flex-col h-full bg-gray-50 dark:bg-gray-900 relative"
         style={{
           paddingBottom: keyboardHeight > 0 ? '0' : 'env(safe-area-inset-bottom)',
+          paddingTop: isInHomepage ? '0' : 'env(safe-area-inset-top)',
         }}
       >
-      {/* Header is now handled by parent ChatContainer as fixed header */}
+      {/* Header is handled by parent context - homepage header or ChatWidgetHeader */}
       
       {/* Response Mode Indicator */}
       {responseMode === "agent" && (
@@ -220,6 +244,10 @@ export default function MobileOptimizedChat({
         style={{
           WebkitOverflowScrolling: 'touch',
           paddingBottom: '100px',
+          transform: 'translate3d(0,0,0)', // Hardware acceleration for smooth scrolling
+          // Ensure proper height calculation for mobile
+          height: '100%',
+          minHeight: 0, // Critical for flex child scrolling
         }}
       >
         <ChatHistory

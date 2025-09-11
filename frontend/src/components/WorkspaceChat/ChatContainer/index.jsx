@@ -528,7 +528,7 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
   // Use mobile-optimized chat for mobile devices
   if (useMobileUI) {
     return (
-      <div className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] overflow-hidden safe-area-inset pt-16">
+      <div className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] overflow-hidden">
         <DnDFileUploaderWrapper>
           <MobileOptimizedChat
             workspace={workspace}
@@ -556,11 +556,9 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
     );
   }
 
-  // Desktop layout
+  // Desktop layout with header
   return (
-    <div
-      className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] overflow-hidden safe-area-inset pt-16 sm:pt-14"
-    >
+    <div className="relative bg-white dark:bg-dark-bg-primary w-full h-full max-h-full flex flex-col z-[2] overflow-hidden">
       <ChatWidgetHeader 
         workspace={workspace}
         connectors={[]} 
@@ -587,23 +585,29 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
       )}
       
       <DnDFileUploaderWrapper>
-        <MetricsProvider>
-          <ChatHistory
-            history={chatHistory}
-            workspace={workspace}
-            sendCommand={sendCommand}
-            updateHistory={setChatHistory}
-            regenerateAssistantMessage={regenerateAssistantMessage}
-            hasAttachments={files.length > 0}
-          />
-        </MetricsProvider>
-        <PromptInput
-          submit={handleSubmit}
-          onChange={handleMessageChange}
-          isStreaming={loadingResponse}
-          sendCommand={sendCommand}
-          attachments={files}
-        />
+        <div className="flex flex-col h-full">
+          <div className="flex-1 min-h-0">
+            <MetricsProvider>
+              <ChatHistory
+                history={chatHistory}
+                workspace={workspace}
+                sendCommand={sendCommand}
+                updateHistory={setChatHistory}
+                regenerateAssistantMessage={regenerateAssistantMessage}
+                hasAttachments={files.length > 0}
+              />
+            </MetricsProvider>
+          </div>
+          <div className="flex-shrink-0">
+            <PromptInput
+              submit={handleSubmit}
+              onChange={handleMessageChange}
+              isStreaming={loadingResponse}
+              sendCommand={sendCommand}
+              attachments={files}
+            />
+          </div>
+        </div>
       </DnDFileUploaderWrapper>
       <ChatTooltips />
     </div>

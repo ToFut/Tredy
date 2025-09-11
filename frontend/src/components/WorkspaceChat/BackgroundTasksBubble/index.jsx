@@ -183,7 +183,7 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
 
   // Bubble styled like Avatar/ConnectorBubble
   return (
-    <>
+    <div className="relative">
       <div 
         className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105"
         onClick={() => setIsOpen(!isOpen)}
@@ -221,7 +221,7 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
 
       {/* Dropdown Panel */}
       {isOpen && (
-        <div ref={dropdownRef} className="absolute right-0 mt-2 w-96 bg-gray-800 rounded-lg shadow-2xl z-50 border border-gray-700 max-h-[600px] overflow-hidden flex flex-col">
+        <div ref={dropdownRef} className="absolute right-0 md:right-auto md:left-auto mt-2 w-[calc(100vw-2rem)] md:w-96 max-w-96 bg-gray-800 rounded-lg shadow-2xl z-50 border border-gray-700 max-h-[60vh] md:max-h-[600px] overflow-hidden flex flex-col">
           {/* Header */}
           <div className="p-4 border-b border-gray-700">
             <div className="flex items-center justify-between">
@@ -358,6 +358,6 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

@@ -77,7 +77,7 @@ export default function ActionButtonsBar({
         
         {/* Gamify Options Menu */}
         {showGamifyMenu && (
-          <div className="absolute top-12 left-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-2 z-50 min-w-48">
+          <div className="absolute bottom-full mb-2 left-0 md:bottom-auto md:top-12 md:mb-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-2 z-50 min-w-[12rem] max-w-[calc(100vw-4rem)]">
             <div className="space-y-1">
               <button
                 onClick={() => onGamifyOption('interactive')}

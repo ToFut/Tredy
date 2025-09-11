@@ -877,7 +877,7 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showConnectorModal, setShowConnectorModal] = useState(false);
   const [showExpanded, setShowExpanded] = useState(false);
-  const avatarSize = isMobile ? 44 : 40; // Minimum 44px for proper touch targets
+  const avatarSize = isMobile ? 40 : 40; // Consistent size for better layout
 
   // Check for openConnectors query parameter on mount
   useEffect(() => {
@@ -915,12 +915,12 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
 
   return (
     <>
-      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/40 dark:border-gray-700/40 fixed top-0 left-0 right-0 z-50 safe-area-inset-top">
-        <div className="px-2 sm:px-4 lg:px-5 py-1.5 sm:py-2">
+      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/40 dark:border-gray-700/40 sticky top-0 z-50 w-full">
+        <div className="px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5">
           <div className="flex items-center justify-between gap-1 sm:gap-2">
             {/* Left: Workspace Info - More Compact */}
             <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-shrink-0">
-              <div className="hidden md:flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-2">
                 <div className="p-1.5 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
                   <Sparkle className="w-3.5 h-3.5 text-white" />
                 </div>
@@ -932,11 +932,11 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
               </div>
               
               {/* Mobile: Even More Compact */}
-              <div className="md:hidden flex items-center gap-1">
-                <div className="p-1 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
+              <div className="sm:hidden flex items-center gap-1.5">
+                <div className="p-1 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex-shrink-0">
                   <Sparkle className="w-3 h-3 text-white" />
                 </div>
-                <h2 className="font-medium text-gray-900 dark:text-white truncate text-sm">
+                <h2 className="font-medium text-gray-900 dark:text-white truncate text-xs">
                   {workspace?.name || "Workspace"}
                 </h2>
               </div>
@@ -947,19 +947,19 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
               {/* Members Stack - Responsive sizing */}
               <div className="flex items-center -space-x-1 sm:-space-x-2">
                 {loading ? (
-                  <div className="flex -space-x-2">
+                  <div className="flex -space-x-1">
                     {[...Array(2)].map((_, i) => (
-                      <div key={i} className={`w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse ring-2 ring-white dark:ring-gray-900`} />
+                      <div key={i} className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse ring-1 ring-white dark:ring-gray-900`} />
                     ))}
                   </div>
                 ) : (
                   <>
-                    {members.slice(0, visibleMembers).map((member, idx) => (
+                    {members.slice(0, isMobile ? 2 : visibleMembers).map((member, idx) => (
                       <Avatar 
                         key={idx}
                         user={member}
-                        size={avatarSize}
-                        showBadge={idx === 0 && !isMobile}
+                        size={isMobile ? 28 : avatarSize}
+                        showBadge={false}
                         badgeIcon={member.role === 'admin' && !isMobile ? Crown : null}
                       />
                     ))}
@@ -969,55 +969,59 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
                       <button
                         onClick={() => setShowExpanded(true)}
                         className="relative transform transition-all duration-200 hover:scale-110"
-                        style={{ width: avatarSize, height: avatarSize }}
+                        style={{ width: isMobile ? 28 : avatarSize, height: isMobile ? 28 : avatarSize }}
                       >
-                        <div className="w-full h-full rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300 ring-2 ring-white dark:ring-gray-900 hover:bg-gray-300 dark:hover:bg-gray-600">
+                        <div className="w-full h-full rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300 ring-1 ring-white dark:ring-gray-900 hover:bg-gray-300 dark:hover:bg-gray-600">
                           +{totalOverflow}
                         </div>
                       </button>
                     )}
                     
-                    {/* Add Member Button */}
-                    <AddButton 
-                      onClick={() => setShowInviteModal(true)}
-                      type="member"
-                      size={avatarSize}
-                    />
+                    {/* Add Member Button - Hidden on mobile */}
+                    {!isMobile && (
+                      <AddButton 
+                        onClick={() => setShowInviteModal(true)}
+                        type="member"
+                        size={avatarSize}
+                      />
+                    )}
                   </>
                 )}
               </div>
 
               {/* Services Stack - Mobile responsive */}
-              <div className="h-4 sm:h-6 w-px bg-gray-300 dark:bg-gray-600 mx-0.5 sm:mx-1" />
+              <div className="h-3 sm:h-4 w-px bg-gray-300 dark:bg-gray-600 mx-1" />
               <div className="flex items-center -space-x-1 sm:-space-x-2">
-                {services.slice(0, visibleServices).map((service, idx) => (
+                {services.slice(0, isMobile ? 1 : visibleServices).map((service, idx) => (
                   <ConnectorBubble 
                     key={idx}
                     connector={service}
-                    size={avatarSize}
+                    size={isMobile ? 28 : avatarSize}
                     onClick={() => setShowConnectorModal(true)}
                   />
                 ))}
-                <AddButton 
-                  onClick={() => setShowConnectorModal(true)}
-                  type="service"
-                  size={avatarSize}
-                />
+                {!isMobile && (
+                  <AddButton 
+                    onClick={() => setShowConnectorModal(true)}
+                    type="service"
+                    size={avatarSize}
+                  />
+                )}
               </div>
               
               {/* Background Tasks Bubble */}
-              <div className="h-4 sm:h-6 w-px bg-gray-300 dark:bg-gray-600 mx-0.5 sm:mx-1" />
+              <div className="h-3 sm:h-4 w-px bg-gray-300 dark:bg-gray-600 mx-1" />
               <BackgroundTasksBubble workspace={workspace} />
 
               {/* Expand Button (Mobile) - Improved touch target */}
               {isMobile && (
                 <button
                   onClick={() => setShowExpanded(true)}
-                  className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors md:hidden touch-manipulation"
-                  style={{ minWidth: '44px', minHeight: '44px' }}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors sm:hidden touch-manipulation ml-1"
+                  style={{ minWidth: '32px', minHeight: '32px' }}
                   aria-label="Expand team view"
                 >
-                  <ArrowsOut className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  <ArrowsOut className="w-3 h-3 text-gray-600 dark:text-gray-400" />
                 </button>
               )}
             </div>

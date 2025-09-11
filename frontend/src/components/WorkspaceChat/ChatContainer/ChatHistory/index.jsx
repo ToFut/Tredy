@@ -61,10 +61,15 @@ export default function ChatHistory({
     if (!chatHistoryRef.current) return;
     
     const element = chatHistoryRef.current;
-    element.scrollTo({
-      top: element.scrollHeight,
-      behavior: instant ? 'instant' : 'smooth'
-    });
+    try {
+      element.scrollTo({
+        top: element.scrollHeight,
+        behavior: instant ? 'instant' : 'smooth'
+      });
+    } catch (error) {
+      // Fallback for older browsers or edge cases
+      element.scrollTop = element.scrollHeight;
+    }
   }, []);
 
   // Handle scroll position tracking
@@ -98,6 +103,19 @@ export default function ChatHistory({
       });
     }
   }, [history.length, scrollToBottom]);
+
+  // Also auto-scroll when message content updates (for streaming)
+  useEffect(() => {
+    if (isStreaming && shouldAutoScrollRef.current) {
+      // Debounced scroll during streaming to avoid excessive scrolling
+      const timeoutId = setTimeout(() => {
+        requestAnimationFrame(() => {
+          scrollToBottom();
+        });
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [history, isStreaming, scrollToBottom]);
 
   // Handle streaming messages smoothly
   useEffect(() => {
@@ -299,7 +317,7 @@ export default function ChatHistory({
 
   return (
     <div
-      className="flex-1 flex flex-col bg-white dark:bg-gray-900 min-h-0 safe-area-inset"
+      className="h-full flex flex-col bg-white dark:bg-gray-900"
       id="chat-container"
     >
       <div
@@ -327,14 +345,14 @@ export default function ChatHistory({
         </div>
       </div>
       {!isAtBottom && (
-        <div className="absolute bottom-2 right-2 sm:right-4 md:right-8 z-50 cursor-pointer">
+        <div className="absolute bottom-4 right-4 z-50 cursor-pointer">
           <button
             onClick={manualScrollToBottom}
-            className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 active:scale-95 touch-manipulation"
-            style={{ minWidth: '40px', minHeight: '40px' }}
+            className="flex items-center justify-center w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 active:scale-95 touch-manipulation animate-pulse"
+            style={{ minWidth: '48px', minHeight: '48px' }}
             aria-label="Scroll to bottom"
           >
-            <ArrowDown className="w-4 h-4 sm:w-6 sm:h-6" weight="bold" />
+            <ArrowDown className="w-6 h-6" weight="bold" />
           </button>
         </div>
       )}

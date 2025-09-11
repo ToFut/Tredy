@@ -73,6 +73,37 @@ const TRANSLATIONS = {
     search: "Search",
   },
 
+  // Home page translations
+  homePage: {
+    welcomeHeader: "Welcome to Tredy",
+    welcomeWithName: "Welcome to Tredy, {{username}}!",
+    aiAssistantReady: "Your AI Workflow Assistant is Ready",
+    flowAgentsTitle: "Your Flow Agents - Click to Run",
+    quickActionsTitle: "Quick Actions - Click to Start",
+    emailFlow: "Email Flow",
+    emailFlowDesc: "Send & manage emails",
+    calendarFlow: "Calendar Flow",
+    calendarFlowDesc: "Schedule meetings",
+    linkedinFlow: "LinkedIn Flow",
+    linkedinFlowDesc: "Post & engage",
+    createFlow: "Create Flow",
+    createFlowDesc: "Build custom workflow",
+    welcomeMessage: "Hi! I'm Tredy,",
+    welcomeMessageDesc: "your AI workflow assistant. Click any flow above to get started, or type",
+    welcomeMessageDesc2: "followed by your request. I can help you send emails, schedule meetings, post on social media, and analyze your data!",
+    noWorkspaceTitle: "Welcome to Tredy",
+    noWorkspaceDesc: "Tredy is your intelligent workflow assistant that automates emails, calendar management, social media, and data analysis.",
+    createFirstWorkspace: "Create your first workspace to unlock powerful AI workflows!",
+    createWorkspaceBtn: "Create Your First Workspace",
+    emailWorkflows: "Email Workflows",
+    emailWorkflowsDesc: "Compose, send, and manage emails",
+    smartScheduling: "Smart Scheduling",
+    smartSchedulingDesc: "AI-powered meeting coordination",
+    flowAutomation: "Flow Automation",
+    flowAutomationDesc: "Build custom AI workflows",
+    steps: "steps"
+  },
+
   // Setting Sidebar menu items.
   settings: {
     title: "Instance Settings",

@@ -8,12 +8,10 @@ import {
   ChevronRight,
   Clock,
   CheckCircle2,
-  CheckCircle,
   Loader2,
   Zap,
   Cpu,
-  Sparkles,
-  Shield
+  Sparkles
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -137,63 +135,8 @@ export default function ChatDemo() {
     },
     {
       type: "user",
-      message: "@tredy show me our current compliance and security metrics",
-      timestamp: "9:34 AM"
-    },
-    {
-      type: "assistant",
-      status: "processing",
-      message: "Analyzing compliance status and security metrics across all systems.",
-      tools: ["Security Hub", "Compliance Engine", "Audit Logs"],
-      metrics: {
-        time: "2.1s",
-        confidence: 98,
-        model: "GPT-4",
-        tokens: 189
-      },
-      thinking: [
-        "Scanning security configurations",
-        "Checking compliance requirements",
-        "Analyzing audit logs",
-        "Generating metrics report"
-      ],
-      timestamp: "9:34 AM"
-    },
-    {
-      type: "assistant",
-      status: "complete",
-      message: {
-        type: "structured",
-        content: {
-          title: "Compliance & Security Dashboard",
-          type: "compliance",
-          metrics: {
-            overall: { label: "Compliance Score", value: "94%", trend: "+12%", status: "success" },
-            security: { label: "Security Grade", value: "A+", subtitle: "Enterprise", status: "success" },
-            vulnerabilities: {
-              label: "Vulnerabilities",
-              critical: 0,
-              high: 2,
-              medium: 5,
-              low: 11
-            },
-            audit: {
-              label: "Audit Status",
-              validated: 156,
-              pending: 8,
-              failed: 0,
-              lastScan: "2 hours ago"
-            }
-          },
-          certifications: ["SOC 2", "ISO 27001", "GDPR", "HIPAA"]
-        }
-      },
-      timestamp: "9:34 AM"
-    },
-    {
-      type: "user",
       message: "@tredy create a Jira ticket for the feedback from yesterday's client call and schedule a follow-up meeting for next week",
-      timestamp: "9:35 AM"
+      timestamp: "9:34 AM"
     },
     {
       type: "assistant",
@@ -374,85 +317,6 @@ export default function ChatDemo() {
       );
     }
 
-    if (content.type === "compliance") {
-      return (
-        <div className="space-y-4">
-          <h4 className="font-bold text-gray-900 text-lg flex items-center gap-2">
-            <Shield className="w-5 h-5 text-green-600" />
-            {content.title}
-          </h4>
-          
-          {/* Metrics Grid */}
-          <div className="grid grid-cols-2 gap-3">
-            {/* Compliance Score */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-gray-600">{content.metrics.overall.label}</span>
-                <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full">
-                  {content.metrics.overall.trend}
-                </span>
-              </div>
-              <div className="text-2xl font-bold text-green-700">{content.metrics.overall.value}</div>
-            </div>
-
-            {/* Security Grade */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
-              <div className="text-xs font-medium text-gray-600 mb-2">{content.metrics.security.label}</div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-blue-700">{content.metrics.security.value}</span>
-                <span className="text-xs text-blue-600">{content.metrics.security.subtitle}</span>
-              </div>
-            </div>
-
-            {/* Vulnerabilities */}
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-200">
-              <div className="text-xs font-medium text-gray-600 mb-2">{content.metrics.vulnerabilities.label}</div>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1">
-                  <span className="text-xs font-medium text-red-600">Critical:</span>
-                  <span className="text-sm font-bold text-red-700">{content.metrics.vulnerabilities.critical}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-xs font-medium text-orange-600">High:</span>
-                  <span className="text-sm font-bold text-orange-700">{content.metrics.vulnerabilities.high}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 mt-1">
-                <div className="flex items-center gap-1">
-                  <span className="text-xs text-yellow-600">Med:</span>
-                  <span className="text-xs font-semibold text-yellow-700">{content.metrics.vulnerabilities.medium}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-xs text-gray-500">Low:</span>
-                  <span className="text-xs font-semibold text-gray-600">{content.metrics.vulnerabilities.low}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Audit Status */}
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
-              <div className="text-xs font-medium text-gray-600 mb-2">{content.metrics.audit.label}</div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span className="text-sm font-bold text-green-700">{content.metrics.audit.validated}</span>
-                <span className="text-xs text-gray-500">validated</span>
-              </div>
-              <div className="text-xs text-gray-600 mt-1">Last: {content.metrics.audit.lastScan}</div>
-            </div>
-          </div>
-
-          {/* Certifications */}
-          <div className="flex flex-wrap gap-2">
-            {content.certifications.map((cert, i) => (
-              <span key={i} className="px-3 py-1 text-xs font-medium bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 rounded-full border border-purple-300">
-                ✓ {cert}
-              </span>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
     if (content.sections) {
       return (
         <div className="space-y-3">
@@ -571,7 +435,7 @@ export default function ChatDemo() {
       {/* Chat Messages */}
       <div 
         ref={chatContainerRef}
-        className="h-[600px] overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-purple-50/30 via-white to-purple-50/20 scroll-smooth"
+        className="h-[400px] sm:h-[500px] lg:h-[600px] overflow-y-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 bg-gradient-to-b from-purple-50/30 via-white to-purple-50/20 scroll-smooth"
         style={{ scrollBehavior: 'smooth' }}
       >
         {chatMessages.slice(0, currentMessageIndex + 1).map((msg, idx) => (
@@ -580,7 +444,7 @@ export default function ChatDemo() {
             className={`${msg.type === 'user' ? 'flex justify-end' : 'flex justify-start'} animate-messageSlide`}
             style={{ animationDelay: `${idx * 0.2}s` }}
           >
-            <div className={`max-w-[90%] ${msg.type === 'user' ? 'order-2' : ''}`}>
+            <div className={`max-w-[85%] sm:max-w-[90%] ${msg.type === 'user' ? 'order-2' : ''}`}>
               {msg.type === 'user' ? (
                 <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-5 rounded-2xl rounded-tr-sm shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] animate-slideInRight">
                   <p className="text-sm leading-relaxed font-medium">{msg.message}</p>
@@ -724,7 +588,7 @@ export default function ChatDemo() {
             <input 
               type="text" 
               placeholder="Type @tredy to start your AI workflow..." 
-              className="w-full px-5 py-4 border-2 border-purple-200 rounded-2xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 bg-white/80 backdrop-blur-sm transition-all duration-300 text-sm font-medium placeholder-gray-500"
+              className="w-full px-3 sm:px-4 lg:px-5 py-3 sm:py-4 border-2 border-purple-200 rounded-xl sm:rounded-2xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 bg-white/80 backdrop-blur-sm transition-all duration-300 text-xs sm:text-sm font-medium placeholder-gray-500"
               disabled
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">

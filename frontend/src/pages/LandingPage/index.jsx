@@ -585,9 +585,9 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-24 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6 min-h-screen flex items-center">
+      <section className="relative pt-20 sm:pt-24 lg:pt-32 pb-8 sm:pb-12 lg:pb-20 px-4 sm:px-6 min-h-[90vh] sm:min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto w-full">
-          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 md:gap-12 lg:gap-16 items-center">
             {/* Left: Hero Content */}
             <div className="text-center lg:text-left">
               <div className="inline-flex items-center px-3 sm:px-4 py-2 mb-6 sm:mb-8 bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-700 rounded-full text-xs sm:text-sm font-semibold border border-purple-200 hover:scale-105 transition-all duration-300 shadow-sm">
@@ -596,59 +596,59 @@ export default function LandingPage() {
                 <div className="ml-2 w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
               </div>
               
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-6 sm:mb-8 leading-[1.1]">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 lg:mb-8 leading-[1.15]">
                 <span className="block">{t('landing.hero.title')}</span>
                 <span className="bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 bg-clip-text text-transparent animate-gradient-x" style={{WebkitBackgroundClip: 'text', backgroundClip: 'text'}}>
                   {t('landing.hero.subtitle')}
                 </span>
               </h1>
               
-              <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-8 sm:mb-12 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+              <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-6 sm:mb-8 lg:mb-12 leading-relaxed max-w-2xl mx-auto lg:mx-0">
                 {t('landing.hero.description')}
               </p>
               
-              <div id="hero-cta" className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-8 sm:mb-16">
+              <div id="hero-cta" className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-6 sm:mb-12 lg:mb-16">
                 <button 
                   onClick={handleCreateTredyWorkspace}
-                  className="group inline-flex items-center justify-center px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-xl text-base sm:text-lg lg:text-xl hover:shadow-lg transition-all duration-200 font-bold w-full sm:w-auto"
+                  className="group inline-flex items-center justify-center px-5 sm:px-6 md:px-8 lg:px-10 py-3 sm:py-3.5 md:py-4 lg:py-5 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-xl text-sm sm:text-base md:text-lg lg:text-xl hover:shadow-lg transition-all duration-200 font-bold w-full sm:w-auto"
                 >
                   Chat with Tredy
                   <ArrowRight className="ml-2 sm:ml-3 w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform" />
                 </button>
-                <button className="group inline-flex items-center justify-center px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 bg-white/90 backdrop-blur-sm border-2 border-purple-200 text-purple-700 hover:border-purple-300 hover:bg-purple-50 rounded-xl text-base sm:text-lg lg:text-xl hover:shadow-lg transition-all duration-200 font-bold w-full sm:w-auto">
+                <button className="group inline-flex items-center justify-center px-5 sm:px-6 md:px-8 lg:px-10 py-3 sm:py-3.5 md:py-4 lg:py-5 bg-white/90 backdrop-blur-sm border-2 border-purple-200 text-purple-700 hover:border-purple-300 hover:bg-purple-50 rounded-xl text-sm sm:text-base md:text-lg lg:text-xl hover:shadow-lg transition-all duration-200 font-bold w-full sm:w-auto">
                   <Play className="mr-2 sm:mr-3 w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform" />
                   Watch Demo
                 </button>
               </div>
 
               {/* Enhanced Animated Stats with Balanced Colors */}
-              <div className={`grid grid-cols-3 ${designSystem.spacing.gap.medium} mb-8`}>
+              <div className={`grid grid-cols-3 gap-2 sm:gap-4 lg:gap-6 mb-6 sm:mb-8`}>
                 <div className="text-center lg:text-left group">
-                  <div className={`${designSystem.typography.heading2} ${designSystem.colors.brand.purple} mb-2 transition-all duration-300 group-hover:scale-110`}>
+                  <div className={`text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold ${designSystem.colors.brand.purple} mb-1 sm:mb-2 transition-all duration-300 group-hover:scale-110`}>
                     {animatedCount.integrations.toLocaleString()}+
                   </div>
-                  <div className={`text-sm ${designSystem.colors.text.muted} font-medium`}>Integrations</div>
-                  <div className="text-xs text-emerald-600 font-semibold mt-1">
+                  <div className={`text-xs sm:text-sm ${designSystem.colors.text.muted} font-medium`}>Integrations</div>
+                  <div className="hidden sm:block text-xs text-emerald-600 font-semibold mt-1">
                     <span className="inline-block w-1 h-1 bg-emerald-500 rounded-full mr-1 animate-pulse"></span>
                     +12 this week
                   </div>
                 </div>
                 <div className="text-center lg:text-left group">
-                  <div className={`${designSystem.typography.heading2} ${designSystem.colors.brand.indigo} mb-2 transition-all duration-300 group-hover:scale-110`}>
+                  <div className={`text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold ${designSystem.colors.brand.indigo} mb-1 sm:mb-2 transition-all duration-300 group-hover:scale-110`}>
                     {animatedCount.users.toLocaleString()}+
                   </div>
-                  <div className={`text-sm ${designSystem.colors.text.muted} font-medium`}>Enterprise Users</div>
-                  <div className="text-xs text-teal-600 font-semibold mt-1">
+                  <div className={`text-xs sm:text-sm ${designSystem.colors.text.muted} font-medium`}>Users</div>
+                  <div className="hidden sm:block text-xs text-teal-600 font-semibold mt-1">
                     <span className="inline-block w-1 h-1 bg-teal-500 rounded-full mr-1 animate-pulse"></span>
                     +247 today
                   </div>
                 </div>
                 <div className="text-center lg:text-left group">
-                  <div className={`${designSystem.typography.heading2} ${designSystem.colors.brand.emerald} mb-2 transition-all duration-300 group-hover:scale-110`}>
+                  <div className={`text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold ${designSystem.colors.brand.emerald} mb-1 sm:mb-2 transition-all duration-300 group-hover:scale-110`}>
                     {animatedCount.uptime.toFixed(1)}%
                   </div>
-                  <div className={`text-sm ${designSystem.colors.text.muted} font-medium`}>Uptime SLA</div>
-                  <div className="text-xs text-emerald-600 font-semibold mt-1">
+                  <div className={`text-xs sm:text-sm ${designSystem.colors.text.muted} font-medium`}>Uptime</div>
+                  <div className="hidden sm:block text-xs text-emerald-600 font-semibold mt-1">
                     <span className="inline-block w-1 h-1 bg-emerald-500 rounded-full mr-1 animate-pulse"></span>
                     30 days streak
                   </div>
@@ -656,7 +656,7 @@ export default function LandingPage() {
               </div>
 
               {/* Live Activity Feed */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+              <div className="hidden sm:block bg-white/90 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-full flex items-center justify-center">
@@ -673,7 +673,7 @@ export default function LandingPage() {
             </div>
 
             {/* Right: Enhanced Chat Demo */}
-            <div className="relative">
+            <div className="relative mt-8 lg:mt-0">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-3xl blur-3xl opacity-20 animate-pulse"></div>
               <div className="relative">
                 <ChatDemo />

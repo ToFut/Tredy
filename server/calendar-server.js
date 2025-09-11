@@ -116,6 +116,16 @@ class SimpleCalendarMCP {
   }
 
   async getCalendarEvents(args = {}) {
+    // Get workspace ID from args to determine the connection
+    const workspaceId = args.workspaceId;
+    const connectionId = workspaceId ? `workspace_${workspaceId}` : process.env.NANGO_CONNECTION_ID;
+    
+    if (!connectionId) {
+      throw new Error('No workspace ID provided and no default connection configured');
+    }
+    
+    console.error(`[Calendar MCP] Getting events for connectionId: ${connectionId}`);
+    
     // Get data from Nango instead of direct API calls
     const { Nango } = require('@nangohq/node');
     
@@ -185,13 +195,7 @@ class SimpleCalendarMCP {
     const endpoint = `/calendar/v3/calendars/primary/events?${params}`;
     
     try {
-      // Use Nango's proxy to make the API call
-      // Get connection ID from environment (set by MCP bridge)
-      const connectionId = process.env.NANGO_CONNECTION_ID;
-      if (!connectionId) {
-        throw new Error('NANGO_CONNECTION_ID not set. Calendar not connected for this workspace.');
-      }
-      
+      // Use Nango's proxy to make the API call with workspace-specific connection
       const response = await nango.get({
         endpoint,
         connectionId,
@@ -242,6 +246,16 @@ class SimpleCalendarMCP {
   }
 
   async createCalendarEvent(args) {
+    // Get workspace ID from args to determine the connection
+    const workspaceId = args.workspaceId;
+    const connectionId = workspaceId ? `workspace_${workspaceId}` : process.env.NANGO_CONNECTION_ID;
+    
+    if (!connectionId) {
+      throw new Error('No workspace ID provided and no default connection configured');
+    }
+    
+    console.error(`[Calendar MCP] Creating event for connectionId: ${connectionId}`);
+    
     // Use Nango for creating events too
     const { Nango } = require('@nangohq/node');
     
@@ -339,7 +353,7 @@ class SimpleCalendarMCP {
     try {
       const response = await nango.post({
         endpoint: '/calendar/v3/calendars/primary/events',
-        connectionId: process.env.NANGO_CONNECTION_ID,
+        connectionId: connectionId,
         providerConfigKey: 'google-calendar-getting-started',
         data: eventData
       });

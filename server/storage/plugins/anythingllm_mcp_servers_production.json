@@ -4,7 +4,7 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "/app/server/universal-gmail-mcp.js"
+        "/app/server/gmail-server.js"
       ],
       "env": {
         "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
@@ -22,7 +22,7 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "/app/server/simple-google-calendar-mcp.js"
+        "/app/server/calendar-server.js"
       ],
       "env": {
         "NANGO_PROVIDER": "google-calendar",
@@ -42,7 +42,7 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "/app/server/linkedin-mcp.js"
+        "/app/server/linkedin-server.js"
       ],
       "env": {
         "NANGO_PROVIDER": "linkedin",
@@ -62,7 +62,7 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "/app/server/google-drive-generated-mcp.js"
+        "/app/server/drive-server.js"
       ],
       "env": {
         "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",

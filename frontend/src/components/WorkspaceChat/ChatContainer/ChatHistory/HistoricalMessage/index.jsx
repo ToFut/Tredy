@@ -397,28 +397,34 @@ function HistoricalMessageMetrics({ metrics, message }) {
               const logoSrc = getDirectLogo(toolName);
               
               return (
-                <div key={idx} className="relative group">
+                <div key={idx} className="relative">
                   {logoSrc ? (
-                    <img 
-                      src={logoSrc} 
-                      alt={toolName} 
-                      className="w-4 h-4 rounded" 
-                      title={toolName}
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
-                      }}
-                    />
+                    <div className="relative group/logo">
+                      <img 
+                        src={logoSrc} 
+                        alt={toolName} 
+                        className="w-4 h-4 rounded cursor-pointer hover:scale-110 transition-transform" 
+                        title={toolName}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                      <div className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-white border border-gray-200 shadow-lg text-gray-800 text-xs px-2 py-1 rounded opacity-0 group-hover/logo:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                        {toolName}
+                      </div>
+                    </div>
                   ) : null}
                   {/* Fallback icon */}
-                  <div 
-                    className="w-4 h-4 bg-gray-300 rounded flex items-center justify-center text-xs font-bold text-gray-600"
-                    style={{ display: logoSrc ? 'none' : 'flex' }}
-                  >
-                    {toolName.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-                    {toolName}
+                  <div className="relative group/logo" style={{ display: logoSrc ? 'none' : 'block' }}>
+                    <div 
+                      className="w-4 h-4 bg-gray-300 rounded flex items-center justify-center text-xs font-bold text-gray-600 cursor-pointer hover:scale-110 transition-transform"
+                    >
+                      {toolName.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-white border border-gray-200 shadow-lg text-gray-800 text-xs px-2 py-1 rounded opacity-0 group-hover/logo:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                      {toolName}
+                    </div>
                   </div>
                 </div>
               );

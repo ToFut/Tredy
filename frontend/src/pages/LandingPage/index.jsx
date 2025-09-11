@@ -287,16 +287,21 @@ export default function LandingPage() {
       <div
         onMouseEnter={() => setActiveTooltip(id)}
         onMouseLeave={() => setActiveTooltip(null)}
+        className="group"
       >
         {children}
       </div>
       {activeTooltip === id && (
-        <div className={`absolute z-50 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-xl max-w-xs animate-fadeIn ${
-          position === 'top' ? 'bottom-full mb-2 left-1/2 transform -translate-x-1/2' :
-          position === 'bottom' ? 'top-full mt-2 left-1/2 transform -translate-x-1/2' :
-          position === 'left' ? 'right-full mr-2 top-1/2 transform -translate-y-1/2' :
-          'left-full ml-2 top-1/2 transform -translate-y-1/2'
-        }`}>
+        <div 
+          className={`absolute z-50 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-xl max-w-xs animate-fadeIn pointer-events-none ${
+            position === 'top' ? 'bottom-full mb-2 left-1/2 transform -translate-x-1/2' :
+            position === 'bottom' ? 'top-full mt-2 left-1/2 transform -translate-x-1/2' :
+            position === 'left' ? 'right-full mr-2 top-1/2 transform -translate-y-1/2' :
+            'left-full ml-2 top-1/2 transform -translate-y-1/2'
+          }`}
+          onMouseEnter={() => setActiveTooltip(id)}
+          onMouseLeave={() => setActiveTooltip(null)}
+        >
           <div className="font-semibold mb-1">{title}</div>
           <div>{content}</div>
           <div className={`absolute w-2 h-2 bg-gray-900 transform rotate-45 ${
@@ -428,7 +433,7 @@ export default function LandingPage() {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-40 left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+        <div className="absolute top-20 left-20 w-80 h-80 bg-cyan-300 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-blob animation-delay-4000"></div>
       </div>
 
       {/* Navigation */}
@@ -578,31 +583,17 @@ export default function LandingPage() {
               </p>
               
               <div id="hero-cta" className={`flex flex-col sm:flex-row ${designSystem.spacing.gap.small} justify-center lg:justify-start mb-16`}>
-                <Tooltip 
-                  id="free-trial" 
-                  title="Free Trial Benefits" 
-                  content="No credit card required • Full access to all features • Cancel anytime • Dedicated support included"
-                  position="bottom"
+                <Link 
+                  to="/workspace/tredy"
+                  className={`group inline-flex items-center px-10 py-5 ${designSystem.components.button.primary} text-xl hover:shadow-lg transition-all duration-200`}
                 >
-                  <Link 
-                    to="/login"
-                    className={`group inline-flex items-center px-10 py-5 ${designSystem.components.button.primary} text-xl`}
-                  >
-                    Chat with Tredy
-                    <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </Tooltip>
-                <Tooltip 
-                  id="demo-video" 
-                  title="Interactive Demo" 
-                  content="See Tredy in action with real-world scenarios from your industry"
-                  position="bottom"
-                >
-                  <button className={`group inline-flex items-center px-10 py-5 bg-white/90 backdrop-blur-sm ${designSystem.components.button.secondary} text-xl`}>
-                    <Play className="mr-3 w-6 h-6 group-hover:scale-110 transition-transform" />
-                    Watch Demo
-                  </button>
-                </Tooltip>
+                  Chat with Tredy
+                  <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <button className={`group inline-flex items-center px-10 py-5 bg-white/90 backdrop-blur-sm ${designSystem.components.button.secondary} text-xl hover:shadow-lg transition-all duration-200`}>
+                  <Play className="mr-3 w-6 h-6 group-hover:scale-110 transition-transform" />
+                  Watch Demo
+                </button>
               </div>
 
               {/* Enhanced Animated Stats with Balanced Colors */}
@@ -1416,9 +1407,12 @@ export default function LandingPage() {
                     </div>
                   )}
                   
-                  <button className={`w-full py-4 px-6 rounded-xl font-bold transition-all duration-200 ${plan.buttonStyle}`}>
+                  <Link 
+                    to="/login"
+                    className={`w-full py-4 px-6 rounded-xl font-bold transition-all duration-200 ${plan.buttonStyle} inline-block text-center`}
+                  >
                     {plan.button}
-                  </button>
+                  </Link>
                 </div>
               </div>
             ))}

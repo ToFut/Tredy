@@ -172,14 +172,17 @@ const createWorkflow = {
                   
                   if (bestTool) {
                     // Use AI-provided parameters if available, otherwise extract them
-                    const params = (action.parameters && Object.keys(action.parameters).length > 0) 
+                    let params = (action.parameters && Object.keys(action.parameters).length > 0) 
                                   ? action.parameters 
                                   : extractParameters(action);
+                    
+                    // Normalize variable references to use correct step variable names
+                    params = normalizeVariableReferences(params, index, actions);
                     
                     // Use AI-provided resultVariable if available
                     const resultVar = action.resultVariable || `step_${index + 1}_result`;
                     
-                    console.log(`✅ [CreateWorkflow] Creating TOOL_CALL for ${bestTool} with params:`, params);
+                    console.log(`✅ [CreateWorkflow] Creating TOOL_CALL for ${bestTool} with normalized params:`, params);
                     console.log(`✅ [CreateWorkflow] Result will be saved to: ${resultVar}`);
                     
                     return {
@@ -702,11 +705,56 @@ Do NOT include explanations, markdown, or any other text. Only return the JSON a
                 return score;
               }
               
+              // Fix variable references in parameters to use correct step variable names
+              function normalizeVariableReferences(parameters, stepIndex, allActions) {
+                if (!parameters || typeof parameters !== 'object') return parameters;
+                
+                const normalizedParams = { ...parameters };
+                
+                // Create a mapping of step dependencies to correct variable names
+                for (const [key, value] of Object.entries(normalizedParams)) {
+                  if (typeof value === 'string' && value.includes('{{') && value.includes('}}')) {
+                    // Find all variable references in the value
+                    const variableMatches = value.match(/\{\{([^}]+)\}\}/g);
+                    if (variableMatches) {
+                      let normalizedValue = value;
+                      
+                      variableMatches.forEach(match => {
+                        const varName = match.slice(2, -2); // Remove {{ }}
+                        
+                        // If it's not already in step_X_result format, try to map it
+                        if (!varName.match(/^step_\d+_result$/)) {
+                          // Look for which previous step this might reference
+                          // This is a simple heuristic - in practice, the AI should provide dependency info
+                          for (let i = 0; i < stepIndex; i++) {
+                            const previousAction = allActions[i];
+                            // If the variable name suggests it's from this step's result
+                            if (varName.includes('summary') && previousAction.action?.includes('analyz')) {
+                              normalizedValue = normalizedValue.replace(match, `{{step_${i + 1}_result}}`);
+                              console.log(`🔧 [VarNormalization] Mapped ${match} -> {{step_${i + 1}_result}}`);
+                              break;
+                            } else if (varName.includes('email') && previousAction.action?.includes('search')) {
+                              normalizedValue = normalizedValue.replace(match, `{{step_${i + 1}_result}}`);
+                              console.log(`🔧 [VarNormalization] Mapped ${match} -> {{step_${i + 1}_result}}`);
+                              break;
+                            }
+                          }
+                        }
+                      });
+                      
+                      normalizedParams[key] = normalizedValue;
+                    }
+                  }
+                }
+                
+                return normalizedParams;
+              }
+
               function extractParameters(action) {
-                // If AI already provided parameters, use them
+                // If AI already provided parameters, use them but normalize variable references
                 if (action.parameters && Object.keys(action.parameters).length > 0) {
                   console.log(`✅ [ParamExtraction] Using AI-provided parameters:`, action.parameters);
-                  return action.parameters;
+                  return action.parameters; // Will be normalized later in step creation
                 }
                 
                 // Dynamic parameter extraction based on action type and content

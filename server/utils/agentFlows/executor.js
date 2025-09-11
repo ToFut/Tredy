@@ -107,10 +107,16 @@ class FlowExecutor {
   replaceVariables(config) {
     const deepReplace = (obj) => {
       if (typeof obj === "string") {
-        return obj.replace(/\${([^}]+)}/g, (match, varName) => {
-          const value = this.getValueFromPath(this.variables, varName);
-          return value !== undefined ? value : match;
-        });
+        // Support both ${varName} and {{varName}} syntax for variable substitution
+        return obj
+          .replace(/\${([^}]+)}/g, (match, varName) => {
+            const value = this.getValueFromPath(this.variables, varName);
+            return value !== undefined ? value : match;
+          })
+          .replace(/\{\{([^}]+)\}\}/g, (match, varName) => {
+            const value = this.getValueFromPath(this.variables, varName);
+            return value !== undefined ? value : match;
+          });
       }
 
       if (Array.isArray(obj)) return obj.map((item) => deepReplace(item));

@@ -104,18 +104,16 @@ export default function ChatHistory({
     }
   }, [history.length, scrollToBottom]);
 
-  // Also auto-scroll when message content updates (for streaming)
+  // Handle streaming content updates
   useEffect(() => {
     if (isStreaming && shouldAutoScrollRef.current) {
-      // Debounced scroll during streaming to avoid excessive scrolling
-      const timeoutId = setTimeout(() => {
-        requestAnimationFrame(() => {
-          scrollToBottom();
-        });
+      // Debounced scroll for streaming to prevent jank
+      const scrollTimer = setTimeout(() => {
+        scrollToBottom();
       }, 100);
-      return () => clearTimeout(timeoutId);
+      return () => clearTimeout(scrollTimer);
     }
-  }, [history, isStreaming, scrollToBottom]);
+  }, [isStreaming, history[history.length - 1]?.content, scrollToBottom]);
 
   // Handle streaming messages smoothly
   useEffect(() => {
@@ -332,6 +330,7 @@ export default function ChatHistory({
         }}
         id="chat-history"
         ref={chatHistoryRef}
+        data-chat-history // Add data attribute for container selector
       >
           <div className="px-2 sm:px-4 py-2 pb-4 sm:pb-6">
           {compiledHistory.map((item, index) =>
@@ -345,14 +344,14 @@ export default function ChatHistory({
         </div>
       </div>
       {!isAtBottom && (
-        <div className="absolute bottom-4 right-4 z-50 cursor-pointer">
+        <div className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 cursor-pointer">
           <button
             onClick={manualScrollToBottom}
-            className="flex items-center justify-center w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 active:scale-95 touch-manipulation animate-pulse"
+            className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 active:scale-95 touch-manipulation animate-pulse"
             style={{ minWidth: '48px', minHeight: '48px' }}
             aria-label="Scroll to bottom"
           >
-            <ArrowDown className="w-6 h-6" weight="bold" />
+            <ArrowDown className="w-6 h-6 md:w-7 md:h-7" weight="bold" />
           </button>
         </div>
       )}

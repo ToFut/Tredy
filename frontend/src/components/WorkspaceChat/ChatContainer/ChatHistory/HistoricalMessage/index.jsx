@@ -115,7 +115,7 @@ const HistoricalMessage = ({
             />
           ) : (
             <div className="flex-1 min-w-0 max-w-full">
-              <div className="text-sm sm:text-[15px] leading-[1.6] sm:leading-[1.7] text-gray-900 whitespace-pre-wrap font-medium break-words">
+              <div className="text-base sm:text-lg leading-relaxed sm:leading-relaxed text-gray-800 whitespace-pre-wrap font-normal break-words">
                 <RenderChatContent
                   role={role}
                   message={message}

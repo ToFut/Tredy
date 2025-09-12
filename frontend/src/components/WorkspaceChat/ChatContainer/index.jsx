@@ -98,6 +98,39 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
   const [intelligenceMetrics, setIntelligenceMetrics] = useState({});
   const [insights, setInsights] = useState([]);
 
+  // Auto-scroll effect for both mobile and desktop
+  useEffect(() => {
+    const scrollToBottom = () => {
+      // Try multiple selectors for different views
+      const selectors = [
+        '.chat-history-container', // Mobile view
+        '[data-chat-history]', // Desktop view
+        '.overflow-y-auto.flex-grow' // Alternative desktop selector
+      ];
+      
+      for (const selector of selectors) {
+        const container = document.querySelector(selector);
+        if (container) {
+          // Check if user is near bottom (within 150px)
+          const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+          
+          // Auto-scroll only if near bottom or new conversation
+          if (isNearBottom || chatHistory.length <= 2) {
+            container.scrollTo({
+              top: container.scrollHeight,
+              behavior: 'smooth'
+            });
+          }
+          break; // Stop after finding first matching container
+        }
+      }
+    };
+
+    // Delay to ensure DOM updates
+    const timer = setTimeout(scrollToBottom, 100);
+    return () => clearTimeout(timer);
+  }, [chatHistory]);
+
   // Maintain state of message from whatever is in PromptInput
   const handleMessageChange = (event) => {
     setMessage(event.target.value);

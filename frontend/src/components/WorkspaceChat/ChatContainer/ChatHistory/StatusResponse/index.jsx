@@ -3,10 +3,39 @@ import { CaretDown } from "@phosphor-icons/react";
 import AgenticThinking from "@/components/AgenticThinking";
 
 /**
+ * Extract structured tool results from [TOOL_RESULT] blocks
+ */
+function extractToolResult(content) {
+  if (!content) return null;
+  
+  // Look for [TOOL_RESULT] blocks in the content
+  const toolResultMatch = content.match(/\[TOOL_RESULT\]([\s\S]*?)\[\/TOOL_RESULT\]/);
+  if (toolResultMatch) {
+    try {
+      return JSON.parse(toolResultMatch[1]);
+    } catch (e) {
+      console.log("Failed to parse TOOL_RESULT:", e);
+    }
+  }
+  return null;
+}
+
+/**
  * Parse debug messages into clean tool information
  */
 function parseDebugToToolInfo(content) {
   if (!content) return null;
+  
+  // First try to extract structured TOOL_RESULT
+  const toolResult = extractToolResult(content);
+  if (toolResult) {
+    return {
+      type: toolResult.status === 'success' ? 'complete' : 'failed',
+      tool: toolResult.displayName || toolResult.tool,
+      message: toolResult.summary,
+      structured: toolResult
+    };
+  }
   
   // Tool call attempt
   if (content.includes('[debug]:') && content.includes('attempting to call')) {
@@ -132,58 +161,95 @@ function EnhancedToolDisplay({ tools, latestTool, content }) {
     }
   };
 
-  // If we have a complete action with meaningful content, show structured result (landing page style)
+  // If we have structured data from TOOL_RESULT, use it
+  if (latestTool?.structured) {
+    const { icon, displayName, summary, highlights, metrics, status } = latestTool.structured;
+    const isSuccess = status === 'success';
+    
+    return (
+      <div className="bg-white rounded-2xl rounded-tl-sm shadow-sm border border-gray-100 p-4 mb-2">
+        <div className="space-y-3">
+          {/* Header with icon and status */}
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">{icon}</span>
+            <h4 className="font-semibold text-gray-900">
+              {isSuccess ? '✅' : '❌'} {summary}
+            </h4>
+          </div>
+          
+          {/* Highlights section */}
+          {highlights && highlights.length > 0 && (
+            <div className="space-y-2">
+              {highlights.map((highlight, idx) => (
+                <div key={idx}>
+                  <div className="flex items-center justify-between">
+                    <span className={`text-sm font-medium ${
+                      highlight.importance === 'primary' ? 'text-gray-700' : 'text-gray-600'
+                    }`}>
+                      {highlight.label}
+                    </span>
+                  </div>
+                  <div className={`text-sm mt-1 ${
+                    highlight.importance === 'primary' ? 'text-gray-900 font-medium' : 'text-gray-700'
+                  }`}>
+                    {highlight.label.includes('ID') ? (
+                      <span className="font-mono text-xs bg-gray-50 px-2 py-1 rounded">
+                        {highlight.value}
+                      </span>
+                    ) : (
+                      highlight.value
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* Metrics footer */}
+          {metrics && (
+            <div className="flex items-center gap-3 text-xs text-gray-600 pt-2 border-t border-gray-100">
+              {metrics.duration && (
+                <>
+                  <div className="flex items-center gap-1">
+                    <Zap className="w-3 h-3 text-yellow-600" />
+                    <span>{metrics.duration}ms</span>
+                  </div>
+                  <span className="text-gray-300">•</span>
+                </>
+              )}
+              {metrics.confidence && (
+                <>
+                  <div className="flex items-center gap-1">
+                    <div className="w-12 bg-gray-200 rounded-full h-1.5">
+                      <div 
+                        className="bg-green-500 h-1.5 rounded-full"
+                        style={{ width: `${metrics.confidence}%` }}
+                      ></div>
+                    </div>
+                    <span>{metrics.confidence}%</span>
+                  </div>
+                  <span className="text-gray-300">•</span>
+                </>
+              )}
+              <div className="flex items-center gap-1">
+                <span>{displayName}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+  
+  // Fallback: If we have a complete action with meaningful content, show basic result
   if (latestTool?.type === 'complete' && content) {
     return (
       <div className="bg-white rounded-2xl rounded-tl-sm shadow-sm border border-gray-100 p-4 mb-2">
-        {/* Structured content like landing page */}
         <div className="space-y-3">
-          <h4 className="font-semibold text-gray-900">✅ Email Sent Successfully</h4>
-          <div className="space-y-2">
-            {/* Parse email content */}
-            {content.includes('@') && (
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600">Recipients</span>
-                </div>
-                <div className="text-gray-900 text-sm mt-1">
-                  {content.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/)?.[1]}
-                </div>
-              </div>
-            )}
-            
-            {/* Extract subject from agent response */}
-            {content.includes('subject') && (
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600">Subject</span>
-                </div>
-                <div className="text-gray-900 text-sm mt-1">
-                  {content.match(/subject["\s]*["']([^"']+)["']/i)?.[1] || "Hello"}
-                </div>
-              </div>
-            )}
-
-            {content.includes('Message ID:') && (
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600">Message ID</span>
-                </div>
-                <div className="text-gray-900 text-sm mt-1">
-                  <span className="font-mono text-xs bg-gray-50 px-2 py-1 rounded">
-                    {content.match(/Message ID: ([a-zA-Z0-9]+)/)?.[1]}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          {/* Footer like landing page */}
-          {content.includes('successfully') && (
-            <p className="text-sm text-gray-600 pt-2 border-t border-gray-200">
-              The email was delivered successfully.
-            </p>
-          )}
+          <h4 className="font-semibold text-gray-900">✅ {latestTool.message || 'Action Completed'}</h4>
+          <p className="text-sm text-gray-600">
+            {getCleanMessage(content)}
+          </p>
         </div>
       </div>
     );
@@ -256,50 +322,59 @@ export default function StatusResponse({
             content={relevantContent}
           />
           
-          {/* Metrics line like landing page - only for completed tasks */}
-          {latestTool?.type === 'complete' && (
+          {/* Metrics line - only for completed tasks with structured data */}
+          {latestTool?.type === 'complete' && latestTool?.structured?.metrics && (
             <div className="flex items-center gap-3 text-xs text-gray-600 px-1">
               {/* Tool Logo */}
               <div className="flex items-center gap-1">
-                <div className="relative group">
-                  <img 
-                    src={toolLogos[latestTool.tool] || toolLogos["Gmail"]} 
-                    alt={latestTool.tool}
-                    className="w-5 h-5 rounded"
-                    title={latestTool.tool}
-                  />
-                </div>
+                <span className="text-lg" title={latestTool.structured.displayName}>
+                  {latestTool.structured.icon || '🔧'}
+                </span>
               </div>
 
-              {/* Separator */}
-              <span className="text-gray-300">•</span>
+              {/* Only show metrics that exist */}
+              {latestTool.structured.metrics.duration && (
+                <>
+                  <span className="text-gray-300">•</span>
+                  <div className="flex items-center gap-1">
+                    <Zap className="w-3 h-3 text-yellow-600" />
+                    <span>{latestTool.structured.metrics.duration}ms</span>
+                  </div>
+                </>
+              )}
 
-              {/* Time */}
+              {latestTool.structured.metrics.confidence && (
+                <>
+                  <span className="text-gray-300">•</span>
+                  <div className="flex items-center gap-1">
+                    <div className="w-12 bg-gray-200 rounded-full h-1.5">
+                      <div 
+                        className="bg-green-500 h-1.5 rounded-full"
+                        style={{ width: `${latestTool.structured.metrics.confidence}%` }}
+                      ></div>
+                    </div>
+                    <span>{latestTool.structured.metrics.confidence}%</span>
+                  </div>
+                </>
+              )}
+
+              {latestTool.structured.displayName && (
+                <>
+                  <span className="text-gray-300">•</span>
+                  <div className="flex items-center gap-1">
+                    <span>{latestTool.structured.displayName}</span>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+          
+          {/* Fallback metrics for non-structured responses (backward compatibility) */}
+          {latestTool?.type === 'complete' && !latestTool?.structured && (
+            <div className="flex items-center gap-3 text-xs text-gray-600 px-1">
               <div className="flex items-center gap-1">
-                <Zap className="w-3 h-3 text-yellow-600" />
-                <span>1.2s</span>
-              </div>
-
-              {/* Separator */}
-              <span className="text-gray-300">•</span>
-
-              {/* Confidence */}
-              <div className="flex items-center gap-1">
-                <div className="w-12 bg-gray-200 rounded-full h-1.5">
-                  <div 
-                    className="bg-green-500 h-1.5 rounded-full"
-                    style={{ width: '98%' }}
-                  ></div>
-                </div>
-                <span>98%</span>
-              </div>
-
-              {/* Separator */}
-              <span className="text-gray-300">•</span>
-
-              {/* Model */}
-              <div className="flex items-center gap-1">
-                <span>GPT-4</span>
+                <CheckCircle2 className="w-3 h-3 text-green-600" />
+                <span>Completed</span>
               </div>
             </div>
           )}

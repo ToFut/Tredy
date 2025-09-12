@@ -915,13 +915,13 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
 
   return (
     <>
-      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/40 dark:border-gray-700/40 sticky top-0 z-50 w-full">
+      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/40 dark:border-gray-700/40 sticky top-[60px] z-40 w-full">
         <div className="px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5">
           <div className="flex items-center justify-between gap-1 sm:gap-2">
-            {/* Left: Workspace Info - More Compact */}
+            {/* Left: Workspace Info - Without logo since it's in main header */}
             <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-shrink-0">
               <div className="hidden sm:flex items-center gap-2">
-                <div className="p-1.5 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
+                <div className="p-1.5 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg">
                   <Sparkle className="w-3.5 h-3.5 text-white" />
                 </div>
                 <div className="min-w-0">
@@ -933,7 +933,7 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
               
               {/* Mobile: Even More Compact */}
               <div className="sm:hidden flex items-center gap-1.5">
-                <div className="p-1 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex-shrink-0">
+                <div className="p-1 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex-shrink-0">
                   <Sparkle className="w-3 h-3 text-white" />
                 </div>
                 <h2 className="font-medium text-gray-900 dark:text-white truncate text-xs">

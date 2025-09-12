@@ -111,6 +111,23 @@ function agentScheduleEndpoints(app) {
             });
           }
 
+          // For flows, validate the flow exists and is active
+          if (agentType === "flow") {
+            const flowData = await SchedulableAgent.loadFlowById(agentId);
+            if (!flowData) {
+              return response.status(400).json({
+                success: false,
+                error: "Flow not found or invalid"
+              });
+            }
+            if (flowData.active === false) {
+              return response.status(400).json({
+                success: false,
+                error: "Cannot schedule inactive flow. Please activate the flow first."
+              });
+            }
+          }
+
           // Create the schedule
           const schedule = await agent.schedule({
             name,
@@ -463,6 +480,30 @@ function agentScheduleEndpoints(app) {
         });
       } catch (error) {
         console.error("Failed to get schedule stats:", error);
+        response.status(500).json({ 
+          success: false, 
+          error: error.message 
+        });
+      }
+    }
+  );
+
+  /**
+   * GET /api/workspace/:slug/flows/schedulable
+   * Get all available flows that can be scheduled
+   */
+  app.get(
+    "/api/workspace/:slug/flows/schedulable",
+    [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default])],
+    async (request, response) => {
+      try {
+        const flows = await SchedulableAgent.getAvailableFlows();
+        response.status(200).json({ 
+          success: true, 
+          flows 
+        });
+      } catch (error) {
+        console.error("Failed to get schedulable flows:", error);
         response.status(500).json({ 
           success: false, 
           error: error.message 

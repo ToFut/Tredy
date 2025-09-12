@@ -42,22 +42,65 @@ class WebSocketToolEmitter {
   }
 
   /**
-   * Emit when tool completes
+   * Emit when tool completes with AI-structured data
    */
-  emitToolComplete(toolName, result) {
+  async emitToolComplete(toolName, result) {
     if (!this.messageId) return;
+    
+    // Get structured data from AI if LLM is available
+    let structured = null;
+    if (this.llmProvider) {
+      structured = await this.getAIStructuredResponse(toolName, result);
+    }
     
     this.socket.emit(`tool_executing_${this.messageId}`, {
       tools: [{
         name: this.cleanToolName(toolName),
         status: 'complete',
-        result: result
+        result: result,
+        structured: structured // AI-generated metadata
       }]
     });
 
     // Track completion in ThinkingTracker if available
     if (this.thinkingTracker) {
       this.thinkingTracker.trackToolUse(toolName, null, result);
+    }
+  }
+
+  /**
+   * Get AI to structure the tool response
+   */
+  async getAIStructuredResponse(toolName, result) {
+    try {
+      // Use the same LLM that's running the agent
+      const response = await this.llmProvider.getChatCompletion(
+        [
+          {
+            role: "system",
+            content: `Extract structured data from tool execution results. Return ONLY valid JSON with these fields:
+- displayName: user-friendly name
+- icon: emoji representation
+- action: what happened (sent/created/fetched/etc)
+- target: what was affected
+- summary: one-line description
+- highlights: array of {label, value} for key details`
+          },
+          {
+            role: "user",
+            content: `Tool: ${toolName}\nResult: ${JSON.stringify(result).substring(0, 500)}`
+          }
+        ],
+        {
+          temperature: 0,
+          response_format: { type: "json_object" }
+        }
+      );
+      
+      return JSON.parse(response.choices[0].message.content);
+    } catch (error) {
+      console.log("Failed to get AI structured response:", error);
+      return null;
     }
   }
 
@@ -130,6 +173,9 @@ function enhanceAgentHandler(agentHandler, socket) {
   
   // Inject thinkingTracker reference into emitter
   emitter.thinkingTracker = agentHandler.thinkingTracker;
+  
+  // Inject LLM provider for structured responses
+  emitter.llmProvider = agentHandler.llm || agentHandler.provider;
   
   // Hook into agent lifecycle
   const originalRun = agentHandler.run;

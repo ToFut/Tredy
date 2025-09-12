@@ -1,10 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import Workspace from "@/models/workspace";
 
 export default function ThreadSummary({ workspace, threadSlug, children }) {
   const [summary, setSummary] = useState(null);
   const [isHovering, setIsHovering] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
+  const containerRef = useRef(null);
+
+  // Update tooltip position when hovering
+  useEffect(() => {
+    if (!isHovering || !containerRef.current) return;
+    
+    const rect = containerRef.current.getBoundingClientRect();
+    setTooltipPosition({
+      top: rect.top,
+      left: rect.right + 8 // 8px offset from the right edge
+    });
+  }, [isHovering]);
 
   useEffect(() => {
     if (!isHovering || !workspace?.slug) return;
@@ -49,6 +63,7 @@ export default function ThreadSummary({ workspace, threadSlug, children }) {
 
   return (
     <div 
+      ref={containerRef}
       className="relative inline-block w-full"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => {
@@ -59,9 +74,15 @@ export default function ThreadSummary({ workspace, threadSlug, children }) {
     >
       {children}
       
-      {/* Tooltip */}
-      {isHovering && summary && (
-        <div className="absolute left-full ml-2 top-0 z-50 animate-fadeIn">
+      {/* Tooltip rendered in portal */}
+      {isHovering && summary && createPortal(
+        <div 
+          className="fixed z-[999] animate-fadeIn"
+          style={{
+            top: `${tooltipPosition.top}px`,
+            left: `${tooltipPosition.left}px`
+          }}
+        >
           <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg border border-gray-200 dark:border-zinc-700 p-3 min-w-[250px] max-w-[350px]">
             {/* Overview Section */}
             {summary.overview && (
@@ -102,19 +123,27 @@ export default function ThreadSummary({ workspace, threadSlug, children }) {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Loading indicator */}
-      {isHovering && loading && !summary && (
-        <div className="absolute left-full ml-2 top-0 z-50">
+      {isHovering && loading && !summary && createPortal(
+        <div 
+          className="fixed z-[999]"
+          style={{
+            top: `${tooltipPosition.top}px`,
+            left: `${tooltipPosition.left}px`
+          }}
+        >
           <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg border border-gray-200 dark:border-zinc-700 p-3">
             <div className="animate-pulse">
               <div className="h-3 bg-gray-200 dark:bg-zinc-700 rounded w-32 mb-2"></div>
               <div className="h-2 bg-gray-200 dark:bg-zinc-700 rounded w-24"></div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

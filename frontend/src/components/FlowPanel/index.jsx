@@ -273,36 +273,23 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
             )}
           </div>
           
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="text-xl font-bold bg-gradient-to-r from-gray-900 via-purple-800 to-gray-900 bg-clip-text text-transparent">
-                AI Workflows
-              </h2>
+          <div className="flex-1 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs text-gray-500">
+              {/* Minimal Flow Count */}
+              <span className="flex items-center gap-1">
+                <span className={`w-1 h-1 rounded-full ${
+                  hasNewFlows ? 'bg-green-500' :
+                  isCreatingWorkflow ? 'bg-amber-500 animate-pulse' :
+                  'bg-gray-400'
+                }`} />
+                {flows.length}
+              </span>
+              
+              {/* Building indicator */}
               {isCreatingWorkflow && (
-                <div className="flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 rounded-full">
-                  <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
-                  <span className="text-xs font-medium">Building</span>
-                </div>
+                <span className="text-amber-600">building...</span>
               )}
             </div>
-            <p className="text-sm text-gray-600 font-medium">Intelligent automation & AI agents</p>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <span className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-xl font-semibold text-sm transition-all ${
-              hasNewFlows 
-                ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 shadow-sm ring-2 ring-green-200/50 animate-pulse' 
-                : isCreatingWorkflow
-                ? 'bg-gradient-to-r from-amber-100 to-orange-100 text-amber-800 shadow-sm ring-2 ring-amber-200/50'
-                : 'bg-gray-100/80 text-gray-700'
-            }`}>
-              <span className={`w-2 h-2 rounded-full ${
-                hasNewFlows ? 'bg-green-500 animate-pulse' :
-                isCreatingWorkflow ? 'bg-amber-500 animate-pulse' :
-                'bg-gray-400'
-              }`} />
-              {flows.length} {flows.length === 1 ? 'Flow' : 'Flows'}
-            </span>
           </div>
         </div>
         <div className="relative flex items-center gap-2">
@@ -327,11 +314,10 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
               e.stopPropagation();
               handleNewFlow();
             }}
-            className="relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:from-purple-600 hover:via-purple-700 hover:to-purple-800 text-white rounded-xl text-sm font-semibold transition-all shadow-lg hover:shadow-xl group overflow-hidden"
+            className="p-1.5 hover:bg-purple-100 text-purple-600 hover:text-purple-700 rounded-lg transition-colors group"
+            title="Create new flow"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-            <Plus size={16} weight="bold" className="relative z-10 group-hover:rotate-90 transition-transform duration-200" />
-            <span className="relative z-10">Create</span>
+            <Plus size={16} className="group-hover:rotate-90 transition-transform duration-200" />
           </button>
           
           <div className="p-2">
@@ -410,31 +396,26 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
               </div>
             </div>
           ) : (
-            <div className="p-2 space-y-2 overflow-y-auto h-full" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+            <div className="p-1.5 space-y-1.5 overflow-y-auto h-full" style={{ maxHeight: 'calc(100vh - 180px)' }}>
               {flows.map((flow, index) => (
                 <div
                   key={flow.uuid}
-                  className={`group relative overflow-hidden transition-all duration-200 hover:shadow-md ${
-                    flow.status === 'building' ? 'ring-1 ring-amber-200' : ''
-                  }`}
+                  className="group relative"
                 >
-                  {/* Status indicator line */}
-                  <div className={`absolute top-0 left-0 right-0 h-0.5 rounded-t-xl ${
-                    flow.status === 'building' ? 'bg-gradient-to-r from-amber-400 to-orange-400' :
-                    flow.active ? 'bg-gradient-to-r from-green-400 to-emerald-400' :
-                    'bg-gradient-to-r from-gray-300 to-gray-400'
+                  {/* Minimal status indicator */}
+                  <div className={`absolute top-0 left-0 right-0 h-0.5 rounded-t-lg ${
+                    flow.status === 'building' ? 'bg-amber-400' :
+                    flow.active ? 'bg-green-400' : 'bg-gray-300'
                   }`} />
                   
-                  <div className="relative z-10">
-                    <FlowItem
-                      flow={flow}
-                      onEdit={() => handleEditFlow(flow)}
-                      onRun={() => handleRunFlow(flow)}
-                      onToggle={() => handleToggleFlow(flow)}
-                      onDelete={() => handleDeleteFlow(flow)}
-                      formatLastUsed={formatLastUsed}
-                    />
-                  </div>
+                  <FlowItem
+                    flow={flow}
+                    onEdit={() => handleEditFlow(flow)}
+                    onRun={() => handleRunFlow(flow)}
+                    onToggle={() => handleToggleFlow(flow)}
+                    onDelete={() => handleDeleteFlow(flow)}
+                    formatLastUsed={formatLastUsed}
+                  />
                 </div>
               ))}
             </div>

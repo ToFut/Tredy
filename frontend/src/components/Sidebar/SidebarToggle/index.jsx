@@ -75,7 +75,7 @@ export function ToggleSidebarButton({ showSidebar, setShowSidebar }) {
     <>
       <button
         type="button"
-        className={`hidden md:block border-none bg-transparent outline-none ring-0 transition-left duration-500 ${showSidebar ? "left-[247px]" : "absolute top-[20px] left-[30px] z-10"}`}
+        className={`hidden md:block border-none bg-transparent outline-none ring-0 transition-all duration-500 ${showSidebar ? "" : "absolute top-[85px] left-[20px] z-10 bg-white/90 p-2 rounded-lg shadow-lg hover:bg-white"}`}
         onClick={() => setShowSidebar((prev) => !prev)}
         data-tooltip-id="sidebar-toggle"
         data-tooltip-content={
@@ -90,7 +90,7 @@ export function ToggleSidebarButton({ showSidebar, setShowSidebar }) {
         }
       >
         <SidebarSimple
-          className="text-theme-text-secondary hover:text-theme-text-primary"
+          className={`${showSidebar ? "text-theme-text-secondary hover:text-theme-text-primary" : "text-gray-600 hover:text-gray-900"} transition-colors`}
           size={24}
         />
       </button>

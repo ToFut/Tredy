@@ -2,6 +2,7 @@ import { API_BASE, fullApiUrl } from "@/utils/constants";
 import { baseHeaders, safeJsonParse } from "@/utils/request";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import WorkspaceThread from "@/models/workspaceThread";
+import AgentSchedule from "@/models/agentSchedule";
 import { v4 } from "uuid";
 import { ABORT_STREAM_EVENT } from "@/utils/chat";
 
@@ -718,6 +719,9 @@ const Workspace = {
       return { summary: null, error: error.message };
     }
   },
+
+  // Schedule management - delegate to AgentSchedule model
+  schedules: AgentSchedule,
 };
 
 export default Workspace;

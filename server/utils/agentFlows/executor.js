@@ -7,7 +7,10 @@ const { Telemetry } = require("../../models/telemetry");
 const { safeJsonParse } = require("../http");
 
 class FlowExecutor {
-  constructor() {
+  constructor(flowData = null, options = {}) {
+    this.flowData = flowData;
+    this.workspaceSlug = options.workspaceSlug;
+    this.userId = options.userId;
     this.variables = {};
     this.introspect = (...args) => console.log("[introspect] ", ...args);
     this.logger = console.info;
@@ -18,6 +21,36 @@ class FlowExecutor {
     this.introspect =
       introspectFn || ((...args) => console.log("[introspect] ", ...args));
     this.logger = loggerFn || console.info;
+  }
+
+  /**
+   * Execute the flow with given context
+   * @param {Object} context - Execution context
+   * @returns {Promise<Object>} Execution result
+   */
+  async execute(context = {}) {
+    if (!this.flowData) {
+      throw new Error("No flow data provided to executor");
+    }
+
+    // Transform flowData to expected format if needed
+    const flow = {
+      config: {
+        steps: this.flowData.steps || []
+      }
+    };
+
+    try {
+      const result = await this.executeFlow(flow, context);
+      return {
+        success: true,
+        output: result,
+        variables: this.variables
+      };
+    } catch (error) {
+      console.error("Flow execution failed:", error);
+      throw error;
+    }
   }
 
   /**

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Sparkle, Clock, ChatCircle, Lightning } from "@phosphor-icons/react";
 import Workspace from "@/models/workspace";
 
@@ -83,10 +84,11 @@ export default function SummaryTooltip({
     }
   };
 
-  return (
+  // Render tooltip in a portal to escape sidebar clipping
+  return createPortal(
     <div
       ref={tooltipRef}
-      className="fixed z-50 animate-fadeIn summary-tooltip"
+      className="fixed z-[999] animate-fadeIn summary-tooltip"
       style={{
         top: `${position.top}px`,
         left: `${position.left}px`,
@@ -212,7 +214,11 @@ export default function SummaryTooltip({
                 </p>
                 <button
                   onClick={() => {
-                    window.location.href = `/workspace/${workspace.slug}/t/${threadSlug || ''}`;
+                    // Navigate to thread if threadSlug exists, otherwise to workspace
+                    const url = threadSlug 
+                      ? `/workspace/${workspace.slug}/t/${threadSlug}`
+                      : `/workspace/${workspace.slug}`;
+                    window.location.href = url;
                   }}
                   className="text-[10px] text-blue-500 hover:text-blue-600 font-medium"
                 >
@@ -231,7 +237,8 @@ export default function SummaryTooltip({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body // Render in document body to escape sidebar clipping
   );
 }
 

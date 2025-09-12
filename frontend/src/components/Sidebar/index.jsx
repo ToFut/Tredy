@@ -48,9 +48,13 @@ export default function Sidebar() {
         return;
       }
       
-      if (thread) {
+      if (thread && thread.slug) {
         showToast("Tredy created successfully!", "success");
         window.location.replace(paths.workspace.thread(slug, thread.slug));
+      } else if (thread) {
+        // Thread exists but no slug, navigate to workspace instead
+        showToast("Tredy created, opening workspace...", "success");
+        window.location.replace(`/workspace/${slug}`);
       } else {
         showToast("Failed to create Tredy - no thread returned", "error");
       }
@@ -62,66 +66,153 @@ export default function Sidebar() {
 
   return (
     <>
-      <div
-        style={{
-          width: showSidebar ? "292px" : "0px",
-          paddingLeft: showSidebar ? "0px" : "16px",
-        }}
-        className="transition-all duration-500"
-      >
-        <div className="flex shrink-0 w-full justify-center my-[18px]">
-          <div className="flex justify-between w-[250px] min-w-[250px]">
-            <Link to={paths.home()} aria-label="Home">
+      {/* Top Header Bar - Improved Design */}
+      <div className="fixed top-0 left-0 right-0 h-[60px] bg-white/95 backdrop-blur-xl border-b border-gray-200/50 shadow-sm z-50">
+        <div className="flex items-center justify-between h-full px-6">
+          {/* Left: Tredy Logo with Menu */}
+          <div className="flex items-center gap-4">
+            <Link to={paths.home()} aria-label="Home" className="flex items-center gap-2">
               <img
-                src={logo}
-                alt="Logo"
-                className={`rounded max-h-[48px] object-contain transition-opacity duration-500 ${showSidebar ? "opacity-100" : "opacity-0"}`}
+                src="/tredy_logo_name_slogan_purple.PNG"
+                alt="Tredy"
+                className="h-[36px] object-contain"
               />
             </Link>
+            <div className="h-6 w-px bg-gray-300" />
             {canToggleSidebar && (
-              <ToggleSidebarButton
-                showSidebar={showSidebar}
-                setShowSidebar={setShowSidebar}
-              />
+              <button
+                onClick={() => setShowSidebar(!showSidebar)}
+                className="p-2 rounded-lg hover:bg-gray-100 transition-all group"
+                title={showSidebar ? "Hide Sidebar" : "Show Sidebar"}
+              >
+                <List className="w-5 h-5 text-gray-600 group-hover:text-gray-900" />
+              </button>
             )}
           </div>
+          
+          {/* Center: Enhanced Search */}
+          <div className="flex-1 max-w-3xl mx-8">
+            <div className="relative group">
+              <MagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-purple-500 transition-colors" size={18} />
+              <input
+                type="text"
+                placeholder="Search conversations, documents, or ask a question..."
+                className="w-full pl-12 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent focus:bg-white transition-all"
+              />
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                <button
+                  className="p-1.5 hover:bg-gray-200 rounded-lg transition-all"
+                  title="Advanced Search"
+                >
+                  <Funnel size={16} className="text-gray-500" />
+                </button>
+                <kbd className="hidden lg:inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded border border-gray-200">
+                  <span className="text-[10px]">⌘</span>K
+                </kbd>
+              </div>
+            </div>
+          </div>
+          
+          {/* Right: User Actions */}
+          <div className="flex items-center gap-3">
+            <button 
+              className="p-2 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-all relative group animate-slideInRight animate-stagger-1"
+              title="AI Assistant"
+            >
+              <Brain className="w-5 h-5 text-gray-600 group-hover:text-purple-600 group-hover:scale-110 transition-all" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse group-hover:animate-bounce" />
+            </button>
+            <button className="p-2 hover:bg-gray-100 rounded-lg transition-all group animate-slideInRight animate-stagger-2">
+              <Gear className="w-5 h-5 text-gray-600 group-hover:rotate-90 group-hover:scale-110 transition-all duration-300" />
+            </button>
+            <div className="h-6 w-px bg-gray-300" />
+            <div className="flex items-center gap-2 animate-slideInRight animate-stagger-3">
+              <div className="text-right hidden lg:block">
+                <p className="text-xs font-medium text-gray-700">{user?.username || 'User'}</p>
+                <p className="text-[10px] text-gray-500">
+                  {user?.role === 'admin' ? 'Admin' : user?.role === 'manager' ? 'Manager' : 'Member'} Plan
+                </p>
+              </div>
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white font-medium text-sm interactive-scale hover:animate-glowPulse transition-all cursor-pointer">
+                {(user?.username || 'U').charAt(0).toUpperCase()}
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+      
+      {/* Sidebar - Adjusted for fixed header */}
+      <div
+        style={{
+          width: showSidebar ? "292px" : "72px",
+          paddingLeft: showSidebar ? "0px" : "8px",
+          marginTop: "60px", // Account for fixed header
+        }}
+        className="transition-all duration-500 relative"
+      >
         <div
           ref={sidebarRef}
-          className="relative m-4 rounded-2xl bg-white/95 backdrop-blur-xl border border-gray-200/50 shadow-lg min-w-[280px] p-4 h-[calc(100%-92px)] transition-all duration-300 hover:shadow-xl"
+          className={`relative ${showSidebar ? "m-4" : "m-2"} rounded-3xl bg-gradient-to-b from-white/98 to-white/95 backdrop-blur-2xl border border-gray-200/40 shadow-xl ${showSidebar ? "min-w-[300px] p-5" : "w-[60px] p-3"} h-[calc(100vh-92px)] transition-all duration-500 hover:shadow-2xl hover:border-purple-200/50`}
           style={{
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(20px)',
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%)',
+            backdropFilter: 'blur(32px)',
+            borderImage: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(168, 85, 247, 0.05)) 1',
           }}
         >
           <div className="flex flex-col h-full overflow-x-hidden">
-            {/* Search, Filter, and Create Tredys Buttons at Top */}
-            <div className="flex gap-2 mb-4">
-              <button
-                className="px-3 py-2 text-xs bg-gray-100 hover:bg-gray-200 border border-gray-300/50 rounded-lg transition-all flex items-center justify-center"
-                title="Search Tredys"
-              >
-                <MagnifyingGlass size={16} />
-              </button>
-              
-              <button
-                className="px-3 py-2 text-xs bg-gray-100 hover:bg-gray-200 border border-gray-300/50 rounded-lg transition-all flex items-center justify-center"
-                title="Filter Tredys"
-              >
-                <Funnel size={16} />
-              </button>
+            {/* Enhanced Workspace Actions */}
+            {showSidebar ? (
+              <div className="space-y-3 mb-6">
+                <div className="relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/20 via-purple-600/20 to-purple-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <button
+                    onClick={handleCreateTredy}
+                    className="relative w-full px-5 py-3 bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:from-purple-600 hover:via-purple-700 hover:to-purple-800 text-white rounded-2xl transition-all flex items-center justify-center gap-3 shadow-lg hover:shadow-xl font-semibold group overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                    <Plus size={20} weight="bold" className="group-hover:rotate-180 transition-transform duration-300 relative z-10" />
+                    <span className="relative z-10 text-base">New Tredy</span>
+                    <div className="absolute right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="w-2 h-2 bg-white/40 rounded-full animate-pulse" />
+                    </div>
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    className="px-3 py-2.5 bg-gradient-to-br from-gray-50/80 to-gray-100/60 hover:from-purple-50 hover:to-purple-100/80 border border-gray-200/60 hover:border-purple-200 rounded-xl transition-all flex items-center justify-center gap-2 text-sm text-gray-700 hover:text-purple-700 font-medium group backdrop-blur-sm"
+                    title="Browse Templates"
+                  >
+                    <House size={16} className="group-hover:scale-110 group-hover:text-purple-600 transition-all" />
+                    <span>Templates</span>
+                  </button>
+                  <button
+                    className="px-3 py-2.5 bg-gradient-to-br from-gray-50/80 to-gray-100/60 hover:from-blue-50 hover:to-blue-100/80 border border-gray-200/60 hover:border-blue-200 rounded-xl transition-all flex items-center justify-center gap-2 text-sm text-gray-700 hover:text-blue-700 font-medium group backdrop-blur-sm"
+                    title="Recent Chats"
+                  >
+                    <List size={16} className="group-hover:scale-110 group-hover:text-blue-600 transition-all" />
+                    <span>Recent</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2 mb-4 items-center">
+                <button
+                  onClick={handleCreateTredy}
+                  className="p-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg transition-all shadow-sm"
+                  title="New Tredy"
+                >
+                  <Plus size={16} weight="bold" />
+                </button>
+                <button
+                  className="p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-all"
+                  title="Browse Templates"
+                >
+                  <House size={16} className="text-gray-600" />
+                </button>
+              </div>
+            )}
 
-              <button
-                onClick={handleCreateTredy}
-                className="flex-1 px-3 py-2 text-xs bg-blue-100 hover:bg-blue-200 border border-blue-300/50 rounded-lg transition-all flex items-center justify-center gap-1.5 text-blue-700"
-                title="Create new Tredy"
-              >
-                <Plus size={14} />
-                <span>New Tredy</span>
-              </button>
-            </div>
-
-            <div className="flex-grow flex flex-col min-w-[260px] overflow-hidden">
+            <div className={`flex-grow flex flex-col ${showSidebar ? "min-w-[260px]" : "min-w-[40px]"} overflow-hidden`}>
               <div className="relative h-full flex flex-col w-full">
                 <div className="flex flex-col gap-y-3 pb-[60px] overflow-y-auto custom-scrollbar">
                   <ActiveWorkspaces />

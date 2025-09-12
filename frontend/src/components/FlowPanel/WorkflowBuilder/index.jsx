@@ -26,7 +26,6 @@ import AnythingInfinityLogo from "@/media/logo/Tredy Full.png";
 import { Tooltip } from "react-tooltip";
 import showToast from "@/utils/toast";
 import AgentFlows from "@/models/agentFlows";
-import HeaderMenu from "./HeaderMenu";
 
 // Block Types - Only supported types from backend
 const BLOCK_TYPES = {
@@ -152,34 +151,30 @@ const DEFAULT_BLOCKS = [
   },
 ];
 
-function OldHeaderMenu({
+// Unified Modern Header Component
+function UnifiedHeader({
   flowName,
-  availableFlows = [],
-  onNewFlow,
+  blockCount,
+  onClose,
   onSaveFlow,
   onRunFlow,
-  onPublishFlow,
   onClearFlow,
-  onClose,
   isSaving,
   isRunning,
-  lastSaved,
   hasUnsavedChanges,
+  lastSaved
 }) {
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showActions, setShowActions] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false);
+        setShowActions(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const formatLastSaved = () => {
@@ -190,205 +185,135 @@ function OldHeaderMenu({
     const diffMins = Math.floor(diffMs / 60000);
     
     if (diffMins < 1) return "Saved just now";
-    if (diffMins === 1) return "Saved 1 minute ago";
-    if (diffMins < 60) return `Saved ${diffMins} minutes ago`;
+    if (diffMins === 1) return "1 min ago";
+    if (diffMins < 60) return `${diffMins} min ago`;
     
     const diffHours = Math.floor(diffMins / 60);
-    if (diffHours === 1) return "Saved 1 hour ago";
-    if (diffHours < 24) return `Saved ${diffHours} hours ago`;
+    if (diffHours === 1) return "1h ago";
+    if (diffHours < 24) return `${diffHours}h ago`;
     
-    return `Saved on ${saved.toLocaleDateString()}`;
+    return saved.toLocaleDateString();
   };
 
   return (
-    <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200/50">
-      {/* Compact header */}
-      <div className="flex justify-between items-center px-3 py-2">
-        <div className="flex items-center gap-2">
+    <div className="relative bg-white/95 backdrop-blur-md border-b border-gray-200/40 shadow-sm">
+      {/* Elegant gradient accent */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-300/40 to-transparent" />
+      
+      <div className="flex items-center justify-between px-6 py-4">
+        {/* Left Section - Navigation & Flow Info */}
+        <div className="flex items-center gap-4">
+          {/* Sidebar Toggle */}
           <button
             onClick={onClose}
-            className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2.5 hover:bg-gray-100/80 rounded-xl transition-all duration-200 hover:scale-105 group"
             title="Back to Flow Panel"
           >
-            <CaretLeft size={16} className="text-gray-600" />
+            <CaretLeft size={18} className="text-gray-600 group-hover:text-purple-600 transition-colors" />
           </button>
           
-          <div className="flex items-center gap-2">
-            <Wrench size={14} className="text-purple-600" />
-            <span className="text-sm font-medium text-gray-800">
-              {flowName || "New Workflow"}
-            </span>
-          </div>
-
-          <div className="h-4 w-px bg-gray-300" />
-
-          <div className="relative" ref={dropdownRef}>
-            <button
-              className="flex items-center gap-1 text-gray-600 hover:bg-gray-100 px-2 py-1 rounded text-xs transition-colors"
-              onClick={() => setShowDropdown(!showDropdown)}
-            >
-              Actions
-              <CaretDown size={12} />
-            </button>
+          {/* Flow Info */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-purple-200/70 rounded-xl flex items-center justify-center shadow-sm">
+              <Wrench size={18} className="text-purple-700" />
+            </div>
             
-            {showDropdown && (
-              <div className="absolute top-full left-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
-                <button
-                  onClick={() => { onNewFlow(); setShowDropdown(false); }}
-                  className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
-                >
-                  <Plus size={12} />
-                  New
-                </button>
-                <button
-                  onClick={() => { onClearFlow(); setShowDropdown(false); }}
-                  className="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2 border-t border-gray-100"
-                >
-                  <Trash size={12} />
-                  Clear
-                </button>
+            <div>
+              <h1 className="text-lg font-semibold text-gray-900 leading-tight">
+                {flowName || "New Workflow"}
+              </h1>
+              <div className="flex items-center gap-3 text-xs text-gray-500">
+                <span className="flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 bg-purple-400 rounded-full" />
+                  {blockCount} blocks
+                </span>
+                {lastSaved && (
+                  <span className="flex items-center gap-1">
+                    <CheckCircle size={12} className="text-green-500" />
+                    {formatLastSaved()}
+                  </span>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
 
-        {/* Compact action buttons */}
-        <div className="flex items-center gap-1">
+        {/* Right Section - Actions */}
+        <div className="flex items-center gap-2">
+          {/* Status Indicator */}
+          {hasUnsavedChanges && (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200/60 rounded-lg">
+              <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+              <span className="text-xs font-medium text-amber-700">Unsaved</span>
+            </div>
+          )}
+          
+          {/* Primary Actions */}
           <button
             onClick={onRunFlow}
             disabled={isRunning}
-            className="p-1.5 bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white rounded text-xs transition-all flex items-center gap-1"
-            title="Run workflow"
+            className="flex items-center gap-2 px-4 py-2.5 bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white rounded-xl font-medium text-sm transition-all duration-200 hover:shadow-lg hover:shadow-green-200/50 disabled:hover:shadow-none"
           >
             {isRunning ? (
-              <ArrowsClockwise size={12} className="animate-spin" />
+              <>
+                <ArrowsClockwise size={16} className="animate-spin" />
+                Running...
+              </>
             ) : (
-              <Play size={12} weight="fill" />
+              <>
+                <Play size={16} weight="fill" />
+                Run
+              </>
             )}
           </button>
 
           <button
             onClick={onSaveFlow}
             disabled={isSaving || !hasUnsavedChanges}
-            className="p-1.5 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white rounded text-xs transition-all flex items-center gap-1"
-            title="Save workflow"
+            className="flex items-center gap-2 px-4 py-2.5 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white rounded-xl font-medium text-sm transition-all duration-200 hover:shadow-lg hover:shadow-purple-200/50 disabled:hover:shadow-none"
           >
             {isSaving ? (
-              <ArrowsClockwise size={12} className="animate-spin" />
+              <>
+                <ArrowsClockwise size={16} className="animate-spin" />
+                Saving...
+              </>
             ) : (
-              <FloppyDisk size={12} />
+              <>
+                <FloppyDisk size={16} />
+                Save
+              </>
             )}
           </button>
 
-          {hasUnsavedChanges && (
-            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse ml-1" title="Unsaved changes" />
-          )}
-
-          {lastSaved && (
-            <div className="text-green-500 ml-2" title={formatLastSaved()}>
-              <CheckCircle size={12} />
-            </div>
-          )}
+          {/* More Actions */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setShowActions(!showActions)}
+              className="p-2.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100/80 rounded-xl transition-all duration-200"
+              title="More actions"
+            >
+              <CaretDown size={16} className={`transition-transform duration-200 ${showActions ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {showActions && (
+              <div className="absolute right-0 top-full mt-2 w-40 bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-xl shadow-xl z-50 overflow-hidden">
+                <button
+                  onClick={() => { onClearFlow(); setShowActions(false); }}
+                  className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50/80 transition-colors flex items-center gap-3"
+                >
+                  <Trash size={16} />
+                  Clear Flow
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function ActionBar({ 
-  onRunFlow,
-  onSaveFlow,
-  onClearFlow,
-  onPublishFlow,
-  onNewFlow,
-  isRunning,
-  isSaving,
-  hasUnsavedChanges,
-  lastSaved,
-  formatLastSaved
-}) {
-  return (
-    <div className="px-3 py-2 bg-white/90 backdrop-blur-sm border-t border-gray-200/50 flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        {/* Primary Actions */}
-        <button
-            onClick={onRunFlow}
-            disabled={isRunning}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white rounded text-sm font-medium transition-all"
-          >
-            {isRunning ? (
-              <>
-                <ArrowsClockwise size={14} className="animate-spin" />
-                Running...
-              </>
-            ) : (
-              <>
-                <Play size={14} weight="fill" />
-                Run Flow
-              </>
-            )}
-          </button>
 
-          <button
-            onClick={onSaveFlow}
-            disabled={isSaving || !hasUnsavedChanges}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white rounded text-sm font-medium transition-all"
-          >
-            {isSaving ? (
-              <>
-                <ArrowsClockwise size={14} className="animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <FloppyDisk size={14} />
-                Save
-              </>
-            )}
-          </button>
-
-          <div className="h-4 w-px bg-gray-300 mx-1" />
-
-          {/* Secondary Actions */}
-          <button
-            onClick={onPublishFlow}
-            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded text-sm font-medium transition-all"
-          >
-            <Upload size={14} />
-            Publish
-          </button>
-
-          <button
-            onClick={onNewFlow}
-            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded text-sm font-medium transition-all"
-          >
-            <Plus size={14} />
-            New
-          </button>
-
-          <button
-            onClick={onClearFlow}
-            className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-red-50 hover:text-red-600 text-gray-600 rounded text-sm font-medium transition-all"
-          >
-            <Trash size={14} />
-            Clear
-          </button>
-        </div>
-
-        {/* Keyboard Shortcuts Hint */}
-        <div className="flex items-center gap-2 text-xs text-gray-500">
-          <span className="flex items-center gap-1">
-            <kbd className="px-1 py-0.5 bg-gray-100 rounded text-[10px] font-mono">Cmd+S</kbd>
-            Save
-          </span>
-          <span className="flex items-center gap-1">
-            <kbd className="px-1 py-0.5 bg-gray-100 rounded text-[10px] font-mono">Cmd+Enter</kbd>
-            Run
-          </span>
-        </div>
-      </div>
-  );
-}
 
 function BlockNode({ 
   block, 
@@ -738,75 +663,121 @@ function BlockNode({
 
   return (
     <div className={`
-      bg-white/80 border border-gray-200/60 rounded-lg transition-all duration-200 hover:bg-white hover:border-purple-200/60 shadow-sm hover:shadow-md group
-      ${isExecuting ? 'border-blue-500 animate-pulse shadow-lg shadow-blue-500/20' : ''}
-      ${isCompleted ? 'border-green-500 shadow-lg shadow-green-500/20' : ''}
-      ${isFailed ? 'border-red-500 shadow-lg shadow-red-500/20' : ''}
-      ${hasErrors ? 'border-yellow-500' : ''}
+      relative overflow-hidden backdrop-blur-md bg-gradient-to-r from-white/90 via-white/95 to-purple-50/90 
+      border border-gray-200/40 rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-purple-100/50 
+      hover:border-purple-300/60 hover:scale-[1.02] group transform-gpu
+      ${isExecuting ? 'border-blue-400 shadow-2xl shadow-blue-400/30 animate-pulse bg-gradient-to-r from-blue-50/80 to-white/90' : ''}
+      ${isCompleted ? 'border-green-400 shadow-2xl shadow-green-400/30 bg-gradient-to-r from-green-50/80 to-white/90' : ''}
+      ${isFailed ? 'border-red-400 shadow-2xl shadow-red-400/30 bg-gradient-to-r from-red-50/80 to-white/90' : ''}
+      ${hasErrors ? 'border-amber-400 bg-gradient-to-r from-amber-50/80 to-white/90' : ''}
+      before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/5 before:to-transparent
+      before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700
     `}>
-      <div className="flex justify-between items-center p-2.5">
-        <div className="flex items-center gap-2 relative flex-1 min-w-0">
-          {/* Status Indicator */}
+      <div className="relative z-10 flex justify-between items-center p-4">
+        <div className="flex items-center gap-3 relative flex-1 min-w-0">
+          {/* Advanced Status Indicator */}
           {(isExecuting || isCompleted || isFailed) && (
-            <div className="flex-shrink-0">
-              {isExecuting && <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping" />}
-              {isCompleted && <CheckCircle size={14} className="text-green-500" />}
-              {isFailed && <Warning size={14} className="text-red-500" />}
+            <div className="flex-shrink-0 relative">
+              {isExecuting && (
+                <div className="relative">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full animate-ping absolute" />
+                  <div className="w-3 h-3 bg-blue-600 rounded-full animate-pulse" />
+                </div>
+              )}
+              {isCompleted && (
+                <div className="relative">
+                  <CheckCircle size={16} className="text-green-500 drop-shadow-sm" />
+                  <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-20" />
+                </div>
+              )}
+              {isFailed && (
+                <div className="relative">
+                  <Warning size={16} className="text-red-500 drop-shadow-sm animate-bounce" />
+                </div>
+              )}
             </div>
           )}
           
-          <div className="w-6 h-6 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center flex-shrink-0">
-            <div className="text-purple-600" style={{fontSize: '12px'}}>{blockInfo.icon}</div>
+          {/* Modern Icon Container */}
+          <div className="relative flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-100 to-purple-200/70 border border-purple-200/80 flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-110">
+              <div className="text-purple-700 transform transition-transform duration-300 group-hover:rotate-6" style={{fontSize: '16px'}}>
+                {blockInfo.icon}
+              </div>
+            </div>
+            {/* Subtle glow effect */}
+            <div className="absolute inset-0 rounded-xl bg-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md -z-10" />
           </div>
+          
           <div className="min-w-0 flex-1">
-            <h4 className="text-gray-800 font-medium flex items-center gap-1 text-sm truncate">
-              {block.metadata?.name || blockInfo.label}
-              {hasErrors && (
-                <Warning 
-                  size={12} 
-                  className="text-yellow-500 flex-shrink-0" 
-                  data-tooltip-id="validation-error-tooltip"
-                  data-tooltip-content={validationErrors?.join(', ')}
-                />
-              )}
-            </h4>
-            <p className="text-gray-600 text-xs mt-0.5 truncate">
-              {block.metadata?.description || blockInfo.getSummary(block.config)}
-            </p>
+            <div className="flex items-start justify-between">
+              <div className="min-w-0 flex-1">
+                <h4 className="text-gray-900 font-semibold flex items-center gap-2 text-base truncate group-hover:text-purple-800 transition-colors duration-200">
+                  {block.metadata?.name || blockInfo.label}
+                  {hasErrors && (
+                    <div className="flex-shrink-0 relative">
+                      <Warning 
+                        size={14} 
+                        className="text-amber-500 animate-pulse drop-shadow-sm" 
+                        data-tooltip-id="validation-error-tooltip"
+                        data-tooltip-content={validationErrors?.join(', ')}
+                      />
+                    </div>
+                  )}
+                </h4>
+                <p className="text-gray-600 text-sm mt-1 truncate leading-relaxed">
+                  {block.metadata?.description || blockInfo.getSummary(block.config)}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-2 flex-shrink-0">
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 ml-4 flex-shrink-0 transform translate-x-2 group-hover:translate-x-0">
           {duplicateBlock && !["flow_info", "start", "finish"].includes(block.id) && (
             <button
               onClick={() => duplicateBlock(block.id)}
-              className="p-1 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded transition-all"
+              className="p-2 bg-white/80 hover:bg-blue-50 text-gray-600 hover:text-blue-600 rounded-lg border border-gray-200/60 hover:border-blue-300/60 transition-all duration-200 hover:shadow-md hover:scale-105 backdrop-blur-sm"
               title="Duplicate"
             >
-              <Copy size={12} />
+              <Copy size={14} />
             </button>
           )}
           {removeBlock && !["flow_info", "start", "finish"].includes(block.id) && (
             <button
               onClick={() => removeBlock(block.id)}
-              className="p-1 bg-red-50 hover:bg-red-100 text-red-600 rounded transition-all"
+              className="p-2 bg-white/80 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200/60 hover:border-red-300/60 transition-all duration-200 hover:shadow-md hover:scale-105 backdrop-blur-sm"
               title="Remove"
             >
-              <X size={12} />
+              <X size={14} />
             </button>
           )}
           <button
             onClick={() => toggleBlockExpansion(block.id)}
-            className="p-1 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded transition-all"
+            className="p-2 bg-white/80 hover:bg-purple-50 text-gray-600 hover:text-purple-600 rounded-lg border border-gray-200/60 hover:border-purple-300/60 transition-all duration-200 hover:shadow-md hover:scale-105 backdrop-blur-sm"
             title={block.isExpanded ? "Collapse" : "Expand"}
           >
-            {block.isExpanded ? <CaretUp size={12} /> : <CaretDown size={12} />}
+            {block.isExpanded ? (
+              <CaretUp size={14} className="transform transition-transform duration-200 group-hover:scale-110" />
+            ) : (
+              <CaretDown size={14} className="transform transition-transform duration-200 group-hover:scale-110" />
+            )}
           </button>
         </div>
       </div>
 
       {block.isExpanded && (
-        <div className="px-2.5 pb-2.5 border-t border-gray-100">
-          <div className="mt-2">{renderBlockContent()}</div>
+        <div className="relative">
+          {/* Elegant separator */}
+          <div className="mx-4 border-t border-gradient-to-r from-transparent via-gray-200/60 to-transparent" />
+          
+          <div className="px-6 pb-6 pt-4">
+            <div className="bg-white/40 backdrop-blur-sm rounded-xl p-4 border border-white/60 shadow-inner">
+              {renderBlockContent()}
+            </div>
+          </div>
+          
+          {/* Bottom accent line */}
+          <div className="absolute bottom-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-purple-200/40 to-transparent" />
         </div>
       )}
     </div>
@@ -843,47 +814,56 @@ function AddBlockMenu({ blocks, addBlock }) {
   if (!canAddBlock) return null;
 
   return (
-    <div className="relative mt-4">
+    <div className="relative mt-8">
       <button
         onClick={() => setShowMenu(!showMenu)}
-        className="w-full py-3 border-2 border-dashed border-white/20 rounded-lg text-theme-text-secondary hover:border-white/40 hover:text-theme-text-primary hover:bg-theme-action-menu-bg/50 transition-all duration-300 flex items-center justify-center gap-2 group"
+        className="w-full py-4 border-2 border-dashed border-purple-200/40 bg-gradient-to-r from-purple-50/30 to-white/50 rounded-xl text-gray-600 hover:border-purple-300/60 hover:text-purple-700 hover:bg-gradient-to-r hover:from-purple-100/40 hover:to-purple-50/60 transition-all duration-300 flex items-center justify-center gap-3 group backdrop-blur-sm hover:shadow-lg hover:shadow-purple-100/30"
       >
-        <Plus size={20} className="group-hover:scale-110 transition-transform" />
-        <span className="font-medium">Add Block</span>
+        <div className="relative">
+          <Plus size={22} className="group-hover:scale-110 transition-all duration-300 group-hover:rotate-90" />
+          <div className="absolute inset-0 bg-purple-400 rounded-full opacity-0 group-hover:opacity-20 animate-ping" />
+        </div>
+        <span className="font-semibold text-base">Add Block</span>
       </button>
 
       {showMenu && (
         <div
           ref={menuRef}
-          className="absolute top-full left-0 right-0 mt-2 bg-theme-settings-input-bg border border-white/10 rounded-lg shadow-2xl z-50 overflow-hidden animate-fadeUpIn"
+          className="absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-2xl shadow-2xl z-50 overflow-hidden transform animate-fadeIn"
         >
-          <div className="p-2">
-            <div className="text-xs text-theme-text-secondary px-2 py-1 uppercase tracking-wider">
+          <div className="p-4">
+            <div className="text-xs font-semibold text-gray-500 px-3 py-2 uppercase tracking-wider border-b border-gray-200/40 mb-3">
               Available Blocks
             </div>
-            {availableBlocks.map(([type, info]) => (
-              <button
-                key={type}
-                onClick={() => {
-                  addBlock(type);
-                  setShowMenu(false);
-                }}
-                className="w-full text-left px-2 py-2 hover:bg-theme-action-menu-bg rounded transition-colors duration-200 flex items-center gap-3 group"
-              >
-                <div className="w-8 h-8 rounded-full bg-theme-bg-primary border border-white/10 flex items-center justify-center group-hover:border-primary-button transition-colors">
-                  {info.icon}
-                </div>
-                <div className="flex-1">
-                  <div className="text-sm font-medium text-theme-text-primary">
-                    {info.label}
+            <div className="space-y-1">
+              {availableBlocks.map(([type, info]) => (
+                <button
+                  key={type}
+                  onClick={() => {
+                    addBlock(type);
+                    setShowMenu(false);
+                  }}
+                  className="w-full text-left px-3 py-3 hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 rounded-xl transition-all duration-200 flex items-center gap-4 group transform hover:scale-[1.02]"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-100 to-purple-200/70 border border-purple-200/80 flex items-center justify-center group-hover:shadow-lg group-hover:scale-110 transition-all duration-200">
+                    <div className="text-purple-700 group-hover:rotate-6 transition-transform duration-200">
+                      {info.icon}
+                    </div>
                   </div>
-                  <div className="text-xs text-theme-text-secondary">
-                    {info.description}
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold text-gray-800 group-hover:text-purple-800 transition-colors">
+                      {info.label}
+                    </div>
+                    <div className="text-xs text-gray-600 leading-relaxed">
+                      {info.description}
+                    </div>
                   </div>
-                </div>
-                <Plus size={16} className="text-theme-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
-              </button>
-            ))}
+                  <div className="opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0">
+                    <Plus size={18} className="text-purple-500" />
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -1466,15 +1446,13 @@ export default function WorkflowBuilder({ workspace, noteData, onClose }) {
         backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         backgroundSize: '30px 30px'
       }} />
-      <HeaderMenu
+      <UnifiedHeader
         flowName={flowName}
-        availableFlows={availableFlows}
-        onNewFlow={clearFlow}
+        blockCount={blocks.length}
+        onClose={onClose}
         onSaveFlow={() => saveFlow(false)}
         onRunFlow={runFlow}
-        onPublishFlow={publishFlow}
         onClearFlow={clearFlow}
-        onClose={onClose}
         isSaving={isSaving}
         isRunning={isRunning}
         lastSaved={lastSaved}
@@ -1482,9 +1460,9 @@ export default function WorkflowBuilder({ workspace, noteData, onClose }) {
       />
       
       <div className="flex-1 flex overflow-hidden">
-        <div className="flex-1 p-3 overflow-y-auto">
-          <div className="max-w-2xl mx-auto">
-            <div className="space-y-2">
+        <div className="flex-1 overflow-y-auto" style={{maxHeight: 'calc(100vh - 120px)'}}>
+          <div className="max-w-3xl mx-auto p-4">
+            <div className="space-y-6">
               {blocks.map((block) => (
                 <BlockNode
                   key={block.id}

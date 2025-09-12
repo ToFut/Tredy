@@ -555,39 +555,8 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
     }
   }, [onSendCommandReady, sendCommand]);
 
-  // Determine if we should use mobile UI (viewport width < 768px is more reliable than isMobile)
-  const useMobileUI = window.innerWidth < 768 || isMobile;
-  
-  // Use mobile-optimized chat for mobile devices
-  if (useMobileUI) {
-    return (
-      <div className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] overflow-hidden">
-        <DnDFileUploaderWrapper>
-          <MobileOptimizedChat
-            workspace={workspace}
-            knownHistory={knownHistory}
-            sendCommand={sendCommand}
-            handleSubmit={handleSubmit}
-            message={message}
-            setMessage={setMessage}
-            loadingResponse={loadingResponse}
-            chatHistory={chatHistory}
-            setChatHistory={setChatHistory}
-            regenerateAssistantMessage={regenerateAssistantMessage}
-            activeAgents={agentOperations.filter(op => op.status === 'active')}
-            threadStats={{
-              activeAgents: agentOperations.filter(op => op.status === 'active').length,
-              complexity: 'Medium',
-              tokensUsed: Math.floor(Math.random() * 50000),
-              tokenLimit: 128000,
-              avgResponse: '1.2s'
-            }}
-            performance={intelligenceMetrics}
-          />
-        </DnDFileUploaderWrapper>
-      </div>
-    );
-  }
+  // Remove mobile-specific UI - use the same layout for all devices
+  // This ensures consistency across mobile and desktop
 
   // Desktop layout with header
   return (

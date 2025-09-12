@@ -19,7 +19,7 @@ import {
 import WorkflowBuilder from "./WorkflowBuilder";
 import AgentFlows from "@/models/agentFlows";
 import showToast from "@/utils/toast";
-import FlowItem from "./FlowItem";
+// import FlowItem from "./FlowItem";
 
 export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpen }) {
   const [flows, setFlows] = useState([]);
@@ -408,14 +408,51 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
                     flow.active ? 'bg-green-400' : 'bg-gray-300'
                   }`} />
                   
-                  <FlowItem
-                    flow={flow}
-                    onEdit={() => handleEditFlow(flow)}
-                    onRun={() => handleRunFlow(flow)}
-                    onToggle={() => handleToggleFlow(flow)}
-                    onDelete={() => handleDeleteFlow(flow)}
-                    formatLastUsed={formatLastUsed}
-                  />
+                  {/* Inline flow item rendering */}
+                  <div className="bg-white/80 border border-gray-200/60 rounded-lg p-2.5 hover:bg-white hover:border-purple-200/60 transition-all duration-200 group shadow-sm hover:shadow-md">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <button 
+                          onClick={() => handleToggleFlow(flow)} 
+                          className="transition-transform hover:scale-110 flex-shrink-0"
+                        >
+                          {flow.active ? (
+                            <CheckCircle size={16} className="text-green-500" />
+                          ) : (
+                            <div className="w-4 h-4 rounded-full border-2 border-gray-300" />
+                          )}
+                        </button>
+                        <div className="min-w-0 flex-1">
+                          <h3 
+                            className="font-medium text-gray-800 hover:text-purple-600 transition-colors cursor-pointer text-sm truncate"
+                            onClick={() => handleEditFlow(flow)}
+                          >
+                            {flow.name}
+                          </h3>
+                        </div>
+                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                          flow.active ? 'bg-green-400' : 'bg-gray-300'
+                        }`} />
+                      </div>
+                      
+                      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-2">
+                        <button
+                          onClick={() => handleRunFlow(flow)}
+                          className="p-1 bg-green-500 hover:bg-green-600 text-white rounded transition-all"
+                          title="Run"
+                        >
+                          <Play size={12} weight="fill" />
+                        </button>
+                        <button
+                          onClick={() => handleEditFlow(flow)}
+                          className="p-1 bg-purple-50 hover:bg-purple-100 text-purple-600 rounded transition-all"
+                          title="Edit"
+                        >
+                          <Gear size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

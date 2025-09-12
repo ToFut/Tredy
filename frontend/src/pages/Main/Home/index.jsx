@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Sparkle, Plus, Robot, EnvelopeSimple, Calendar, FileText, ChartBar, Play, FlowArrow, Globe, ArrowRight, Zap, Brain, Workflow } from "@phosphor-icons/react";
+import { Sparkle, Plus, EnvelopeSimple, Calendar, Play, FlowArrow, Globe, ArrowRight } from "@phosphor-icons/react";
 import useUser from "@/hooks/useUser";
 import Workspace from "@/models/workspace";
 import WorkspaceChat from "@/components/WorkspaceChat";
@@ -216,7 +216,7 @@ export default function Home() {
                   <div className="group">
                     <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl p-8 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
                       <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 rounded-2xl flex items-center justify-center mb-6">
-                        <Workflow className="w-8 h-8 text-purple-600 dark:text-purple-400" weight="duotone" />
+                        <FlowArrow className="w-8 h-8 text-purple-600 dark:text-purple-400" weight="duotone" />
                       </div>
                       <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Custom Workflows</h3>
                       <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
@@ -332,7 +332,7 @@ export default function Home() {
                 </div>
                 <div className="text-center">
                   <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Workflow className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                    <FlowArrow className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                   </div>
                   <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Workflows</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Custom automation flows</p>

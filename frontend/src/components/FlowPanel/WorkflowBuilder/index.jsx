@@ -26,6 +26,7 @@ import AnythingInfinityLogo from "@/media/logo/Tredy Full.png";
 import { Tooltip } from "react-tooltip";
 import showToast from "@/utils/toast";
 import AgentFlows from "@/models/agentFlows";
+import HeaderMenu from "./HeaderMenu";
 
 // Block Types - Only supported types from backend
 const BLOCK_TYPES = {
@@ -151,7 +152,7 @@ const DEFAULT_BLOCKS = [
   },
 ];
 
-function HeaderMenu({
+function OldHeaderMenu({
   flowName,
   availableFlows = [],
   onNewFlow,
@@ -200,125 +201,129 @@ function HeaderMenu({
   };
 
   return (
-    <div className="bg-theme-bg-secondary border-b border-white/10">
-      {/* Top Bar with Logo and Flow Name */}
-      <div className="flex justify-between items-center px-4 py-3">
-        <div className="flex items-center gap-x-3">
+    <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200/50">
+      {/* Compact header */}
+      <div className="flex justify-between items-center px-3 py-2">
+        <div className="flex items-center gap-2">
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-theme-settings-input-bg border border-white/10 hover:bg-theme-action-menu-bg transition-colors duration-300"
+            className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Back to Flow Panel"
           >
-            <CaretLeft
-              weight="bold"
-              className="w-5 h-5 text-theme-text-primary"
-            />
+            <CaretLeft size={16} className="text-gray-600" />
           </button>
           
-          <div className="flex items-center gap-x-2">
-            <img
-              src={AnythingInfinityLogo}
-              alt="logo"
-              className="w-[20px] light:invert"
-            />
-            <span className="text-theme-text-primary text-sm uppercase tracking-widest font-medium">
-              Workflow Builder
+          <div className="flex items-center gap-2">
+            <Wrench size={14} className="text-purple-600" />
+            <span className="text-sm font-medium text-gray-800">
+              {flowName || "New Workflow"}
             </span>
           </div>
 
-          <div className="h-6 w-px bg-white/10" />
+          <div className="h-4 w-px bg-gray-300" />
 
-          <div
-            className="relative"
-            ref={dropdownRef}
-          >
+          <div className="relative" ref={dropdownRef}>
             <button
-              className="flex items-center gap-x-2 text-theme-text-primary hover:bg-theme-action-menu-bg px-3 py-1.5 rounded-lg transition-colors duration-300"
+              className="flex items-center gap-1 text-gray-600 hover:bg-gray-100 px-2 py-1 rounded text-xs transition-colors"
               onClick={() => setShowDropdown(!showDropdown)}
             >
-              <span
-                className={`text-sm font-medium ${
-                  flowName ? "text-theme-text-primary" : "text-theme-text-secondary"
-                }`}
-              >
-                {flowName || "Untitled Flow"}
-              </span>
-              {hasUnsavedChanges && (
-                <span className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" title="Unsaved changes" />
-              )}
-              <CaretDown size={12} className="text-theme-text-secondary" />
+              Actions
+              <CaretDown size={12} />
             </button>
             
             {showDropdown && (
-              <div className="absolute top-full left-0 mt-1 w-64 bg-theme-settings-input-bg border border-white/10 rounded-lg shadow-lg z-50 animate-fadeUpIn">
-                <div className="p-2">
-                  <div className="text-xs text-theme-text-secondary px-2 py-1 uppercase tracking-wider">
-                    Recent Flows
-                  </div>
-                  {availableFlows.length > 0 ? (
-                    availableFlows.slice(0, 5).map((flow) => (
-                      <button
-                        key={flow?.uuid || Math.random()}
-                        onClick={() => {
-                          console.log("Switch to flow:", flow);
-                          setShowDropdown(false);
-                        }}
-                        className="w-full text-left px-2 py-2 text-sm text-theme-text-primary hover:bg-theme-action-menu-bg rounded transition-colors duration-200 flex items-center justify-between group"
-                      >
-                        <span className="truncate">{flow?.name || "Untitled Flow"}</span>
-                        <span className="text-xs text-theme-text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
-                          Load
-                        </span>
-                      </button>
-                    ))
-                  ) : (
-                    <div className="px-2 py-3 text-sm text-theme-text-secondary text-center">
-                      No other flows available
-                    </div>
-                  )}
-                </div>
+              <div className="absolute top-full left-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
+                <button
+                  onClick={() => { onNewFlow(); setShowDropdown(false); }}
+                  className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                >
+                  <Plus size={12} />
+                  New
+                </button>
+                <button
+                  onClick={() => { onClearFlow(); setShowDropdown(false); }}
+                  className="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2 border-t border-gray-100"
+                >
+                  <Trash size={12} />
+                  Clear
+                </button>
               </div>
             )}
           </div>
         </div>
 
-        {/* Status and Info */}
-        <div className="flex items-center gap-x-4">
-          {lastSaved && (
-            <div className="flex items-center gap-x-2 text-xs text-theme-text-secondary">
-              <CheckCircle size={14} className="text-green-500" />
-              <span>{formatLastSaved()}</span>
-            </div>
-          )}
-          
-          <a
-            href="https://docs.tredy.com/agent-flows/overview"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-theme-text-secondary text-xs hover:text-cta-button flex items-center gap-x-1 transition-colors"
-          >
-            Documentation
-            <span className="text-[10px]">↗</span>
-          </a>
-        </div>
-      </div>
-
-      {/* Action Bar */}
-      <div className="px-4 py-2 bg-theme-bg-primary/50 flex items-center justify-between">
-        <div className="flex items-center gap-x-2">
-          {/* Primary Actions */}
+        {/* Compact action buttons */}
+        <div className="flex items-center gap-1">
           <button
             onClick={onRunFlow}
             disabled={isRunning}
-            className="flex items-center gap-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-800 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-all duration-300 shadow-sm"
+            className="p-1.5 bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white rounded text-xs transition-all flex items-center gap-1"
+            title="Run workflow"
+          >
+            {isRunning ? (
+              <ArrowsClockwise size={12} className="animate-spin" />
+            ) : (
+              <Play size={12} weight="fill" />
+            )}
+          </button>
+
+          <button
+            onClick={onSaveFlow}
+            disabled={isSaving || !hasUnsavedChanges}
+            className="p-1.5 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white rounded text-xs transition-all flex items-center gap-1"
+            title="Save workflow"
+          >
+            {isSaving ? (
+              <ArrowsClockwise size={12} className="animate-spin" />
+            ) : (
+              <FloppyDisk size={12} />
+            )}
+          </button>
+
+          {hasUnsavedChanges && (
+            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse ml-1" title="Unsaved changes" />
+          )}
+
+          {lastSaved && (
+            <div className="text-green-500 ml-2" title={formatLastSaved()}>
+              <CheckCircle size={12} />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ActionBar({ 
+  onRunFlow,
+  onSaveFlow,
+  onClearFlow,
+  onPublishFlow,
+  onNewFlow,
+  isRunning,
+  isSaving,
+  hasUnsavedChanges,
+  lastSaved,
+  formatLastSaved
+}) {
+  return (
+    <div className="px-3 py-2 bg-white/90 backdrop-blur-sm border-t border-gray-200/50 flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        {/* Primary Actions */}
+        <button
+            onClick={onRunFlow}
+            disabled={isRunning}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white rounded text-sm font-medium transition-all"
           >
             {isRunning ? (
               <>
-                <ArrowsClockwise size={16} className="animate-spin" />
+                <ArrowsClockwise size={14} className="animate-spin" />
                 Running...
               </>
             ) : (
               <>
-                <Play size={16} weight="fill" />
+                <Play size={14} weight="fill" />
                 Run Flow
               </>
             )}
@@ -327,62 +332,61 @@ function HeaderMenu({
           <button
             onClick={onSaveFlow}
             disabled={isSaving || !hasUnsavedChanges}
-            className="flex items-center gap-x-2 px-4 py-2 bg-primary-button hover:bg-primary-button/90 disabled:opacity-50 text-black light:text-white rounded-lg text-sm font-medium transition-all duration-300 shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white rounded text-sm font-medium transition-all"
           >
             {isSaving ? (
               <>
-                <ArrowsClockwise size={16} className="animate-spin" />
+                <ArrowsClockwise size={14} className="animate-spin" />
                 Saving...
               </>
             ) : (
               <>
-                <FloppyDisk size={16} />
+                <FloppyDisk size={14} />
                 Save
               </>
             )}
           </button>
 
-          <div className="h-6 w-px bg-white/10 mx-1" />
+          <div className="h-4 w-px bg-gray-300 mx-1" />
 
           {/* Secondary Actions */}
           <button
             onClick={onPublishFlow}
-            className="flex items-center gap-x-2 px-3 py-2 border border-white/10 hover:bg-theme-action-menu-bg text-theme-text-primary rounded-lg text-sm font-medium transition-all duration-300"
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded text-sm font-medium transition-all"
           >
-            <Upload size={16} />
+            <Upload size={14} />
             Publish
           </button>
 
           <button
             onClick={onNewFlow}
-            className="flex items-center gap-x-2 px-3 py-2 border border-white/10 hover:bg-theme-action-menu-bg text-theme-text-primary rounded-lg text-sm font-medium transition-all duration-300"
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded text-sm font-medium transition-all"
           >
-            <Plus size={16} />
+            <Plus size={14} />
             New
           </button>
 
           <button
             onClick={onClearFlow}
-            className="flex items-center gap-x-2 px-3 py-2 hover:bg-red-500/10 hover:text-red-400 text-theme-text-secondary rounded-lg text-sm font-medium transition-all duration-300"
+            className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-red-50 hover:text-red-600 text-gray-600 rounded text-sm font-medium transition-all"
           >
-            <Trash size={16} />
+            <Trash size={14} />
             Clear
           </button>
         </div>
 
         {/* Keyboard Shortcuts Hint */}
-        <div className="flex items-center gap-x-3 text-xs text-theme-text-secondary">
-          <span className="flex items-center gap-x-1">
-            <kbd className="px-1.5 py-0.5 bg-theme-bg-secondary rounded text-[10px] font-mono">⌘S</kbd>
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          <span className="flex items-center gap-1">
+            <kbd className="px-1 py-0.5 bg-gray-100 rounded text-[10px] font-mono">Cmd+S</kbd>
             Save
           </span>
-          <span className="flex items-center gap-x-1">
-            <kbd className="px-1.5 py-0.5 bg-theme-bg-secondary rounded text-[10px] font-mono">⌘↵</kbd>
+          <span className="flex items-center gap-1">
+            <kbd className="px-1 py-0.5 bg-gray-100 rounded text-[10px] font-mono">Cmd+Enter</kbd>
             Run
           </span>
         </div>
       </div>
-    </div>
   );
 }
 
@@ -407,9 +411,9 @@ function BlockNode({
     switch (block.type) {
       case BLOCK_TYPES.FLOW_INFO:
         return (
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div>
-              <label className="block text-xs font-medium mb-1 text-theme-text-primary">
+              <label className="block text-xs font-medium mb-1 text-gray-700">
                 Flow Name *
               </label>
               <input
@@ -418,12 +422,12 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { name: e.target.value })
                 }
-                className="w-full border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2.5"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
                 placeholder="Enter flow name..."
               />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1 text-theme-text-primary">
+              <label className="block text-xs font-medium mb-1 text-gray-700">
                 Description *
               </label>
               <textarea
@@ -431,9 +435,9 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { description: e.target.value })
                 }
-                className="w-full border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2.5"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
                 placeholder="Describe what this flow does..."
-                rows={3}
+                rows={2}
               />
             </div>
           </div>
@@ -441,9 +445,9 @@ function BlockNode({
 
       case BLOCK_TYPES.START:
         return (
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-medium text-theme-text-primary">
+              <label className="block text-xs font-medium text-gray-700">
                 Variables
               </label>
               <button
@@ -452,13 +456,13 @@ function BlockNode({
                   variables.push({ name: "", value: "" });
                   updateBlockConfig(block.id, { variables });
                 }}
-                className="text-xs px-2 py-1 bg-primary-button text-black light:text-white rounded hover:opacity-80"
+                className="text-xs px-2 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
               >
                 Add Variable
               </button>
             </div>
             {(block.config.variables || []).map((variable, index) => (
-              <div key={index} className="flex gap-2 items-center">
+              <div key={index} className="flex gap-1.5 items-center">
                 <input
                   type="text"
                   value={variable.name || ""}
@@ -467,7 +471,7 @@ function BlockNode({
                     variables[index] = { ...variables[index], name: e.target.value };
                     updateBlockConfig(block.id, { variables });
                   }}
-                  className="flex-1 border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2"
+                  className="flex-1 border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-1.5"
                   placeholder="Variable name"
                 />
                 <input
@@ -478,7 +482,7 @@ function BlockNode({
                     variables[index] = { ...variables[index], value: e.target.value };
                     updateBlockConfig(block.id, { variables });
                   }}
-                  className="flex-1 border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2"
+                  className="flex-1 border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-1.5"
                   placeholder="Default value"
                 />
                 <button
@@ -487,9 +491,9 @@ function BlockNode({
                     variables.splice(index, 1);
                     updateBlockConfig(block.id, { variables });
                   }}
-                  className="p-1 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/20 rounded"
+                  className="p-1 text-red-500 hover:bg-red-100 rounded"
                 >
-                  <X size={14} />
+                  <X size={12} />
                 </button>
               </div>
             ))}
@@ -498,9 +502,9 @@ function BlockNode({
 
       case BLOCK_TYPES.LLM_INSTRUCTION:
         return (
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div>
-              <label className="block text-xs font-medium mb-1 text-theme-text-primary">
+              <label className="block text-xs font-medium mb-1 text-gray-700">
                 Instruction *
               </label>
               <textarea
@@ -508,13 +512,13 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { instruction: e.target.value })
                 }
-                className="w-full border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2.5"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
                 placeholder="Enter AI instruction..."
-                rows={4}
+                rows={3}
               />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1 text-theme-text-primary">
+              <label className="block text-xs font-medium mb-1 text-gray-700">
                 Result Variable
               </label>
               <input
@@ -523,7 +527,7 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { resultVariable: e.target.value })
                 }
-                className="w-full border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2.5"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
                 placeholder="Variable to store result"
               />
             </div>
@@ -536,7 +540,7 @@ function BlockNode({
                 }
                 className="w-4 h-4"
               />
-              <label className="text-xs text-theme-text-primary">
+              <label className="text-xs text-gray-700">
                 Direct output (bypass further LLM processing)
               </label>
             </div>
@@ -545,9 +549,9 @@ function BlockNode({
 
       case BLOCK_TYPES.API_CALL:
         return (
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div>
-              <label className="block text-xs font-medium mb-1 text-theme-text-primary">
+              <label className="block text-xs font-medium mb-1 text-gray-700">
                 API URL *
               </label>
               <input
@@ -556,12 +560,12 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { url: e.target.value })
                 }
-                className="w-full border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2.5"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
                 placeholder="https://api.example.com/endpoint"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1 text-theme-text-primary">
+              <label className="block text-xs font-medium mb-1 text-gray-700">
                 Method
               </label>
               <select
@@ -569,7 +573,7 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { method: e.target.value })
                 }
-                className="w-full border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2.5"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
               >
                 <option value="GET">GET</option>
                 <option value="POST">POST</option>
@@ -578,7 +582,7 @@ function BlockNode({
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1 text-theme-text-primary">
+              <label className="block text-xs font-medium mb-1 text-gray-700">
                 Response Variable
               </label>
               <input
@@ -587,7 +591,7 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { responseVariable: e.target.value })
                 }
-                className="w-full border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2.5"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
                 placeholder="Variable to store response"
               />
             </div>
@@ -596,9 +600,9 @@ function BlockNode({
 
       case BLOCK_TYPES.WEB_SCRAPING:
         return (
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div>
-              <label className="block text-xs font-medium mb-1 text-theme-text-primary">
+              <label className="block text-xs font-medium mb-1 text-gray-700">
                 URL to Scrape *
               </label>
               <input
@@ -607,12 +611,12 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { url: e.target.value })
                 }
-                className="w-full border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2.5"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
                 placeholder="https://example.com"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1 text-theme-text-primary">
+              <label className="block text-xs font-medium mb-1 text-gray-700">
                 Result Variable
               </label>
               <input
@@ -621,7 +625,7 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { resultVariable: e.target.value })
                 }
-                className="w-full border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2.5"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
                 placeholder="Variable to store scraped content"
               />
             </div>
@@ -634,7 +638,7 @@ function BlockNode({
                 }
                 className="w-4 h-4"
               />
-              <label className="text-xs text-theme-text-primary">
+              <label className="text-xs text-gray-700">
                 Direct output (return content directly to chat)
               </label>
             </div>
@@ -643,7 +647,7 @@ function BlockNode({
 
       case BLOCK_TYPES.TOOL_CALL:
         return (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {/* Show metadata if available */}
             {block.metadata && (
               <div className="p-2 bg-theme-bg-primary/50 rounded-lg text-xs text-theme-text-secondary mb-3">
@@ -658,7 +662,7 @@ function BlockNode({
             )}
             
             <div>
-              <label className="block text-xs font-medium mb-1 text-theme-text-primary">
+              <label className="block text-xs font-medium mb-1 text-gray-700">
                 Tool Name *
               </label>
               <input
@@ -667,12 +671,12 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { toolName: e.target.value })
                 }
-                className="w-full border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2.5"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
                 placeholder="e.g., gmail_ws6-send_email"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1 text-theme-text-primary">
+              <label className="block text-xs font-medium mb-1 text-gray-700">
                 Parameters (JSON)
               </label>
               <textarea
@@ -685,13 +689,13 @@ function BlockNode({
                     // Invalid JSON, don't update
                   }
                 }}
-                className="w-full border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2.5 font-mono"
-                rows={4}
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2 font-mono"
+                rows={3}
                 placeholder='{"to": "user@example.com", "body": "Message"}'
               />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1 text-theme-text-primary">
+              <label className="block text-xs font-medium mb-1 text-gray-700">
                 Result Variable
               </label>
               <input
@@ -700,7 +704,7 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { resultVariable: e.target.value })
                 }
-                className="w-full border-none bg-theme-bg-primary text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2.5"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
                 placeholder="Variable to store tool result"
               />
             </div>
@@ -713,7 +717,7 @@ function BlockNode({
                 }
                 className="w-4 h-4"
               />
-              <label className="text-xs text-theme-text-primary">
+              <label className="text-xs text-gray-700">
                 Direct output (bypass LLM processing)
               </label>
             </div>
@@ -722,7 +726,7 @@ function BlockNode({
 
       case BLOCK_TYPES.FINISH:
         return (
-          <div className="text-sm text-theme-text-secondary">
+          <div className="text-sm text-gray-600">
             This block marks the end of the workflow. All results will be collected and returned.
           </div>
         );
@@ -734,75 +738,75 @@ function BlockNode({
 
   return (
     <div className={`
-      bg-theme-settings-input-bg rounded-lg border transition-all duration-300
+      bg-white/80 border border-gray-200/60 rounded-lg transition-all duration-200 hover:bg-white hover:border-purple-200/60 shadow-sm hover:shadow-md group
       ${isExecuting ? 'border-blue-500 animate-pulse shadow-lg shadow-blue-500/20' : ''}
       ${isCompleted ? 'border-green-500 shadow-lg shadow-green-500/20' : ''}
       ${isFailed ? 'border-red-500 shadow-lg shadow-red-500/20' : ''}
-      ${hasErrors ? 'border-yellow-500' : 'border-white/10'}
-      ${!isExecuting && !isCompleted && !isFailed && !hasErrors ? 'hover:border-white/20' : ''}
+      ${hasErrors ? 'border-yellow-500' : ''}
     `}>
-      <div className="flex justify-between items-center p-4">
-        <div className="flex items-center gap-3 relative">
+      <div className="flex justify-between items-center p-2.5">
+        <div className="flex items-center gap-2 relative flex-1 min-w-0">
           {/* Status Indicator */}
           {(isExecuting || isCompleted || isFailed) && (
-            <div className="absolute -left-8">
+            <div className="flex-shrink-0">
               {isExecuting && <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping" />}
-              {isCompleted && <CheckCircle size={20} className="text-green-500" />}
-              {isFailed && <Warning size={20} className="text-red-500" />}
+              {isCompleted && <CheckCircle size={14} className="text-green-500" />}
+              {isFailed && <Warning size={14} className="text-red-500" />}
             </div>
           )}
           
-          <div className="w-8 h-8 rounded-full bg-theme-bg-primary border border-white/10 flex items-center justify-center">
-            {blockInfo.icon}
+          <div className="w-6 h-6 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center flex-shrink-0">
+            <div className="text-purple-600" style={{fontSize: '12px'}}>{blockInfo.icon}</div>
           </div>
-          <div>
-            <h4 className="text-theme-text-primary font-medium flex items-center gap-2">
+          <div className="min-w-0 flex-1">
+            <h4 className="text-gray-800 font-medium flex items-center gap-1 text-sm truncate">
               {block.metadata?.name || blockInfo.label}
               {hasErrors && (
                 <Warning 
-                  size={14} 
-                  className="text-yellow-500" 
+                  size={12} 
+                  className="text-yellow-500 flex-shrink-0" 
                   data-tooltip-id="validation-error-tooltip"
                   data-tooltip-content={validationErrors?.join(', ')}
                 />
               )}
             </h4>
-            <p className="text-theme-text-secondary text-xs mt-0.5">
+            <p className="text-gray-600 text-xs mt-0.5 truncate">
               {block.metadata?.description || blockInfo.getSummary(block.config)}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-2 flex-shrink-0">
           {duplicateBlock && !["flow_info", "start", "finish"].includes(block.id) && (
             <button
               onClick={() => duplicateBlock(block.id)}
-              className="p-1.5 text-theme-text-secondary hover:text-theme-text-primary hover:bg-theme-action-menu-bg rounded transition-colors"
-              title="Duplicate block"
+              className="p-1 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded transition-all"
+              title="Duplicate"
             >
-              <Copy size={14} />
+              <Copy size={12} />
             </button>
           )}
           {removeBlock && !["flow_info", "start", "finish"].includes(block.id) && (
             <button
               onClick={() => removeBlock(block.id)}
-              className="p-1.5 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/20 rounded transition-colors"
-              title="Remove block"
+              className="p-1 bg-red-50 hover:bg-red-100 text-red-600 rounded transition-all"
+              title="Remove"
             >
-              <X size={14} />
+              <X size={12} />
             </button>
           )}
           <button
             onClick={() => toggleBlockExpansion(block.id)}
-            className="p-1.5 text-theme-text-secondary hover:text-theme-text-primary hover:bg-theme-action-menu-bg rounded transition-colors"
+            className="p-1 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded transition-all"
+            title={block.isExpanded ? "Collapse" : "Expand"}
           >
-            {block.isExpanded ? <CaretUp size={14} /> : <CaretDown size={14} />}
+            {block.isExpanded ? <CaretUp size={12} /> : <CaretDown size={12} />}
           </button>
         </div>
       </div>
 
       {block.isExpanded && (
-        <div className="px-4 pb-4 border-t border-white/10">
-          <div className="mt-4">{renderBlockContent()}</div>
+        <div className="px-2.5 pb-2.5 border-t border-gray-100">
+          <div className="mt-2">{renderBlockContent()}</div>
         </div>
       )}
     </div>
@@ -1456,15 +1460,12 @@ export default function WorkflowBuilder({ workspace, noteData, onClose }) {
   const flowName = flowInfoBlock?.config?.name || "";
 
   return (
-    <div
-      className="w-full h-full flex flex-col bg-theme-bg-primary relative"
-      style={{
-        backgroundImage:
-          "radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0)",
-        backgroundSize: "20px 20px",
-        backgroundPosition: "-10px -10px",
-      }}
-    >
+    <div className="w-full h-full flex flex-col bg-gradient-to-br from-gray-50/30 via-white/95 to-purple-50/20 relative">
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 opacity-[0.02]" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        backgroundSize: '30px 30px'
+      }} />
       <HeaderMenu
         flowName={flowName}
         availableFlows={availableFlows}
@@ -1481,9 +1482,9 @@ export default function WorkflowBuilder({ workspace, noteData, onClose }) {
       />
       
       <div className="flex-1 flex overflow-hidden">
-        <div className="flex-1 p-6 overflow-y-auto">
+        <div className="flex-1 p-3 overflow-y-auto">
           <div className="max-w-2xl mx-auto">
-            <div className="space-y-3">
+            <div className="space-y-2">
               {blocks.map((block) => (
                 <BlockNode
                   key={block.id}

@@ -16,7 +16,7 @@ import {
   Menu,
   X,
   Award,
-  TrendingUp,
+  TrendUp as TrendingUp,
   Lock,
   Cloud,
   BarChart

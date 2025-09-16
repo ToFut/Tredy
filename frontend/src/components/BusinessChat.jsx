@@ -53,6 +53,7 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [isMenuCollapsed, setIsMenuCollapsed] = useState(false);
   const [mobileView, setMobileView] = useState('chat'); // 'chat' or 'dashboard'
+  const [error, setError] = useState(null);
   const chatContainerRef = useRef(null);
   const scrollTimeoutRef = useRef(null);
   const isScrollingRef = useRef(false);
@@ -343,10 +344,10 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
     }
   };
 
-  // Get current industry data
-  const currentIndustryData = industryData[selectedIndustry];
-  const menuItems = currentIndustryData.menuItems;
-  const dashboardData = currentIndustryData.dashboardData;
+  // Get current industry data with error handling
+  const currentIndustryData = industryData[selectedIndustry] || industryData['Real Estate'];
+  const menuItems = currentIndustryData?.menuItems || [];
+  const dashboardData = currentIndustryData?.dashboardData || {};
 
   // Industry-specific chat messages
   const industryChatMessages = {
@@ -522,6 +523,11 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
     setCurrentMessageIndex(0);
     setTypingMessage("");
     setExpandedDetails({});
+    setIsTyping(false);
+    // Clear any pending timeouts to prevent memory leaks
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
   }, [selectedIndustry]);
 
   // Smooth scroll function with debouncing
@@ -555,6 +561,9 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
 
   // Typing animation effect with smooth scrolling
   useEffect(() => {
+    let typingInterval = null;
+    let timeoutId = null;
+    
     if (currentMessageIndex < chatMessages.length) {
       const currentMsg = chatMessages[currentMessageIndex];
       
@@ -563,7 +572,7 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         let charIndex = 0;
         const message = currentMsg.message;
         
-        const typingInterval = setInterval(() => {
+        typingInterval = setInterval(() => {
           if (charIndex <= message.length) {
             setTypingMessage(message.substring(0, charIndex));
             charIndex++;
@@ -579,7 +588,7 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
             // Final scroll after typing completes
             smoothScrollToBottom(300);
             
-            setTimeout(() => {
+            timeoutId = setTimeout(() => {
               if (currentMessageIndex < chatMessages.length - 1) {
                 setCurrentMessageIndex(currentMessageIndex + 1);
                 setTypingMessage("");
@@ -587,13 +596,11 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
             }, 2500);
           }
         }, 35); // Slightly faster typing for smoother feel
-        
-        return () => clearInterval(typingInterval);
       } else {
         // For non-typing messages, show immediately and scroll
         smoothScrollToBottom(200);
         
-        setTimeout(() => {
+        timeoutId = setTimeout(() => {
           if (currentMessageIndex < chatMessages.length - 1) {
             setCurrentMessageIndex(currentMessageIndex + 1);
           }
@@ -601,7 +608,7 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
       }
     } else {
       // Reset animation with smooth scroll to top
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         if (chatContainerRef.current) {
           chatContainerRef.current.scrollTo({
             top: 0,
@@ -609,14 +616,31 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
           });
         }
         
-        setTimeout(() => {
+        timeoutId = setTimeout(() => {
           setCurrentMessageIndex(0);
           setTypingMessage("");
           setExpandedDetails({});
+          setIsTyping(false);
         }, 1200);
       }, 5500);
     }
-  }, [currentMessageIndex, smoothScrollToBottom]);
+    
+    // Cleanup function to prevent memory leaks
+    return () => {
+      if (typingInterval) clearInterval(typingInterval);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [currentMessageIndex, smoothScrollToBottom, chatMessages.length]);
+
+  // Cleanup effect to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      // Clear all timeouts and intervals when component unmounts
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const renderStructuredMessage = (content) => {
     return (
@@ -736,6 +760,25 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
       </div>
     );
   };
+
+  // Error boundary for the component
+  if (error) {
+    return (
+      <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border-2 border-red-200 h-[600px] flex items-center justify-center">
+        <div className="text-center p-8">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">Business Chat Error</h3>
+          <p className="text-sm text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={() => setError(null)}
+            className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border-2 border-purple-200 hover:border-purple-300 transition-all duration-300 h-[600px] flex flex-col lg:flex-row">
@@ -997,7 +1040,16 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
                                     title={tool}
                                     onError={(e) => {
                                       e.target.style.display = 'none';
-                                      e.target.nextSibling.style.display = 'flex';
+                                      const fallback = e.target.nextElementSibling;
+                                      if (fallback) {
+                                        fallback.style.display = 'flex';
+                                      }
+                                    }}
+                                    onLoad={(e) => {
+                                      const fallback = e.target.nextElementSibling;
+                                      if (fallback) {
+                                        fallback.style.display = 'none';
+                                      }
                                     }}
                                   />
                                 ) : null}

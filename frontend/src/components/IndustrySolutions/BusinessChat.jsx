@@ -13,8 +13,7 @@ import {
   Target,
   Lightning,
   Brain,
-  Eye,
-  Sparkle
+  Eye
 } from "@phosphor-icons/react";
 import { Tooltip } from "react-tooltip";
 

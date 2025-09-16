@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, Image, FileText, Video, TrendUp } from '@phosphor-icons/react';
+import { Calendar, Clock, Image, FileText, Video, TrendingUp } from '@phosphor-icons/react';
 
 const ContentPlanningResult = ({ userName = "John" }) => {
   const [analysisStep, setAnalysisStep] = useState(0);
@@ -30,7 +30,7 @@ const ContentPlanningResult = ({ userName = "John" }) => {
     {
       day: "Wednesday",
       posts: [
-        { time: "10:00 AM", platform: "LinkedIn", type: "post", title: "Team spotlight featuring your latest achievements", icon: <TrendUp size={16} /> },
+        { time: "10:00 AM", platform: "LinkedIn", type: "post", title: "Team spotlight featuring your latest achievements", icon: <TrendingUp size={16} /> },
         { time: "7:00 PM", platform: "Instagram", type: "story", title: "Interactive Q&A session", icon: <Video size={16} /> }
       ]
     },

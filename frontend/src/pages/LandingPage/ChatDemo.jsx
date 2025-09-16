@@ -441,9 +441,17 @@ export default function ChatDemo() {
   };
 
   return (
-    <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border-2 border-purple-200 hover:border-purple-300 transition-all duration-300">
+    <div 
+      className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border-2 border-purple-200 hover:border-purple-300 transition-all duration-300 flex flex-col"
+      style={{ 
+        height: '400px', 
+        maxHeight: '400px',
+        '@media (min-width: 640px)': { height: '500px', maxHeight: '500px' },
+        '@media (min-width: 1024px)': { height: '600px', maxHeight: '600px' }
+      }}
+    >
       {/* Chat Header */}
-      <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-5 relative overflow-hidden">
+      <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-5 relative overflow-hidden flex-shrink-0">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-500/90 to-purple-600/90"></div>
         <div className="relative flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -472,7 +480,7 @@ export default function ChatDemo() {
       {/* Chat Messages */}
       <div 
         ref={chatContainerRef}
-        className="h-[350px] sm:h-[400px] lg:h-[450px] overflow-y-auto p-3 sm:p-4 lg:p-5 space-y-3 sm:space-y-4 bg-gradient-to-b from-purple-50/30 via-white to-purple-50/20 scroll-smooth"
+        className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4 lg:p-5 space-y-3 sm:space-y-4 bg-gradient-to-b from-purple-50/30 via-white to-purple-50/20 scroll-smooth min-h-0"
         style={{ 
           scrollBehavior: 'smooth',
           scrollPaddingBottom: '20px'
@@ -639,7 +647,7 @@ export default function ChatDemo() {
       </div>
       
       {/* Chat Input */}
-      <div className="p-6 bg-gradient-to-r from-purple-50 to-purple-100/50 border-t border-purple-200">
+      <div className="flex-shrink-0 p-6 bg-gradient-to-r from-purple-50 to-purple-100/50 border-t border-purple-200">
         <div className="flex items-center space-x-4">
           <div className="flex-1 relative">
             <input 

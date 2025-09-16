@@ -806,7 +806,7 @@ export default function LandingPage() {
             </div>
 
             {/* Right: Modern Chat Demo */}
-            <div className="relative mt-12 lg:mt-0">
+            <div className="relative mt-12 lg:mt-0 w-full max-w-md lg:max-w-lg mx-auto lg:mx-0">
               <ChatDemo />
             </div>
           </div>

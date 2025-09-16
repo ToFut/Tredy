@@ -495,3 +495,14 @@ model thread_participants {
   @@index([thread_id])
   @@index([user_id])
 }
+
+model waitlist {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  joinedAt  DateTime @default(now())
+  notified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([joinedAt])
+}

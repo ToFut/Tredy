@@ -1,0 +1,425 @@
+/* ===========================
+   SOPHISTICATED THEMES & COLOR PALETTES
+   Ultra-Elegant Visual Design
+   =========================== */
+
+/* 1. ULTRA ELEGANT COLOR SYSTEM */
+:root {
+  /* Primary Elegant Palette */
+  --elegant-primary-50: #faf5ff;
+  --elegant-primary-100: #f3e8ff;
+  --elegant-primary-200: #e9d5ff;
+  --elegant-primary-300: #d8b4fe;
+  --elegant-primary-400: #c084fc;
+  --elegant-primary-500: #a855f7;
+  --elegant-primary-600: #9333ea;
+  --elegant-primary-700: #7c3aed;
+  --elegant-primary-800: #6b21a8;
+  --elegant-primary-900: #581c87;
+  
+  /* Sophisticated Accent Colors */
+  --elegant-accent-rose: #f43f5e;
+  --elegant-accent-amber: #f59e0b;
+  --elegant-accent-emerald: #10b981;
+  --elegant-accent-sky: #0ea5e9;
+  --elegant-accent-violet: #8b5cf6;
+  --elegant-accent-pink: #ec4899;
+  
+  /* Refined Neutral Palette */
+  --elegant-neutral-50: #fafafa;
+  --elegant-neutral-100: #f5f5f5;
+  --elegant-neutral-200: #e5e5e5;
+  --elegant-neutral-300: #d4d4d4;
+  --elegant-neutral-400: #a3a3a3;
+  --elegant-neutral-500: #737373;
+  --elegant-neutral-600: #525252;
+  --elegant-neutral-700: #404040;
+  --elegant-neutral-800: #262626;
+  --elegant-neutral-900: #171717;
+  
+  /* Sophisticated Dark Palette */
+  --elegant-dark-50: #0a0a0a;
+  --elegant-dark-100: #1a1a1a;
+  --elegant-dark-200: #262626;
+  --elegant-dark-300: #404040;
+  --elegant-dark-400: #525252;
+  --elegant-dark-500: #737373;
+  --elegant-dark-600: #a3a3a3;
+  --elegant-dark-700: #d4d4d4;
+  --elegant-dark-800: #e5e5e5;
+  --elegant-dark-900: #f5f5f5;
+  
+  /* Premium Gradients */
+  --elegant-gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 50%, #c084fc 100%);
+  --elegant-gradient-secondary: linear-gradient(135deg, #f43f5e 0%, #ec4899 50%, #f472b6 100%);
+  --elegant-gradient-accent: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%);
+  --elegant-gradient-success: linear-gradient(135deg, #10b981 0%, #34d399 50%, #6ee7b7 100%);
+  --elegant-gradient-warning: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #fde047 100%);
+  --elegant-gradient-dark: linear-gradient(135deg, #1a1a1a 0%, #262626 50%, #404040 100%);
+  
+  /* Sophisticated Shadows */
+  --elegant-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --elegant-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --elegant-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --elegant-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --elegant-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --elegant-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --elegant-shadow-glow: 0 0 20px rgba(139, 92, 246, 0.3);
+  --elegant-shadow-glow-lg: 0 0 40px rgba(139, 92, 246, 0.4);
+  
+  /* Premium Border Radius */
+  --elegant-radius-xs: 0.25rem;
+  --elegant-radius-sm: 0.375rem;
+  --elegant-radius-md: 0.5rem;
+  --elegant-radius-lg: 0.75rem;
+  --elegant-radius-xl: 1rem;
+  --elegant-radius-2xl: 1.5rem;
+  --elegant-radius-3xl: 2rem;
+  --elegant-radius-full: 9999px;
+  
+  /* Sophisticated Spacing */
+  --elegant-space-xs: 0.25rem;
+  --elegant-space-sm: 0.5rem;
+  --elegant-space-md: 0.75rem;
+  --elegant-space-lg: 1rem;
+  --elegant-space-xl: 1.25rem;
+  --elegant-space-2xl: 1.5rem;
+  --elegant-space-3xl: 2rem;
+  --elegant-space-4xl: 2.5rem;
+  --elegant-space-5xl: 3rem;
+  
+  /* Premium Typography */
+  --elegant-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --elegant-font-family-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, monospace;
+  --elegant-font-family-serif: 'Playfair Display', 'Times New Roman', serif;
+  
+  /* Sophisticated Transitions */
+  --elegant-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --elegant-transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --elegant-transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  --elegant-transition-bounce: 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --elegant-transition-elastic: 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* 2. ULTRA ELEGANT DARK THEME */
+[data-theme="ultra-elegant-dark"] {
+  --theme-loader: var(--elegant-primary-500);
+  --theme-bg-primary: var(--elegant-dark-50);
+  --theme-bg-secondary: var(--elegant-dark-100);
+  --theme-bg-sidebar: linear-gradient(180deg, var(--elegant-dark-50) 0%, var(--elegant-dark-100) 100%);
+  --theme-bg-container: var(--elegant-dark-100);
+  --theme-bg-chat: var(--elegant-dark-200);
+  --theme-bg-chat-input: rgba(255, 255, 255, 0.03);
+  --theme-text-primary: var(--elegant-dark-900);
+  --theme-text-secondary: var(--elegant-dark-700);
+  --theme-placeholder: var(--elegant-dark-500);
+  --theme-sidebar-item-default: rgba(255, 255, 255, 0.02);
+  --theme-sidebar-item-selected: rgba(139, 92, 246, 0.15);
+  --theme-sidebar-item-hover: rgba(139, 92, 246, 0.08);
+  --theme-sidebar-border: rgba(255, 255, 255, 0.08);
+  --theme-button-primary: var(--elegant-primary-500);
+  --theme-button-primary-hover: var(--elegant-primary-600);
+  --theme-button-cta: var(--elegant-primary-400);
+  
+  /* Ultra Elegant Dark Enhancements */
+  --elegant-glass-bg: rgba(255, 255, 255, 0.02);
+  --elegant-glass-border: rgba(255, 255, 255, 0.08);
+  --elegant-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --elegant-glow-primary: 0 0 20px rgba(139, 92, 246, 0.3);
+  --elegant-glow-secondary: 0 0 20px rgba(167, 139, 250, 0.2);
+}
+
+/* 3. ULTRA ELEGANT LIGHT THEME */
+[data-theme="ultra-elegant-light"] {
+  --theme-loader: var(--elegant-primary-600);
+  --theme-bg-primary: var(--elegant-neutral-50);
+  --theme-bg-secondary: var(--elegant-neutral-100);
+  --theme-bg-sidebar: linear-gradient(180deg, var(--elegant-neutral-50) 0%, var(--elegant-neutral-100) 100%);
+  --theme-bg-container: var(--elegant-neutral-50);
+  --theme-bg-chat: #ffffff;
+  --theme-bg-chat-input: rgba(0, 0, 0, 0.02);
+  --theme-text-primary: var(--elegant-neutral-900);
+  --theme-text-secondary: var(--elegant-neutral-600);
+  --theme-placeholder: var(--elegant-neutral-400);
+  --theme-sidebar-item-default: rgba(0, 0, 0, 0.02);
+  --theme-sidebar-item-selected: rgba(139, 92, 246, 0.1);
+  --theme-sidebar-item-hover: rgba(139, 92, 246, 0.05);
+  --theme-sidebar-border: rgba(0, 0, 0, 0.08);
+  --theme-button-primary: var(--elegant-primary-600);
+  --theme-button-primary-hover: var(--elegant-primary-700);
+  --theme-button-cta: var(--elegant-primary-500);
+  
+  /* Ultra Elegant Light Enhancements */
+  --elegant-glass-bg: rgba(255, 255, 255, 0.8);
+  --elegant-glass-border: rgba(0, 0, 0, 0.08);
+  --elegant-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --elegant-glow-primary: 0 0 20px rgba(139, 92, 246, 0.2);
+  --elegant-glow-secondary: 0 0 20px rgba(167, 139, 250, 0.15);
+}
+
+/* 4. SOPHISTICATED PREMIUM THEME */
+[data-theme="sophisticated-premium"] {
+  --theme-loader: var(--elegant-accent-rose);
+  --theme-bg-primary: #0f0f23;
+  --theme-bg-secondary: #1a1a2e;
+  --theme-bg-sidebar: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 100%);
+  --theme-bg-container: #16213e;
+  --theme-bg-chat: #1e2749;
+  --theme-bg-chat-input: rgba(255, 255, 255, 0.05);
+  --theme-text-primary: #e2e8f0;
+  --theme-text-secondary: #94a3b8;
+  --theme-placeholder: #64748b;
+  --theme-sidebar-item-default: rgba(255, 255, 255, 0.03);
+  --theme-sidebar-item-selected: rgba(244, 63, 94, 0.15);
+  --theme-sidebar-item-hover: rgba(244, 63, 94, 0.08);
+  --theme-sidebar-border: rgba(255, 255, 255, 0.1);
+  --theme-button-primary: var(--elegant-accent-rose);
+  --theme-button-primary-hover: #e11d48;
+  --theme-button-cta: #f87171;
+  
+  /* Sophisticated Premium Enhancements */
+  --elegant-glass-bg: rgba(255, 255, 255, 0.03);
+  --elegant-glass-border: rgba(244, 63, 94, 0.2);
+  --elegant-glass-shadow: 0 8px 32px rgba(244, 63, 94, 0.1);
+  --elegant-glow-primary: 0 0 20px rgba(244, 63, 94, 0.3);
+  --elegant-glow-secondary: 0 0 20px rgba(248, 113, 113, 0.2);
+}
+
+/* 5. ULTRA ELEGANT COMPONENTS */
+.glass-morphism-ultra-elegant {
+  background: var(--elegant-glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--elegant-glass-border);
+  box-shadow: var(--elegant-glass-shadow);
+}
+
+.gradient-text-ultra-elegant {
+  background: var(--elegant-gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-border-ultra-elegant {
+  border: 1px solid transparent;
+  background: linear-gradient(var(--elegant-dark-100), var(--elegant-dark-100)) padding-box,
+              var(--elegant-gradient-primary) border-box;
+}
+
+.glow-effect-ultra-elegant {
+  box-shadow: var(--elegant-glow-primary);
+}
+
+.glow-effect-ultra-elegant:hover {
+  box-shadow: var(--elegant-glow-secondary);
+}
+
+/* 6. SOPHISTICATED BUTTON SYSTEM */
+.btn-ultra-elegant {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--elegant-space-sm);
+  padding: var(--elegant-space-md) var(--elegant-space-xl);
+  font-family: var(--elegant-font-family);
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  border-radius: var(--elegant-radius-xl);
+  transition: all var(--elegant-transition-base);
+  cursor: pointer;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.btn-ultra-elegant-primary {
+  background: var(--elegant-gradient-primary);
+  color: white;
+  box-shadow: var(--elegant-shadow-md);
+}
+
+.btn-ultra-elegant-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elegant-shadow-lg);
+}
+
+.btn-ultra-elegant-primary:active {
+  transform: translateY(0);
+  box-shadow: var(--elegant-shadow-md);
+}
+
+.btn-ultra-elegant-secondary {
+  background: var(--elegant-glass-bg);
+  backdrop-filter: blur(20px);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--elegant-glass-border);
+}
+
+.btn-ultra-elegant-secondary:hover {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-ultra-elegant-ghost {
+  background: transparent;
+  color: var(--theme-text-secondary);
+  border: 1px solid transparent;
+}
+
+.btn-ultra-elegant-ghost:hover {
+  background: var(--elegant-glass-bg);
+  color: var(--theme-text-primary);
+  border-color: var(--elegant-glass-border);
+}
+
+/* 7. PREMIUM CARD SYSTEM */
+.card-ultra-elegant {
+  background: var(--elegant-glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--elegant-glass-border);
+  border-radius: var(--elegant-radius-2xl);
+  padding: var(--elegant-space-2xl);
+  box-shadow: var(--elegant-shadow-lg);
+  transition: all var(--elegant-transition-base);
+}
+
+.card-ultra-elegant:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--elegant-shadow-xl);
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.card-ultra-elegant-interactive {
+  cursor: pointer;
+}
+
+.card-ultra-elegant-interactive:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: var(--elegant-shadow-2xl);
+}
+
+/* 8. SOPHISTICATED INPUT SYSTEM */
+.input-ultra-elegant {
+  width: 100%;
+  padding: var(--elegant-space-md) var(--elegant-space-lg);
+  font-family: var(--elegant-font-family);
+  font-size: 0.875rem;
+  background: var(--elegant-glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--elegant-glass-border);
+  border-radius: var(--elegant-radius-xl);
+  transition: all var(--elegant-transition-base);
+  color: var(--theme-text-primary);
+}
+
+.input-ultra-elegant:focus {
+  outline: none;
+  border-color: var(--elegant-primary-500);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.input-ultra-elegant::placeholder {
+  color: var(--theme-placeholder);
+}
+
+/* 9. ULTRA ELEGANT STATUS SYSTEM */
+.status-ultra-elegant-success {
+  color: var(--elegant-accent-emerald);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--elegant-radius-lg);
+  padding: var(--elegant-space-sm) var(--elegant-space-md);
+}
+
+.status-ultra-elegant-warning {
+  color: var(--elegant-accent-amber);
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: var(--elegant-radius-lg);
+  padding: var(--elegant-space-sm) var(--elegant-space-md);
+}
+
+.status-ultra-elegant-error {
+  color: var(--elegant-accent-rose);
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.2);
+  border-radius: var(--elegant-radius-lg);
+  padding: var(--elegant-space-sm) var(--elegant-space-md);
+}
+
+.status-ultra-elegant-info {
+  color: var(--elegant-accent-sky);
+  background: rgba(14, 165, 233, 0.1);
+  border: 1px solid rgba(14, 165, 233, 0.2);
+  border-radius: var(--elegant-radius-lg);
+  padding: var(--elegant-space-sm) var(--elegant-space-md);
+}
+
+/* 10. RESPONSIVE ULTRA ELEGANT THEMES */
+@media (max-width: 768px) {
+  .card-ultra-elegant {
+    padding: var(--elegant-space-xl);
+    border-radius: var(--elegant-radius-xl);
+  }
+  
+  .btn-ultra-elegant {
+    padding: var(--elegant-space-sm) var(--elegant-space-lg);
+    font-size: 0.8rem;
+  }
+  
+  .input-ultra-elegant {
+    padding: var(--elegant-space-sm) var(--elegant-space-md);
+    font-size: 0.8rem;
+  }
+}
+
+/* 11. ACCESSIBILITY ENHANCEMENTS */
+@media (prefers-contrast: high) {
+  .glass-morphism-ultra-elegant {
+    background: rgba(255, 255, 255, 0.1);
+    border-width: 2px;
+  }
+  
+  .btn-ultra-elegant-primary {
+    border: 2px solid var(--elegant-primary-500);
+  }
+  
+  .card-ultra-elegant {
+    border-width: 2px;
+  }
+}
+
+/* 12. REDUCED MOTION SUPPORT */
+@media (prefers-reduced-motion: reduce) {
+  .card-ultra-elegant,
+  .btn-ultra-elegant,
+  .input-ultra-elegant {
+    transition: none;
+  }
+  
+  .card-ultra-elegant:hover,
+  .btn-ultra-elegant:hover {
+    transform: none;
+  }
+}
+
+/* 13. PRINT STYLES */
+@media print {
+  .glass-morphism-ultra-elegant,
+  .card-ultra-elegant {
+    background: white !important;
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  
+  .gradient-text-ultra-elegant {
+    -webkit-text-fill-color: black !important;
+    color: black !important;
+  }
+}

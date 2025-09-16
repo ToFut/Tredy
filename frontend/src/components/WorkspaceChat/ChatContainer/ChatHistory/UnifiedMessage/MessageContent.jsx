@@ -27,7 +27,7 @@ export default function MessageContent({
         <StructuredContent data={content} />
       ) : (
         <div 
-          className="prose prose-sm dark:prose-invert max-w-none"
+          className="prose-ultra-elegant content-flow-ultra-elegant glass-morphism-ultra-elegant message-ultra-elegant-entrance"
           dangerouslySetInnerHTML={{ 
             __html: renderMarkdown(content || '') 
           }}

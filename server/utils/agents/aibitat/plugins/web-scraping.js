@@ -61,8 +61,31 @@ const webScraping = {
             this.super.introspect(
               `${this.caller}: Scraping the content of ${url}`
             );
-            const { success, content } =
-              await new CollectorApi().getLinkContent(url);
+            
+            // Check if collector service is available first
+            const collector = new CollectorApi();
+            const isOnline = await collector.online();
+            
+            if (!isOnline) {
+              this.super.introspect(
+                `${this.caller}: Collector service is offline. Using fallback method.`
+              );
+              // Fallback to direct fetch
+              try {
+                const response = await fetch(url, {
+                  headers: {
+                    'User-Agent': 'Mozilla/5.0 (compatible; AnythingLLM-Bot/1.0)'
+                  }
+                });
+                const html = await response.text();
+                const content = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                return content.substring(0, 5000); // Limit content length
+              } catch (error) {
+                throw new Error(`URL could not be scraped: ${error.message}`);
+              }
+            }
+            
+            const { success, content } = await collector.getLinkContent(url);
 
             if (!success) {
               this.super.introspect(

@@ -24,9 +24,12 @@ import {
 import { useTranslation } from "react-i18next";
 import { useLanguageOptions } from "@/hooks/useLanguageOptions";
 import ChatDemo from "./ChatDemo";
+import EmbeddedCapabilityDemo from "./EmbeddedCapabilityDemo";
+import BusinessChat from "@/components/BusinessChat";
 import Workspace from "@/models/workspace";
 import paths from "@/utils/paths";
 import showToast from "@/utils/toast";
+import AIEnterprisePlatform from "@/components/AIEnterprisePlatform";
 
 export default function LandingPage() {
   const { t } = useTranslation();
@@ -36,7 +39,7 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [animatedCount, setAnimatedCount] = useState({ users: 0, integrations: 0, uptime: 0 });
-  const [selectedIndustry, setSelectedIndustry] = useState("Technology");
+  const [selectedIndustry, setSelectedIndustry] = useState("Real Estate");
   const [expandedFeature, setExpandedFeature] = useState(null);
   const [showAdvancedPricing, setShowAdvancedPricing] = useState(false);
   const [email, setEmail] = useState("");
@@ -47,6 +50,11 @@ export default function LandingPage() {
   const [activeTooltip, setActiveTooltip] = useState(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState(0);
+  const [waitlistEmail, setWaitlistEmail] = useState("");
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
+  const [waitlistSuccess, setWaitlistSuccess] = useState(false);
+  const [waitlistError, setWaitlistError] = useState("");
+  const [waitlistCount, setWaitlistCount] = useState(0);
 
   const faqs = [
     {
@@ -195,6 +203,23 @@ export default function LandingPage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Fetch waitlist count on mount
+  useEffect(() => {
+    const fetchWaitlistCount = async () => {
+      try {
+        const response = await fetch('/api/waitlist/count');
+        if (response.ok) {
+          const data = await response.json();
+          setWaitlistCount(data.count || 0);
+        }
+      } catch (error) {
+        console.error("Error fetching waitlist count:", error);
+      }
+    };
+
+    fetchWaitlistCount();
+  }, []);
+
   // Smart form validation
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -285,7 +310,43 @@ export default function LandingPage() {
     setOnboardingStep(0);
   };
 
-  // Function to create Tredy workspace
+  // Function to submit to waitlist
+  const handleWaitlistSubmit = async () => {
+    if (!waitlistEmail || !waitlistEmail.includes('@')) {
+      setWaitlistError("Please enter a valid email address");
+      return;
+    }
+
+    setWaitlistLoading(true);
+    setWaitlistError("");
+
+    try {
+      const response = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: waitlistEmail }),
+      });
+
+      if (response.ok) {
+        setWaitlistSuccess(true);
+        setWaitlistEmail("");
+        setWaitlistCount(prev => prev + 1);
+        showToast("Thanks! You're on the waitlist. We'll notify you when Tredy is ready!", "success");
+      } else {
+        const errorData = await response.json();
+        setWaitlistError(errorData.error || "Failed to join waitlist. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error joining waitlist:", error);
+      setWaitlistError("Failed to join waitlist. Please try again.");
+    } finally {
+      setWaitlistLoading(false);
+    }
+  };
+
+  // Function to create Tredy workspace (kept for demo button)
   const handleCreateTredyWorkspace = async () => {
     try {
       const { workspace, message } = await Workspace.new({
@@ -585,99 +646,168 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-20 sm:pt-24 lg:pt-32 pb-8 sm:pb-12 lg:pb-20 px-4 sm:px-6 min-h-[90vh] sm:min-h-screen flex items-center">
-        <div className="max-w-7xl mx-auto w-full">
-          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 md:gap-12 lg:gap-16 items-center">
+      <section className="relative pt-16 sm:pt-20 lg:pt-24 pb-12 sm:pb-16 lg:pb-20 px-4 sm:px-6 min-h-[95vh] sm:min-h-screen flex items-center overflow-hidden">
+        {/* Agentic Background Elements */}
+        <div className="absolute inset-0 -z-10">
+          {/* Vibrant Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-100/40 via-blue-50/30 to-indigo-100/40"></div>
+          
+          {/* Agentic Grid Pattern */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{
+            backgroundImage: `
+              linear-gradient(rgba(59, 130, 246, 0.15) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(139, 92, 246, 0.15) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px'
+          }}></div>
+          
+          {/* Vibrant Light Rays */}
+          <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-blue-300/30 via-purple-300/20 to-transparent"></div>
+          <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-indigo-300/30 via-blue-300/20 to-transparent"></div>
+          
+          {/* Subtle Color Accents */}
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-200/10 to-purple-200/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-indigo-200/10 to-blue-200/10 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto w-full relative z-10">
+          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16 lg:gap-20 items-center">
             {/* Left: Hero Content */}
-            <div className="text-center lg:text-left">
-              <div className="inline-flex items-center px-3 sm:px-4 py-2 mb-6 sm:mb-8 bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-700 rounded-full text-xs sm:text-sm font-semibold border border-purple-200 hover:scale-105 transition-all duration-300 shadow-sm">
-                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-spin text-purple-600" />
-                <span className="hidden sm:inline">#1 Enterprise </span>AI Platform
-                <div className="ml-2 w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            <div className="text-center lg:text-left space-y-8">
+              {/* Elegant Badge */}
+              <div className="premium-badge inline-flex items-center px-4 py-2 mb-8 bg-white/70 backdrop-blur-sm text-purple-800 rounded-full text-sm font-semibold border border-purple-200/40 hover:scale-105 transition-all duration-300 shadow-lg">
+                <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full mr-3"></div>
+                <span className="text-purple-600 dark:text-purple-400 font-semibold">
+                  AI-First Enterprise Platform
+                </span>
               </div>
               
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 lg:mb-8 leading-[1.15]">
-                <span className="block">{t('landing.hero.title')}</span>
-                <span className="bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 bg-clip-text text-transparent animate-gradient-x" style={{WebkitBackgroundClip: 'text', backgroundClip: 'text'}}>
-                  {t('landing.hero.subtitle')}
-                </span>
-              </h1>
+              {/* Agentic Title */}
+              <div className="space-y-6">
+                <h1 className="hero-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] tracking-tight">
+                  <span className="hero-title block mb-3 text-slate-800">
+                    {t('landing.hero.title')}
+                  </span>
+                  <span className="hero-title block text-purple-600 dark:text-purple-400 animate-gradient-x relative">
+                    {t('landing.hero.subtitle')}
+                    <div className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-purple-400/30 to-indigo-400/30 rounded-full animate-pulse"></div>
+                  </span>
+                </h1>
+              </div>
               
-              <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-6 sm:mb-8 lg:mb-12 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                {t('landing.hero.description')}
-              </p>
+              {/* Agentic Description */}
+              <div className="space-y-4">
+                <p className="hero-description text-lg sm:text-xl lg:text-2xl text-slate-700 leading-relaxed max-w-2xl mx-auto lg:mx-0 font-medium">
+                  Transform your business with <span className="text-purple-600 font-semibold">intelligent automation</span> that connects every tool, understands context, and scales infinitely.
+                </p>
+                <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
+                  <div className="px-3 py-1 bg-purple-50/50 rounded-full text-sm text-purple-700 font-medium border border-purple-200/30">
+                    Intelligent Agents
+                  </div>
+                  <div className="px-3 py-1 bg-indigo-50/50 rounded-full text-sm text-indigo-700 font-medium border border-indigo-200/30">
+                    Context Aware
+                  </div>
+                  <div className="px-3 py-1 bg-emerald-50/50 rounded-full text-sm text-emerald-700 font-medium border border-emerald-200/30">
+                    Infinite Scale
+                  </div>
+                </div>
+              </div>
               
-              <div id="hero-cta" className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-6 sm:mb-12 lg:mb-16">
+              {/* Agentic CTA Section */}
+              <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start items-center">
+                {/* Sleek Email Input */}
+                <div className="relative group">
+                  <input
+                    type="email"
+                    value={waitlistEmail}
+                    onChange={(e) => setWaitlistEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="w-80 px-6 py-3 bg-white/60 backdrop-blur-sm border border-purple-200/40 text-slate-900 placeholder-slate-500 rounded-full text-sm focus:border-purple-400 focus:bg-white/80 transition-all duration-300 font-medium"
+                    disabled={waitlistLoading}
+                  />
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400/20 to-indigo-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                </div>
+                
+                {/* Shiny Blue Primary Button */}
+                <button 
+                  onClick={handleWaitlistSubmit}
+                  disabled={waitlistLoading || !waitlistEmail}
+                  className="group inline-flex items-center px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-slate-400 disabled:to-slate-500 disabled:cursor-not-allowed text-white text-sm font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 disabled:hover:scale-100 relative overflow-hidden border border-blue-400/30 hover:border-blue-300/50"
+                  style={{
+                    clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%)',
+                    borderRadius: '0'
+                  }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-blue-400/30 to-cyan-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-50"></div>
+                  {waitlistLoading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin mr-3" />
+                      <span className="relative z-10 font-medium tracking-wide">INITIALIZING...</span>
+                    </>
+                  ) : waitlistSuccess ? (
+                    <>
+                      <CheckCircle className="mr-3 w-4 h-4 relative z-10" />
+                      <span className="relative z-10 font-medium tracking-wide">ACTIVATED</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="relative z-10 font-medium tracking-wide">JOIN WAITLIST</span>
+                      <ArrowRight className="ml-3 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300 relative z-10" />
+                    </>
+                  )}
+                </button>
+                
+                {/* Agentic Secondary Button */}
                 <button 
                   onClick={handleCreateTredyWorkspace}
-                  className="group inline-flex items-center justify-center px-5 sm:px-6 md:px-8 lg:px-10 py-3 sm:py-3.5 md:py-4 lg:py-5 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-xl text-sm sm:text-base md:text-lg lg:text-xl hover:shadow-lg transition-all duration-200 font-bold w-full sm:w-auto"
+                  className="group inline-flex items-center px-8 py-3 bg-white/60 backdrop-blur-sm border border-purple-300/40 text-purple-700 hover:border-purple-400/60 hover:bg-white/80 text-sm font-semibold transition-all duration-300 hover:shadow-lg hover:scale-105 relative overflow-hidden"
+                  style={{
+                    clipPath: 'polygon(8px 0, 100% 0, calc(100% - 8px) 50%, 100% 100%, 8px 100%, 0 50%)',
+                    borderRadius: '0'
+                  }}
                 >
-                  Chat with Tredy
-                  <ArrowRight className="ml-2 sm:ml-3 w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform" />
-                </button>
-                <button className="group inline-flex items-center justify-center px-5 sm:px-6 md:px-8 lg:px-10 py-3 sm:py-3.5 md:py-4 lg:py-5 bg-white/90 backdrop-blur-sm border-2 border-purple-200 text-purple-700 hover:border-purple-300 hover:bg-purple-50 rounded-xl text-sm sm:text-base md:text-lg lg:text-xl hover:shadow-lg transition-all duration-200 font-bold w-full sm:w-auto">
-                  <Play className="mr-2 sm:mr-3 w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform" />
-                  Watch Demo
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-50/0 via-purple-50/40 to-purple-50/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500"></div>
+                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-purple-100/20 to-indigo-100/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <Play className="mr-3 w-4 h-4 group-hover:scale-110 transition-transform duration-300 relative z-10" />
+                  <span className="relative z-10 font-medium tracking-wide">TRY DEMO</span>
                 </button>
               </div>
 
-              {/* Enhanced Animated Stats with Balanced Colors */}
-              <div className={`grid grid-cols-3 gap-2 sm:gap-4 lg:gap-6 mb-6 sm:mb-8`}>
-                <div className="text-center lg:text-left group">
-                  <div className={`text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold ${designSystem.colors.brand.purple} mb-1 sm:mb-2 transition-all duration-300 group-hover:scale-110`}>
-                    {animatedCount.integrations.toLocaleString()}+
+              {/* Agentic Stats */}
+              <div className="flex flex-wrap gap-8 justify-center lg:justify-start">
+                <div className="text-center lg:text-left group cursor-pointer">
+                  <div className="stat-number text-2xl sm:text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent mb-1 transition-all duration-300 group-hover:scale-110">
+                    99.9%
                   </div>
-                  <div className={`text-xs sm:text-sm ${designSystem.colors.text.muted} font-medium`}>Integrations</div>
-                  <div className="hidden sm:block text-xs text-emerald-600 font-semibold mt-1">
-                    <span className="inline-block w-1 h-1 bg-emerald-500 rounded-full mr-1 animate-pulse"></span>
-                    +12 this week
+                  <div className="text-sm text-slate-500 font-medium">
+                    Uptime
                   </div>
                 </div>
-                <div className="text-center lg:text-left group">
-                  <div className={`text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold ${designSystem.colors.brand.indigo} mb-1 sm:mb-2 transition-all duration-300 group-hover:scale-110`}>
-                    {animatedCount.users.toLocaleString()}+
+                <div className="text-center lg:text-left group cursor-pointer">
+                  <div className="stat-number text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-500 bg-clip-text text-transparent mb-1 transition-all duration-300 group-hover:scale-110">
+                    500+
                   </div>
-                  <div className={`text-xs sm:text-sm ${designSystem.colors.text.muted} font-medium`}>Users</div>
-                  <div className="hidden sm:block text-xs text-teal-600 font-semibold mt-1">
-                    <span className="inline-block w-1 h-1 bg-teal-500 rounded-full mr-1 animate-pulse"></span>
-                    +247 today
+                  <div className="text-sm text-slate-500 font-medium">
+                    Integrations
                   </div>
                 </div>
-                <div className="text-center lg:text-left group">
-                  <div className={`text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold ${designSystem.colors.brand.emerald} mb-1 sm:mb-2 transition-all duration-300 group-hover:scale-110`}>
-                    {animatedCount.uptime.toFixed(1)}%
+                <div className="text-center lg:text-left group cursor-pointer">
+                  <div className="stat-number text-2xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-indigo-500 bg-clip-text text-transparent mb-1 transition-all duration-300 group-hover:scale-110">
+                    Enterprise
                   </div>
-                  <div className={`text-xs sm:text-sm ${designSystem.colors.text.muted} font-medium`}>Uptime</div>
-                  <div className="hidden sm:block text-xs text-emerald-600 font-semibold mt-1">
-                    <span className="inline-block w-1 h-1 bg-emerald-500 rounded-full mr-1 animate-pulse"></span>
-                    30 days streak
+                  <div className="text-sm text-slate-500 font-medium">
+                    Ready
                   </div>
                 </div>
               </div>
 
-              {/* Live Activity Feed */}
-              <div className="hidden sm:block bg-white/90 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-full flex items-center justify-center">
-                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                    </div>
-                    <div>
-                      <div className={`text-sm font-semibold ${designSystem.colors.text.primary}`}>Sarah from Atlassian</div>
-                      <div className={`text-xs ${designSystem.colors.text.muted}`}>Just started their automation workflow</div>
-                    </div>
-                  </div>
-                  <div className={`text-xs ${designSystem.colors.text.muted}`}>2 min ago</div>
-                </div>
-              </div>
             </div>
 
-            {/* Right: Enhanced Chat Demo */}
-            <div className="relative mt-8 lg:mt-0">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-3xl blur-3xl opacity-20 animate-pulse"></div>
-              <div className="relative">
-                <ChatDemo />
-              </div>
+            {/* Right: Modern Chat Demo */}
+            <div className="relative mt-12 lg:mt-0 w-full max-w-md lg:max-w-lg mx-auto lg:mx-0">
+              <ChatDemo />
             </div>
           </div>
         </div>
@@ -691,22 +821,21 @@ export default function LandingPage() {
               <Users className="w-5 h-5 mr-2" />
               Industry Solutions
             </div>
-            <h2 className={`${designSystem.typography.heading1} ${designSystem.colors.text.primary} mb-6`}>
-              Built for Your
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent" style={{WebkitBackgroundClip: 'text', backgroundClip: 'text'}}> Industry</span>
+            <h2 className={`${designSystem.typography.heading1} text-gray-900 dark:text-white mb-6`}>
+              Built for Your <span className="text-purple-600 dark:text-purple-400">Industry</span>
             </h2>
-            <p className={`${designSystem.typography.body} ${designSystem.colors.text.secondary} max-w-4xl mx-auto`}>
-              Pre-built workflows and integrations for your specific business needs
+            <p className={`${designSystem.typography.body} text-gray-700 dark:text-gray-300 max-w-4xl mx-auto`}>
+              Experience how Tredy AI creates intelligent business platforms tailored to your specific industry needs
             </p>
           </div>
 
-          {/* Industry Tab Selector - Compact */}
+          {/* Industry Tabs */}
           <div className="flex flex-wrap justify-center gap-3 mb-12">
-            {Object.keys(industryWorkflows).map((industry) => (
+            {['Real Estate', 'Healthcare', 'E-commerce', 'Finance', 'Manufacturing', 'Education'].map((industry) => (
               <button
                 key={industry}
                 onClick={() => setSelectedIndustry(industry)}
-                className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 cursor-pointer text-sm ${
+                className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 cursor-pointer ${
                   selectedIndustry === industry
                     ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg'
                     : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300 hover:text-purple-700 hover:shadow-md'
@@ -717,178 +846,27 @@ export default function LandingPage() {
             ))}
           </div>
 
-          {/* Live Automation Showcase */}
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
-            
-            {/* Left: Live Workflow Cards */}
-            <div className="space-y-6">
-              <div className="mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Available Integrations</h3>
-              </div>
-
-              {/* Simple Integration Cards */}
-              {industryWorkflows[selectedIndustry].connectors.slice(0, 4).map((connector, idx) => (
-                <div 
-                  key={idx}
-                  className="bg-white rounded-xl border border-gray-200 p-4 hover:border-purple-300 transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center text-xl">
-                      {connector.icon}
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-gray-900">{connector.name}</h4>
-                      <p className="text-sm text-gray-600">{connector.workflow}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Right: Industry Overview */}
-            <div className="lg:sticky lg:top-8">
-              <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-                {/* Header */}
-                <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-6 text-white">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold">{industryWorkflows[selectedIndustry].title}</h3>
-                    <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
-                      <Users className="w-4 h-4" />
-                      <span className="text-sm font-semibold">500+ companies</span>
-                    </div>
-                  </div>
-                  <p className="text-purple-100 leading-relaxed">
-                    {industryWorkflows[selectedIndustry].description}
-                  </p>
-                </div>
-
-                {/* Metrics Dashboard */}
-                <div className="p-6">
-                  <h4 className="font-bold text-gray-900 mb-4">
-                    Key Results
-                  </h4>
-                  
-                  <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="text-center p-4 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl">
-                      <div className="text-2xl font-bold text-emerald-700">
-                        {industryWorkflows[selectedIndustry].metrics.split(',')[0].replace(/[^\d]/g, '')}%
-                      </div>
-                      <div className="text-xs text-emerald-600 font-medium">Performance Boost</div>
-                    </div>
-                    <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl">
-                      <div className="text-2xl font-bold text-purple-700">
-                        500+
-                      </div>
-                      <div className="text-xs text-purple-600 font-medium">Companies Trust Us</div>
-                    </div>
-                  </div>
-
-                  {/* Featured Companies */}
-                  <div className="mb-6">
-                    <h5 className="font-semibold text-gray-900 mb-3">Trusted by Industry Leaders</h5>
-                    <div className="flex flex-wrap gap-2">
-                      {industryWorkflows[selectedIndustry].companies.map((company, ci) => (
-                        <span key={ci} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium border border-gray-200">
-                          {company}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Quick Actions */}
-                  <div className="space-y-3">
-                    <button className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white py-3 px-6 rounded-xl font-semibold hover:from-purple-600 hover:to-indigo-600 transition-all duration-200 flex items-center justify-center gap-2">
-                      <Play className="w-4 h-4" />
-                      Watch {selectedIndustry} Demo
-                    </button>
-                    <button className="w-full border-2 border-purple-200 text-purple-700 py-3 px-6 rounded-xl font-semibold hover:border-purple-300 hover:bg-purple-50 transition-all duration-200">
-                      View Workflow Templates
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* Business Platform Demo */}
+          <div className="flex justify-center mb-16">
+            <BusinessChat selectedIndustry={selectedIndustry} />
           </div>
 
-            {/* Clean Industry Content Display */}
-            <div className={`${designSystem.components.card} ${designSystem.components.cardHover} ${designSystem.spacing.cardPadding} max-w-6xl mx-auto transition-all duration-300`}>
-              {/* Industry Header */}
-              <div className="text-center mb-8">
-                <div className="flex items-center justify-center gap-4 mb-4">
-                  <h3 className={`${designSystem.typography.heading3} ${designSystem.colors.text.primary}`}>
-                    {industryWorkflows[selectedIndustry].title}
-                  </h3>
-                  <div className="flex items-center gap-1 bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-bold shadow-sm">
-                    <TrendingUp className="w-4 h-4" />
-                    {industryWorkflows[selectedIndustry].metrics.split(',')[0]}
-                  </div>
-                </div>
-                <p className={`${designSystem.colors.text.secondary} mb-6`}>
-                  {industryWorkflows[selectedIndustry].description}
-                </p>
-              </div>
-
-              {/* Available Tools Grid */}
-              <div className="mb-8">
-                <h4 className={`text-lg font-bold ${designSystem.colors.text.primary} mb-4 text-center`}>
-                  Available Tools & Integrations ({industryWorkflows[selectedIndustry].connectors.length})
-                </h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {industryWorkflows[selectedIndustry].connectors.map((connector, ci) => (
-                    <div 
-                      key={ci} 
-                      className="flex items-center gap-3 bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg p-3 hover:bg-gradient-to-r hover:from-purple-50 hover:to-indigo-50 transition-all duration-300 hover:shadow-md cursor-pointer group border border-slate-200 hover:border-purple-200"
-                    >
-                      <span className="text-xl group-hover:scale-110 transition-transform">{connector.icon}</span>
-                      <div>
-                        <div className={`font-semibold text-sm ${designSystem.colors.text.primary}`}>{connector.name}</div>
-                        <div className={`text-xs ${designSystem.colors.text.muted}`}>{connector.workflow}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Live Usage Stats */}
-              <div className="bg-gradient-to-r from-slate-50 to-purple-50 rounded-xl p-6 border border-slate-200">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                    <span className={`${designSystem.colors.text.secondary}`}>
-                      <span className={`font-bold ${designSystem.colors.brand.emerald}`}>1,247</span> workflows running
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-center gap-2">
-                    <Users className={`w-4 h-4 ${designSystem.colors.brand.indigo}`} />
-                    <span className={`${designSystem.colors.text.secondary}`}>
-                      <span className={`font-bold ${designSystem.colors.brand.indigo}`}>500+</span> companies
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-center gap-2">
-                    <Award className={`w-4 h-4 ${designSystem.colors.brand.amber}`} />
-                    <span className={`${designSystem.colors.text.secondary}`}>
-                      <span className={`font-bold ${designSystem.colors.brand.amber}`}>{industryWorkflows[selectedIndustry].metrics.split(',')[1] || '95% satisfaction'}</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          {/* Bottom CTA */}
-          <div className="text-center mt-16">
-            <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 max-w-4xl mx-auto">
-              <h3 className={`${designSystem.typography.heading3} ${designSystem.colors.text.primary} mb-4`}>
-                Ready to See Your Industry in Action?
+          {/* Call to Action */}
+          <div className="text-center">
+            <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl p-8 text-white">
+              <h3 className="text-2xl font-bold mb-4">
+                Ready to Transform Your Industry?
               </h3>
-              <p className={`${designSystem.colors.text.secondary} mb-8`}>
-                Get a personalized demo with workflows tailored to your specific business needs
+              <p className="text-purple-100 mb-6 max-w-2xl mx-auto">
+                Tredy AI adapts to your specific industry needs, creating intelligent workflows 
+                that understand your business processes and automate complex tasks.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button className={`${designSystem.spacing.buttonPadding} ${designSystem.components.button.primary} text-lg`}>
-                  {t('landing.cta.startTrial')}
+                <button className="bg-white text-purple-600 px-8 py-3 rounded-xl font-semibold hover:bg-purple-50 transition-colors duration-300">
+                  Start Your Industry Solution
                 </button>
-                <button className={`${designSystem.spacing.buttonPadding} ${designSystem.components.button.secondary} text-lg`}>
-                  Book Custom Demo
+                <button className="border-2 border-white text-white px-8 py-3 rounded-xl font-semibold hover:bg-white hover:text-purple-600 transition-colors duration-300">
+                  View All Industries
                 </button>
               </div>
             </div>
@@ -896,667 +874,17 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Enhanced Customer Success Stories */}
-      <section className={`${designSystem.spacing.section} ${designSystem.spacing.container} bg-white`}>
-        <div className="max-w-6xl mx-auto">
+    
 
-          {/* Industry Success Stories Header */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-3 mb-6">
-              <div className="flex -space-x-2">
-                {industryTestimonials.slice(0, 4).map((testimonial, i) => (
-                  <img 
-                    key={i}
-                    src={testimonial.image} 
-                    alt={testimonial.name}
-                    className="w-8 h-8 rounded-full border-2 border-white shadow-sm"
-                  />
-                ))}
-              </div>
-              <div className="text-sm text-gray-600">
-                <span className="font-bold text-purple-700">1,247+</span> success stories
-              </div>
-            </div>
-            
-            <h2 className={`${designSystem.typography.heading1} ${designSystem.colors.text.primary} mb-6`}>
-              Real Results from
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent" style={{WebkitBackgroundClip: 'text', backgroundClip: 'text'}}> Real Companies</span>
-            </h2>
-            <p className={`${designSystem.typography.body} ${designSystem.colors.text.secondary} mb-4`}>See how industry leaders achieve measurable results with Tredy</p>
-            
-            {/* Trust Indicators */}
-            <div className="flex justify-center gap-6 text-sm text-gray-500">
-              <div className="flex items-center gap-1">
-                <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                <span>4.9/5 on G2</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Award className="w-4 h-4 text-purple-600" />
-                <span>Leader in Automation</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Shield className="w-4 h-4 text-green-600" />
-                <span>SOC 2 Certified</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Enhanced Testimonial Carousel */}
-          <div className={`bg-gradient-to-br ${designSystem.colors.secondary} rounded-3xl ${designSystem.spacing.cardPadding} shadow-xl border border-purple-100 max-w-5xl mx-auto relative overflow-hidden`}>
-            {/* Background Elements */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-200 to-transparent rounded-bl-full opacity-30"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-pink-200 to-transparent rounded-tr-full opacity-30"></div>
-            
-            <div className="text-center mb-8 relative z-10">
-              {/* Rating and Verification */}
-              <div className="flex justify-center items-center gap-4 mb-6">
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-7 h-7 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 100}ms` }} />
-                  ))}
-                </div>
-                <div className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
-                  <CheckCircle className="w-4 h-4" />
-                  Verified Review
-                </div>
-              </div>
-              
-              <div className={`${designSystem.components.card} p-6 mb-6 relative`}>
-                {/* Quote Icon */}
-                <div className="absolute -top-3 -left-3 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-lg font-bold">"</span>
-                </div>
-                
-                <blockquote className={`${designSystem.typography.heading3} ${designSystem.colors.text.primary} font-medium mb-4 leading-relaxed italic`}>
-                  "{industryTestimonials[currentTestimonial].quote}"
-                </blockquote>
-                
-                {/* Results Badge */}
-                <div className={`inline-flex items-center gap-2 bg-gradient-to-r from-green-100 to-green-200 text-green-700 ${designSystem.spacing.buttonPadding} rounded-full font-bold text-sm shadow-sm`}>
-                  <TrendingUp className="w-4 h-4" />
-                  {industryTestimonials[currentTestimonial].metrics}
-                  <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-center">
-                <img 
-                  src={industryTestimonials[currentTestimonial].image} 
-                  alt={industryTestimonials[currentTestimonial].name}
-                  className="w-20 h-20 rounded-full mr-6 border-4 border-purple-200 shadow-lg"
-                />
-                <div className="text-left">
-                  <div className={`font-bold ${designSystem.typography.heading3} ${designSystem.colors.text.primary}`}>{industryTestimonials[currentTestimonial].name}</div>
-                  <div className={`${designSystem.colors.text.secondary} ${designSystem.typography.body}`}>{industryTestimonials[currentTestimonial].role}</div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <div className={`text-purple-600 ${designSystem.typography.body} font-bold`}>{industryTestimonials[currentTestimonial].company}</div>
-                    <span className={`${designSystem.colors.text.muted}`}>•</span>
-                    <div className={`${designSystem.colors.text.muted} text-sm font-medium`}>{industryTestimonials[currentTestimonial].industry}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className={`flex justify-center ${designSystem.spacing.gap.small}`}>
-              {industryTestimonials.map((_, i) => (
-                <button 
-                  key={i}
-                  onClick={() => setCurrentTestimonial(i)}
-                  className={`w-4 h-4 rounded-full ${designSystem.animations.transition} ${
-                    i === currentTestimonial ? 'bg-purple-600 scale-110' : 'bg-gray-300 hover:bg-gray-400'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Enhanced Features Section */}
-      <section id="features-section" className="py-12 sm:py-16 lg:py-24 px-4 sm:px-6 bg-gradient-to-br from-purple-50 via-white to-pink-50 relative overflow-hidden">
-        {/* Background Animation */}
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-20 left-20 w-64 h-64 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
-          <div className="absolute top-40 right-20 w-64 h-64 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
-        </div>
-        
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center px-6 py-3 mb-8 bg-white/90 backdrop-blur-md text-purple-700 rounded-full text-sm font-bold border border-purple-200 shadow-lg hover:scale-105 transition-transform">
-              <Brain className="w-5 h-5 mr-2 animate-pulse" />
-              AI-First Enterprise Platform
-              <div className="ml-2 flex gap-1">
-                <div className="w-1 h-1 bg-purple-600 rounded-full animate-pulse"></div>
-                <div className="w-1 h-1 bg-purple-600 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                <div className="w-1 h-1 bg-purple-600 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-              </div>
-            </div>
-            
-            <h2 className={`${designSystem.typography.heading1} ${designSystem.colors.text.primary} mb-8`}>
-              Enterprise AI That
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent" style={{WebkitBackgroundClip: 'text', backgroundClip: 'text'}}> Actually Works</span>
-            </h2>
-            
-            <p className={`${designSystem.typography.body} ${designSystem.colors.text.secondary} max-w-4xl mx-auto leading-relaxed mb-8`}>
-              Built from the ground up for enterprise scale, security, and compliance. Connect every system, automate complex workflows, and maintain complete control.
-            </p>
-            
-            {/* Feature Stats */}
-            <div className="flex justify-center gap-8 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-gray-600">
-                  <span className="font-bold text-purple-700">99.9%</span> Uptime
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                <span className="text-gray-600">
-                  <span className="font-bold text-purple-700">500+</span> Integrations
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
-                <span className="text-gray-600">
-                  <span className="font-bold text-purple-700">Enterprise</span> Ready
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            {[
-              {
-                id: 'integration',
-                icon: Globe,
-                title: 'Universal Integration Hub',
-                summary: 'Connect 500+ enterprise systems with certified security.',
-                details: [
-                  'Pre-built connectors for Salesforce, SAP, Oracle, and 500+ more',
-                  'Real-time bidirectional sync with conflict resolution',
-                  'Custom API development and legacy system integration',
-                  'Enterprise-grade rate limiting and error handling',
-                  'Webhook management and event-driven automation'
-                ],
-                metric: '99.9% API uptime',
-                color: 'from-blue-600 to-blue-700'
-              },
-              {
-                id: 'ai',
-                icon: Brain,
-                title: 'Advanced AI Reasoning',
-                summary: 'Multi-step reasoning with persistent memory.',
-                details: [
-                  'Context-aware decision making across multiple systems',
-                  'Learning from historical workflows and outcomes',
-                  'Natural language to complex workflow translation',
-                  'Predictive automation based on usage patterns',
-                  'Multi-modal understanding (text, images, documents)'
-                ],
-                metric: 'GPT-4 powered',
-                color: 'from-purple-600 to-purple-700'
-              },
-              {
-                id: 'security',
-                icon: Shield,
-                title: 'Zero-Trust Security',
-                summary: 'SOC 2 Type II, GDPR compliant, end-to-end encryption.',
-                details: [
-                  'AES-256 encryption for data at rest and in transit',
-                  'Role-based access control with granular permissions',
-                  'Complete audit trails and compliance reporting',
-                  'On-premise and private cloud deployment options',
-                  'Regular penetration testing and security audits'
-                ],
-                metric: 'Bank-grade security',
-                color: 'from-green-600 to-green-700'
-              }
-            ].map((feature, i) => (
-              <div key={i} className="group">
-                <div className="bg-white/70 backdrop-blur-md border border-white/20 rounded-3xl p-8 hover:bg-white/90 transition-all duration-500 transform hover:-translate-y-2 hover:shadow-2xl relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-200 to-transparent rounded-bl-full opacity-50"></div>
-                  <div className="relative">
-                    <div className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                      <feature.icon className="w-8 h-8" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                      {feature.title}
-                    </h3>
-                    <p className="text-gray-600 leading-relaxed mb-6">
-                      {feature.summary}
-                    </p>
-                    
-                    {/* Progressive Disclosure */}
-                    <button 
-                      onClick={() => setExpandedFeature(expandedFeature === feature.id ? null : feature.id)}
-                      className="text-purple-600 hover:text-purple-700 font-semibold text-sm flex items-center gap-2 mb-4 transition-colors"
-                    >
-                      {expandedFeature === feature.id ? 'Show Less' : 'Learn More'}
-                      {expandedFeature === feature.id ? 
-                        <ChevronUp className="w-4 h-4" /> : 
-                        <ChevronDown className="w-4 h-4" />
-                      }
-                    </button>
-                    
-                    {expandedFeature === feature.id && (
-                      <div className="bg-white/90 rounded-xl p-4 mb-6 animate-fadeIn border border-purple-100">
-                        <ul className="space-y-2">
-                          {feature.details.map((detail, di) => (
-                            <li key={di} className="flex items-start gap-2 text-sm text-gray-700">
-                              <CheckCircle className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
-                              {detail}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center text-purple-600 font-semibold group-hover:translate-x-2 transition-transform duration-300">
-                      <span>{feature.metric}</span>
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Integrations Showcase */}
-      <section id="integrations" className="py-24 px-6 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center px-6 py-3 mb-8 bg-purple-50 text-purple-700 rounded-full text-sm font-bold border border-purple-200">
-              <Globe className="w-5 h-5 mr-2" />
-              500+ Enterprise Integrations
-            </div>
-            <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-8">
-              Your Entire Tech Stack,
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent" style={{WebkitBackgroundClip: 'text', backgroundClip: 'text'}}> Connected</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-12">
-              From legacy systems to modern SaaS, everything connects securely through our unified API layer with real-time synchronization.
-            </p>
-          </div>
-
-          {/* Popular Enterprise Integrations */}
-          <div className="mb-16">
-            <h3 className="text-2xl font-bold text-gray-900 text-center mb-8">Most Popular Enterprise Integrations</h3>
-            <div className="grid grid-cols-3 md:grid-cols-6 gap-6">
-              {[
-                { name: "Salesforce", icon: "☁️", users: "45K+" },
-                { name: "GitHub", icon: "🐙", users: "38K+" },
-                { name: "Slack", icon: "💬", users: "52K+" },
-                { name: "AWS", icon: "☁️", users: "29K+" },
-                { name: "Jira", icon: "📊", users: "41K+" },
-                { name: "Stripe", icon: "💳", users: "22K+" }
-              ].map((app, i) => (
-                <div
-                  key={i}
-                  className="group bg-white rounded-2xl p-6 flex flex-col items-center justify-center hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer border-2 border-gray-100 hover:border-purple-300 relative"
-                  style={{
-                    animation: `fadeInUp 0.6s ease-out ${i * 0.1}s both`
-                  }}
-                >
-                  <div className="absolute top-2 right-2 bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded-full">
-                    {app.users}
-                  </div>
-                  <div className="text-4xl mb-3 group-hover:scale-110 transition-transform duration-300">{app.icon}</div>
-                  <span className="text-sm text-gray-700 font-bold">{app.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Industry Integration Stats */}
-          <div className="grid md:grid-cols-4 gap-6 mb-16">
-            <div className="text-center p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <div className="text-3xl font-bold text-purple-700 mb-2">500+</div>
-              <div className="text-sm text-gray-600 font-medium">Total Integrations</div>
-            </div>
-            <div className="text-center p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <div className="text-3xl font-bold text-purple-700 mb-2">15</div>
-              <div className="text-sm text-gray-600 font-medium">Industry Verticals</div>
-            </div>
-            <div className="text-center p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <div className="text-3xl font-bold text-purple-700 mb-2">99.9%</div>
-              <div className="text-sm text-gray-600 font-medium">API Uptime</div>
-            </div>
-            <div className="text-center p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <div className="text-3xl font-bold text-purple-700 mb-2">&lt; 30s</div>
-              <div className="text-sm text-gray-600 font-medium">Setup Time</div>
-            </div>
-          </div>
-
-          {/* Enterprise Integration Categories */}
-          <div className="bg-white rounded-3xl border border-gray-100 p-8 mb-12 shadow-lg">
-            <h3 className="text-2xl font-bold text-gray-900 text-center mb-8">Enterprise Integration Categories</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <div className="text-center group">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <span className="text-2xl text-white">📊</span>
-                </div>
-                <div className="font-bold text-gray-900 mb-2">CRM & Sales</div>
-                <div className="text-sm text-gray-600 mb-3">Salesforce, HubSpot, Pipedrive</div>
-                <div className="text-xs text-purple-600 font-semibold">120+ integrations</div>
-              </div>
-              <div className="text-center group">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <span className="text-2xl text-white">💼</span>
-                </div>
-                <div className="font-bold text-gray-900 mb-2">ERP & Finance</div>
-                <div className="text-sm text-gray-600 mb-3">SAP, Oracle, QuickBooks</div>
-                <div className="text-xs text-purple-600 font-semibold">85+ integrations</div>
-              </div>
-              <div className="text-center group">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <span className="text-2xl text-white">👥</span>
-                </div>
-                <div className="font-bold text-gray-900 mb-2">HR & Workforce</div>
-                <div className="text-sm text-gray-600 mb-3">Workday, BambooHR, ADP</div>
-                <div className="text-xs text-purple-600 font-semibold">95+ integrations</div>
-              </div>
-              <div className="text-center group">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <span className="text-2xl text-white">🔧</span>
-                </div>
-                <div className="font-bold text-gray-900 mb-2">DevOps & IT</div>
-                <div className="text-sm text-gray-600 mb-3">Jira, GitHub, ServiceNow</div>
-                <div className="text-xs text-purple-600 font-semibold">150+ integrations</div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="text-center">
-            <Link 
-              to="/marketplace"
-              className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-full text-lg font-bold hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              Browse All Integrations
-              <ArrowRight className="ml-3 w-5 h-5" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Enterprise Pricing Section */}
-      <section id="pricing-section" className="py-12 sm:py-16 lg:py-24 px-4 sm:px-6 bg-gradient-to-br from-gray-50 to-purple-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12 sm:mb-16 lg:mb-20">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 lg:mb-8">
-              Enterprise-Grade
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent" style={{WebkitBackgroundClip: 'text', backgroundClip: 'text'}}> Pricing</span>
-            </h2>
-            <p className="text-sm sm:text-base lg:text-xl text-gray-600 max-w-3xl mx-auto px-4 sm:px-0">
-              Transparent pricing that scales with your business. Start free, upgrade when you're ready.
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-3 gap-8 mb-12">
-            {[
-              {
-                name: "Professional",
-                price: "$49",
-                period: "/user/mo",
-                description: "For growing teams",
-                highlight: false,
-                basicFeatures: [
-                  "50+ integrations",
-                  "Advanced AI workflows", 
-                  "Priority support",
-                  "Team collaboration",
-                  "Basic analytics"
-                ],
-                advancedFeatures: [
-                  "Custom workflow builder",
-                  "Advanced reporting & insights",
-                  "API access with rate limits",
-                  "Standard SLA (99.5% uptime)",
-                  "Email support (24h response)"
-                ],
-                button: "Start Free Trial",
-                buttonStyle: "border-2 border-purple-200 text-purple-700 hover:border-purple-300 hover:bg-purple-50"
-              },
-              {
-                name: "Enterprise",
-                price: "$149",
-                period: "/user/mo",
-                description: "For large organizations",
-                highlight: true,
-                basicFeatures: [
-                  "500+ integrations",
-                  "Advanced security & compliance",
-                  "Dedicated success manager", 
-                  "On-premise deployment",
-                  "Custom workflows",
-                  "24/7 priority support"
-                ],
-                advancedFeatures: [
-                  "White-label customization",
-                  "Advanced audit & compliance tools",
-                  "Unlimited API calls",
-                  "Premium SLA (99.9% uptime)",
-                  "Phone & chat support (1h response)",
-                  "Dedicated infrastructure options"
-                ],
-                button: "Contact Sales",
-                buttonStyle: "bg-white text-purple-600 hover:bg-purple-50"
-              },
-              {
-                name: "Custom",
-                price: "Custom",
-                period: "",
-                description: "Tailored solutions",
-                highlight: false,
-                basicFeatures: [
-                  "Custom integrations",
-                  "White-label options",
-                  "Dedicated infrastructure",
-                  "Custom SLAs",
-                  "Professional services"
-                ],
-                advancedFeatures: [
-                  "Unlimited custom connectors",
-                  "Multi-tenant architecture",
-                  "Custom security protocols",
-                  "Professional implementation",
-                  "Training & certification programs",
-                  "24/7 dedicated support team"
-                ],
-                button: "Contact Us",
-                buttonStyle: "border-2 border-purple-200 text-purple-700 hover:border-purple-300 hover:bg-purple-50"
-              }
-            ].map((plan, i) => (
-              <div key={i} className={`rounded-3xl p-8 transition-all duration-300 hover:shadow-xl relative overflow-hidden ${
-                plan.highlight 
-                  ? 'bg-gradient-to-br from-purple-600 to-purple-700 text-white transform scale-105' 
-                  : 'bg-white border-2 border-gray-200 hover:border-purple-300'
-              }`}>
-                {plan.highlight && (
-                  <>
-                    <div className="absolute top-6 right-6 bg-white/20 text-xs font-bold px-4 py-2 rounded-full">
-                      Most Popular
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-                  </>
-                )}
-                
-                <div className="relative">
-                  <div className="text-center mb-8">
-                    <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                    <div className="text-5xl font-bold mb-2">
-                      {plan.price}
-                      <span className={`text-lg font-normal ${plan.highlight ? 'opacity-80' : 'text-gray-500'}`}>
-                        {plan.period}
-                      </span>
-                    </div>
-                    <p className={plan.highlight ? 'opacity-90' : 'text-gray-600'}>{plan.description}</p>
-                  </div>
-                  
-                  <ul className="space-y-4 mb-6">
-                    {plan.basicFeatures.map((feature, fi) => (
-                      <li key={fi} className="flex items-center">
-                        <CheckCircle className={`w-5 h-5 mr-3 flex-shrink-0 ${plan.highlight ? 'text-white' : 'text-purple-600'}`} />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  {/* Progressive Disclosure for Advanced Features */}
-                  <button 
-                    onClick={() => setShowAdvancedPricing(!showAdvancedPricing)}
-                    className={`text-sm font-semibold flex items-center gap-2 mb-4 transition-colors ${
-                      plan.highlight ? 'text-white/80 hover:text-white' : 'text-purple-600 hover:text-purple-700'
-                    }`}
-                  >
-                    {showAdvancedPricing ? 'Show Less Features' : 'Show All Features'}
-                    {showAdvancedPricing ? 
-                      <ChevronUp className="w-4 h-4" /> : 
-                      <ChevronDown className="w-4 h-4" />
-                    }
-                  </button>
-                  
-                  {showAdvancedPricing && (
-                    <div className={`rounded-xl p-4 mb-6 animate-fadeIn border ${
-                      plan.highlight ? 'bg-white/10 border-white/20' : 'bg-purple-50 border-purple-100'
-                    }`}>
-                      <ul className="space-y-2">
-                        {plan.advancedFeatures.map((feature, fi) => (
-                          <li key={fi} className="flex items-start gap-2">
-                            <CheckCircle className={`w-4 h-4 mt-0.5 flex-shrink-0 ${plan.highlight ? 'text-white/80' : 'text-purple-600'}`} />
-                            <span className={`text-sm ${plan.highlight ? 'text-white/90' : 'text-gray-700'}`}>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  
-                  <Link 
-                    to="/login"
-                    className={`w-full py-4 px-6 rounded-xl font-bold transition-all duration-200 ${plan.buttonStyle} inline-block text-center`}
-                  >
-                    {plan.button}
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          {/* Advanced Pricing Features */}
-          <div className="text-center">
-            <Tooltip 
-              id="pricing-help"
-              title="Need Help Choosing?"
-              content="Not sure which plan fits your team? Our experts can recommend the perfect solution based on your needs."
-              position="top"
-            >
-              <button 
-                onClick={() => setShowAdvancedPricing(!showAdvancedPricing)}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white border-2 border-purple-200 text-purple-700 rounded-full font-semibold hover:border-purple-300 hover:bg-purple-50 transition-all duration-200"
-              >
-                {showAdvancedPricing ? 'Hide' : 'Compare'} All Features
-                {showAdvancedPricing ? 
-                  <ChevronUp className="w-4 h-4" /> : 
-                  <ChevronDown className="w-4 h-4" />
-                }
-              </button>
-            </Tooltip>
-            
-            <div className="mt-6">
-              <p className="text-sm text-gray-600 mb-4">
-                💡 <strong>Tip:</strong> Most customers save 40% by choosing annual billing
-              </p>
-              <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                  Free migration support
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                  14-day money back guarantee
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                  Volume discounts available
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Security Section */}
-      <section id="security" className="py-24 px-6 bg-gray-900">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center px-6 py-3 mb-8 bg-green-900/30 text-green-400 rounded-full text-sm font-bold border border-green-800">
-              <Shield className="w-5 h-5 mr-2" />
-              Enterprise Security
-            </div>
-            <h2 className="text-5xl lg:text-6xl font-bold text-white mb-8">
-              Security That Scales
-              <span className="bg-gradient-to-r from-green-500 to-blue-500 bg-clip-text text-transparent" style={{WebkitBackgroundClip: 'text', backgroundClip: 'text'}}> With You</span>
-            </h2>
-            <p className="text-xl text-gray-300 max-w-4xl mx-auto">
-              Built from the ground up with enterprise security standards. Your data never leaves your control.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            {[
-              { icon: Award, title: "SOC 2 Type II", desc: "Independently audited security controls" },
-              { icon: Lock, title: "GDPR Ready", desc: "Full compliance with EU data regulations" },
-              { icon: Shield, title: "End-to-End Encryption", desc: "AES-256 encryption in transit and at rest" },
-              { icon: Cloud, title: "Self-Hosted Options", desc: "Deploy in your own infrastructure" }
-            ].map((item, i) => (
-              <div key={i} className="text-center group">
-                <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <item.icon className="w-10 h-10 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
-                <p className="text-gray-400 text-sm">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            {[
-              {
-                title: "Data Protection",
-                features: ["Zero data retention policy", "Regional data residency", "Automatic data purging", "GDPR compliance"]
-              },
-              {
-                title: "Access Control", 
-                features: ["Role-based permissions", "SSO integration (SAML/OAuth)", "Multi-factor authentication", "API key management"]
-              },
-              {
-                title: "Monitoring",
-                features: ["Complete audit trails", "Real-time threat detection", "Compliance reporting", "24/7 security monitoring"]
-              }
-            ].map((section, i) => (
-              <div key={i} className="bg-gray-800/50 backdrop-blur-md rounded-2xl p-6 border border-gray-700 hover:border-gray-600 transition-colors">
-                <h3 className="text-xl font-bold text-white mb-6">{section.title}</h3>
-                <ul className="space-y-4">
-                  {section.features.map((feature, j) => (
-                    <li key={j} className="flex items-center text-gray-300">
-                      <CheckCircle className="w-4 h-4 text-green-400 mr-3 flex-shrink-0" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* AI Enterprise Platform Section */}
+      <AIEnterprisePlatform />
 
       {/* FAQ Section */}
       <section className="py-24 px-6 bg-white">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 text-center mb-16">
             Frequently Asked
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent" style={{WebkitBackgroundClip: 'text', backgroundClip: 'text'}}> Questions</span>
+            <span className="text-purple-600 dark:text-purple-400"> Questions</span>
           </h2>
           
           <div className="space-y-4">
@@ -1712,24 +1040,23 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Footer */}
-      <footer className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 bg-gray-900">
+      <footer className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 bg-gradient-to-r from-purple-600 to-purple-700">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-12">
             <div className="sm:col-span-2 lg:col-span-2">
               <div className="flex items-center mb-4 sm:mb-6">
                 <img 
-                  src="/tredy_logo_purple.png" 
+                  src="/tredy_logo_name_slogan_purple.PNG" 
                   alt="Tredy" 
-                  className="h-10 sm:h-12 object-contain mr-2 sm:mr-3"
+                  className="h-12 sm:h-16 object-contain"
                 />
-                <span className="text-white font-bold text-xl sm:text-2xl">Tredy</span>
               </div>
-              <p className="text-gray-400 text-sm sm:text-base lg:text-lg mb-4 sm:mb-6 max-w-md">
+              <p className="text-purple-100 text-sm sm:text-base lg:text-lg mb-4 sm:mb-6 max-w-md">
                 The future of intelligent workflows. Connect, visualize, and execute through AI-powered threads.
               </p>
               <div className="flex space-x-4">
                 {['twitter', 'linkedin', 'github'].map((social) => (
-                  <a key={social} href="#" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:text-purple-400 hover:bg-gray-700 transition-colors">
+                  <a key={social} href="#" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white hover:text-purple-200 hover:bg-white/30 transition-colors">
                     <span className="sr-only">{social}</span>
                     <div className="w-5 h-5 bg-current"></div>
                   </a>

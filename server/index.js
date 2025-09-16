@@ -43,6 +43,7 @@ const { supabaseAuthEndpoints } = require("./endpoints/supabaseAuth");
 const { threadSharingEndpoints } = require("./endpoints/threadSharing");
 const { userConnectorEndpoints } = require("./endpoints/user/connectors");
 const { apiWorkspaceConnectorEndpoints } = require("./endpoints/api/workspace/connectors");
+const { waitlistEndpoints } = require("./endpoints/waitlist");
 const { WelcomeMessages } = require("./models/welcomeMessages");
 const { initializeDatabase } = require("./utils/database/init");
 const app = express();
@@ -90,6 +91,7 @@ supabaseAuthEndpoints(apiRouter);
 threadSharingEndpoints(apiRouter);
 userConnectorEndpoints(apiRouter);
 apiWorkspaceConnectorEndpoints(apiRouter);
+waitlistEndpoints(app);
 
 // Externally facing embedder endpoints
 embeddedEndpoints(apiRouter);

@@ -54,9 +54,9 @@ function Avatar({ user, size = 40, onClick, showBadge = false, badgeIcon: BadgeI
       {/* Main Avatar */}
       <div className={`
         w-full h-full rounded-full flex items-center justify-center
-        ${colors[colorIndex]} text-white font-medium shadow-lg
+        ${colors[colorIndex]} text-white font-semibold shadow-md
         ring-2 ring-white dark:ring-gray-800
-        ${onClick ? 'hover:ring-4 hover:ring-blue-200 dark:hover:ring-blue-900' : ''}
+        ${onClick ? 'hover:ring-4 hover:ring-blue-200 dark:hover:ring-blue-900 hover:shadow-lg' : ''}
       `}
       style={{ fontSize: size * 0.4 }}
       >
@@ -112,10 +112,10 @@ function ConnectorBubble({ connector, size = 40, onClick }) {
       onClick={onClick}
       style={{ width: size, height: size }}
     >
-      <div className={`w-full h-full rounded-full flex items-center justify-center bg-gradient-to-br ${style.color} shadow-lg ring-2 ring-white dark:ring-gray-800`}>
+      <div className={`w-full h-full rounded-full flex items-center justify-center bg-gradient-to-br ${style.color} shadow-md ring-2 ring-white dark:ring-gray-800 hover:shadow-lg`}>
         <span style={{ fontSize: size * 0.5 }}>{style.emoji}</span>
       </div>
-      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-800" />
+      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 animate-pulse" />
       <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
         {connector?.name || 'Service'}
       </div>
@@ -915,36 +915,41 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
 
   return (
     <>
-      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/40 dark:border-gray-700/40 sticky top-0 z-40 w-full">
-        <div className="px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5">
-          <div className="flex items-center justify-between gap-1 sm:gap-2">
-            {/* Left: Workspace Info - Without logo since it's in main header */}
-            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-shrink-0">
-              <div className="hidden sm:flex items-center gap-2">
-                <div className="p-1.5 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg">
+      <div className="bg-white/98 dark:bg-gray-900/98 backdrop-blur-md border-b border-gray-200/60 dark:border-gray-700/60 sticky top-[60px] z-40 w-full shadow-sm">
+        <div className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-2 sm:gap-3">
+            {/* Left: Workspace Info - Enhanced design */}
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink-0">
+              <div className="hidden sm:flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-sm">
+                  <Sparkle className="w-4 h-4 text-white" />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="font-semibold text-gray-900 dark:text-white truncate text-base">
+                    {workspace?.name || "Workspace"}
+                  </h2>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    Active workspace
+                  </p>
+                </div>
+              </div>
+              
+              {/* Mobile: Compact but improved */}
+              <div className="sm:hidden flex items-center gap-2">
+                <div className="p-1.5 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex-shrink-0 shadow-sm">
                   <Sparkle className="w-3.5 h-3.5 text-white" />
                 </div>
                 <div className="min-w-0">
-                  <h2 className="font-medium text-gray-900 dark:text-white truncate text-sm">
+                  <h2 className="font-semibold text-gray-900 dark:text-white truncate text-sm">
                     {workspace?.name || "Workspace"}
                   </h2>
                 </div>
               </div>
-              
-              {/* Mobile: Even More Compact */}
-              <div className="sm:hidden flex items-center gap-1.5">
-                <div className="p-1 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex-shrink-0">
-                  <Sparkle className="w-3 h-3 text-white" />
-                </div>
-                <h2 className="font-medium text-gray-900 dark:text-white truncate text-xs">
-                  {workspace?.name || "Workspace"}
-                </h2>
-              </div>
             </div>
 
-            {/* Right: Avatar Stack - More Compact */}
-            <div className="flex items-center gap-0.5 sm:gap-1">
-              {/* Members Stack - Responsive sizing */}
+            {/* Right: Avatar Stack - Enhanced design */}
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* Members Stack - Improved spacing */}
               <div className="flex items-center -space-x-1 sm:-space-x-2">
                 {loading ? (
                   <div className="flex -space-x-1">
@@ -989,8 +994,8 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
                 )}
               </div>
 
-              {/* Services Stack - Mobile responsive */}
-              <div className="h-3 sm:h-4 w-px bg-gray-300 dark:bg-gray-600 mx-1" />
+              {/* Services Stack - Enhanced separator */}
+              <div className="h-4 sm:h-5 w-px bg-gray-300/60 dark:bg-gray-600/60 mx-1 sm:mx-2" />
               <div className="flex items-center -space-x-1 sm:-space-x-2">
                 {services.slice(0, isMobile ? 1 : visibleServices).map((service, idx) => (
                   <ConnectorBubble 
@@ -1010,18 +1015,18 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
               </div>
               
               {/* Background Tasks Bubble */}
-              <div className="h-3 sm:h-4 w-px bg-gray-300 dark:bg-gray-600 mx-1" />
+              <div className="h-4 sm:h-5 w-px bg-gray-300/60 dark:bg-gray-600/60 mx-1 sm:mx-2" />
               <BackgroundTasksBubble workspace={workspace} />
 
-              {/* Expand Button (Mobile) - Improved touch target */}
+              {/* Expand Button (Mobile) - Enhanced design */}
               {isMobile && (
                 <button
                   onClick={() => setShowExpanded(true)}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors sm:hidden touch-manipulation ml-1"
-                  style={{ minWidth: '32px', minHeight: '32px' }}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 sm:hidden touch-manipulation ml-1 hover:scale-105"
+                  style={{ minWidth: '36px', minHeight: '36px' }}
                   aria-label="Expand team view"
                 >
-                  <ArrowsOut className="w-3 h-3 text-gray-600 dark:text-gray-400" />
+                  <ArrowsOut className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                 </button>
               )}
             </div>

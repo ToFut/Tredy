@@ -1,0 +1,736 @@
+/* ===========================
+   ULTRA ELEGANT CHAT DESIGN
+   Sophisticated & Refined
+   =========================== */
+
+/* 1. ULTRA ELEGANT MESSAGE CONTAINERS */
+.chat-message-ultra-elegant {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 16px 20px;
+  margin: 4px 0;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.chat-message-ultra-elegant::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(139, 92, 246, 0.3) 20%, 
+    rgba(139, 92, 246, 0.6) 50%, 
+    rgba(139, 92, 246, 0.3) 80%, 
+    transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.chat-message-ultra-elegant:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(139, 92, 246, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(139, 92, 246, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px) scale(1.01);
+}
+
+.chat-message-ultra-elegant:hover::before {
+  opacity: 1;
+}
+
+/* 2. SOPHISTICATED TYPOGRAPHY */
+.prose-ultra-elegant {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--theme-text-primary);
+  max-width: none;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.prose-ultra-elegant p {
+  margin: 0.75rem 0;
+  font-weight: 400;
+  color: rgba(250, 250, 250, 0.9);
+}
+
+.prose-ultra-elegant p:first-child {
+  margin-top: 0;
+}
+
+.prose-ultra-elegant p:last-child {
+  margin-bottom: 0;
+}
+
+/* 3. REFINED HEADINGS */
+.prose-ultra-elegant h1 {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 1.5rem 0 1rem 0;
+  background: linear-gradient(135deg, 
+    #a78bfa 0%, 
+    #c084fc 25%, 
+    #e879f9 50%, 
+    #f0abfc 75%, 
+    #fbbf24 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+  letter-spacing: -0.02em;
+}
+
+.prose-ultra-elegant h1::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, #a78bfa, #c084fc);
+  border-radius: 1px;
+}
+
+.prose-ultra-elegant h2 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 1.25rem 0 0.75rem 0;
+  color: var(--theme-text-primary);
+  padding-left: 12px;
+  border-left: 3px solid transparent;
+  background: linear-gradient(180deg, 
+    rgba(139, 92, 246, 0.3) 0%, 
+    rgba(167, 139, 250, 0.1) 100%);
+  background-clip: padding-box;
+  border-left-color: rgba(139, 92, 246, 0.4);
+  position: relative;
+}
+
+.prose-ultra-elegant h2::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #8b5cf6, #a78bfa);
+  border-radius: 2px;
+}
+
+.prose-ultra-elegant h3 {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+  margin: 1rem 0 0.5rem 0;
+  color: var(--theme-text-primary);
+  position: relative;
+}
+
+.prose-ultra-elegant h3::before {
+  content: '◆';
+  color: rgba(139, 92, 246, 0.6);
+  margin-right: 8px;
+  font-size: 12px;
+}
+
+.prose-ultra-elegant h4,
+.prose-ultra-elegant h5,
+.prose-ultra-elegant h6 {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  margin: 0.75rem 0 0.25rem 0;
+  color: rgba(250, 250, 250, 0.8);
+}
+
+/* 4. ELEGANT LISTS */
+.prose-ultra-elegant ul,
+.prose-ultra-elegant ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.prose-ultra-elegant ul::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, 
+    transparent, 
+    rgba(139, 92, 246, 0.2) 20%, 
+    rgba(139, 92, 246, 0.2) 80%, 
+    transparent);
+}
+
+.prose-ultra-elegant li {
+  margin: 0.5rem 0;
+  line-height: 1.6;
+  position: relative;
+  padding-left: 8px;
+}
+
+.prose-ultra-elegant ul li::marker {
+  color: rgba(139, 92, 246, 0.8);
+  font-size: 14px;
+}
+
+.prose-ultra-elegant ul li::before {
+  content: '';
+  position: absolute;
+  left: -16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, #8b5cf6, #a78bfa);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
+}
+
+.prose-ultra-elegant ol li::marker {
+  color: rgba(250, 250, 250, 0.7);
+  font-weight: 500;
+}
+
+/* 5. PREMIUM CODE BLOCKS */
+.prose-ultra-elegant pre {
+  background: linear-gradient(135deg, 
+    rgba(15, 23, 42, 0.95) 0%, 
+    rgba(30, 41, 59, 0.95) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  font-size: 14px;
+  line-height: 1.6;
+  position: relative;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.prose-ultra-elegant pre::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(139, 92, 246, 0.5) 50%, 
+    transparent);
+}
+
+.prose-ultra-elegant code {
+  background: rgba(139, 92, 246, 0.15);
+  color: #c084fc;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.9em;
+  font-weight: 500;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.prose-ultra-elegant pre code {
+  background: transparent;
+  color: #e2e8f0;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* 6. SOPHISTICATED TABLES */
+.prose-ultra-elegant table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 1.5rem 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.prose-ultra-elegant th {
+  background: linear-gradient(135deg, 
+    rgba(139, 92, 246, 0.2) 0%, 
+    rgba(167, 139, 250, 0.1) 100%);
+  color: var(--theme-text-primary);
+  font-weight: 600;
+  padding: 16px 20px;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+  position: relative;
+}
+
+.prose-ultra-elegant th::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(139, 92, 246, 0.4) 50%, 
+    transparent);
+}
+
+.prose-ultra-elegant td {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 14px;
+  color: rgba(250, 250, 250, 0.8);
+  transition: background-color 0.2s ease;
+}
+
+.prose-ultra-elegant tr:hover td {
+  background: rgba(139, 92, 246, 0.05);
+}
+
+.prose-ultra-elegant tr:last-child td {
+  border-bottom: none;
+}
+
+/* 7. ELEGANT BLOCKQUOTES */
+.prose-ultra-elegant blockquote {
+  border-left: 4px solid transparent;
+  background: linear-gradient(135deg, 
+    rgba(139, 92, 246, 0.08) 0%, 
+    rgba(167, 139, 250, 0.04) 100%);
+  padding: 20px 24px;
+  margin: 1.5rem 0;
+  border-radius: 0 16px 16px 0;
+  font-style: italic;
+  color: rgba(250, 250, 250, 0.8);
+  position: relative;
+  backdrop-filter: blur(10px);
+  border-left-color: rgba(139, 92, 246, 0.4);
+}
+
+.prose-ultra-elegant blockquote::before {
+  content: '"';
+  position: absolute;
+  top: -8px;
+  left: 16px;
+  font-size: 48px;
+  color: rgba(139, 92, 246, 0.3);
+  font-family: serif;
+  line-height: 1;
+}
+
+.prose-ultra-elegant blockquote::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(139, 92, 246, 0.2) 50%, 
+    transparent);
+}
+
+/* 8. REFINED LINKS */
+.prose-ultra-elegant a {
+  color: #a78bfa;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  font-weight: 500;
+}
+
+.prose-ultra-elegant a::before {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #a78bfa, #c084fc);
+  transition: width 0.3s ease;
+}
+
+.prose-ultra-elegant a:hover {
+  color: #c084fc;
+  text-shadow: 0 0 8px rgba(167, 139, 250, 0.4);
+}
+
+.prose-ultra-elegant a:hover::before {
+  width: 100%;
+}
+
+/* 9. ELEGANT SEPARATORS */
+.prose-ultra-elegant hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(139, 92, 246, 0.2) 20%, 
+    rgba(139, 92, 246, 0.4) 50%, 
+    rgba(139, 92, 246, 0.2) 80%, 
+    transparent);
+  margin: 2rem 0;
+  border-radius: 1px;
+  position: relative;
+}
+
+.prose-ultra-elegant hr::after {
+  content: '◆';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--theme-bg-primary);
+  color: rgba(139, 92, 246, 0.6);
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+/* 10. PREMIUM ANIMATIONS */
+.message-ultra-elegant-enter {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  animation: ultraElegantSlideIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes ultraElegantSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(-2px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 11. SOPHISTICATED SPACING UTILITIES */
+.space-ultra-elegant-xs { margin: 0.25rem 0; }
+.space-ultra-elegant-sm { margin: 0.5rem 0; }
+.space-ultra-elegant-md { margin: 0.75rem 0; }
+.space-ultra-elegant-lg { margin: 1rem 0; }
+.space-ultra-elegant-xl { margin: 1.5rem 0; }
+
+/* 12. PREMIUM TYPOGRAPHY SCALE */
+.text-ultra-elegant-xs { 
+  font-size: 12px; 
+  line-height: 1.5; 
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+.text-ultra-elegant-sm { 
+  font-size: 13px; 
+  line-height: 1.6; 
+  font-weight: 400;
+  letter-spacing: 0.005em;
+}
+.text-ultra-elegant-base { 
+  font-size: 15px; 
+  line-height: 1.7; 
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.text-ultra-elegant-lg { 
+  font-size: 17px; 
+  line-height: 1.6; 
+  font-weight: 400;
+  letter-spacing: -0.015em;
+}
+.text-ultra-elegant-xl { 
+  font-size: 20px; 
+  line-height: 1.5; 
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* 13. GLASS MORPHISM EFFECTS */
+.glass-morphism-elegant {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-morphism-elegant:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(139, 92, 246, 0.2);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* 14. RESPONSIVE ULTRA ELEGANT */
+@media (max-width: 768px) {
+  .chat-message-ultra-elegant {
+    padding: 14px 16px;
+    margin: 3px 0;
+    border-radius: 16px;
+  }
+  
+  .prose-ultra-elegant {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  
+  .prose-ultra-elegant h1 {
+    font-size: 20px;
+    margin: 1.25rem 0 0.75rem 0;
+  }
+  
+  .prose-ultra-elegant h2 {
+    font-size: 16px;
+    margin: 1rem 0 0.5rem 0;
+  }
+  
+  .prose-ultra-elegant h3 {
+    font-size: 15px;
+    margin: 0.75rem 0 0.25rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-message-ultra-elegant {
+    padding: 12px 14px;
+    margin: 2px 0;
+    border-radius: 12px;
+  }
+  
+  .prose-ultra-elegant {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+}
+
+/* 15. DARK THEME ULTRA ELEGANT */
+[data-theme="dark"] .prose-ultra-elegant h1 {
+  background: linear-gradient(135deg, 
+    #a78bfa 0%, 
+    #c084fc 25%, 
+    #e879f9 50%, 
+    #f0abfc 75%, 
+    #fbbf24 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="dark"] .prose-ultra-elegant code {
+  background: rgba(167, 139, 250, 0.2);
+  color: #d8b4fe;
+  border-color: rgba(167, 139, 250, 0.3);
+}
+
+[data-theme="dark"] .prose-ultra-elegant blockquote {
+  background: linear-gradient(135deg, 
+    rgba(167, 139, 250, 0.1) 0%, 
+    rgba(192, 132, 252, 0.05) 100%);
+  border-left-color: rgba(167, 139, 250, 0.5);
+}
+
+/* 16. LIGHT THEME ULTRA ELEGANT */
+[data-theme="light"] .chat-message-ultra-elegant {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .prose-ultra-elegant h1 {
+  background: linear-gradient(135deg, 
+    #7c3aed 0%, 
+    #9333ea 25%, 
+    #a855f7 50%, 
+    #c084fc 75%, 
+    #d8b4fe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .prose-ultra-elegant code {
+  background: rgba(124, 58, 237, 0.1);
+  color: #7c3aed;
+  border-color: rgba(124, 58, 237, 0.2);
+}
+
+[data-theme="light"] .prose-ultra-elegant blockquote {
+  background: linear-gradient(135deg, 
+    rgba(124, 58, 237, 0.05) 0%, 
+    rgba(147, 51, 234, 0.02) 100%);
+  border-left-color: rgba(124, 58, 237, 0.3);
+}
+
+/* 17. PREMIUM FOCUS STATES */
+.prose-ultra-elegant:focus-within {
+  outline: none;
+  box-shadow: 
+    0 0 0 2px rgba(139, 92, 246, 0.3),
+    0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* 18. ELEGANT SELECTION */
+.prose-ultra-elegant ::selection {
+  background: rgba(139, 92, 246, 0.3);
+  color: var(--theme-text-primary);
+}
+
+/* 19. PREMIUM SCROLLING */
+.prose-ultra-elegant pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+.prose-ultra-elegant pre::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.prose-ultra-elegant pre::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.prose-ultra-elegant pre::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, #a78bfa, #c084fc);
+}
+
+/* 20. ULTRA ELEGANT CONTENT FLOW */
+.content-flow-ultra-elegant {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.content-flow-ultra-elegant > * + * {
+  margin-top: 0.75rem;
+}
+
+.content-flow-ultra-elegant > *:first-child {
+  margin-top: 0;
+}
+
+.content-flow-ultra-elegant > *:last-child {
+  margin-bottom: 0;
+}
+
+/* 21. SOPHISTICATED HOVER EFFECTS */
+.chat-message-ultra-elegant .prose-ultra-elegant h1:hover {
+  transform: translateX(4px);
+  transition: transform 0.3s ease;
+}
+
+.chat-message-ultra-elegant .prose-ultra-elegant h2:hover {
+  transform: translateX(2px);
+  transition: transform 0.3s ease;
+}
+
+/* 22. PREMIUM LOADING STATES */
+.ultra-elegant-loading {
+  background: linear-gradient(90deg, 
+    rgba(139, 92, 246, 0.1) 0%, 
+    rgba(167, 139, 250, 0.2) 50%, 
+    rgba(139, 92, 246, 0.1) 100%);
+  background-size: 200% 100%;
+  animation: ultraElegantShimmer 2s ease-in-out infinite;
+}
+
+@keyframes ultraElegantShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* 23. ELEGANT MICRO-INTERACTIONS */
+.interactive-elegant {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: pointer;
+}
+
+.interactive-elegant:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.2);
+}
+
+.interactive-elegant:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* 24. PREMIUM VISUAL HIERARCHY */
+.visual-hierarchy-elegant h1 {
+  position: relative;
+  z-index: 1;
+}
+
+.visual-hierarchy-elegant h2 {
+  position: relative;
+  z-index: 1;
+}
+
+.visual-hierarchy-elegant p {
+  position: relative;
+  z-index: 0;
+}
+
+/* 25. ULTRA ELEGANT ACCESSIBILITY */
+@media (prefers-reduced-motion: reduce) {
+  .chat-message-ultra-elegant,
+  .prose-ultra-elegant *,
+  .message-ultra-elegant-enter {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* 26. HIGH CONTRAST MODE */
+@media (prefers-contrast: high) {
+  .chat-message-ultra-elegant {
+    border-width: 2px;
+    border-color: var(--theme-text-primary);
+  }
+  
+  .prose-ultra-elegant h1,
+  .prose-ultra-elegant h2,
+  .prose-ultra-elegant h3 {
+    -webkit-text-fill-color: var(--theme-text-primary);
+    color: var(--theme-text-primary);
+  }
+}

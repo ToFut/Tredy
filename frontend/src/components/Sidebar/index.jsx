@@ -141,18 +141,19 @@ export default function Sidebar() {
         </div>
       </div>
       
+      
       {/* Sidebar - Adjusted for fixed header */}
       <div
         style={{
           width: showSidebar ? "292px" : "72px",
           paddingLeft: showSidebar ? "0px" : "8px",
-          marginTop: "60px", // Account for fixed header
+          marginTop: "110px", // Account for fixed header + industry solutions bar
         }}
         className="transition-all duration-500 relative"
       >
         <div
           ref={sidebarRef}
-          className={`relative ${showSidebar ? "m-4" : "m-2"} rounded-3xl bg-gradient-to-b from-white/98 to-white/95 backdrop-blur-2xl border border-gray-200/40 shadow-xl ${showSidebar ? "min-w-[300px] p-5" : "w-[60px] p-3"} h-[calc(100vh-92px)] transition-all duration-500 hover:shadow-2xl hover:border-purple-200/50`}
+          className={`relative ${showSidebar ? "m-4" : "m-2"} rounded-3xl bg-gradient-to-b from-white/98 to-white/95 backdrop-blur-2xl border border-gray-200/40 shadow-xl ${showSidebar ? "min-w-[300px] p-5" : "w-[60px] p-3"} h-[calc(100vh-142px)] transition-all duration-500 hover:shadow-2xl hover:border-purple-200/50`}
           style={{
             background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%)',
             backdropFilter: 'blur(32px)',
@@ -280,6 +281,7 @@ export function SidebarMobileHeader() {
           <img src={logo} alt="Logo" className="h-7 w-7 rounded" />
           <span className="font-medium text-gray-900 dark:text-white text-sm">Tredy</span>
         </div>
+        
       </div>
 
       {/* Mobile Sidebar */}

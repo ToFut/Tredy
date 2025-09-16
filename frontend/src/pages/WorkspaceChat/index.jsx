@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { default as WorkspaceChatContainer } from "@/components/WorkspaceChat";
 import Sidebar, { SidebarMobileHeader } from "@/components/Sidebar";
 import FlowPanel from "@/components/FlowPanel";
+import IndustrySolutions from "@/components/IndustrySolutions/index";
 import { useParams } from "react-router-dom";
 import Workspace from "@/models/workspace";
 import PasswordModal, { usePasswordModal } from "@/components/Modals/Password";
@@ -91,6 +92,22 @@ function ShowWorkspaceChat() {
             
             {/* Main Content Area - Enhanced */}
             <div className="flex-1 min-w-0 flex flex-col bg-gradient-to-br from-gray-50/30 via-white/80 to-gray-100/30 backdrop-blur-sm relative z-10">
+              
+              {/* Industry Solutions Bar */}
+              <div className="p-4 border-b border-gray-200/50 bg-white/80 backdrop-blur-sm">
+                <IndustrySolutions 
+                  className="w-full"
+                  onConnectorClick={(connector) => {
+                    console.log("Connector clicked:", connector);
+                    // Handle connector click - could open connector details or settings
+                  }}
+                  onConnectConnector={() => {
+                    console.log("Connect new connector");
+                    // Handle new connector connection
+                  }}
+                  maxVisible={6}
+                />
+              </div>
               
               {/* Enhanced Chat Container */}
               <div className="flex-1 overflow-hidden relative animate-fadeIn">

@@ -11,6 +11,16 @@ const WorkspaceAgentInvocation = {
 
   close: async function (uuid, retryCount = 0) {
     if (!uuid) return;
+    
+    // Make this operation non-blocking by not awaiting it
+    // This prevents the websocket close from hanging on database timeouts
+    this.closeAsync(uuid, retryCount).catch(error => {
+      console.error(`[WorkspaceAgentInvocation] Background close failed for ${uuid}:`, error.message);
+    });
+  },
+
+  closeAsync: async function (uuid, retryCount = 0) {
+    if (!uuid) return;
     const maxRetries = 3;
     const retryDelay = 1000; // 1 second
     
@@ -28,7 +38,7 @@ const WorkspaceAgentInvocation = {
         if (retryCount < maxRetries) {
           console.log(`[WorkspaceAgentInvocation] Retrying close operation (attempt ${retryCount + 1}/${maxRetries})...`);
           await new Promise(resolve => setTimeout(resolve, retryDelay));
-          return await this.close(uuid, retryCount + 1);
+          return await this.closeAsync(uuid, retryCount + 1);
         } else {
           console.error(`[WorkspaceAgentInvocation] Failed to close invocation ${uuid} after ${maxRetries} retries`);
         }

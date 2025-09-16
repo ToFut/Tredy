@@ -158,8 +158,19 @@ const createWorkflow = {
                   return createFallbackSteps(desc, availableTools);
                 }
                 
-                // Create TOOL_CALL steps for each action
-                const steps = actions.map((action, index) => {
+              // Convert web scraping actions to Puppeteer workflows for better reliability
+              const processedActions = actions.map((action, index) => {
+                if (action.type === 'web' && action.action?.includes('scrape')) {
+                  // Convert single web scraping action to multi-step Puppeteer workflow
+                  return convertWebScrapingToPuppeteerWorkflow(action, index);
+                }
+                return action;
+              }).flat(); // Flatten in case we created multiple actions
+              
+              console.log('🚀 [CreateWorkflow] Processed actions count:', processedActions.length);
+              
+              // Create TOOL_CALL steps for each action
+              const steps = processedActions.map((action, index) => {
                   // Check if AI already provided a specific tool
                   let bestTool = action.tool;
                   
@@ -178,6 +189,9 @@ const createWorkflow = {
                     
                     // Normalize variable references to use correct step variable names
                     params = normalizeVariableReferences(params, index, actions);
+                    
+                    // Validate and clean parameters for the specific tool
+                    params = validateToolParameters(bestTool, params);
                     
                     // Use AI-provided resultVariable if available
                     const resultVar = action.resultVariable || `step_${index + 1}_result`;
@@ -700,6 +714,8 @@ Do NOT include explanations, markdown, or any other text. Only return the JSON a
                 
                 if (actionType === 'web' && (toolLower.includes('web') || toolLower.includes('scrape') || toolLower.includes('puppeteer'))) {
                   score += 20;
+                  // Prefer puppeteer tools over web-scraping for reliability
+                  if (toolLower.includes('puppeteer')) score += 10;
                 }
                 
                 return score;
@@ -748,6 +764,109 @@ Do NOT include explanations, markdown, or any other text. Only return the JSON a
                 }
                 
                 return normalizedParams;
+              }
+
+              // Convert web scraping action to reliable Puppeteer workflow
+              function convertWebScrapingToPuppeteerWorkflow(action, baseIndex) {
+                const urlMatch = action.text?.match(/https?:\/\/[^\s]+/);
+                const url = urlMatch ? urlMatch[0] : 'https://news.ycombinator.com/';
+                
+                return [
+                  {
+                    type: 'web',
+                    action: 'navigate',
+                    tool: 'puppeteer-puppeteer_navigate',
+                    parameters: { url },
+                    text: `Navigate to ${url}`,
+                    target: url,
+                    content: `Navigate to ${url}`,
+                    resultVariable: `step_${baseIndex + 1}_result`
+                  },
+                  {
+                    type: 'web',
+                    action: 'extract_content',
+                    tool: 'puppeteer-puppeteer_evaluate',
+                    parameters: { 
+                      script: `return {
+                        title: document.title,
+                        content: document.body.innerText,
+                        links: Array.from(document.querySelectorAll('a')).map(a => ({ text: a.textContent, href: a.href })).slice(0, 10),
+                        headlines: Array.from(document.querySelectorAll('h1, h2, h3')).map(h => h.textContent).slice(0, 5)
+                      }`
+                    },
+                    text: `Extract content from ${url}`,
+                    target: '',
+                    content: `Extract content from ${url}`,
+                    requires: [baseIndex + 1],
+                    resultVariable: `step_${baseIndex + 2}_result`
+                  }
+                ];
+              }
+
+              // Validate and clean parameters for specific tools
+              function validateToolParameters(toolName, params) {
+                const cleanedParams = { ...params };
+                
+                // Web scraping tool only accepts 'url' parameter
+                if (toolName === 'web-scraping') {
+                  const validParams = {};
+                  if (cleanedParams.url) {
+                    validParams.url = cleanedParams.url;
+                  }
+                  console.log(`🔧 [ParamValidation] Cleaned web-scraping params:`, validParams);
+                  return validParams;
+                }
+                
+                // Gmail send_email tool parameters
+                if (toolName === 'gmail-send_email') {
+                  const validParams = {};
+                  if (cleanedParams.to) validParams.to = cleanedParams.to;
+                  if (cleanedParams.subject) validParams.subject = cleanedParams.subject;
+                  if (cleanedParams.body) validParams.body = cleanedParams.body;
+                  if (cleanedParams.cc) validParams.cc = cleanedParams.cc;
+                  if (cleanedParams.bcc) validParams.bcc = cleanedParams.bcc;
+                  console.log(`🔧 [ParamValidation] Cleaned gmail-send_email params:`, validParams);
+                  return validParams;
+                }
+                
+                // Gmail get_emails tool parameters
+                if (toolName === 'gmail-get_emails') {
+                  const validParams = {};
+                  if (cleanedParams.num_emails) validParams.num_emails = cleanedParams.num_emails;
+                  if (cleanedParams.query) validParams.query = cleanedParams.query;
+                  console.log(`🔧 [ParamValidation] Cleaned gmail-get_emails params:`, validParams);
+                  return validParams;
+                }
+                
+                // Calendar book_meeting tool parameters
+                if (toolName === 'gcalendar-book_meeting') {
+                  const validParams = {};
+                  if (cleanedParams.attendees) validParams.attendees = cleanedParams.attendees;
+                  if (cleanedParams.start_time) validParams.start_time = cleanedParams.start_time;
+                  if (cleanedParams.end_time) validParams.end_time = cleanedParams.end_time;
+                  if (cleanedParams.description) validParams.description = cleanedParams.description;
+                  if (cleanedParams.title) validParams.title = cleanedParams.title;
+                  console.log(`🔧 [ParamValidation] Cleaned gcalendar-book_meeting params:`, validParams);
+                  return validParams;
+                }
+                
+                // Puppeteer tools parameters
+                if (toolName === 'puppeteer-puppeteer_navigate') {
+                  const validParams = {};
+                  if (cleanedParams.url) validParams.url = cleanedParams.url;
+                  console.log(`🔧 [ParamValidation] Cleaned puppeteer-navigate params:`, validParams);
+                  return validParams;
+                }
+                
+                if (toolName === 'puppeteer-puppeteer_evaluate') {
+                  const validParams = {};
+                  if (cleanedParams.script) validParams.script = cleanedParams.script;
+                  console.log(`🔧 [ParamValidation] Cleaned puppeteer-evaluate params:`, validParams);
+                  return validParams;
+                }
+                
+                // For other tools, return params as-is
+                return cleanedParams;
               }
 
               function extractParameters(action) {
@@ -803,6 +922,18 @@ Do NOT include explanations, markdown, or any other text. Only return the JSON a
                 else if (action.type === 'file') {
                   if (action.target) params.path = action.target;
                   if (action.content) params.content = action.content;
+                }
+                
+                // Web scraping parameters - use Puppeteer for reliability
+                else if (action.type === 'web') {
+                  // Extract URL from action text or use a default news source
+                  const urlMatch = action.text?.match(/https?:\/\/[^\s]+/);
+                  if (urlMatch) {
+                    params.url = urlMatch[0];
+                  } else {
+                    // Default to a reliable news source
+                    params.url = 'https://news.ycombinator.com/';
+                  }
                 }
                 
                 // Generic parameters for other types

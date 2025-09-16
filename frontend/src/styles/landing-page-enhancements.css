@@ -1,0 +1,349 @@
+/* ===========================
+   LANDING PAGE ENHANCEMENTS
+   Ultra-Clean & Elegant Design
+   =========================== */
+
+/* 1. GRADIENT ANIMATION */
+@keyframes gradient-x {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient-x {
+  background-size: 200% 200%;
+  animation: gradient-x 3s ease infinite;
+}
+
+/* 2. ENHANCED BLOB ANIMATION */
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+/* 3. PREMIUM HOVER EFFECTS */
+.hero-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.hero-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.hero-button:hover::before {
+  left: 100%;
+}
+
+/* 4. ELEGANT STATS ANIMATION */
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stat-number {
+  animation: countUp 0.6s ease-out forwards;
+}
+
+/* 5. PREMIUM CARD HOVER */
+.premium-card {
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(167, 139, 250, 0.05));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.premium-card:hover::before {
+  opacity: 1;
+}
+
+.premium-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
+}
+
+/* 6. ELEGANT INPUT FOCUS */
+.hero-input {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+}
+
+.hero-input:focus {
+  transform: scale(1.02);
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1), 0 10px 30px rgba(139, 92, 246, 0.2);
+}
+
+/* 7. PREMIUM BADGE ANIMATION */
+@keyframes badgeGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+  }
+}
+
+.premium-badge {
+  animation: badgeGlow 2s ease-in-out infinite;
+}
+
+/* 8. ELEGANT TITLE ANIMATION */
+@keyframes titleSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-title {
+  animation: titleSlideIn 0.8s ease-out forwards;
+}
+
+.hero-title:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.hero-title:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+/* 9. PREMIUM ACTIVITY FEED */
+.activity-feed {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.activity-feed::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.activity-feed:hover::before {
+  opacity: 1;
+}
+
+/* 10. ENHANCED RESPONSIVE DESIGN */
+@media (max-width: 640px) {
+  .hero-title {
+    font-size: 2.5rem;
+    line-height: 1.1;
+  }
+  
+  .hero-description {
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+  
+  .hero-button {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .stat-number {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .hero-description {
+    font-size: 1rem;
+  }
+  
+  .hero-button {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* 11. PREMIUM LOADING STATES */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* 12. ELEGANT SCROLL INDICATORS */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.scroll-indicator {
+  animation: bounce 2s infinite;
+}
+
+/* 13. PREMIUM GLASS MORPHISM */
+.glass-morphism-premium {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* 14. ENHANCED ACCESSIBILITY */
+@media (prefers-reduced-motion: reduce) {
+  .animate-gradient-x,
+  .animate-blob,
+  .hero-button,
+  .premium-card,
+  .hero-input,
+  .premium-badge,
+  .hero-title,
+  .activity-feed,
+  .loading-shimmer,
+  .scroll-indicator {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* 15. HIGH CONTRAST MODE */
+@media (prefers-contrast: high) {
+  .hero-button {
+    border: 2px solid currentColor;
+  }
+  
+  .premium-card {
+    border: 2px solid rgba(139, 92, 246, 0.5);
+  }
+  
+  .glass-morphism-premium {
+    background: rgba(255, 255, 255, 0.2);
+    border-width: 2px;
+  }
+}
+
+/* 16. PREMIUM FOCUS STATES */
+.focus-ring-premium:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+/* 17. ELEGANT SELECTION */
+::selection {
+  background: rgba(139, 92, 246, 0.2);
+  color: inherit;
+}
+
+/* 18. PREMIUM PERFORMANCE */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+.will-change-auto {
+  will-change: auto;
+}
+
+/* 19. ENHANCED MOBILE INTERACTIONS */
+@media (hover: none) and (pointer: coarse) {
+  .premium-card:hover,
+  .hero-button:hover,
+  .activity-feed:hover {
+    transform: none;
+  }
+  
+  .premium-card:active {
+    transform: scale(0.98);
+  }
+}
+
+/* 20. PREMIUM PRINT STYLES */
+@media print {
+  .hero-button,
+  .premium-card,
+  .glass-morphism-premium {
+    background: white !important;
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  
+  .animate-gradient-x,
+  .animate-blob,
+  .premium-badge {
+    animation: none !important;
+  }
+}

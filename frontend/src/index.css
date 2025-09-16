@@ -4,6 +4,21 @@
 /* Import modern chat styles */
 @import './styles/modern-chat.css';
 
+/* Import elegant chat styles */
+@import './styles/elegant-chat.css';
+
+/* Import ultra-elegant chat styles */
+@import './styles/ultra-elegant-chat.css';
+
+/* Import premium animations */
+@import './styles/premium-animations.css';
+
+/* Import sophisticated themes */
+@import './styles/sophisticated-themes.css';
+
+/* Import landing page enhancements */
+@import './styles/landing-page-enhancements.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

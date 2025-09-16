@@ -5,7 +5,7 @@ import {
   Sparkle, 
   Zap, 
   Clock,
-  TrendUp,
+  ChartLine,
   Users,
   Mail,
   Calendar,
@@ -17,7 +17,7 @@ import {
 // Search Categories and Quick Actions
 const SEARCH_CATEGORIES = {
   analytics: {
-    icon: TrendUp,
+    icon: ChartLine,
     color: "text-blue-500",
     suggestions: [
       "Show Gmail analytics",

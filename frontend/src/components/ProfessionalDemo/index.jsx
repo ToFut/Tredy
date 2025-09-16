@@ -11,7 +11,7 @@ import {
   Shield,
   Globe,
   Users,
-  TrendUp,
+  TrendingUp,
   CheckCircle,
   Star,
   Award,
@@ -576,7 +576,7 @@ export default function ProfessionalDemo({ className = "" }) {
 
           <div className="text-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <TrendUp className="w-6 h-6 text-white" />
+              <TrendingUp className="w-6 h-6 text-white" />
             </div>
             <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Business Intelligence</h4>
             <p className="text-sm text-gray-600 dark:text-gray-400">Connect all your systems for comprehensive insights</p>

@@ -1775,6 +1775,25 @@ export default function LandingPage() {
 
       {/* Custom Styles */}
       <style>{`
+        .fixed-chat-container {
+          height: 400px !important;
+          max-height: 400px !important;
+        }
+        
+        @media (min-width: 640px) {
+          .fixed-chat-container {
+            height: 500px !important;
+            max-height: 500px !important;
+          }
+        }
+        
+        @media (min-width: 1024px) {
+          .fixed-chat-container {
+            height: 600px !important;
+            max-height: 600px !important;
+          }
+        }
+        
         @keyframes blob {
           0%, 100% {
             transform: translate(0px, 0px) scale(1);

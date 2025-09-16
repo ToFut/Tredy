@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { 
   Send,
   Bot,
@@ -19,12 +19,17 @@ import { useTranslation } from "react-i18next";
 const toolLogos = {
   "Google Calendar": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg",
   "Gmail": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg",
+  "WhatsApp": "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg",
+  "Google Drive": "https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg",
+  "CRM": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Laravel.svg",
+  "AI Analysis": "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
+  "AI Engine": "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
+  "Analytics": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Google_Chrome_icon_%282011%29.svg",
   "Figma": "https://upload.wikimedia.org/wikipedia/commons/3/33/Figma-logo.svg",
   "Jira": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Jira_Logo.svg",
   "Slack": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Slack_icon_2019.svg",
   "GitHub": "https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg",
-  "Notion": "https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png",
-  "Drive": "https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg"
+  "Notion": "https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png"
 };
 
 export default function ChatDemo() {
@@ -35,29 +40,65 @@ export default function ChatDemo() {
   const [isTyping, setIsTyping] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
   const chatContainerRef = useRef(null);
+  const scrollTimeoutRef = useRef(null);
+  const isScrollingRef = useRef(false);
 
-  // Enhanced chat messages with rich formatting
+  // Smooth scroll function with debouncing
+  const smoothScrollToBottom = useCallback((delay = 0) => {
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    
+    if (isScrollingRef.current) return;
+    
+    scrollTimeoutRef.current = setTimeout(() => {
+      if (chatContainerRef.current && !isScrollingRef.current) {
+        isScrollingRef.current = true;
+        chatContainerRef.current.scrollTo({
+          top: chatContainerRef.current.scrollHeight,
+          behavior: 'smooth'
+        });
+        
+        // Reset scrolling flag after animation completes
+        setTimeout(() => {
+          isScrollingRef.current = false;
+        }, 500);
+      }
+    }, delay);
+  }, []);
+
+  // Enhanced chat messages with rich formatting - Real Estate Business Automation
   const chatMessages = [
     {
+      type: "assistant",
+      status: "complete",
+      message: "Hi! I'm Tredy. What's your website? I'll analyze it and suggest automation opportunities.",
+      timestamp: "9:31 AM"
+    },
+    {
       type: "user",
-      message: "@tredy check my calendar for tomorrow",
+      message: "https://realestate.com",
       timestamp: "9:32 AM"
     },
     {
       type: "assistant",
       status: "processing",
-      message: "I'll check your calendar for tomorrow's schedule.",
-      tools: ["Google Calendar"],
+      message: "Analyzing realestate.com... 🏠 I can see your property listings, contact forms, and lead generation tools. Connecting your connectors now...",
+      tools: ["Web Scraper", "Gmail", "WhatsApp", "Google Drive", "CRM"],
       metrics: {
-        time: "0.8s",
+        time: "2.1s",
         confidence: 98,
         model: "GPT-4",
-        tokens: 127
+        tokens: 234
       },
       thinking: [
-        "Accessing Google Calendar API",
-        "Retrieving events for tomorrow (Nov 15, 2024)",
-        "Formatting schedule information"
+        "🌐 Scanning realestate.com website structure",
+        "📋 Analyzing property listings and contact forms",
+        "🔍 Identifying lead capture mechanisms",
+        "📧 Detecting email integration opportunities",
+        "📱 Finding WhatsApp contact options",
+        "📁 Checking document management needs",
+        "📊 Preparing CRM synchronization setup"
       ],
       timestamp: "9:32 AM"
     },
@@ -67,39 +108,42 @@ export default function ChatDemo() {
       message: {
         type: "structured",
         content: {
-          title: "Tomorrow's Schedule",
-          subtitle: "Thursday, November 15, 2024",
-          items: [
-            { time: "10:00 AM", title: "Product Review", subtitle: "with Design Team", tag: "Meeting", color: "purple" },
-            { time: "2:00 PM", title: "Client Demo", subtitle: "via Zoom", tag: "Presentation", color: "purple" },
-            { time: "4:30 PM", title: "Weekly Standup", subtitle: "Team sync", tag: "Recurring", color: "purple" }
-          ]
+          title: "🏠 Website Analysis Complete - realestate.com",
+          subtitle: "Found 3 automation opportunities that could save you 15+ hours per week!",
+          quickSummary: [
+            { icon: "📧", label: "Lead Processing", status: "Ready" },
+            { icon: "📱", label: "Email Automation", status: "Ready" },
+            { icon: "📁", label: "CRM Sync", status: "Ready" },
+            { icon: "📊", label: "View Analysis", status: "Ready" }
+          ],
+          footer: "💡 Ready to create intelligent workflows"
         }
       },
       timestamp: "9:32 AM"
     },
     {
       type: "user",
-      message: "@tredy send a reminder email to the design team about tomorrow's meeting and attach the latest mockups from Figma",
+      message: "Connected! Now what can you do for me?",
       timestamp: "9:33 AM"
     },
     {
       type: "assistant",
       status: "processing",
-      message: "I'll send a reminder email to the design team with the latest Figma mockups attached.",
-      tools: ["Gmail", "Figma", "Google Calendar"],
+      message: "Excellent! I've analyzed your connected systems and found some powerful automation opportunities. Should I create an intelligent workflow that monitors your marketing folder for new leads and automatically responds to prospects via WhatsApp?",
+      tools: ["Google Drive", "WhatsApp", "CRM", "AI Analysis"],
       metrics: {
-        time: "2.1s",
-        confidence: 95,
+        time: "2.8s",
+        confidence: 96,
         model: "GPT-4",
         tokens: 342
       },
       thinking: [
-        "Fetching meeting details from calendar",
-        "Accessing Figma API for latest mockups",
-        "Found 2 files: Dashboard_v3.fig, Mobile_Screens_v2.fig",
-        "Composing email with meeting context",
-        "Attaching files and preparing to send"
+        "🔍 Scanning Google Drive marketing folder structure",
+        "📊 Analyzing 23 lead documents and contact lists",
+        "🤖 Evaluating WhatsApp integration capabilities",
+        "⚡ Preparing intelligent lead response system",
+        "🔄 Setting up real-time CRM synchronization",
+        "📈 Calculating potential conversion improvements"
       ],
       timestamp: "9:33 AM"
     },
@@ -109,53 +153,49 @@ export default function ChatDemo() {
       message: {
         type: "structured",
         content: {
-          title: "✅ Email Sent Successfully",
-          sections: [
-            {
-              label: "Recipients",
-              value: "design-team@company.com",
-              badge: "5 members"
-            },
-            {
-              label: "Subject",
-              value: "Reminder: Product Review Meeting Tomorrow at 10 AM"
-            },
-            {
-              label: "Attachments",
-              files: [
-                { name: "Dashboard_v3.fig", size: "2.4 MB" },
-                { name: "Mobile_Screens_v2.fig", size: "1.8 MB" }
-              ]
-            }
+          title: "🚀 Intelligent Lead Response System",
+          subtitle: "I've analyzed your marketing folder and found incredible automation potential!",
+          quickStats: [
+            { label: "📁 Documents", value: "23 lead files" },
+            { label: "👥 Prospects", value: "156 contacts" },
+            { label: "⚡ Response Rate", value: "23% → 67%" },
+            { label: "💰 Conversion", value: "8% → 24%" }
           ],
-          footer: "The team should receive it shortly."
+          automation: [
+            { icon: "👁️", label: "Real-time monitoring" },
+            { icon: "🧠", label: "AI contact parsing" },
+            { icon: "💬", label: "WhatsApp automation" },
+            { icon: "🔄", label: "CRM synchronization" }
+          ],
+          footer: "🎯 This automation could increase your lead conversion by 200% and save 15 hours per week!"
         }
       },
       timestamp: "9:33 AM"
     },
     {
       type: "user",
-      message: "@tredy create a Jira ticket for the feedback from yesterday's client call and schedule a follow-up meeting for next week",
+      message: "This sounds amazing! Yes, create that workflow immediately!",
       timestamp: "9:34 AM"
     },
     {
       type: "assistant",
       status: "processing",
-      message: "I'll create a Jira ticket for the client feedback and schedule a follow-up meeting.",
-      tools: ["Jira", "Slack", "Google Calendar", "Gmail"],
+      message: "🚀 Creating your intelligent lead automation system...",
+      tools: ["Google Drive", "WhatsApp", "CRM", "AI Engine", "Analytics"],
       metrics: {
-        time: "3.2s",
-        confidence: 92,
+        time: "4.2s",
+        confidence: 98,
         model: "GPT-4",
-        tokens: 523
+        tokens: 512
       },
       thinking: [
-        "Analyzing Slack #client-feedback channel",
-        "Extracting key points from yesterday's discussion",
-        "Creating Jira ticket with extracted information",
-        "Setting priority based on feedback urgency",
-        "Finding available calendar slots next week",
-        "Sending meeting invites to stakeholders"
+        "🔧 Building automated lead response workflow",
+        "📁 Setting up Google Drive real-time monitoring",
+        "💬 Configuring intelligent WhatsApp message templates",
+        "🔄 Integrating seamless CRM synchronization",
+        "🧪 Testing all workflow components",
+        "⚡ Activating 24/7 intelligent monitoring",
+        "📊 Setting up performance analytics dashboard"
       ],
       timestamp: "9:34 AM"
     },
@@ -165,51 +205,56 @@ export default function ChatDemo() {
       message: {
         type: "structured",
         content: {
-          title: "✅ Tasks Completed",
-          cards: [
-            {
-              icon: "📝",
-              title: "Jira Ticket Created",
-              id: "PROD-1247",
-              items: [
-                { label: "Title", value: "Client Feedback: Dashboard Performance" },
-                { label: "Priority", value: "High", color: "purple" },
-                { label: "Assigned", value: "Backend Team" },
-                { label: "Sprint", value: "Sprint 24" }
-              ]
-            },
-            {
-              icon: "📅",
-              title: "Meeting Scheduled",
-              items: [
-                { label: "Date", value: "Thursday, Nov 21" },
-                { label: "Time", value: "3:00 PM EST" },
-                { label: "Duration", value: "45 minutes" },
-                { label: "Invitees", value: "8 participants" }
-              ]
-            }
+          title: "🎉 Workflow Successfully Created & Running!",
+          subtitle: "Your intelligent lead automation system is now live and processing leads in real-time!",
+          status: [
+            { icon: "📁", label: "Folder Monitoring", status: "🟢 Active" },
+            { icon: "💬", label: "WhatsApp Integration", status: "🟢 Active" },
+            { icon: "🔄", label: "CRM Synchronization", status: "🟢 Active" },
+            { icon: "🧠", label: "AI Processing", status: "🟢 Active" }
           ],
-          footer: "Posted summary in #client-feedback Slack channel"
+          performance: [
+            { label: "📊 Leads Processed", value: "23 (+3 this hour)" },
+            { label: "💬 Messages Sent", value: "15 WhatsApp (67% response)" },
+            { label: "🔄 CRM Updates", value: "8 records (100% accuracy)" },
+            { label: "⏱️ Response Time", value: "2.3 min (vs 4.2 hours)" }
+          ],
+          footer: "🚀 All systems operational! Saving 15+ hours/week and increasing conversions by 200%!"
         }
       },
       timestamp: "9:34 AM"
+    },
+    {
+      type: "assistant",
+      status: "complete",
+      message: {
+        type: "structured",
+        content: {
+          title: "📊 Intelligent Daily Monitoring Active",
+          subtitle: "I'll continuously monitor your lead generation and send you comprehensive insights every morning:",
+          monitoring: [
+            { icon: "🎯", label: "New Leads", value: "Auto-processed & qualified" },
+            { icon: "💬", label: "WhatsApp Engagement", value: "Optimized messaging" },
+            { icon: "🔄", label: "CRM Health", value: "Perfect data integrity" },
+            { icon: "📊", label: "Conversion Analytics", value: "ROI insights & tips" }
+          ],
+          settings: [
+            { icon: "⏰", label: "Report Schedule", value: "8:00 AM daily + alerts" },
+            { icon: "📧", label: "Email Delivery", value: "your-email@company.com" },
+            { icon: "🔍", label: "Monitoring", value: "24/7 surveillance" },
+            { icon: "🚨", label: "Smart Alerts", value: "High-value leads" }
+          ],
+          footer: "🎯 Your automation is now saving 15+ hours/week and increasing revenue by 200%! Daily insights delivered to your-email@company.com"
+        }
+      },
+      timestamp: "9:35 AM"
     }
   ];
 
   // Auto-scroll to bottom when new message appears
   useEffect(() => {
-    if (chatContainerRef.current) {
-      const scrollToBottom = () => {
-        chatContainerRef.current.scrollTo({
-          top: chatContainerRef.current.scrollHeight,
-          behavior: 'smooth'
-        });
-      };
-      
-      // Delay scroll to allow message to render
-      setTimeout(scrollToBottom, 100);
-    }
-  }, [currentMessageIndex]);
+    smoothScrollToBottom(150);
+  }, [currentMessageIndex, smoothScrollToBottom]);
 
   // Typing animation effect with smooth scrolling
   useEffect(() => {
@@ -226,53 +271,36 @@ export default function ChatDemo() {
             setTypingMessage(message.substring(0, charIndex));
             charIndex++;
             
-            // Auto-scroll during typing
-            if (chatContainerRef.current && charIndex % 10 === 0) {
-              chatContainerRef.current.scrollTo({
-                top: chatContainerRef.current.scrollHeight,
-                behavior: 'smooth'
-              });
+            // Smooth scroll during typing (less frequent)
+            if (charIndex % 15 === 0) {
+              smoothScrollToBottom(50);
             }
           } else {
             clearInterval(typingInterval);
             setIsTyping(false);
             
             // Final scroll after typing completes
+            smoothScrollToBottom(300);
+            
             setTimeout(() => {
-              if (chatContainerRef.current) {
-                chatContainerRef.current.scrollTo({
-                  top: chatContainerRef.current.scrollHeight,
-                  behavior: 'smooth'
-                });
+              if (currentMessageIndex < chatMessages.length - 1) {
+                setCurrentMessageIndex(currentMessageIndex + 1);
+                setTypingMessage("");
               }
-              
-              setTimeout(() => {
-                if (currentMessageIndex < chatMessages.length - 1) {
-                  setCurrentMessageIndex(currentMessageIndex + 1);
-                  setTypingMessage("");
-                }
-              }, 2000);
-            }, 500);
+            }, 2500);
           }
-        }, 40);
+        }, 35); // Slightly faster typing for smoother feel
         
         return () => clearInterval(typingInterval);
       } else {
         // For non-typing messages, show immediately and scroll
+        smoothScrollToBottom(200);
+        
         setTimeout(() => {
-          if (chatContainerRef.current) {
-            chatContainerRef.current.scrollTo({
-              top: chatContainerRef.current.scrollHeight,
-              behavior: 'smooth'
-            });
+          if (currentMessageIndex < chatMessages.length - 1) {
+            setCurrentMessageIndex(currentMessageIndex + 1);
           }
-          
-          setTimeout(() => {
-            if (currentMessageIndex < chatMessages.length - 1) {
-              setCurrentMessageIndex(currentMessageIndex + 1);
-            }
-          }, currentMsg.type === "assistant" ? 3000 : 1500);
-        }, 500);
+        }, currentMsg.type === "assistant" ? 2800 : 1200);
       }
     } else {
       // Reset animation with smooth scroll to top
@@ -288,125 +316,136 @@ export default function ChatDemo() {
           setCurrentMessageIndex(0);
           setTypingMessage("");
           setExpandedDetails({});
-        }, 1000);
-      }, 6000);
+        }, 1200);
+      }, 5500);
     }
-  }, [currentMessageIndex]);
+  }, [currentMessageIndex, smoothScrollToBottom]);
 
   const renderStructuredMessage = (content) => {
-    if (content.title === "Tomorrow's Schedule") {
-      return (
-        <div className="space-y-2">
+    return (
+      <div className="space-y-3">
+        <div>
           <h4 className="font-semibold text-gray-900">{content.title}</h4>
-          <p className="text-sm text-gray-600">{content.subtitle}</p>
-          <div className="space-y-2">
-            {content.items.map((item, i) => (
-              <div key={i} className="flex items-center gap-3 bg-purple-50/50 rounded-lg p-3 border border-purple-100">
-                <div className="text-xs font-medium text-gray-500 w-16">{item.time}</div>
+          {content.subtitle && (
+            <p className="text-xs text-gray-600 mt-1">{content.subtitle}</p>
+          )}
+        </div>
+
+        {/* Quick Summary */}
+        {content.quickSummary && (
+          <div className="grid grid-cols-2 gap-2">
+            {content.quickSummary.map((item, i) => (
+              <div key={i} className="flex items-center gap-2 bg-white rounded-lg p-2 border border-purple-100">
+                <span className="text-sm">{item.icon}</span>
+                <span className="text-xs font-medium text-gray-700">{item.label}</span>
+                <span className="text-xs text-green-600 font-medium">{item.status}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Quick Stats */}
+        {content.quickStats && (
+          <div className="grid grid-cols-2 gap-2">
+            {content.quickStats.map((stat, i) => (
+              <div key={i} className="flex items-center justify-between bg-white rounded-lg p-2 border border-purple-100">
+                <span className="text-xs text-gray-600">{stat.label}</span>
+                <span className="text-xs font-medium text-purple-700">{stat.value}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Automation Features */}
+        {content.automation && (
+          <div className="grid grid-cols-2 gap-2">
+            {content.automation.map((feature, i) => (
+              <div key={i} className="flex items-center gap-2 bg-white rounded-lg p-2 border border-purple-100">
+                <span className="text-sm">{feature.icon}</span>
+                <span className="text-xs font-medium text-gray-700">{feature.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Status */}
+        {content.status && (
+          <div className="grid grid-cols-2 gap-2">
+            {content.status.map((item, i) => (
+              <div key={i} className="flex items-center justify-between bg-white rounded-lg p-2 border border-purple-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">{item.icon}</span>
+                  <span className="text-xs font-medium text-gray-700">{item.label}</span>
+                </div>
+                <span className="text-xs font-medium text-green-600">{item.status}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Performance */}
+        {content.performance && (
+          <div className="space-y-1">
+            {content.performance.map((item, i) => (
+              <div key={i} className="flex items-center justify-between bg-white rounded-lg p-2 border border-purple-100">
+                <span className="text-xs text-gray-600">{item.label}</span>
+                <span className="text-xs font-medium text-purple-700">{item.value}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Monitoring */}
+        {content.monitoring && (
+          <div className="grid grid-cols-2 gap-2">
+            {content.monitoring.map((item, i) => (
+              <div key={i} className="flex items-center gap-2 bg-white rounded-lg p-2 border border-purple-100">
+                <span className="text-sm">{item.icon}</span>
                 <div className="flex-1">
-                  <div className="font-medium text-sm text-gray-900">{item.title}</div>
-                  <div className="text-xs text-gray-600">{item.subtitle}</div>
+                  <div className="text-xs font-medium text-gray-700">{item.label}</div>
+                  <div className="text-xs text-gray-500">{item.value}</div>
                 </div>
-                <span className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-700 border border-purple-200">
-                  {item.tag}
-                </span>
               </div>
             ))}
           </div>
-        </div>
-      );
-    }
+        )}
 
-    if (content.sections) {
-      return (
-        <div className="space-y-3">
-          <h4 className="font-semibold text-gray-900">{content.title}</h4>
-          <div className="space-y-2">
-            {content.sections.map((section, i) => (
-              <div key={i}>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600">{section.label}</span>
-                  {section.badge && (
-                    <span className="px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded-full">
-                      {section.badge}
-                    </span>
-                  )}
-                </div>
-                <div className="text-gray-900 text-sm mt-1">
-                  {section.value}
-                  {section.files && (
-                    <div className="flex gap-2 mt-2">
-                      {section.files.map((file, fi) => (
-                        <div key={fi} className="flex items-center gap-2 bg-purple-50 rounded-lg px-3 py-1 border border-purple-200">
-                          <span className="text-xs font-medium">{file.name}</span>
-                          <span className="text-xs text-gray-500">{file.size}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+        {/* Settings */}
+        {content.settings && (
+          <div className="grid grid-cols-2 gap-2">
+            {content.settings.map((item, i) => (
+              <div key={i} className="flex items-center gap-2 bg-white rounded-lg p-2 border border-purple-100">
+                <span className="text-sm">{item.icon}</span>
+                <div className="flex-1">
+                  <div className="text-xs font-medium text-gray-700">{item.label}</div>
+                  <div className="text-xs text-gray-500">{item.value}</div>
                 </div>
               </div>
             ))}
           </div>
-          {content.footer && (
-            <p className="text-sm text-gray-600 pt-2 border-t border-gray-200">
-              {content.footer}
-            </p>
-          )}
-        </div>
-      );
-    }
+        )}
 
-    if (content.cards) {
-      return (
-        <div className="space-y-3">
-          <h4 className="font-semibold text-gray-900">{content.title}</h4>
-          <div className="grid gap-3">
-            {content.cards.map((card, i) => (
-              <div key={i} className="bg-purple-50/30 rounded-lg p-4 border border-purple-100">
-                <div className="flex items-start gap-2">
-                  <span className="text-xl">{card.icon}</span>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h5 className="font-semibold text-sm text-gray-900">{card.title}</h5>
-                      {card.id && (
-                        <span className="px-2 py-1 text-xs font-mono bg-purple-700 text-white rounded-md">
-                          {card.id}
-                        </span>
-                      )}
-                    </div>
-                    <div className="space-y-1">
-                      {card.items.map((item, ii) => (
-                        <div key={ii} className="flex items-center gap-2 text-xs">
-                          <span className="text-gray-600">{item.label}:</span>
-                          <span className="font-medium text-purple-600">
-                            {item.value}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          {content.footer && (
-            <div className="flex items-center gap-2 text-xs text-purple-600 bg-purple-50 rounded-lg px-3 py-1 border border-purple-200">
-              <CheckCircle2 className="w-3 h-3 text-purple-600" />
-              {content.footer}
+        {/* Footer */}
+        {content.footer && (
+          <div className="bg-green-50 rounded-lg p-2 border border-green-200">
+            <div className="flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3 text-green-600" />
+              <p className="text-xs text-green-800 font-medium">
+                {content.footer}
+              </p>
             </div>
-          )}
-        </div>
-      );
-    }
-
-    return null;
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
-    <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border-2 border-purple-200 hover:border-purple-300 transition-all duration-300">
+    <div 
+      className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border-2 border-purple-200 hover:border-purple-300 transition-all duration-300 flex flex-col fixed-chat-container"
+    >
       {/* Chat Header */}
-      <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-5 relative overflow-hidden">
+      <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-5 relative overflow-hidden flex-shrink-0">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-500/90 to-purple-600/90"></div>
         <div className="relative flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -435,8 +474,11 @@ export default function ChatDemo() {
       {/* Chat Messages */}
       <div 
         ref={chatContainerRef}
-        className="h-[400px] sm:h-[500px] lg:h-[600px] overflow-y-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 bg-gradient-to-b from-purple-50/30 via-white to-purple-50/20 scroll-smooth"
-        style={{ scrollBehavior: 'smooth' }}
+        className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4 lg:p-5 space-y-3 sm:space-y-4 bg-gradient-to-b from-purple-50/30 via-white to-purple-50/20 scroll-smooth min-h-0"
+        style={{ 
+          scrollBehavior: 'smooth',
+          scrollPaddingBottom: '20px'
+        }}
       >
         {chatMessages.slice(0, currentMessageIndex + 1).map((msg, idx) => (
           <div 
@@ -478,22 +520,39 @@ export default function ChatDemo() {
                     </p>
                   </div>
 
-                  {/* Compact Metrics Line */}
+                  {/* Compact Tool Logos with Metrics - Single Line */}
                   {msg.tools && idx <= currentMessageIndex && (
-                    <div className="flex items-center gap-4 text-xs text-gray-600 px-3 mt-3 bg-purple-50/50 rounded-lg py-2 border border-purple-100">
-                      {/* Tool Logos */}
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3 text-xs text-gray-600 px-3 mt-3 bg-purple-50/50 rounded-lg py-2 border border-purple-100 overflow-x-auto">
+                      {/* Compact Tool Logos */}
+                      <div className="flex items-center gap-1 flex-shrink-0">
                         {msg.tools.map((tool, ti) => (
-                          <div key={ti} className="relative group">
-                            <div className="w-6 h-6 bg-white rounded-lg border border-purple-200 flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-110">
-                              <img 
-                                src={toolLogos[tool] || ""} 
-                                alt={tool}
-                                className="w-4 h-4 rounded"
-                                title={tool}
-                              />
+                          <div key={ti} className="relative group flex-shrink-0">
+                            <div className="w-5 h-5 bg-white rounded-full border border-purple-200 flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-110">
+                              {toolLogos[tool] ? (
+                                <img 
+                                  src={toolLogos[tool]} 
+                                  alt={tool}
+                                  className="w-3 h-3 rounded-full object-cover"
+                                  title={tool}
+                                  onError={(e) => {
+                                    e.target.style.display = 'none';
+                                    e.target.nextSibling.style.display = 'flex';
+                                  }}
+                                />
+                              ) : null}
+                              <div 
+                                className={`w-3 h-3 rounded-full flex items-center justify-center text-xs font-bold ${toolLogos[tool] ? 'hidden' : 'flex'}`}
+                                style={{ 
+                                  backgroundColor: tool === 'AI Analysis' || tool === 'AI Engine' ? '#10b981' : 
+                                                 tool === 'Analytics' ? '#3b82f6' : 
+                                                 tool === 'CRM' ? '#f59e0b' : '#8b5cf6',
+                                  color: 'white'
+                                }}
+                              >
+                                {tool.charAt(0)}
+                              </div>
                             </div>
-                            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-purple-900 text-white text-xs px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
+                            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-purple-900 text-white text-xs px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg z-10">
                               {tool}
                             </div>
                           </div>
@@ -501,35 +560,35 @@ export default function ChatDemo() {
                       </div>
 
                       {/* Separator */}
-                      <span className="text-purple-300">•</span>
+                      <span className="text-purple-300 flex-shrink-0">•</span>
 
                       {/* Time */}
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 flex-shrink-0">
                         <Zap className="w-3 h-3 text-purple-600" />
                         <span className="font-medium">{msg.metrics.time}</span>
                       </div>
 
                       {/* Separator */}
-                      <span className="text-purple-300">•</span>
+                      <span className="text-purple-300 flex-shrink-0">•</span>
 
                       {/* Confidence */}
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 bg-purple-100 rounded-full h-2 relative overflow-hidden">
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <div className="w-12 bg-purple-100 rounded-full h-1.5 relative overflow-hidden">
                           <div 
-                            className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full transition-all duration-1000 ease-out relative"
+                            className="bg-gradient-to-r from-purple-500 to-purple-600 h-1.5 rounded-full transition-all duration-1000 ease-out relative"
                             style={{ width: `${msg.metrics.confidence}%` }}
                           >
                             <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
                           </div>
                         </div>
-                        <span className="font-bold text-purple-700">{msg.metrics.confidence}%</span>
+                        <span className="font-bold text-purple-700 text-xs">{msg.metrics.confidence}%</span>
                       </div>
 
                       {/* Separator */}
-                      <span className="text-purple-300">•</span>
+                      <span className="text-purple-300 flex-shrink-0">•</span>
 
                       {/* Model */}
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 flex-shrink-0">
                         <Cpu className="w-3 h-3 text-purple-600" />
                         <span className="font-medium">{msg.metrics.model}</span>
                       </div>
@@ -537,10 +596,10 @@ export default function ChatDemo() {
                       {/* Expandable Details */}
                       {msg.thinking && (
                         <>
-                          <span className="text-gray-300">•</span>
+                          <span className="text-gray-300 flex-shrink-0">•</span>
                           <button
                             onClick={() => setExpandedDetails({ ...expandedDetails, [idx]: !expandedDetails[idx] })}
-                            className="flex items-center gap-1 text-purple-600 hover:text-purple-800 transition-colors duration-200 font-medium"
+                            className="flex items-center gap-1 text-purple-600 hover:text-purple-800 transition-colors duration-200 font-medium flex-shrink-0"
                           >
                             <Brain className="w-3 h-3" />
                             <span>Details</span>
@@ -582,7 +641,7 @@ export default function ChatDemo() {
       </div>
       
       {/* Chat Input */}
-      <div className="p-6 bg-gradient-to-r from-purple-50 to-purple-100/50 border-t border-purple-200">
+      <div className="flex-shrink-0 p-6 bg-gradient-to-r from-purple-50 to-purple-100/50 border-t border-purple-200">
         <div className="flex items-center space-x-4">
           <div className="flex-1 relative">
             <input 
@@ -685,6 +744,38 @@ export default function ChatDemo() {
         
         ::-webkit-scrollbar-thumb:hover {
           background: rgb(126 34 206);
+        }
+        
+        /* Google-style logo animations */
+        @keyframes logoFloat {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-2px);
+          }
+        }
+        
+        @keyframes logoGlow {
+          0%, 100% {
+            box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.4);
+          }
+          50% {
+            box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.1);
+          }
+        }
+        
+        .logo-container:hover {
+          animation: logoFloat 0.6s ease-in-out infinite, logoGlow 2s ease-in-out infinite;
+        }
+        
+        /* Smooth transitions for all interactive elements */
+        .tool-logo-item {
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .tool-logo-item:hover {
+          transform: translateY(-1px) scale(1.05);
         }
       `}</style>
     </div>

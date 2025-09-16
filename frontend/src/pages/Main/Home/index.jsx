@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Sparkle, Plus, EnvelopeSimple, Calendar, Play, FlowArrow, Globe, ArrowRight } from "@phosphor-icons/react";
+import { Sparkle, Plus, EnvelopeSimple, Calendar, Play, FlowArrow, Globe, ArrowRight, Users, Brain } from "@phosphor-icons/react";
 import useUser from "@/hooks/useUser";
 import Workspace from "@/models/workspace";
 import WorkspaceChat from "@/components/WorkspaceChat";
@@ -8,7 +8,7 @@ import NewWorkspaceModal, { useNewWorkspaceModal } from "@/components/Modals/New
 import AgentFlows from "@/models/agentFlows";
 import { useTranslation } from "react-i18next";
 import { useLanguageOptions } from "@/hooks/useLanguageOptions";
-import ChatDemo from "../LandingPage/ChatDemo";
+import ChatDemo from "../../LandingPage/ChatDemo";
 import AIEnterprisePlatform from "@/components/AIEnterprisePlatform";
 import ProfessionalDemo from "@/components/ProfessionalDemo";
 

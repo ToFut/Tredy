@@ -7,7 +7,7 @@ import {
   Eye,
   Code,
   Sparkles,
-  Lightning,
+  Zap,
   Shield,
   Globe,
   Users,

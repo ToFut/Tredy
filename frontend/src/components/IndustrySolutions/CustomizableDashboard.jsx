@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { 
-  ChartLine, 
-  Users, 
-  Calendar, 
-  Mail, 
-  Briefcase, 
+import {
+  ChartLine,
+  Users,
+  Calendar,
+  Envelope,
+  Briefcase,
   Activity,
   Clock,
   Target,
   Lightning,
   Eye,
-  Settings,
-  Refresh,
+  Gear,
+  ArrowClockwise,
   Plus,
   Minus,
   ArrowsOut,
@@ -40,7 +40,7 @@ const WIDGET_TYPES = {
   },
   'communication-summary': {
     title: 'Communication Summary',
-    icon: Mail,
+    icon: Envelope,
     color: 'from-orange-500 to-orange-600',
     description: 'Email and messaging overview'
   },
@@ -203,7 +203,7 @@ function DashboardWidget({
             Updated 2 min ago
           </span>
           <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
-            <Refresh className="w-3 h-3 text-gray-500" />
+            <ArrowClockwise className="w-3 h-3 text-gray-500" />
           </button>
         </div>
       </div>
@@ -394,7 +394,7 @@ export default function CustomizableDashboard({
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
             }`}
           >
-            <Settings className="w-4 h-4" />
+            <Gear className="w-4 h-4" />
           </button>
           {onCustomize && (
             <button

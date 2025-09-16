@@ -13,7 +13,7 @@ import {
   ChartLine,
   Globe,
   Shield,
-  Zap,
+  Lightning,
   Sparkle,
   Eye,
   ChatCircle,
@@ -25,7 +25,6 @@ import Workspace from "@/models/workspace";
 import { useParams } from "react-router-dom";
 import BusinessChat from "./BusinessChat";
 import CustomizableDashboard from "./CustomizableDashboard";
-import OneLineSearch from "./OneLineSearch";
 
 // Industry Solutions connector configurations
 const INDUSTRY_CONNECTORS = {

@@ -20,7 +20,7 @@ import {
   Users,
   FileText,
   Workflow,
-  TrendingUp,
+  TrendUp,
   Target,
   Calendar,
   Mail,

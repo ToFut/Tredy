@@ -5,7 +5,7 @@ import {
   Calendar, 
   Mail, 
   Briefcase, 
-  TrendingUp,
+  TrendUp,
   Activity,
   Clock,
   Target,
@@ -35,7 +35,7 @@ const WIDGET_TYPES = {
   },
   'business-insights': {
     title: 'Business Insights',
-    icon: TrendingUp,
+    icon: TrendUp,
     color: 'from-purple-500 to-purple-600',
     description: 'Key performance indicators'
   },

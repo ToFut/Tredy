@@ -17,7 +17,7 @@ import {
   Lightning as Zap,
   Brain,
   Clock,
-  TrendingUp,
+  TrendUp,
   Robot as Bot,
   ChatCircle as MessageSquare,
   Gear as Settings,

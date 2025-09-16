@@ -4,7 +4,7 @@ import {
   Cpu, 
   Stack as Layers, 
   Lightning as Zap, 
-  TrendingUp,
+  TrendUp,
   Shield,
   Clock,
   ChatCircle as MessageSquare,

@@ -5,7 +5,6 @@ import {
   Calendar, 
   Mail, 
   Briefcase, 
-  ChartLine,
   Activity,
   Clock,
   Target,

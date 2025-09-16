@@ -37,10 +37,6 @@ export default function CommunityHub() {
           
           {/* Navigation Tabs */}
           <div className="flex gap-4 mb-6">
-            <div className="flex items-center gap-2 px-3 py-2 bg-primary-button/20 text-primary-button rounded">
-              <TrendUp className="w-4 h-4" />
-              Trending Items
-            </div>
             <a
               href={paths.communityHub.marketplace()}
               className="flex items-center gap-2 px-3 py-2 hover:bg-theme-bg-primary rounded transition-colors text-theme-text-secondary"

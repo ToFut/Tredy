@@ -18,6 +18,7 @@ import {
   Brain,
   Clock,
   TrendingUp,
+  ChartLine,
   Robot as Bot,
   ChatCircle as MessageSquare,
   Gear as Settings,

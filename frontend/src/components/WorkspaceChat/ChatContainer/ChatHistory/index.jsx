@@ -199,6 +199,7 @@ export default function ChatHistory({
         saveEditedMessage,
         forkThread,
         getMessageAlignment,
+        sendCommand,
       }),
     [
       workspace,
@@ -206,6 +207,7 @@ export default function ChatHistory({
       regenerateAssistantMessage,
       saveEditedMessage,
       forkThread,
+      sendCommand,
     ]
   );
   const lastMessageInfo = useMemo(() => getLastMessageInfo(history), [history]);
@@ -419,6 +421,7 @@ function buildMessages({
   saveEditedMessage,
   forkThread,
   getMessageAlignment,
+  sendCommand,
 }) {
   return history.reduce((acc, props, index) => {
     const isLastBotReply =
@@ -447,17 +450,17 @@ function buildMessages({
           key={props.uuid} 
           workflowData={workflowData}
           onSave={async (workflowId, name) => {
-            // Handle save via sendMessage
-            await sendMessage(`@agent save workflow ${workflowId} as ${name}`, true);
+            // Handle save via sendCommand
+            await sendCommand({ text: `@agent save workflow ${workflowId} as ${name}`, autoSubmit: true });
           }}
           onTest={async (workflowId) => {
-            await sendMessage(`@agent test workflow ${workflowId}`, true);
+            await sendCommand({ text: `@agent test workflow ${workflowId}`, autoSubmit: true });
           }}
           onEdit={async (workflowId) => {
-            await sendMessage(`@agent edit workflow ${workflowId}`, true);
+            await sendCommand({ text: `@agent edit workflow ${workflowId}`, autoSubmit: true });
           }}
           onCancel={async (workflowId) => {
-            await sendMessage(`@agent cancel workflow creation ${workflowId}`, true);
+            await sendCommand({ text: `@agent cancel workflow creation ${workflowId}`, autoSubmit: true });
           }}
         />
       );

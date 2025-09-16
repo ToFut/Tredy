@@ -5,6 +5,7 @@ import {
   Stack as Layers, 
   Lightning as Zap, 
   TrendingUp,
+  ChartLine,
   Shield,
   Clock,
   ChatCircle as MessageSquare,
@@ -155,7 +156,7 @@ export default function SmartContextPills({
                   {/* Trend Indicator */}
                   {pill.trend && (
                     <div className="flex items-center gap-0.5 ml-1">
-                      <TrendingUp className="w-3 h-3 text-green-400" />
+                      <ChartLine className="w-3 h-3 text-green-400" />
                       <span className="text-green-400 text-[10px] font-bold">
                         {pill.trend}
                       </span>

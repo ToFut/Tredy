@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { 
-  ChartLine, 
-  Users, 
-  Calendar, 
-  Mail, 
-  Briefcase, 
-  TrendingUp,
+import {
+  ChartLine,
+  Users,
+  Calendar,
+  Envelope,
+  Briefcase,
   Activity,
   Clock,
   Target,
-  Zap,
+  Lightning,
   Eye,
-  Settings,
-  Refresh,
+  Gear,
+  ArrowClockwise,
   Plus,
   Minus,
   ArrowsOut,
@@ -29,19 +28,19 @@ const WIDGET_TYPES = {
   },
   'connector-health': {
     title: 'Connector Health',
-    icon: Zap,
+    icon: Lightning,
     color: 'from-green-500 to-green-600',
     description: 'Monitor all connected services'
   },
   'business-insights': {
     title: 'Business Insights',
-    icon: TrendingUp,
+    icon: ChartLine,
     color: 'from-purple-500 to-purple-600',
     description: 'Key performance indicators'
   },
   'communication-summary': {
     title: 'Communication Summary',
-    icon: Mail,
+    icon: Envelope,
     color: 'from-orange-500 to-orange-600',
     description: 'Email and messaging overview'
   },
@@ -204,7 +203,7 @@ function DashboardWidget({
             Updated 2 min ago
           </span>
           <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
-            <Refresh className="w-3 h-3 text-gray-500" />
+            <ArrowClockwise className="w-3 h-3 text-gray-500" />
           </button>
         </div>
       </div>
@@ -222,7 +221,7 @@ function ConnectorStatusBar({ connectors }) {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg">
-            <Zap className="w-4 h-4 text-white" />
+            <Lightning className="w-4 h-4 text-white" />
           </div>
           <div>
             <h3 className="font-semibold text-blue-900 dark:text-blue-100 text-sm">
@@ -395,7 +394,7 @@ export default function CustomizableDashboard({
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
             }`}
           >
-            <Settings className="w-4 h-4" />
+            <Gear className="w-4 h-4" />
           </button>
           {onCustomize && (
             <button

@@ -13,7 +13,7 @@ import {
 
 
 // Lazy load the heavy ChatContainer component
-const ChatContainer = lazy(() => import("./ChatContainer"));
+const ChatContainer = lazy(() => import("./ChatContainer/index.jsx"));
 
 export default function WorkspaceChat({ loading, workspace, onSendCommandReady }) {
   useWatchForAutoPlayAssistantTTSResponse();

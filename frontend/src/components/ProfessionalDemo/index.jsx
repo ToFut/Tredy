@@ -209,7 +209,7 @@ function ProfessionalChat({ isActive, onToggle }) {
               {msg.isAction && (
                 <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                   <div className="flex items-center gap-2 mb-1">
-                    <Zap className="w-3 h-3 text-blue-600" />
+                    <Lightning className="w-3 h-3 text-blue-600" />
                     <span className="text-xs font-medium text-blue-800 dark:text-blue-200">Automated Actions</span>
                   </div>
                 </div>

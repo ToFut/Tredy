@@ -689,10 +689,10 @@ export default function LandingPage() {
                     {t('landing.hero.title')}
                   </span>
                   <span className="hero-title block text-purple-600 dark:text-purple-400 animate-gradient-x relative">
-                    {t('landing.hero.subtitle')}
+                  {t('landing.hero.subtitle')}
                     <div className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-purple-400/30 to-indigo-400/30 rounded-full animate-pulse"></div>
-                  </span>
-                </h1>
+                </span>
+              </h1>
               </div>
               
               {/* Agentic Description */}
@@ -849,14 +849,14 @@ export default function LandingPage() {
           {/* Business Platform Demo */}
           <div className="flex justify-center mb-16">
             <BusinessChat selectedIndustry={selectedIndustry} />
-          </div>
+              </div>
 
           {/* Call to Action */}
           <div className="text-center">
             <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl p-8 text-white">
               <h3 className="text-2xl font-bold mb-4">
                 Ready to Transform Your Industry?
-              </h3>
+                  </h3>
               <p className="text-purple-100 mb-6 max-w-2xl mx-auto">
                 Tredy AI adapts to your specific industry needs, creating intelligent workflows 
                 that understand your business processes and automate complex tasks.

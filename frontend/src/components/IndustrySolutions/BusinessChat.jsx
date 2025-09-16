@@ -6,15 +6,15 @@ import {
   Palette, 
   ChartLine, 
   GitBranch, 
-  Search,
+  MagnifyingGlass,
   Plus,
   ArrowRight,
-  Lightbulb,
+  Bulb,
   Target,
   Lightning,
   Brain,
   Eye,
-  Wand
+  Sparkle
 } from "@phosphor-icons/react";
 import { Tooltip } from "react-tooltip";
 
@@ -219,7 +219,7 @@ export default function IndustrySolutionsBusinessChat({
           {/* Search Section */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+              <MagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
               <input
                 ref={searchRef}
                 type="text"
@@ -266,7 +266,7 @@ export default function IndustrySolutionsBusinessChat({
                 onClick={handleDashboardCustomize}
                 className="flex items-center gap-2 px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors text-sm"
               >
-                <Wand className="w-4 h-4" />
+                <Sparkle className="w-4 h-4" />
                 Customize
               </button>
             </div>
@@ -359,7 +359,7 @@ export default function IndustrySolutionsBusinessChat({
             <div className="space-y-3">
               <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
                 <div className="flex items-start gap-3">
-                  <Lightbulb className="w-5 h-5 text-blue-500 mt-0.5" />
+                  <Bulb className="w-5 h-5 text-blue-500 mt-0.5" />
                   <div>
                     <h4 className="font-medium text-blue-900 dark:text-blue-100 text-sm">
                       Workflow Optimization

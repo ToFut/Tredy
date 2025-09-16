@@ -5,13 +5,13 @@ import {
   Gear, 
   Palette, 
   ChartLine, 
-  Workflow, 
+  GitBranch, 
   Search,
   Plus,
   ArrowRight,
   Lightbulb,
   Target,
-  Zap,
+  Lightning,
   Brain,
   Eye,
   Wand
@@ -24,7 +24,7 @@ const DASHBOARD_PROMPTS = [
     id: "workflow-mirror",
     title: "Mirror My Workflow",
     description: "Tailored dashboard reflecting YOUR daily workflow patterns",
-    icon: Workflow,
+    icon: GitBranch,
     prompt: "Analyze my workflow patterns and create a dashboard that mirrors my daily tasks and processes",
     color: "from-blue-500 to-blue-600"
   },
@@ -40,7 +40,7 @@ const DASHBOARD_PROMPTS = [
     id: "connector-status",
     title: "Your Platform Health",
     description: "Monitor YOUR connected services and their status",
-    icon: Zap,
+    icon: Lightning,
     prompt: "Create a dashboard that monitors the health and status of all connected services",
     color: "from-purple-500 to-purple-600"
   },
@@ -304,7 +304,7 @@ export default function IndustrySolutionsBusinessChat({
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-green-500" />
+                <Lightning className="w-5 h-5 text-green-500" />
                 <h3 className="font-semibold text-gray-900 dark:text-white">
                   Your Data Sources
                 </h3>

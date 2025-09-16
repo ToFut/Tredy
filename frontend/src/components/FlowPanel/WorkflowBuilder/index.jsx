@@ -963,7 +963,7 @@ function ExecutionPanel({ isOpen, onClose, executionResults, executionStatus }) 
   );
 }
 
-export default function WorkflowBuilder({ workspace, noteData, onClose }) {
+function WorkflowBuilder({ workspace, noteData, onClose }) {
   const [blocks, setBlocks] = useState([]);
   const [availableFlows, setAvailableFlows] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -1522,3 +1522,7 @@ export default function WorkflowBuilder({ workspace, noteData, onClose }) {
     </div>
   );
 }
+
+// Export both as named export and default export for compatibility
+export { WorkflowBuilder as Workflow };
+export default WorkflowBuilder;

@@ -9,7 +9,7 @@ import {
   Clock,
   CheckCircle2,
   Loader2,
-  Zap,
+  Bolt,
   Cpu,
   Sparkles,
   Menu,
@@ -19,7 +19,7 @@ import {
   Settings,
   Users,
   FileText,
-  Workflow,
+  GitBranch,
   TrendingUp,
   Target,
   Calendar,
@@ -69,7 +69,7 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         { icon: MessageSquare, label: "Client Communication" },
         { icon: FolderOpen, label: "Property Documents" },
         { icon: Database, label: "Property CRM" },
-        { icon: Workflow, label: "Purchase Automation" },
+        { icon: GitBranch, label: "Purchase Automation" },
         { icon: Settings, label: "Settings" }
       ],
       dashboardData: {
@@ -116,7 +116,7 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         { icon: MessageSquare, label: "Telemedicine" },
         { icon: FolderOpen, label: "Medical Records" },
         { icon: Database, label: "Patient CRM" },
-        { icon: Workflow, label: "Care Automation" },
+        { icon: GitBranch, label: "Care Automation" },
         { icon: Settings, label: "Settings" }
       ],
       dashboardData: {
@@ -163,7 +163,7 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         { icon: MessageSquare, label: "Customer Support" },
         { icon: FolderOpen, label: "Product Catalog" },
         { icon: Database, label: "Order Management" },
-        { icon: Workflow, label: "Sales Automation" },
+        { icon: GitBranch, label: "Sales Automation" },
         { icon: Settings, label: "Settings" }
       ],
       dashboardData: {
@@ -210,7 +210,7 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         { icon: MessageSquare, label: "Financial Advisory" },
         { icon: FolderOpen, label: "Financial Reports" },
         { icon: Database, label: "Portfolio Management" },
-        { icon: Workflow, label: "Risk Automation" },
+        { icon: GitBranch, label: "Risk Automation" },
         { icon: Settings, label: "Settings" }
       ],
       dashboardData: {
@@ -257,7 +257,7 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         { icon: MessageSquare, label: "Quality Control" },
         { icon: FolderOpen, label: "Production Reports" },
         { icon: Database, label: "Inventory Management" },
-        { icon: Workflow, label: "Production Automation" },
+        { icon: GitBranch, label: "Production Automation" },
         { icon: Settings, label: "Settings" }
       ],
       dashboardData: {
@@ -304,7 +304,7 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         { icon: MessageSquare, label: "Online Learning" },
         { icon: FolderOpen, label: "Course Materials" },
         { icon: Database, label: "Student Records" },
-        { icon: Workflow, label: "Learning Automation" },
+        { icon: GitBranch, label: "Learning Automation" },
         { icon: Settings, label: "Settings" }
       ],
       dashboardData: {
@@ -891,7 +891,7 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
             {/* Active Automations */}
             <div className="bg-white rounded-xl p-4 shadow-sm border border-purple-100">
               <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <Workflow className="w-4 h-4 text-purple-600" />
+                <GitBranch className="w-4 h-4 text-purple-600" />
                 Automation Impact
               </h3>
               <div className="space-y-3">
@@ -1025,7 +1025,7 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
 
                         {/* Time */}
                         <div className="flex items-center gap-1 flex-shrink-0">
-                          <Zap className="w-3 h-3 text-purple-600" />
+                          <Bolt className="w-3 h-3 text-purple-600" />
                           <span className="font-medium">{msg.metrics.time}</span>
                         </div>
 

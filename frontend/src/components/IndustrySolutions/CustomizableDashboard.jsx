@@ -8,7 +8,7 @@ import {
   Activity,
   Clock,
   Target,
-  Zap,
+  Lightning,
   Eye,
   Settings,
   Refresh,
@@ -28,7 +28,7 @@ const WIDGET_TYPES = {
   },
   'connector-health': {
     title: 'Connector Health',
-    icon: Zap,
+    icon: Lightning,
     color: 'from-green-500 to-green-600',
     description: 'Monitor all connected services'
   },
@@ -221,7 +221,7 @@ function ConnectorStatusBar({ connectors }) {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg">
-            <Zap className="w-4 h-4 text-white" />
+            <Lightning className="w-4 h-4 text-white" />
           </div>
           <div>
             <h3 className="font-semibold text-blue-900 dark:text-blue-100 text-sm">

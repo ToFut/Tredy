@@ -8,7 +8,7 @@ import NewWorkspaceModal, { useNewWorkspaceModal } from "@/components/Modals/New
 import AgentFlows from "@/models/agentFlows";
 import { useTranslation } from "react-i18next";
 import { useLanguageOptions } from "@/hooks/useLanguageOptions";
-import ChatDemo from "../LandingPage/ChatDemo";
+import ChatDemo from "../LandingPage/ChatDemo.jsx";
 import AIEnterprisePlatform from "@/components/AIEnterprisePlatform";
 import ProfessionalDemo from "@/components/ProfessionalDemo";
 

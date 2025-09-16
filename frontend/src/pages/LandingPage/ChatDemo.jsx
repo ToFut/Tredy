@@ -442,13 +442,7 @@ export default function ChatDemo() {
 
   return (
     <div 
-      className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border-2 border-purple-200 hover:border-purple-300 transition-all duration-300 flex flex-col"
-      style={{ 
-        height: '400px', 
-        maxHeight: '400px',
-        '@media (min-width: 640px)': { height: '500px', maxHeight: '500px' },
-        '@media (min-width: 1024px)': { height: '600px', maxHeight: '600px' }
-      }}
+      className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border-2 border-purple-200 hover:border-purple-300 transition-all duration-300 flex flex-col fixed-chat-container"
     >
       {/* Chat Header */}
       <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-5 relative overflow-hidden flex-shrink-0">

@@ -4,9 +4,11 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "/app/server/gmail-server.js"
+        "/app/server/gmail-mcp-server.js"
       ],
       "env": {
+        "NANGO_PROVIDER": "gmail",
+        "NANGO_PROVIDER_CONFIG_KEY": "gmail-getting-started",
         "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
         "NANGO_HOST": "${NANGO_HOST}",
         "MCP_SERVICE_NAME": "gmail"
@@ -22,7 +24,7 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "/app/server/calendar-server.js"
+        "/app/server/simple-google-calendar-mcp.js"
       ],
       "env": {
         "NANGO_PROVIDER": "google-calendar",
@@ -36,6 +38,55 @@
         "workspaceAware": true,
         "description": "Google Calendar integration - handles all calendar operations",
         "toolPrefix": "gcalendar"
+      }
+    },
+    "twilio-universal": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/app/server/mcp/build/index.js",
+        "--services",
+        "twilio_api_v2010",
+        "--tags",
+        "Api20100401IncomingPhoneNumber"
+      ],
+      "env": {
+        "NANGO_PROVIDER": "twilio",
+        "NANGO_PROVIDER_CONFIG_KEY": "twilio",
+        "NANGO_CONNECTION_ID": "test-connection-id",
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "TWILIO_CLIENT_ID": "${TWILIO_CLIENT_ID}",
+        "TWILIO_AUTH_TOKEN": "${TWILIO_AUTH_TOKEN}",
+        "TWILIO_NUMBER": "${TWILIO_NUMBER}",
+        "MCP_SERVICE_NAME": "twilio"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "Twilio integration - handles SMS, calls, and phone number operations",
+        "toolPrefix": "twilio"
+      }
+    },
+    "gdrive-universal": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/app/server/drive-server.js"
+      ],
+      "env": {
+        "NANGO_PROVIDER": "google-drive",
+        "NANGO_PROVIDER_CONFIG_KEY": "google-drive-getting-started",
+        "NANGO_CONNECTION_ID": "${NANGO_CONNECTION_ID}",
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "MCP_SERVICE_NAME": "gdrive"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "Google Drive integration - list files, upload, download, create folders, share files, and access synced documents",
+        "toolPrefix": "gdrive"
       }
     },
     "linkedin-universal": {
@@ -56,24 +107,6 @@
         "workspaceAware": true,
         "description": "LinkedIn integration - handles all LinkedIn operations",
         "toolPrefix": "linkedin"
-      }
-    },
-    "gdrive-universal": {
-      "type": "stdio",
-      "command": "node",
-      "args": [
-        "/app/server/drive-server.js"
-      ],
-      "env": {
-        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
-        "NANGO_HOST": "${NANGO_HOST}",
-        "MCP_SERVICE_NAME": "gdrive"
-      },
-      "anythingllm": {
-        "autoStart": true,
-        "workspaceAware": true,
-        "description": "Google Drive integration - handles all Drive operations",
-        "toolPrefix": "gdrive"
       }
     }
   }

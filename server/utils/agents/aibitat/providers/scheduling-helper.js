@@ -47,18 +47,31 @@ function enhanceSystemPromptWithScheduling(originalPrompt) {
  */
 function isSchedulingRequest(userMessage) {
   const schedulingKeywords = [
-    'every hour', 'every day', 'every week', 'every month',
-    'hourly', 'daily', 'weekly', 'monthly',
-    'recurring', 'periodic', 'regularly',
-    'schedule', 'automate', 'monitor',
-    'check regularly', 'track', 'remind me',
-    'every \\d+ (hour|minute|day|week)',
-    'at \\d+am', 'at \\d+pm'
+    "every hour",
+    "every day",
+    "every week",
+    "every month",
+    "hourly",
+    "daily",
+    "weekly",
+    "monthly",
+    "recurring",
+    "periodic",
+    "regularly",
+    "schedule",
+    "automate",
+    "monitor",
+    "check regularly",
+    "track",
+    "remind me",
+    "every \\d+ (hour|minute|day|week)",
+    "at \\d+am",
+    "at \\d+pm",
   ];
 
   const lower = userMessage.toLowerCase();
-  return schedulingKeywords.some(keyword => {
-    if (keyword.includes('\\d')) {
+  return schedulingKeywords.some((keyword) => {
+    if (keyword.includes("\\d")) {
       return new RegExp(keyword).test(lower);
     }
     return lower.includes(keyword);
@@ -73,33 +86,35 @@ function parseSchedulingRequest(userMessage) {
     isScheduling: isSchedulingRequest(userMessage),
     suggestedTool: null,
     pattern: null,
-    task: null
+    task: null,
   };
 
   if (!request.isScheduling) return request;
 
   // Extract pattern
   const patterns = {
-    'every hour': 'hourly',
-    'hourly': 'hourly',
-    'every day': 'daily',
-    'daily': 'daily',
-    'every week': 'weekly',
-    'weekly': 'weekly',
-    'every 30 minutes': 'every_30_min',
-    'every 15 minutes': 'every_15_min'
+    "every hour": "hourly",
+    hourly: "hourly",
+    "every day": "daily",
+    daily: "daily",
+    "every week": "weekly",
+    weekly: "weekly",
+    "every 30 minutes": "every_30_min",
+    "every 15 minutes": "every_15_min",
   };
 
   for (const [key, value] of Object.entries(patterns)) {
     if (userMessage.toLowerCase().includes(key)) {
       request.pattern = value;
-      request.suggestedTool = 'schedule_task';
+      request.suggestedTool = "schedule_task";
       break;
     }
   }
 
   // Extract task (what comes after "check", "monitor", "track", etc.)
-  const taskMatch = userMessage.match(/(?:check|monitor|track|analyze|summarize|report on|fetch|get)\s+(.+?)(?:\s+every|\s+hourly|\s+daily|$)/i);
+  const taskMatch = userMessage.match(
+    /(?:check|monitor|track|analyze|summarize|report on|fetch|get)\s+(.+?)(?:\s+every|\s+hourly|\s+daily|$)/i
+  );
   if (taskMatch) {
     request.task = taskMatch[1];
   }
@@ -111,5 +126,5 @@ module.exports = {
   SCHEDULING_CONTEXT,
   enhanceSystemPromptWithScheduling,
   isSchedulingRequest,
-  parseSchedulingRequest
+  parseSchedulingRequest,
 };

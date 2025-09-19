@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Plug } from "@phosphor-icons/react";
 import { getDataConnectors } from "@/pages/WorkspaceSettings/Connectors";

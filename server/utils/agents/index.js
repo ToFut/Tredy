@@ -522,12 +522,20 @@ class AgentHandler {
     this.aibitat.agent(USER_AGENT.name, await USER_AGENT.getDefinition());
     this.aibitat.agent(
       WORKSPACE_AGENT.name,
-      await WORKSPACE_AGENT.getDefinition(this.provider, this.invocation?.workspace_id)
+      await WORKSPACE_AGENT.getDefinition(
+        this.provider,
+        this.invocation?.workspace_id
+      )
     );
 
     this.#funcsToLoad = [
       ...((await USER_AGENT.getDefinition())?.functions || []),
-      ...((await WORKSPACE_AGENT.getDefinition(this.provider, this.invocation?.workspace_id))?.functions || []),
+      ...((
+        await WORKSPACE_AGENT.getDefinition(
+          this.provider,
+          this.invocation?.workspace_id
+        )
+      )?.functions || []),
     ];
   }
 
@@ -549,7 +557,7 @@ class AgentHandler {
     );
     this.thinkingTracker.setSocket(args.socket);
     this.thinkingTracker.startThinking("Initializing agent session");
-    
+
     this.aibitat = new AIbitat({
       provider: this.provider ?? "openai",
       model: this.model ?? "gpt-4o",

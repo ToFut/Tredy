@@ -207,8 +207,7 @@ class AgentFlows {
         setup: (aibitat) => {
           aibitat.function({
             name: `flow_${uuid}`,
-            description:
-              `Execute workflow named "${flow.name}". ${flow.config.description || ''}`,
+            description: `Execute workflow named "${flow.name}". ${flow.config.description || ""}`,
             parameters: {
               type: "object",
               properties: variables.reduce((acc, v) => {

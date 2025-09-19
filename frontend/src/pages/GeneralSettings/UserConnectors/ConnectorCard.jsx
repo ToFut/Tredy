@@ -104,15 +104,15 @@ export default function ConnectorCard({
                 {connector.status === "connected"
                   ? "Connected"
                   : connector.status === "error"
-                  ? "Error"
-                  : connector.status === "syncing"
-                  ? "Syncing..."
-                  : "Pending"}
+                    ? "Error"
+                    : connector.status === "syncing"
+                      ? "Syncing..."
+                      : "Pending"}
               </span>
             </div>
           </div>
         </div>
-        
+
         {/* Menu Button */}
         <div className="relative">
           <button
@@ -121,7 +121,7 @@ export default function ConnectorCard({
           >
             <DotsThree className="w-5 h-5 text-theme-text-secondary" />
           </button>
-          
+
           {showMenu && (
             <>
               <div
@@ -189,7 +189,7 @@ export default function ConnectorCard({
             "Never synced"
           )}
         </div>
-        
+
         {connector.metadata?.itemCount !== undefined && (
           <div className="flex items-center gap-2 text-xs text-theme-text-secondary">
             <Database className="w-3 h-3" />

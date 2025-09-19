@@ -342,7 +342,7 @@ const User = {
     try {
       // Check if user already exists
       let existingUser = await this.get({ supabase_id: supabaseUser.id });
-      
+
       if (existingUser) {
         return { user: existingUser, error: null };
       }
@@ -350,15 +350,15 @@ const User = {
       // Check if this is the first user
       const userCount = await prisma.users.count();
       const isFirstUser = userCount === 0;
-      
+
       // Extract user data from Supabase
       const userData = {
         username: supabaseUser.email || `user_${supabaseUser.id.slice(0, 8)}`,
-        password: 'supabase_managed', // Placeholder since auth is handled by Supabase
+        password: "supabase_managed", // Placeholder since auth is handled by Supabase
         supabase_id: supabaseUser.id,
         // All users default to admin role for full access
-        role: 'admin',
-        bio: supabaseUser.user_metadata?.bio || '',
+        role: "admin",
+        bio: supabaseUser.user_metadata?.bio || "",
       };
 
       // Create new user
@@ -403,10 +403,10 @@ const User = {
       }
 
       const updates = {};
-      
+
       // Always ensure users have admin role for full access
-      if (user.role !== 'admin') {
-        updates.role = 'admin';
+      if (user.role !== "admin") {
+        updates.role = "admin";
       }
 
       // Sync username if changed

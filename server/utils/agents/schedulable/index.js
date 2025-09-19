@@ -1,5 +1,7 @@
 const { AgentSchedule } = require("../../../models/agentSchedule");
-const { WorkspaceAgentInvocation } = require("../../../models/workspaceAgentInvocation");
+const {
+  WorkspaceAgentInvocation,
+} = require("../../../models/workspaceAgentInvocation");
 const ImportedPlugin = require("../imported");
 const AgentHandler = require("../index");
 const { safeJsonParse } = require("../../http");
@@ -78,7 +80,7 @@ class SchedulableAgent {
     }
 
     const context = safeJsonParse(schedule.context, {});
-    
+
     // Create a special invocation for scheduled execution
     const invocation = await WorkspaceAgentInvocation.create({
       workspaceId: schedule.workspace_id,
@@ -111,17 +113,17 @@ class SchedulableAgent {
         // For flows - use FlowExecutor
         const { FlowExecutor } = require("../../agentFlows/executor");
         const { Workspace } = require("../../../models/workspace");
-        
+
         const workspace = await Workspace.get({ id: schedule.workspace_id });
         if (!workspace) {
           throw new Error(`Workspace not found: ${schedule.workspace_id}`);
         }
-        
+
         const executor = new FlowExecutor(this.agent.flowData, {
           workspaceSlug: workspace.slug,
-          userId: schedule.created_by
+          userId: schedule.created_by,
         });
-        
+
         result = await executor.execute({
           ...context,
           isScheduled: true,
@@ -156,7 +158,7 @@ class SchedulableAgent {
       agentId: this.getAgentId(),
       agentType: this.agentType,
     };
-    
+
     if (workspaceId) {
       where.workspaceId = workspaceId;
     }
@@ -259,34 +261,51 @@ class SchedulableAgent {
    * @returns {Promise<Object>} Flow data
    */
   static async loadFlowById(flowId) {
-    const fs = require('fs').promises;
-    const path = require('path');
-    
+    const fs = require("fs").promises;
+    const path = require("path");
+
     try {
       // Try multiple possible paths
       const possiblePaths = [
-        path.resolve(process.cwd(), 'storage', 'plugins', 'agent-flows', `${flowId}.json`),
-        path.resolve(process.cwd(), 'server', 'storage', 'plugins', 'agent-flows', `${flowId}.json`),
-        path.resolve(__dirname, '../../../storage/plugins/agent-flows', `${flowId}.json`)
+        path.resolve(
+          process.cwd(),
+          "storage",
+          "plugins",
+          "agent-flows",
+          `${flowId}.json`
+        ),
+        path.resolve(
+          process.cwd(),
+          "server",
+          "storage",
+          "plugins",
+          "agent-flows",
+          `${flowId}.json`
+        ),
+        path.resolve(
+          __dirname,
+          "../../../storage/plugins/agent-flows",
+          `${flowId}.json`
+        ),
       ];
-      
+
       for (const filePath of possiblePaths) {
         try {
-          const data = await fs.readFile(filePath, 'utf8');
+          const data = await fs.readFile(filePath, "utf8");
           const flowData = JSON.parse(data);
-          
+
           // Add the UUID to the flow data if not present
           if (!flowData.uuid) {
             flowData.uuid = flowId;
           }
-          
+
           return flowData;
         } catch (err) {
           // Continue trying other paths
           continue;
         }
       }
-      
+
       throw new Error(`Flow file not found: ${flowId}`);
     } catch (error) {
       console.error(`Failed to load flow ${flowId}:`, error);
@@ -299,47 +318,53 @@ class SchedulableAgent {
    * @returns {Promise<Array>} List of available flows
    */
   static async getAvailableFlows() {
-    const fs = require('fs').promises;
-    const path = require('path');
-    
+    const fs = require("fs").promises;
+    const path = require("path");
+
     try {
       // Try multiple possible paths
       const possibleDirs = [
-        path.resolve(process.cwd(), 'storage', 'plugins', 'agent-flows'),
-        path.resolve(process.cwd(), 'server', 'storage', 'plugins', 'agent-flows'),
-        path.resolve(__dirname, '../../../storage/plugins/agent-flows')
+        path.resolve(process.cwd(), "storage", "plugins", "agent-flows"),
+        path.resolve(
+          process.cwd(),
+          "server",
+          "storage",
+          "plugins",
+          "agent-flows"
+        ),
+        path.resolve(__dirname, "../../../storage/plugins/agent-flows"),
       ];
-      
+
       for (const dir of possibleDirs) {
         try {
           const files = await fs.readdir(dir);
           const flows = [];
-          
+
           for (const file of files) {
-            if (file.endsWith('.json')) {
-              const flowId = file.replace('.json', '');
+            if (file.endsWith(".json")) {
+              const flowId = file.replace(".json", "");
               const flowData = await SchedulableAgent.loadFlowById(flowId);
               if (flowData) {
                 flows.push({
                   id: flowId,
                   name: flowData.name || flowId,
-                  description: flowData.description || '',
-                  active: flowData.active !== false
+                  description: flowData.description || "",
+                  active: flowData.active !== false,
                 });
               }
             }
           }
-          
+
           return flows;
         } catch (err) {
           // Continue trying other paths
           continue;
         }
       }
-      
+
       return [];
     } catch (error) {
-      console.error('Failed to get available flows:', error);
+      console.error("Failed to get available flows:", error);
       return [];
     }
   }
@@ -352,7 +377,7 @@ class SchedulableAgent {
    */
   static async fromId(agentId, agentType = "imported") {
     let agent;
-    
+
     if (agentType === "imported") {
       // Load imported plugin
       const valid = ImportedPlugin.validateImportedPluginHandler(agentId);
@@ -379,7 +404,7 @@ class SchedulableAgent {
         name: flowData.name,
         description: flowData.description,
         type: "flow",
-        flowData: flowData
+        flowData: flowData,
       };
     } else {
       throw new Error(`Unknown agent type: ${agentType}`);

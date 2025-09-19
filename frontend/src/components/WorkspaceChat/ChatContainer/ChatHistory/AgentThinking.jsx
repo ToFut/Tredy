@@ -5,7 +5,7 @@ const thinkingSteps = [
   { id: 1, text: "Understanding your request", duration: 800 },
   { id: 2, text: "Searching through project files", duration: 1200 },
   { id: 3, text: "Analyzing code patterns", duration: 1500 },
-  { id: 4, text: "Preparing response", duration: 600 }
+  { id: 4, text: "Preparing response", duration: 600 },
 ];
 
 export default function AgentThinking({ agentName = "agent", onComplete }) {
@@ -17,7 +17,7 @@ export default function AgentThinking({ agentName = "agent", onComplete }) {
   // Animate dots
   useEffect(() => {
     const interval = setInterval(() => {
-      setDots(prev => {
+      setDots((prev) => {
         if (prev === "...") return "";
         return prev + ".";
       });
@@ -28,12 +28,12 @@ export default function AgentThinking({ agentName = "agent", onComplete }) {
   // Progress through steps
   useEffect(() => {
     let timeoutId;
-    
+
     if (currentStep < thinkingSteps.length) {
       const step = thinkingSteps[currentStep];
       timeoutId = setTimeout(() => {
-        setCompletedSteps(prev => [...prev, step.id]);
-        setCurrentStep(prev => prev + 1);
+        setCompletedSteps((prev) => [...prev, step.id]);
+        setCurrentStep((prev) => prev + 1);
       }, step.duration);
     } else if (currentStep === thinkingSteps.length && !isExiting) {
       // All steps complete, start exit animation
@@ -51,27 +51,27 @@ export default function AgentThinking({ agentName = "agent", onComplete }) {
   }, [currentStep, isExiting, onComplete]);
 
   return (
-    <div 
+    <div
       className={`
         transition-all duration-200 ease-out
-        ${isExiting ? 'opacity-0 scale-[0.98] -translate-y-1' : 'opacity-100 scale-100 translate-y-0'}
+        ${isExiting ? "opacity-0 scale-[0.98] -translate-y-1" : "opacity-100 scale-100 translate-y-0"}
       `}
     >
       <div className="my-3 mx-2">
-        <div className="
+        <div
+          className="
           bg-slate-800/50 backdrop-blur-md 
           border border-slate-700/50 
           rounded-xl p-4 
           shadow-lg shadow-black/10
-        ">
+        "
+        >
           {/* Header */}
           <div className="flex items-center gap-2 mb-3">
             <span className="text-sm font-medium text-white">
               Thinking{dots}
             </span>
-            <span className="text-xs text-slate-500">
-              @{agentName}
-            </span>
+            <span className="text-xs text-slate-500">@{agentName}</span>
           </div>
 
           {/* Steps */}
@@ -82,16 +82,16 @@ export default function AgentThinking({ agentName = "agent", onComplete }) {
               const isPending = index > currentStep;
 
               return (
-                <div 
+                <div
                   key={step.id}
                   className={`
                     flex items-center gap-2 text-sm
                     transition-all duration-300 ease-out
-                    ${isPending ? 'opacity-0' : 'opacity-100'}
-                    ${isCurrent ? 'translate-x-0' : 'translate-x-0'}
+                    ${isPending ? "opacity-0" : "opacity-100"}
+                    ${isCurrent ? "translate-x-0" : "translate-x-0"}
                   `}
                   style={{
-                    transitionDelay: `${index * 100}ms`
+                    transitionDelay: `${index * 100}ms`,
                   }}
                 >
                   {/* Status icon */}
@@ -106,12 +106,14 @@ export default function AgentThinking({ agentName = "agent", onComplete }) {
                   </div>
 
                   {/* Step text */}
-                  <span className={`
+                  <span
+                    className={`
                     transition-colors duration-200
-                    ${isCompleted ? 'text-slate-500 line-through' : ''}
-                    ${isCurrent ? 'text-white' : ''}
-                    ${isPending ? 'text-slate-600' : ''}
-                  `}>
+                    ${isCompleted ? "text-slate-500 line-through" : ""}
+                    ${isCurrent ? "text-white" : ""}
+                    ${isPending ? "text-slate-600" : ""}
+                  `}
+                  >
                     {step.text}
                   </span>
                 </div>

@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { 
-  Zap, 
-  Cpu, 
-  Brain, 
+import {
+  Zap,
+  Cpu,
+  Brain,
   ChevronRight,
   ChevronDown,
   Clock,
   CheckCircle,
   AlertCircle,
-  Loader2
+  Loader2,
 } from "lucide-react";
 import { getToolLogo } from "./utils/toolLogos";
 
@@ -17,10 +17,10 @@ import { getToolLogo } from "./utils/toolLogos";
  * Displays a compact, single-line metrics bar under messages
  * Similar to Perplexity/ChatGPT style with tool logos and expandable details
  */
-export default function MetricsBar({ 
-  tools = [], 
-  metrics = {}, 
-  thinking = [] 
+export default function MetricsBar({
+  tools = [],
+  metrics = {},
+  thinking = [],
 }) {
   const [expandedThinking, setExpandedThinking] = useState(false);
 
@@ -37,12 +37,15 @@ export default function MetricsBar({
         {tools && tools.length > 0 && (
           <>
             <ToolLogos tools={tools} />
-            {(metrics?.time || metrics?.confidence || metrics?.model || thinking?.length > 0) && (
+            {(metrics?.time ||
+              metrics?.confidence ||
+              metrics?.model ||
+              thinking?.length > 0) && (
               <span className="text-gray-300 dark:text-gray-600">•</span>
             )}
           </>
         )}
-        
+
         {/* Execution Time */}
         {metrics?.time && (
           <>
@@ -50,12 +53,14 @@ export default function MetricsBar({
               <Zap className="w-3 h-3 text-yellow-500" />
               <span>{metrics.time}</span>
             </div>
-            {(metrics?.confidence || metrics?.model || thinking?.length > 0) && (
+            {(metrics?.confidence ||
+              metrics?.model ||
+              thinking?.length > 0) && (
               <span className="text-gray-300 dark:text-gray-600">•</span>
             )}
           </>
         )}
-        
+
         {/* Confidence Bar */}
         {metrics?.confidence && (
           <>
@@ -65,7 +70,7 @@ export default function MetricsBar({
             )}
           </>
         )}
-        
+
         {/* Model */}
         {metrics?.model && (
           <>
@@ -78,7 +83,7 @@ export default function MetricsBar({
             )}
           </>
         )}
-        
+
         {/* Expandable Thinking */}
         {thinking && thinking.length > 0 && (
           <button
@@ -87,14 +92,15 @@ export default function MetricsBar({
           >
             <Brain className="w-3 h-3" />
             <span>Details</span>
-            {expandedThinking ? 
-              <ChevronDown className="w-3 h-3" /> : 
+            {expandedThinking ? (
+              <ChevronDown className="w-3 h-3" />
+            ) : (
               <ChevronRight className="w-3 h-3" />
-            }
+            )}
           </button>
         )}
       </div>
-      
+
       {/* Expanded Thinking Log */}
       {expandedThinking && thinking?.length > 0 && (
         <ThinkingLog steps={thinking} metrics={metrics} />
@@ -117,9 +123,7 @@ function ToolLogos({ tools }) {
         <ToolLogo key={index} tool={tool} />
       ))}
       {remainingCount > 0 && (
-        <span className="text-xs text-gray-400 ml-1">
-          +{remainingCount}
-        </span>
+        <span className="text-xs text-gray-400 ml-1">+{remainingCount}</span>
       )}
     </div>
   );
@@ -131,22 +135,22 @@ function ToolLogos({ tools }) {
 function ToolLogo({ tool }) {
   const [showTooltip, setShowTooltip] = useState(false);
   const logo = getToolLogo(tool.name || tool);
-  const status = tool.status || 'complete';
+  const status = tool.status || "complete";
 
   const statusColors = {
-    pending: 'opacity-50',
-    active: 'ring-2 ring-blue-400',
-    complete: '',
-    error: 'ring-2 ring-red-400'
+    pending: "opacity-50",
+    active: "ring-2 ring-blue-400",
+    complete: "",
+    error: "ring-2 ring-red-400",
   };
 
   const StatusIcon = () => {
-    switch(status) {
-      case 'active':
+    switch (status) {
+      case "active":
         return <Loader2 className="w-2 h-2 text-blue-500 animate-spin" />;
-      case 'complete':
+      case "complete":
         return <CheckCircle className="w-2 h-2 text-green-500" />;
-      case 'error':
+      case "error":
         return <AlertCircle className="w-2 h-2 text-red-500" />;
       default:
         return null;
@@ -154,32 +158,30 @@ function ToolLogo({ tool }) {
   };
 
   return (
-    <div 
+    <div
       className="relative group"
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
     >
       <div className={`relative ${statusColors[status]}`}>
-        {typeof logo === 'string' ? (
-          <img 
-            src={logo} 
-            alt={tool.name || tool}
-            className="w-5 h-5 rounded"
-          />
+        {typeof logo === "string" ? (
+          <img src={logo} alt={tool.name || tool} className="w-5 h-5 rounded" />
         ) : (
           <div className="w-5 h-5 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-            {React.createElement(logo, { className: "w-3 h-3 text-gray-600 dark:text-gray-400" })}
+            {React.createElement(logo, {
+              className: "w-3 h-3 text-gray-600 dark:text-gray-400",
+            })}
           </div>
         )}
-        
+
         {/* Status indicator */}
-        {status !== 'complete' && (
+        {status !== "complete" && (
           <div className="absolute -bottom-1 -right-1 bg-white dark:bg-gray-800 rounded-full">
             <StatusIcon />
           </div>
         )}
       </div>
-      
+
       {/* Tooltip */}
       {showTooltip && (
         <div className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10">
@@ -195,13 +197,18 @@ function ToolLogo({ tool }) {
  * Confidence Bar Display
  */
 function ConfidenceBar({ value }) {
-  const percentage = typeof value === 'number' ? value : parseInt(value);
-  const color = percentage > 80 ? 'bg-green-500' : percentage > 60 ? 'bg-yellow-500' : 'bg-orange-500';
+  const percentage = typeof value === "number" ? value : parseInt(value);
+  const color =
+    percentage > 80
+      ? "bg-green-500"
+      : percentage > 60
+        ? "bg-yellow-500"
+        : "bg-orange-500";
 
   return (
     <div className="flex items-center gap-1">
       <div className="w-12 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-        <div 
+        <div
           className={`${color} h-1.5 rounded-full transition-all duration-300`}
           style={{ width: `${percentage}%` }}
         />
@@ -226,13 +233,13 @@ function ThinkingLog({ steps, metrics }) {
           </span>
         )}
       </div>
-      
+
       <div className="space-y-1">
         {steps.map((step, index) => (
           <div key={index} className="flex items-start gap-2">
             <div className="w-1 h-1 bg-purple-400 rounded-full mt-1.5" />
             <span className="text-xs text-gray-600 dark:text-gray-400">
-              {typeof step === 'string' ? step : step.content || step.text}
+              {typeof step === "string" ? step : step.content || step.text}
             </span>
             {step.duration && (
               <span className="text-xs text-gray-400 dark:text-gray-500 ml-auto">
@@ -242,7 +249,7 @@ function ThinkingLog({ steps, metrics }) {
           </div>
         ))}
       </div>
-      
+
       {metrics?.thinkingTime && (
         <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
           <span>Total thinking time</span>

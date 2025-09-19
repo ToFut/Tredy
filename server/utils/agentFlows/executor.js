@@ -36,8 +36,8 @@ class FlowExecutor {
     // Transform flowData to expected format if needed
     const flow = {
       config: {
-        steps: this.flowData.steps || []
-      }
+        steps: this.flowData.steps || [],
+      },
     };
 
     try {
@@ -45,7 +45,7 @@ class FlowExecutor {
       return {
         success: true,
         output: result,
-        variables: this.variables
+        variables: this.variables,
       };
     } catch (error) {
       console.error("Flow execution failed:", error);

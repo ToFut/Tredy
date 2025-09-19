@@ -8,29 +8,29 @@ function waitlistEndpoints(app) {
     try {
       const { email } = request.body;
 
-      if (!email || !email.includes('@')) {
-        return response.status(400).json({ 
-          error: "Please provide a valid email address" 
+      if (!email || !email.includes("@")) {
+        return response.status(400).json({
+          error: "Please provide a valid email address",
         });
       }
 
       const result = await Waitlist.add(email);
-      
+
       if (result.success) {
-        response.status(200).json({ 
-          success: true, 
+        response.status(200).json({
+          success: true,
           message: "Successfully added to waitlist",
-          data: result.data 
+          data: result.data,
         });
       } else {
-        response.status(400).json({ 
-          error: result.error 
+        response.status(400).json({
+          error: result.error,
         });
       }
     } catch (error) {
       console.error("Waitlist endpoint error:", error);
-      response.status(500).json({ 
-        error: "Internal server error" 
+      response.status(500).json({
+        error: "Internal server error",
       });
     }
   });
@@ -39,20 +39,20 @@ function waitlistEndpoints(app) {
   app.get("/api/waitlist/count", async (request, response) => {
     try {
       const result = await Waitlist.getCount();
-      
+
       if (result.success) {
-        response.status(200).json({ 
-          count: result.count 
+        response.status(200).json({
+          count: result.count,
         });
       } else {
-        response.status(500).json({ 
-          error: result.error 
+        response.status(500).json({
+          error: result.error,
         });
       }
     } catch (error) {
       console.error("Waitlist count endpoint error:", error);
-      response.status(500).json({ 
-        error: "Internal server error" 
+      response.status(500).json({
+        error: "Internal server error",
       });
     }
   });
@@ -62,21 +62,21 @@ function waitlistEndpoints(app) {
     try {
       // Add authentication check here if needed
       const result = await Waitlist.getAll();
-      
+
       if (result.success) {
-        response.status(200).json({ 
+        response.status(200).json({
           success: true,
-          data: result.data 
+          data: result.data,
         });
       } else {
-        response.status(500).json({ 
-          error: result.error 
+        response.status(500).json({
+          error: result.error,
         });
       }
     } catch (error) {
       console.error("Admin waitlist endpoint error:", error);
-      response.status(500).json({ 
-        error: "Internal server error" 
+      response.status(500).json({
+        error: "Internal server error",
       });
     }
   });
@@ -85,23 +85,23 @@ function waitlistEndpoints(app) {
   app.delete("/api/admin/waitlist/:email", async (request, response) => {
     try {
       const { email } = request.params;
-      
+
       const result = await Waitlist.remove(email);
-      
+
       if (result.success) {
-        response.status(200).json({ 
+        response.status(200).json({
           success: true,
-          message: "Email removed from waitlist" 
+          message: "Email removed from waitlist",
         });
       } else {
-        response.status(400).json({ 
-          error: result.error 
+        response.status(400).json({
+          error: result.error,
         });
       }
     } catch (error) {
       console.error("Remove waitlist endpoint error:", error);
-      response.status(500).json({ 
-        error: "Internal server error" 
+      response.status(500).json({
+        error: "Internal server error",
       });
     }
   });

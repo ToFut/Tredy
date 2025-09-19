@@ -214,7 +214,7 @@ class MCPHypervisor {
     for (const name of Object.keys(this.mcps)) {
       if (!this.mcps[name]) continue;
       const mcp = this.mcps[name];
-      
+
       try {
         // Safely access transport and process
         if (mcp.transport && mcp.transport._process) {
@@ -225,12 +225,12 @@ class MCPHypervisor {
         }
 
         // Close transport if it exists
-        if (mcp.transport && typeof mcp.transport.close === 'function') {
+        if (mcp.transport && typeof mcp.transport.close === "function") {
           mcp.transport.close();
         }
-        
+
         // Close MCP client if it exists
-        if (typeof mcp.close === 'function') {
+        if (typeof mcp.close === "function") {
           mcp.close();
         }
       } catch (error) {

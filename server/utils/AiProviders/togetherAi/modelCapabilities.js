@@ -6,16 +6,21 @@
 const MODEL_CAPABILITIES = {
   // Vision Models (Together AI currently doesn't have vision models, but structure ready for future)
   vision: [],
-  
+
   // Code Generation Models
   code: [
     {
       id: "deepseek-ai/DeepSeek-Coder-V2-Instruct",
       name: "DeepSeek Coder V2",
-      strengths: ["code generation", "debugging", "code review", "multi-language"],
+      strengths: [
+        "code generation",
+        "debugging",
+        "code review",
+        "multi-language",
+      ],
       costTier: 1, // 1=cheapest, 5=most expensive
       performance: 5,
-      contextLength: 128000
+      contextLength: 128000,
     },
     {
       id: "Qwen/Qwen2.5-Coder-32B-Instruct",
@@ -23,7 +28,7 @@ const MODEL_CAPABILITIES = {
       strengths: ["code generation", "python", "javascript", "sql"],
       costTier: 2,
       performance: 4,
-      contextLength: 32768
+      contextLength: 32768,
     },
     {
       id: "codellama/CodeLlama-70b-Instruct-hf",
@@ -31,19 +36,24 @@ const MODEL_CAPABILITIES = {
       strengths: ["code generation", "code completion", "refactoring"],
       costTier: 3,
       performance: 4,
-      contextLength: 4096
-    }
+      contextLength: 4096,
+    },
   ],
-  
+
   // Reasoning & Analysis Models
   reasoning: [
     {
       id: "deepseek-ai/DeepSeek-R1",
       name: "DeepSeek R1",
-      strengths: ["complex reasoning", "math", "logic", "step-by-step analysis"],
+      strengths: [
+        "complex reasoning",
+        "math",
+        "logic",
+        "step-by-step analysis",
+      ],
       costTier: 3,
       performance: 5,
-      contextLength: 64000
+      contextLength: 64000,
     },
     {
       id: "Qwen/QwQ-32B-Preview",
@@ -51,10 +61,10 @@ const MODEL_CAPABILITIES = {
       strengths: ["reasoning", "problem solving", "analysis"],
       costTier: 2,
       performance: 4,
-      contextLength: 32768
-    }
+      contextLength: 32768,
+    },
   ],
-  
+
   // General Chat Models
   general: [
     {
@@ -63,15 +73,19 @@ const MODEL_CAPABILITIES = {
       strengths: ["general chat", "instruction following", "creative writing"],
       costTier: 2,
       performance: 4,
-      contextLength: 131072
+      contextLength: 131072,
     },
     {
       id: "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
       name: "Llama 3.1 405B Turbo",
-      strengths: ["complex tasks", "nuanced understanding", "professional writing"],
+      strengths: [
+        "complex tasks",
+        "nuanced understanding",
+        "professional writing",
+      ],
       costTier: 4,
       performance: 5,
-      contextLength: 131072
+      contextLength: 131072,
     },
     {
       id: "mistralai/Mixtral-8x7B-Instruct-v0.1",
@@ -79,7 +93,7 @@ const MODEL_CAPABILITIES = {
       strengths: ["multilingual", "general chat", "efficiency"],
       costTier: 1,
       performance: 3,
-      contextLength: 32768
+      contextLength: 32768,
     },
     {
       id: "mistralai/Mixtral-8x22B-Instruct-v0.1",
@@ -87,10 +101,10 @@ const MODEL_CAPABILITIES = {
       strengths: ["advanced reasoning", "multilingual", "technical content"],
       costTier: 3,
       performance: 4,
-      contextLength: 65536
-    }
+      contextLength: 65536,
+    },
   ],
-  
+
   // Creative & Writing Models
   creative: [
     {
@@ -99,7 +113,7 @@ const MODEL_CAPABILITIES = {
       strengths: ["creative writing", "storytelling", "content generation"],
       costTier: 2,
       performance: 4,
-      contextLength: 131072
+      contextLength: 131072,
     },
     {
       id: "mistralai/Mistral-7B-Instruct-v0.3",
@@ -107,10 +121,10 @@ const MODEL_CAPABILITIES = {
       strengths: ["efficient", "creative tasks", "fast response"],
       costTier: 1,
       performance: 3,
-      contextLength: 32768
-    }
+      contextLength: 32768,
+    },
   ],
-  
+
   // Math & Science Models
   math: [
     {
@@ -119,7 +133,7 @@ const MODEL_CAPABILITIES = {
       strengths: ["mathematics", "physics", "scientific reasoning"],
       costTier: 3,
       performance: 5,
-      contextLength: 64000
+      contextLength: 64000,
     },
     {
       id: "Qwen/Qwen2.5-Math-72B-Instruct",
@@ -127,9 +141,9 @@ const MODEL_CAPABILITIES = {
       strengths: ["mathematics", "problem solving", "proofs"],
       costTier: 3,
       performance: 5,
-      contextLength: 4096
-    }
-  ]
+      contextLength: 4096,
+    },
+  ],
 };
 
 /**
@@ -137,37 +151,83 @@ const MODEL_CAPABILITIES = {
  */
 function detectTaskType(userPrompt, attachments = []) {
   const prompt = userPrompt.toLowerCase();
-  
+
   // Check for image attachments
-  if (attachments.some(att => att.mime?.includes('image'))) {
-    return 'vision';
+  if (attachments.some((att) => att.mime?.includes("image"))) {
+    return "vision";
   }
-  
+
   // Code-related keywords
-  const codeKeywords = ['code', 'function', 'debug', 'error', 'implement', 'algorithm', 'program', 'script', 'api', 'class', 'method', 'variable', 'syntax', 'compile'];
-  if (codeKeywords.some(keyword => prompt.includes(keyword))) {
-    return 'code';
+  const codeKeywords = [
+    "code",
+    "function",
+    "debug",
+    "error",
+    "implement",
+    "algorithm",
+    "program",
+    "script",
+    "api",
+    "class",
+    "method",
+    "variable",
+    "syntax",
+    "compile",
+  ];
+  if (codeKeywords.some((keyword) => prompt.includes(keyword))) {
+    return "code";
   }
-  
+
   // Math/Science keywords
-  const mathKeywords = ['calculate', 'solve', 'equation', 'formula', 'math', 'integral', 'derivative', 'proof', 'theorem', 'physics', 'chemistry'];
-  if (mathKeywords.some(keyword => prompt.includes(keyword))) {
-    return 'math';
+  const mathKeywords = [
+    "calculate",
+    "solve",
+    "equation",
+    "formula",
+    "math",
+    "integral",
+    "derivative",
+    "proof",
+    "theorem",
+    "physics",
+    "chemistry",
+  ];
+  if (mathKeywords.some((keyword) => prompt.includes(keyword))) {
+    return "math";
   }
-  
+
   // Reasoning keywords
-  const reasoningKeywords = ['analyze', 'reason', 'logic', 'explain why', 'think through', 'step by step', 'problem solving', 'decision'];
-  if (reasoningKeywords.some(keyword => prompt.includes(keyword))) {
-    return 'reasoning';
+  const reasoningKeywords = [
+    "analyze",
+    "reason",
+    "logic",
+    "explain why",
+    "think through",
+    "step by step",
+    "problem solving",
+    "decision",
+  ];
+  if (reasoningKeywords.some((keyword) => prompt.includes(keyword))) {
+    return "reasoning";
   }
-  
+
   // Creative keywords
-  const creativeKeywords = ['write', 'story', 'creative', 'poem', 'fiction', 'narrative', 'describe', 'imagine', 'fantasy'];
-  if (creativeKeywords.some(keyword => prompt.includes(keyword))) {
-    return 'creative';
+  const creativeKeywords = [
+    "write",
+    "story",
+    "creative",
+    "poem",
+    "fiction",
+    "narrative",
+    "describe",
+    "imagine",
+    "fantasy",
+  ];
+  if (creativeKeywords.some((keyword) => prompt.includes(keyword))) {
+    return "creative";
   }
-  
-  return 'general';
+
+  return "general";
 }
 
 /**
@@ -178,36 +238,35 @@ function getRecommendedModels(taskType, options = {}) {
     maxCost = 5,
     minPerformance = 3,
     requireLongContext = false,
-    preferFast = false
+    preferFast = false,
   } = options;
-  
+
   let candidates = MODEL_CAPABILITIES[taskType] || MODEL_CAPABILITIES.general;
-  
+
   // Filter by cost and performance requirements
-  candidates = candidates.filter(model => 
-    model.costTier <= maxCost && 
-    model.performance >= minPerformance
+  candidates = candidates.filter(
+    (model) => model.costTier <= maxCost && model.performance >= minPerformance
   );
-  
+
   // Filter by context length if needed
   if (requireLongContext) {
-    candidates = candidates.filter(model => model.contextLength >= 32768);
+    candidates = candidates.filter((model) => model.contextLength >= 32768);
   }
-  
+
   // Sort by cost-effectiveness (performance/cost ratio)
   candidates.sort((a, b) => {
     const ratioA = a.performance / a.costTier;
     const ratioB = b.performance / b.costTier;
-    
+
     if (preferFast) {
       // Prefer cheaper, faster models
       return a.costTier - b.costTier;
     }
-    
+
     // Default: best performance per cost
     return ratioB - ratioA;
   });
-  
+
   return candidates;
 }
 
@@ -217,19 +276,43 @@ function getRecommendedModels(taskType, options = {}) {
 function getAlternativeProviders(capability) {
   const alternatives = {
     vision: [
-      { provider: 'openai', models: ['gpt-4o', 'gpt-4o-mini'], features: 'Best vision understanding' },
-      { provider: 'anthropic', models: ['claude-3-5-sonnet', 'claude-3-5-haiku'], features: 'Excellent visual analysis' },
-      { provider: 'google', models: ['gemini-1.5-pro', 'gemini-1.5-flash'], features: 'Strong multimodal support' },
-      { provider: 'groq', models: ['llama-3.2-90b-vision', 'llama-3.2-11b-vision'], features: 'Fast vision processing' }
+      {
+        provider: "openai",
+        models: ["gpt-4o", "gpt-4o-mini"],
+        features: "Best vision understanding",
+      },
+      {
+        provider: "anthropic",
+        models: ["claude-3-5-sonnet", "claude-3-5-haiku"],
+        features: "Excellent visual analysis",
+      },
+      {
+        provider: "google",
+        models: ["gemini-1.5-pro", "gemini-1.5-flash"],
+        features: "Strong multimodal support",
+      },
+      {
+        provider: "groq",
+        models: ["llama-3.2-90b-vision", "llama-3.2-11b-vision"],
+        features: "Fast vision processing",
+      },
     ],
     audio: [
-      { provider: 'openai', models: ['whisper', 'tts-1'], features: 'Speech-to-text and text-to-speech' }
+      {
+        provider: "openai",
+        models: ["whisper", "tts-1"],
+        features: "Speech-to-text and text-to-speech",
+      },
     ],
     realtime: [
-      { provider: 'openai', models: ['gpt-4o-realtime'], features: 'Real-time voice conversations' }
-    ]
+      {
+        provider: "openai",
+        models: ["gpt-4o-realtime"],
+        features: "Real-time voice conversations",
+      },
+    ],
   };
-  
+
   return alternatives[capability] || [];
 }
 
@@ -238,7 +321,7 @@ function getAlternativeProviders(capability) {
  */
 function modelSupportsTask(modelId, taskType) {
   const taskModels = MODEL_CAPABILITIES[taskType] || [];
-  return taskModels.some(model => model.id === modelId);
+  return taskModels.some((model) => model.id === modelId);
 }
 
 /**
@@ -246,25 +329,25 @@ function modelSupportsTask(modelId, taskType) {
  */
 function getModelCapabilities(modelId) {
   for (const [taskType, models] of Object.entries(MODEL_CAPABILITIES)) {
-    const model = models.find(m => m.id === modelId);
+    const model = models.find((m) => m.id === modelId);
     if (model) {
       return {
         taskType,
         ...model,
         supportsVision: false,
         supportsAudio: false,
-        supportsFunctionCalling: true // Together AI supports function calling
+        supportsFunctionCalling: true, // Together AI supports function calling
       };
     }
   }
-  
+
   // Unknown model - return basic capabilities
   return {
-    taskType: 'general',
+    taskType: "general",
     supportsVision: false,
     supportsAudio: false,
     supportsFunctionCalling: true,
-    strengths: ['general tasks']
+    strengths: ["general tasks"],
   };
 }
 
@@ -274,5 +357,5 @@ module.exports = {
   getRecommendedModels,
   getAlternativeProviders,
   modelSupportsTask,
-  getModelCapabilities
+  getModelCapabilities,
 };

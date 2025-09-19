@@ -45,7 +45,6 @@ export default function Footer() {
   // to prevent pop-in.
   if (footerData === false) return null;
 
-
   return (
     <div className="flex justify-center mb-2">
       <div className="flex space-x-4">

@@ -72,24 +72,32 @@ function systemEndpoints(app) {
   app.get("/system/check-token", async (request, response) => {
     try {
       // In development mode, optionally bypass authentication
-      if (process.env.NODE_ENV === 'development' && !process.env.REQUIRE_AUTH) {
-        return response.status(200).json({ 
-          online: true, 
-          valid: true, 
+      if (process.env.NODE_ENV === "development" && !process.env.REQUIRE_AUTH) {
+        return response.status(200).json({
+          online: true,
+          valid: true,
           development: true,
-          message: "Development mode - authentication bypassed" 
+          message: "Development mode - authentication bypassed",
         });
       }
-      
+
       const user = await userFromSession(request, response);
       if (user) {
         response.status(200).json({ online: true, valid: true });
       } else {
-        response.status(401).json({ online: true, valid: false, error: "Invalid or expired token" });
+        response
+          .status(401)
+          .json({
+            online: true,
+            valid: false,
+            error: "Invalid or expired token",
+          });
       }
     } catch (e) {
       console.error("Token validation error:", e.message);
-      response.status(401).json({ online: true, valid: false, error: "Token validation failed" });
+      response
+        .status(401)
+        .json({ online: true, valid: false, error: "Token validation failed" });
     }
   });
 
@@ -294,7 +302,7 @@ function systemEndpoints(app) {
   app.post("/auth/supabase", async (request, response) => {
     try {
       const { supabaseToken, email, id } = reqBody(request);
-      
+
       if (!supabaseToken || !email || !id) {
         return response.status(400).json({
           valid: false,
@@ -307,7 +315,7 @@ function systemEndpoints(app) {
         id,
         email,
         user_metadata: {},
-        app_metadata: { role: 'default' }
+        app_metadata: { role: "default" },
       });
 
       if (error || !user) {

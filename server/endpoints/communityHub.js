@@ -226,12 +226,12 @@ function communityHubEndpoints(app) {
       try {
         const ImportedPlugin = require("../utils/agents/imported");
         const installedPlugins = ImportedPlugin.listImportedPlugins();
-        
+
         // Add additional metadata
-        const items = installedPlugins.map(plugin => ({
+        const items = installedPlugins.map((plugin) => ({
           ...plugin,
-          itemType: 'agent-skill',
-          isInstalled: true
+          itemType: "agent-skill",
+          isInstalled: true,
         }));
 
         response.status(200).json({ success: true, items });
@@ -254,23 +254,23 @@ function communityHubEndpoints(app) {
         const { itemId } = request.params;
         const { active } = reqBody(request);
         const ImportedPlugin = require("../utils/agents/imported");
-        
+
         const result = ImportedPlugin.updateImportedPlugin(itemId, { active });
-        
+
         if (!result) {
-          throw new Error('Failed to update item status');
+          throw new Error("Failed to update item status");
         }
 
-        response.status(200).json({ 
-          success: true, 
-          message: `Item ${active ? 'enabled' : 'disabled'} successfully`,
-          config: result
+        response.status(200).json({
+          success: true,
+          message: `Item ${active ? "enabled" : "disabled"} successfully`,
+          config: result,
         });
       } catch (error) {
-        console.error('Toggle failed:', error);
-        response.status(500).json({ 
-          success: false, 
-          error: error.message 
+        console.error("Toggle failed:", error);
+        response.status(500).json({
+          success: false,
+          error: error.message,
         });
       }
     }
@@ -287,11 +287,11 @@ function communityHubEndpoints(app) {
       try {
         const { itemId } = request.params;
         const ImportedPlugin = require("../utils/agents/imported");
-        
+
         const result = ImportedPlugin.deletePlugin(itemId);
-        
+
         if (!result) {
-          throw new Error('Failed to uninstall item');
+          throw new Error("Failed to uninstall item");
         }
 
         await EventLogs.logEvent(
@@ -300,15 +300,15 @@ function communityHubEndpoints(app) {
           response.locals?.user?.id
         );
 
-        response.status(200).json({ 
-          success: true, 
-          message: 'Item uninstalled successfully'
+        response.status(200).json({
+          success: true,
+          message: "Item uninstalled successfully",
         });
       } catch (error) {
-        console.error('Uninstallation failed:', error);
-        response.status(500).json({ 
-          success: false, 
-          error: error.message 
+        console.error("Uninstallation failed:", error);
+        response.status(500).json({
+          success: false,
+          error: error.message,
         });
       }
     }

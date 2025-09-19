@@ -24,7 +24,11 @@ export default function handleChat(
     metrics = {},
   } = chatResult;
 
-  if (type === "abort" || type === "statusResponse" || type === "workflowPreview") {
+  if (
+    type === "abort" ||
+    type === "statusResponse" ||
+    type === "workflowPreview"
+  ) {
     setLoadingResponse(false);
     setChatHistory([
       ...remHistory,
@@ -120,12 +124,12 @@ export default function handleChat(
     const chatIdx = _chatHistory.findIndex((chat) => chat.uuid === uuid);
     if (chatIdx !== -1) {
       const existingHistory = { ..._chatHistory[chatIdx] };
-      
+
       // Skip if already finalized (prevents duplicates)
       if (existingHistory.closed && existingHistory.chatId === chatId) {
         return;
       }
-      
+
       const updatedHistory = {
         ...existingHistory,
         closed: true,
@@ -135,7 +139,7 @@ export default function handleChat(
         metrics,
       };
       _chatHistory[chatIdx] = updatedHistory;
-      
+
       // Update prompt with chatID if it exists
       if (chatIdx > 0) {
         _chatHistory[chatIdx - 1] = { ..._chatHistory[chatIdx - 1], chatId };

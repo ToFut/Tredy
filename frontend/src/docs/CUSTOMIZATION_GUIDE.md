@@ -49,6 +49,7 @@ The new ultra-elegant spacing system provides:
 ### 2. Theme Customization
 
 #### Available Themes:
+
 - **Default Dark**: Modern dark theme with purple accents
 - **Light**: Clean light theme with blue accents
 - **Genspark**: Professional light theme
@@ -64,15 +65,15 @@ The new ultra-elegant spacing system provides:
   --theme-bg-primary: #0a0a0b;
   --theme-bg-secondary: #18181b;
   --theme-bg-chat: #1a1a1d;
-  
+
   /* Text Colors */
   --theme-text-primary: #fafafa;
   --theme-text-secondary: rgba(250, 250, 250, 0.7);
-  
+
   /* Interactive Elements */
   --theme-button-primary: #8b5cf6;
   --theme-button-cta: #a78bfa;
-  
+
   /* Spacing & Layout */
   --theme-border-radius: 12px;
   --theme-border-radius-lg: 16px;
@@ -83,6 +84,7 @@ The new ultra-elegant spacing system provides:
 ### 3. Chat UI Customization
 
 #### Message Alignment Options:
+
 - **Left-aligned**: Default alignment
 - **Center-aligned**: Centered messages
 - **Right-aligned**: Right-aligned messages
@@ -118,11 +120,13 @@ Customize the initial chat experience:
 ### 5. Branding & Whitelabeling
 
 #### Logo Customization:
+
 - Upload custom logo (recommended: 200x60px)
 - Replace favicon and browser tab icon
 - Custom app name and support email
 
 #### Browser Appearance:
+
 - Custom tab title
 - Custom favicon
 - Custom meta descriptions
@@ -130,6 +134,7 @@ Customize the initial chat experience:
 ### 6. Advanced Styling Options
 
 #### Custom CSS Injection:
+
 You can inject custom CSS for advanced styling:
 
 ```css
@@ -150,6 +155,7 @@ You can inject custom CSS for advanced styling:
 ```
 
 #### Responsive Breakpoints:
+
 ```css
 /* Mobile optimizations */
 @media (max-width: 640px) {
@@ -238,12 +244,12 @@ You can inject custom CSS for advanced styling:
 // Example: Custom code block rendering
 markdown.renderer.rules.fence = function (tokens, idx, options, env, renderer) {
   const token = tokens[idx];
-  const info = token.info ? token.info.trim() : '';
+  const info = token.info ? token.info.trim() : "";
   const langName = info.split(/\s+/g)[0];
-  
+
   return `<div class="elegant-code-block">
     <div class="code-header">
-      <span class="language">${langName || 'text'}</span>
+      <span class="language">${langName || "text"}</span>
       <button class="copy-btn">Copy</button>
     </div>
     <pre><code class="language-${langName}">${token.content}</code></pre>
@@ -254,16 +260,19 @@ markdown.renderer.rules.fence = function (tokens, idx, options, env, renderer) {
 ## Performance Optimizations
 
 ### 1. CSS Optimization:
+
 - Use CSS custom properties for theming
 - Implement efficient animations with `transform` and `opacity`
 - Use `will-change` sparingly for animated elements
 
 ### 2. Rendering Optimization:
+
 - Debounce markdown rendering for long content
 - Implement virtual scrolling for large chat histories
 - Use `React.memo` for message components
 
 ### 3. Memory Management:
+
 - Clean up event listeners in component unmount
 - Implement proper WebSocket connection management
 - Use efficient state updates with functional setState
@@ -271,16 +280,19 @@ markdown.renderer.rules.fence = function (tokens, idx, options, env, renderer) {
 ## Accessibility Features
 
 ### 1. Keyboard Navigation:
+
 - Tab navigation through interactive elements
 - Enter/Space key activation for buttons
 - Escape key to close modals
 
 ### 2. Screen Reader Support:
+
 - Proper ARIA labels and roles
 - Semantic HTML structure
 - Alt text for images
 
 ### 3. Visual Accessibility:
+
 - High contrast mode support
 - Reduced motion preferences
 - Scalable font sizes
@@ -298,13 +310,17 @@ markdown.renderer.rules.fence = function (tokens, idx, options, env, renderer) {
 
 ```javascript
 // Check current theme
-console.log(localStorage.getItem('theme'));
+console.log(localStorage.getItem("theme"));
 
 // Inspect CSS variables
-console.log(getComputedStyle(document.documentElement).getPropertyValue('--theme-bg-primary'));
+console.log(
+  getComputedStyle(document.documentElement).getPropertyValue(
+    "--theme-bg-primary"
+  )
+);
 
 // Debug markdown rendering
-console.log(renderMarkdown('test content'));
+console.log(renderMarkdown("test content"));
 ```
 
 ## Best Practices
@@ -318,6 +334,7 @@ console.log(renderMarkdown('test content'));
 ## Future Enhancements
 
 Planned improvements include:
+
 - Advanced animation controls
 - Custom font loading
 - Enhanced mobile gestures

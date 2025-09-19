@@ -82,7 +82,7 @@ const {
   getRecommendedModels,
   getAlternativeProviders,
   modelSupportsTask,
-  getModelCapabilities
+  getModelCapabilities,
 } = require("./modelCapabilities");
 
 class TogetherAiLLM {
@@ -125,45 +125,57 @@ class TogetherAiLLM {
     // Detect task type and check model capabilities
     const taskType = detectTaskType(userPrompt, attachments);
     const modelCapabilities = getModelCapabilities(this.model);
-    
+
     // Check if current model supports the detected task
-    if (taskType === 'vision' || attachments.some(att => att.mime?.includes('image'))) {
+    if (
+      taskType === "vision" ||
+      attachments.some((att) => att.mime?.includes("image"))
+    ) {
       // Together AI doesn't support vision, provide intelligent recommendations
-      const alternatives = getAlternativeProviders('vision');
-      const recommendationText = this.#generateRecommendation('vision', alternatives, attachments.length);
+      const alternatives = getAlternativeProviders("vision");
+      const recommendationText = this.#generateRecommendation(
+        "vision",
+        alternatives,
+        attachments.length
+      );
       return userPrompt + recommendationText;
     }
-    
+
     // For non-vision attachments, just note them
-    const attachmentTypes = [...new Set(attachments.map(a => a.mime?.split('/')[0] || 'file'))];
-    const attachmentNote = `\n[Note: User uploaded ${attachments.length} ${attachmentTypes.join('/')}(s). Current model: ${this.model}]`;
-    
+    const attachmentTypes = [
+      ...new Set(attachments.map((a) => a.mime?.split("/")[0] || "file")),
+    ];
+    const attachmentNote = `\n[Note: User uploaded ${attachments.length} ${attachmentTypes.join("/")}(s). Current model: ${this.model}]`;
+
     return userPrompt + attachmentNote;
   }
-  
+
   #generateRecommendation(capability, alternatives, attachmentCount) {
     let recommendation = `\n\n⚠️ **Model Capability Notice**\n`;
     recommendation += `You uploaded ${attachmentCount} image(s), but the current model (${this.model}) doesn't support image analysis.\n\n`;
-    
+
     if (alternatives && alternatives.length > 0) {
       recommendation += `**Recommended Vision-Capable Models:**\n`;
-      alternatives.forEach(alt => {
-        recommendation += `• **${alt.provider.toUpperCase()}**: ${alt.models.join(', ')} - ${alt.features}\n`;
+      alternatives.forEach((alt) => {
+        recommendation += `• **${alt.provider.toUpperCase()}**: ${alt.models.join(", ")} - ${alt.features}\n`;
       });
       recommendation += `\nPlease switch to one of these models in your workspace settings for image analysis.`;
     }
-    
+
     // Also suggest best Together AI model for the text portion of the task
     const taskType = detectTaskType(this.model, []);
-    const bestModels = getRecommendedModels(taskType, { maxCost: 3, preferFast: true });
-    
+    const bestModels = getRecommendedModels(taskType, {
+      maxCost: 3,
+      preferFast: true,
+    });
+
     if (bestModels.length > 0) {
       recommendation += `\n\n**Best Together AI Models for Text Tasks:**\n`;
-      bestModels.slice(0, 3).forEach(model => {
-        recommendation += `• **${model.name}**: ${model.strengths.join(', ')} (Cost: ${'$'.repeat(model.costTier)})\n`;
+      bestModels.slice(0, 3).forEach((model) => {
+        recommendation += `• **${model.name}**: ${model.strengths.join(", ")} (Cost: ${"$".repeat(model.costTier)})\n`;
       });
     }
-    
+
     return recommendation;
   }
 
@@ -222,20 +234,22 @@ class TogetherAiLLM {
     // Check if the last message might need a different model
     if (messages && messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
-      if (typeof lastMessage.content === 'string') {
+      if (typeof lastMessage.content === "string") {
         const taskType = detectTaskType(lastMessage.content, []);
         const modelCapabilities = getModelCapabilities(this.model);
-        
+
         // Log recommendation if model might not be optimal
         if (!modelSupportsTask(this.model, taskType)) {
           const recommended = getRecommendedModels(taskType, { maxCost: 3 });
           if (recommended.length > 0) {
-            console.log(`[TogetherAI] Task type '${taskType}' detected. Consider using: ${recommended[0].name}`);
+            console.log(
+              `[TogetherAI] Task type '${taskType}' detected. Consider using: ${recommended[0].name}`
+            );
           }
         }
       }
     }
-    
+
     if (!(await this.isValidChatCompletionModel(this.model)))
       throw new Error(
         `TogetherAI chat: ${this.model} is not valid for chat completion!`

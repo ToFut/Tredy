@@ -176,9 +176,7 @@ function SelectedFeatureComponent({ feature, settings, refresh }) {
 }
 
 function FeatureVerification({ children }) {
-  if (
-    !window.localStorage.getItem("tredy_tos_experimental_feature_set")
-  ) {
+  if (!window.localStorage.getItem("tredy_tos_experimental_feature_set")) {
     function acceptTos(e) {
       e.preventDefault();
 
@@ -212,8 +210,8 @@ function FeatureVerification({ children }) {
               <div className="py-7 px-9 space-y-4 flex-col">
                 <div className="w-full text-white text-md flex flex-col gap-y-4">
                   <p>
-                    Experimental features of Tredy are features that we
-                    are piloting and are <b>opt-in</b>. We proactively will
+                    Experimental features of Tredy are features that we are
+                    piloting and are <b>opt-in</b>. We proactively will
                     condition or warn you on any potential concerns should any
                     exist prior to approval of any feature.
                   </p>

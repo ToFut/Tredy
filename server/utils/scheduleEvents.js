@@ -14,9 +14,9 @@ function registerConnection(workspaceId, socket) {
     workspaceConnections.set(workspaceId, new Set());
   }
   workspaceConnections.get(workspaceId).add(socket);
-  
+
   // Clean up on disconnect
-  socket.on('close', () => {
+  socket.on("close", () => {
     const connections = workspaceConnections.get(workspaceId);
     if (connections) {
       connections.delete(socket);
@@ -33,38 +33,49 @@ function registerConnection(workspaceId, socket) {
 function broadcastScheduleEvent(workspaceId, eventType, data) {
   const connections = workspaceConnections.get(workspaceId);
   if (!connections || connections.size === 0) {
-    console.log(`[ScheduleEvents] No active connections for workspace ${workspaceId}`);
+    console.log(
+      `[ScheduleEvents] No active connections for workspace ${workspaceId}`
+    );
     return;
   }
-  
+
   const message = JSON.stringify({
     type: eventType,
-    ...data
+    ...data,
   });
-  
-  connections.forEach(socket => {
+
+  connections.forEach((socket) => {
     try {
-      if (socket.readyState === 1) { // OPEN state
+      if (socket.readyState === 1) {
+        // OPEN state
         socket.send(message);
       }
     } catch (error) {
       console.error(`[ScheduleEvents] Error broadcasting to socket:`, error);
     }
   });
-  
-  console.log(`[ScheduleEvents] Broadcasted ${eventType} to ${connections.size} clients in workspace ${workspaceId}`);
+
+  console.log(
+    `[ScheduleEvents] Broadcasted ${eventType} to ${connections.size} clients in workspace ${workspaceId}`
+  );
 }
 
 /**
  * Emit schedule progress updates
  */
-function emitProgress(workspaceId, scheduleId, scheduleName, progress, message) {
+function emitProgress(
+  workspaceId,
+  scheduleId,
+  scheduleName,
+  progress,
+  message
+) {
   broadcastScheduleEvent(workspaceId, "schedule:progress", {
     scheduleId,
     scheduleName,
     progress,
     message,
-    timestamp: new Date()
+    timestamp: new Date(),
   });
 }
 
@@ -81,5 +92,5 @@ module.exports = {
   broadcastScheduleEvent,
   emitProgress,
   getConnectionCount,
-  workspaceConnections
+  workspaceConnections,
 };

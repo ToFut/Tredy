@@ -52,8 +52,7 @@ const TRANSLATIONS = {
     },
     workspace: {
       title: "最初のワークスペースを作成する",
-      description:
-        "最初のワークスペースを作成して、Tredyを始めましょう。",
+      description: "最初のワークスペースを作成して、Tredyを始めましょう。",
     },
   },
   common: {

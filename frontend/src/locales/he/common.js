@@ -35,8 +35,7 @@ const TRANSLATIONS = {
     },
     survey: {
       title: "ברוכים הבאים ל-Tredy",
-      description:
-        "עזרו לנו לבנות את Tredy כך שיתאים לצרכים שלכם. אופציונלי.",
+      description: "עזרו לנו לבנות את Tredy כך שיתאים לצרכים שלכם. אופציונלי.",
       email: "מה האימייל שלך?",
       useCase: "לאיזו מטרה תשתמש ב-Tredy?",
       useCaseWork: "לעבודה",
@@ -50,8 +49,7 @@ const TRANSLATIONS = {
     },
     workspace: {
       title: "צור את סביבת העבודה הראשונה שלך",
-      description:
-        "צור את סביבת העבודה הראשונה שלך והתחל לעבוד עם Tredy.",
+      description: "צור את סביבת העבודה הראשונה שלך והתחל לעבוד עם Tredy.",
     },
   },
   common: {
@@ -1017,8 +1015,7 @@ const TRANSLATIONS = {
       generic: {
         unauthenticated: {
           title: "נדרש אימות",
-          description:
-            "עליך להתאמת עם מרכז הקהילה של Tredy לפני פרסום פריטים.",
+          description: "עליך להתאמת עם מרכז הקהילה של Tredy לפני פרסום פריטים.",
           button: "התחבר למרכז הקהילה",
         },
       },

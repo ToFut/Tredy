@@ -5,22 +5,22 @@ export default function MessageDivider({ date, isToday = false }) {
   const formatDate = (dateStr) => {
     const msgDate = new Date(dateStr);
     const today = new Date();
-    
+
     if (isToday || msgDate.toDateString() === today.toDateString()) {
       return "Today";
     }
-    
+
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
     if (msgDate.toDateString() === yesterday.toDateString()) {
       return "Yesterday";
     }
-    
-    return msgDate.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+
+    return msgDate.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 

@@ -4,7 +4,14 @@ import SlashCommandsButton, {
   useSlashCommands,
 } from "./SlashCommands";
 import debounce from "lodash.debounce";
-import { PaperPlaneRight, Lightning, Sparkle, Brain, ArrowUp, GameController } from "@phosphor-icons/react";
+import {
+  PaperPlaneRight,
+  Lightning,
+  Sparkle,
+  Brain,
+  ArrowUp,
+  GameController,
+} from "@phosphor-icons/react";
 import StopGenerationButton from "./StopGenerationButton";
 import AvailableAgentsButton, {
   AvailableAgents,
@@ -43,7 +50,12 @@ export default function PromptInput({
   const [promptInput, setPromptInput] = useState("");
   const { showAgents, setShowAgents } = useAvailableAgents();
   const { showSlashCommand, setShowSlashCommand } = useSlashCommands();
-  const { responseMode, setResponseMode, showModeSelector, setShowModeSelector } = useResponseMode();
+  const {
+    responseMode,
+    setResponseMode,
+    showModeSelector,
+    setShowModeSelector,
+  } = useResponseMode();
   const formRef = useRef(null);
   const textareaRef = useRef(null);
   const [isFocused, setFocused] = useState(false);
@@ -83,25 +95,28 @@ export default function PromptInput({
     const handleViewportChange = () => {
       const newHeight = window.innerHeight;
       setViewportHeight(newHeight);
-      
+
       // Scroll to input when keyboard opens on mobile
       if (isFocused && textareaRef.current && newHeight < viewportHeight) {
         setTimeout(() => {
-          textareaRef.current?.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' 
+          textareaRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
           });
         }, 300);
       }
     };
 
     // Listen for viewport changes (mobile keyboard)
-    window.addEventListener('resize', handleViewportChange);
-    window.visualViewport?.addEventListener('resize', handleViewportChange);
-    
+    window.addEventListener("resize", handleViewportChange);
+    window.visualViewport?.addEventListener("resize", handleViewportChange);
+
     return () => {
-      window.removeEventListener('resize', handleViewportChange);
-      window.visualViewport?.removeEventListener('resize', handleViewportChange);
+      window.removeEventListener("resize", handleViewportChange);
+      window.visualViewport?.removeEventListener(
+        "resize",
+        handleViewportChange
+      );
     };
   }, [isFocused, viewportHeight]);
 
@@ -123,23 +138,23 @@ export default function PromptInput({
   function handleSubmit(e) {
     e.preventDefault();
     setFocused(false);
-    
+
     // Add appropriate @ prefix based on response mode
     // This needs to happen BEFORE the parent's submit handler reads the value
     let finalMessage = promptInput;
-    
+
     if (responseMode === "agent" && !promptInput.startsWith("@agent")) {
       finalMessage = "@agent " + promptInput;
     } else if (responseMode === "flow" && !promptInput.startsWith("@flow")) {
       finalMessage = "@flow " + promptInput;
     }
     // chat mode doesn't need any prefix
-    
+
     if (finalMessage !== promptInput) {
       textareaRef.current.value = finalMessage;
       setPromptInput(finalMessage);
     }
-    
+
     submit(e);
   }
 
@@ -173,14 +188,14 @@ export default function PromptInput({
     if (event.keyCode === 13 && !event.shiftKey) {
       event.preventDefault();
       if (isStreaming || isDisabled) return; // Prevent submission if streaming or disabled
-      
+
       // Add @agent prefix if in agent mode before submitting
       if (responseMode === "agent" && !promptInput.startsWith("@agent")) {
         const messageWithAgent = "@agent " + promptInput;
         textareaRef.current.value = messageWithAgent;
         setPromptInput(messageWithAgent);
       }
-      
+
       return submit(event);
     }
 
@@ -240,7 +255,7 @@ export default function PromptInput({
     element.style.height = "auto";
     const newHeight = Math.min(element.scrollHeight, 240); // Max height ~10 lines
     element.style.height = `${newHeight}px`;
-    
+
     // Add smooth transition for height changes
     element.style.transition = "height 0.2s ease-out";
   }
@@ -311,21 +326,25 @@ export default function PromptInput({
 
   function handleGamifyOption(option) {
     let prompt = "";
-    
-    switch(option) {
-      case 'interactive':
-        prompt = "Transform this conversation into an interactive learning experience with quizzes, challenges, and engaging elements.";
+
+    switch (option) {
+      case "interactive":
+        prompt =
+          "Transform this conversation into an interactive learning experience with quizzes, challenges, and engaging elements.";
         break;
-      case 'workflow':
-        prompt = "@agent Create a workflow from this conversation that captures the key steps and processes we discussed.";
+      case "workflow":
+        prompt =
+          "@agent Create a workflow from this conversation that captures the key steps and processes we discussed.";
         // Also trigger workflow creation in FlowPanel
         triggerWorkflowCreation();
         break;
-      case 'summary':
-        prompt = "Create a gamified summary of our conversation with key insights, action items, and interactive elements.";
+      case "summary":
+        prompt =
+          "Create a gamified summary of our conversation with key insights, action items, and interactive elements.";
         break;
-      case 'quiz':
-        prompt = "Generate an interactive quiz based on the topics and information discussed in this conversation.";
+      case "quiz":
+        prompt =
+          "Generate an interactive quiz based on the topics and information discussed in this conversation.";
         break;
     }
 
@@ -339,12 +358,14 @@ export default function PromptInput({
 
   function triggerWorkflowCreation() {
     // Trigger workflow creation in FlowPanel
-    window.dispatchEvent(new CustomEvent('createWorkflowFromChat', {
-      detail: {
-        chatContext: promptInput,
-        timestamp: new Date().toISOString()
-      }
-    }));
+    window.dispatchEvent(
+      new CustomEvent("createWorkflowFromChat", {
+        detail: {
+          chatContext: promptInput,
+          timestamp: new Date().toISOString(),
+        },
+      })
+    );
   }
 
   return (
@@ -361,13 +382,13 @@ export default function PromptInput({
         sendCommand={sendCommand}
         promptRef={textareaRef}
       />
-      
+
       {/* Mobile optimized input container */}
       <form
         onSubmit={handleSubmit}
         className="w-full bg-gradient-to-t from-white/95 via-white/90 to-transparent backdrop-blur-xl dark:from-gray-900/95 dark:via-gray-900/90 border-t border-gray-200/50 dark:border-gray-800/50 shadow-[0_-8px_16px_-6px_rgba(0,0,0,0.1)] dark:shadow-[0_-8px_16px_-6px_rgba(0,0,0,0.3)] safe-bottom"
         style={{
-          paddingBottom: 'env(safe-area-inset-bottom, 0px)', // iOS safe area
+          paddingBottom: "env(safe-area-inset-bottom, 0px)", // iOS safe area
         }}
       >
         <div className="max-w-5xl mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-4 md:py-6">
@@ -376,27 +397,36 @@ export default function PromptInput({
             <div className="flex items-center justify-center mb-2 sm:mb-3 px-1 sm:px-2">
               <div className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-full border border-purple-200 dark:border-purple-800">
                 <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600 dark:text-purple-400 animate-pulse" />
-                <span className="text-xs font-medium text-purple-700 dark:text-purple-300">Agent Mode</span>
+                <span className="text-xs font-medium text-purple-700 dark:text-purple-300">
+                  Agent Mode
+                </span>
                 <Sparkle className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-500 animate-pulse" />
               </div>
             </div>
           )}
-          
+
           <div className="relative">
-            <div className="relative flex items-end bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200/30 dark:border-gray-700/30 rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl hover:border-purple-300/50 transition-all duration-300 overflow-hidden group"
-                 style={{ 
-                   minHeight: '52px',
-                   maxWidth: isFocused && window.innerWidth < 640 ? '100%' : undefined
-                 }}>
+            <div
+              className="relative flex items-end bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-2 border-gray-200/30 dark:border-gray-700/30 rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl hover:border-purple-300/50 transition-all duration-300 overflow-hidden group"
+              style={{
+                minHeight: "52px",
+                maxWidth:
+                  isFocused && window.innerWidth < 640 ? "100%" : undefined,
+              }}
+            >
               <AttachmentManager attachments={attachments} />
-              
+
               <div className="flex items-end w-full">
                 {/* Enhanced Action Buttons Bar */}
-                <div className={`p-1.5 sm:p-2 md:p-3 transition-all duration-300 ${
-                  isFocused && window.innerWidth < 640 && promptInput.length > 0 
-                    ? 'scale-0 w-0 opacity-0 pointer-events-none' 
-                    : ''
-                }`}>
+                <div
+                  className={`p-1.5 sm:p-2 md:p-3 transition-all duration-300 ${
+                    isFocused &&
+                    window.innerWidth < 640 &&
+                    promptInput.length > 0
+                      ? "scale-0 w-0 opacity-0 pointer-events-none"
+                      : ""
+                  }`}
+                >
                   <ActionButtonsBar
                     sendCommand={sendCommand}
                     showSlashCommand={showSlashCommand}
@@ -413,7 +443,7 @@ export default function PromptInput({
                     compact={window.innerWidth < 640}
                   />
                 </div>
-                
+
                 {/* Enhanced textarea with improved mobile support */}
                 <textarea
                   id={PROMPT_INPUT_ID}
@@ -435,19 +465,26 @@ export default function PromptInput({
                   value={promptInput}
                   spellCheck={Appearance.get("enableSpellCheck")}
                   className={`flex-1 border-none resize-none bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500/70 dark:placeholder:text-gray-400/70 focus:outline-none font-medium transition-all ${
-                    window.innerWidth < 640 
-                      ? 'text-sm leading-tight py-2 px-2' // Mobile: smaller text
-                      : 'text-[16px] leading-relaxed py-3 px-3' // Desktop: normal size
+                    window.innerWidth < 640
+                      ? "text-sm leading-tight py-2 px-2" // Mobile: smaller text
+                      : "text-[16px] leading-relaxed py-3 px-3" // Desktop: normal size
                   }`}
-                  style={{ 
-                    minHeight: window.innerWidth < 640 ? '36px' : '48px',
-                    maxHeight: window.innerWidth < 640 && !isFocused ? '36px' : window.innerWidth < 640 ? '80px' : '160px',
-                    WebkitAppearance: 'none',
-                    fontSize: window.innerWidth < 640 ? '14px' : '16px', // Smaller on mobile
+                  style={{
+                    minHeight: window.innerWidth < 640 ? "36px" : "48px",
+                    maxHeight:
+                      window.innerWidth < 640 && !isFocused
+                        ? "36px"
+                        : window.innerWidth < 640
+                          ? "80px"
+                          : "160px",
+                    WebkitAppearance: "none",
+                    fontSize: window.innerWidth < 640 ? "14px" : "16px", // Smaller on mobile
                   }}
-                  placeholder={responseMode === "agent" ? "Ask AI..." : "Message..."}
+                  placeholder={
+                    responseMode === "agent" ? "Ask AI..." : "Message..."
+                  }
                 />
-                
+
                 {/* Compact modern send button */}
                 <div className="p-1 sm:p-1.5 md:p-2">
                   {isStreaming ? (
@@ -459,16 +496,16 @@ export default function PromptInput({
                         type="submit"
                         disabled={isDisabled || !promptInput.trim()}
                         className={`relative overflow-hidden rounded-xl sm:rounded-2xl transition-all transform active:scale-95 group touch-manipulation ${
-                          !isDisabled && promptInput.trim() 
-                            ? 'bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600 hover:from-blue-600 hover:via-purple-600 hover:to-blue-700 cursor-pointer shadow-lg hover:shadow-xl md:hover:scale-105' 
-                            : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'
+                          !isDisabled && promptInput.trim()
+                            ? "bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600 hover:from-blue-600 hover:via-purple-600 hover:to-blue-700 cursor-pointer shadow-lg hover:shadow-xl md:hover:scale-105"
+                            : "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
                         }`}
-                        style={{ 
-                          minWidth: window.innerWidth < 640 ? '44px' : '48px', 
-                          minHeight: window.innerWidth < 640 ? '44px' : '48px', 
-                          padding: window.innerWidth < 640 ? '10px' : '12px',
-                          WebkitTapHighlightColor: 'transparent',
-                          zIndex: 10
+                        style={{
+                          minWidth: window.innerWidth < 640 ? "44px" : "48px",
+                          minHeight: window.innerWidth < 640 ? "44px" : "48px",
+                          padding: window.innerWidth < 640 ? "10px" : "12px",
+                          WebkitTapHighlightColor: "transparent",
+                          zIndex: 10,
                         }}
                         aria-label="Send message"
                       >
@@ -478,7 +515,10 @@ export default function PromptInput({
                             <Sparkle className="absolute -top-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 text-amber-300 animate-pulse z-10" />
                           </>
                         )}
-                        <ArrowUp className="relative z-10 w-6 h-6 sm:w-7 sm:h-7 text-white drop-shadow-sm" weight="bold" />
+                        <ArrowUp
+                          className="relative z-10 w-6 h-6 sm:w-7 sm:h-7 text-white drop-shadow-sm"
+                          weight="bold"
+                        />
                       </button>
                       <Tooltip
                         id="send-prompt"
@@ -492,7 +532,7 @@ export default function PromptInput({
               </div>
             </div>
           </div>
-          
+
           {/* Mode selector modal */}
           {showModeSelector && (
             <ResponseModeSelector

@@ -154,13 +154,15 @@ const AgentSchedule = {
       // Map camelCase to snake_case for database fields
       const data = {};
       if (updates.name !== undefined) data.name = updates.name;
-      if (updates.description !== undefined) data.description = updates.description;
-      if (updates.cronExpression !== undefined) data.cron_expression = updates.cronExpression;
+      if (updates.description !== undefined)
+        data.description = updates.description;
+      if (updates.cronExpression !== undefined)
+        data.cron_expression = updates.cronExpression;
       if (updates.timezone !== undefined) data.timezone = updates.timezone;
       if (updates.context !== undefined) data.context = updates.context;
       if (updates.enabled !== undefined) data.enabled = updates.enabled;
       if (updates.nextRunAt !== undefined) data.next_run_at = updates.nextRunAt;
-      
+
       data.updated_at = new Date();
 
       const schedule = await prisma.agent_schedules.update({

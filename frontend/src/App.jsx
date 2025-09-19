@@ -113,7 +113,10 @@ export default function App() {
                 {/* <DarkModeToggle /> */}
                 <Routes>
                   <Route path="/" element={<LandingPage />} />
-                  <Route path="/dashboard" element={<PrivateRoute Component={Main} />} />
+                  <Route
+                    path="/dashboard"
+                    element={<PrivateRoute Component={Main} />}
+                  />
                   <Route path="/login" element={<Login />} />
                   <Route path="/login/password" element={<Login />} />
                   <Route

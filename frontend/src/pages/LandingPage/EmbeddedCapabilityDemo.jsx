@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { 
-  ArrowRight, 
-  Zap, 
-  Globe, 
-  Shield, 
+import {
+  ArrowRight,
+  Zap,
+  Globe,
+  Shield,
   Brain,
   CheckCircle,
   Sparkles,
   ExternalLink,
   Code,
   Layers,
-  Cpu
+  Cpu,
 } from "lucide-react";
 
 export default function EmbeddedCapabilityDemo() {
@@ -23,20 +23,20 @@ export default function EmbeddedCapabilityDemo() {
       title: "Website Integration",
       description: "Embed Tredy AI directly into your existing website",
       website: "realestate.com",
-      features: ["AI Chat Widget", "Lead Capture", "Property Assistant"]
+      features: ["AI Chat Widget", "Lead Capture", "Property Assistant"],
     },
     {
-      title: "Workflow Automation", 
+      title: "Workflow Automation",
       description: "Connect your tools and automate complex processes",
       website: "crm.company.com",
-      features: ["Auto Lead Processing", "Email Sequences", "Calendar Sync"]
+      features: ["Auto Lead Processing", "Email Sequences", "Calendar Sync"],
     },
     {
       title: "Data Intelligence",
       description: "Transform your data into actionable insights",
-      website: "analytics.business.com", 
-      features: ["Smart Reports", "Predictive Analytics", "ROI Tracking"]
-    }
+      website: "analytics.business.com",
+      features: ["Smart Reports", "Predictive Analytics", "ROI Tracking"],
+    },
   ];
 
   const pointers = [
@@ -45,29 +45,29 @@ export default function EmbeddedCapabilityDemo() {
       position: { top: "15%", left: "5%" },
       direction: "right",
       content: "AI Widget Embedded",
-      icon: <Brain className="w-4 h-4" />
+      icon: <Brain className="w-4 h-4" />,
     },
     {
       id: 1,
       position: { top: "35%", right: "5%" },
-      direction: "left", 
+      direction: "left",
       content: "Real-time Processing",
-      icon: <Zap className="w-4 h-4" />
+      icon: <Zap className="w-4 h-4" />,
     },
     {
       id: 2,
       position: { top: "55%", left: "5%" },
       direction: "right",
       content: "Smart Integrations",
-      icon: <Layers className="w-4 h-4" />
+      icon: <Layers className="w-4 h-4" />,
     },
     {
       id: 3,
       position: { top: "75%", right: "5%" },
       direction: "left",
       content: "Your Workspace",
-      icon: <Globe className="w-4 h-4" />
-    }
+      icon: <Globe className="w-4 h-4" />,
+    },
   ];
 
   useEffect(() => {
@@ -95,7 +95,6 @@ export default function EmbeddedCapabilityDemo() {
     <div className="relative w-full max-w-4xl mx-auto">
       {/* Main Demo Container */}
       <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden border-2 border-purple-200 hover:border-purple-300 transition-all duration-500">
-        
         {/* Website Preview Header */}
         <div className="bg-gradient-to-r from-gray-100 to-gray-200 p-4 border-b border-gray-300">
           <div className="flex items-center justify-between">
@@ -107,12 +106,16 @@ export default function EmbeddedCapabilityDemo() {
               </div>
               <div className="flex items-center space-x-2 bg-white px-3 py-1 rounded-lg border border-gray-300">
                 <Globe className="w-4 h-4 text-gray-600" />
-                <span className="text-sm font-medium text-gray-700">{demoSteps[currentStep].website}</span>
+                <span className="text-sm font-medium text-gray-700">
+                  {demoSteps[currentStep].website}
+                </span>
               </div>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-xs text-gray-600 font-medium">Tredy Active</span>
+              <span className="text-xs text-gray-600 font-medium">
+                Tredy Active
+              </span>
             </div>
           </div>
         </div>
@@ -127,7 +130,7 @@ export default function EmbeddedCapabilityDemo() {
                 <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
                 <div className="h-3 bg-gray-100 rounded w-1/2"></div>
               </div>
-              
+
               {/* Mock Content Blocks */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white rounded-lg p-4 shadow-sm">
@@ -141,7 +144,7 @@ export default function EmbeddedCapabilityDemo() {
                   <div className="h-2 bg-gray-100 rounded w-2/3"></div>
                 </div>
               </div>
-              
+
               {/* Mock Sidebar */}
               <div className="bg-white rounded-lg p-4 shadow-sm">
                 <div className="h-3 bg-gray-200 rounded w-1/3 mb-2"></div>
@@ -163,8 +166,12 @@ export default function EmbeddedCapabilityDemo() {
                     <Brain className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-white font-bold text-lg">Tredy AI Assistant</h3>
-                    <p className="text-purple-100 text-sm">Intelligent Business Automation</p>
+                    <h3 className="text-white font-bold text-lg">
+                      Tredy AI Assistant
+                    </h3>
+                    <p className="text-purple-100 text-sm">
+                      Intelligent Business Automation
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2 bg-white/20 rounded-full px-3 py-1">
@@ -181,7 +188,12 @@ export default function EmbeddedCapabilityDemo() {
                   </div>
                   <div className="flex-1">
                     <p className="text-white text-sm leading-relaxed">
-                      I've analyzed your website and found <span className="font-semibold">3 automation opportunities</span> that could save you 15+ hours per week and increase conversions by 200%.
+                      I've analyzed your website and found{" "}
+                      <span className="font-semibold">
+                        3 automation opportunities
+                      </span>{" "}
+                      that could save you 15+ hours per week and increase
+                      conversions by 200%.
                     </p>
                     <div className="flex items-center space-x-4 mt-3 text-xs text-purple-100">
                       <div className="flex items-center space-x-1">
@@ -203,23 +215,33 @@ export default function EmbeddedCapabilityDemo() {
 
               {/* Action Buttons */}
               <div className="flex space-x-3">
-                <button 
+                <button
                   onClick={() => {
                     // Focus on chat input or trigger chat action
-                    const chatInput = document.querySelector('textarea[placeholder*="Send a message"], textarea[placeholder*="Type your message"]');
+                    const chatInput = document.querySelector(
+                      'textarea[placeholder*="Send a message"], textarea[placeholder*="Type your message"]'
+                    );
                     if (chatInput) {
                       chatInput.focus();
-                      chatInput.value = '@agent analyze my website and provide automation recommendations';
-                      chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+                      chatInput.value =
+                        "@agent analyze my website and provide automation recommendations";
+                      chatInput.dispatchEvent(
+                        new Event("input", { bubbles: true })
+                      );
                     } else {
                       // If no chat input found, scroll to top and try to find it
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      window.scrollTo({ top: 0, behavior: "smooth" });
                       setTimeout(() => {
-                        const chatInput = document.querySelector('textarea[placeholder*="Send a message"], textarea[placeholder*="Type your message"]');
+                        const chatInput = document.querySelector(
+                          'textarea[placeholder*="Send a message"], textarea[placeholder*="Type your message"]'
+                        );
                         if (chatInput) {
                           chatInput.focus();
-                          chatInput.value = '@agent analyze my website and provide automation recommendations';
-                          chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+                          chatInput.value =
+                            "@agent analyze my website and provide automation recommendations";
+                          chatInput.dispatchEvent(
+                            new Event("input", { bubbles: true })
+                          );
                         }
                       }, 500);
                     }
@@ -243,13 +265,19 @@ export default function EmbeddedCapabilityDemo() {
               <div
                 key={pointer.id}
                 className={`absolute transition-all duration-1000 ${
-                  activePointer === index ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                  activePointer === index
+                    ? "opacity-100 scale-100"
+                    : "opacity-0 scale-75"
                 }`}
                 style={pointer.position}
               >
-                <div className={`flex items-center space-x-2 ${
-                  pointer.direction === 'right' ? 'flex-row' : 'flex-row-reverse'
-                }`}>
+                <div
+                  className={`flex items-center space-x-2 ${
+                    pointer.direction === "right"
+                      ? "flex-row"
+                      : "flex-row-reverse"
+                  }`}
+                >
                   <div className="bg-purple-600 text-white px-3 py-2 rounded-lg shadow-lg text-sm font-medium whitespace-nowrap">
                     {pointer.content}
                   </div>
@@ -257,11 +285,13 @@ export default function EmbeddedCapabilityDemo() {
                     {pointer.icon}
                   </div>
                 </div>
-                <div className={`absolute top-1/2 w-0 h-0 border-8 ${
-                  pointer.direction === 'right' 
-                    ? 'border-l-purple-600 border-t-transparent border-b-transparent border-r-transparent left-full -translate-y-1/2'
-                    : 'border-r-purple-600 border-t-transparent border-b-transparent border-l-transparent right-full -translate-y-1/2'
-                }`}></div>
+                <div
+                  className={`absolute top-1/2 w-0 h-0 border-8 ${
+                    pointer.direction === "right"
+                      ? "border-l-purple-600 border-t-transparent border-b-transparent border-r-transparent left-full -translate-y-1/2"
+                      : "border-r-purple-600 border-t-transparent border-b-transparent border-l-transparent right-full -translate-y-1/2"
+                  }`}
+                ></div>
               </div>
             ))}
           </div>
@@ -274,7 +304,7 @@ export default function EmbeddedCapabilityDemo() {
               <div
                 key={index}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  currentStep === index ? 'bg-purple-600 w-6' : 'bg-gray-300'
+                  currentStep === index ? "bg-purple-600 w-6" : "bg-gray-300"
                 }`}
               ></div>
             ))}
@@ -290,8 +320,12 @@ export default function EmbeddedCapabilityDemo() {
               <Cpu className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-gray-900">Your Tredy Workspace</h3>
-              <p className="text-sm text-gray-600">Centralized AI command center</p>
+              <h3 className="text-lg font-bold text-gray-900">
+                Your Tredy Workspace
+              </h3>
+              <p className="text-sm text-gray-600">
+                Centralized AI command center
+              </p>
             </div>
           </div>
           <div className="flex items-center space-x-4">

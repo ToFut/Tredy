@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { 
-  CheckCircle, 
-  XCircle, 
+import {
+  CheckCircle,
+  XCircle,
   Clock,
   ArrowsClockwise,
   Plus,
@@ -17,7 +17,7 @@ import {
   Sparkle,
   Eye,
   ChatCircle,
-  X
+  X,
 } from "@phosphor-icons/react";
 import { Tooltip } from "react-tooltip";
 import UserConnector from "@/models/userConnector";
@@ -29,93 +29,93 @@ import CustomizableDashboard from "./CustomizableDashboard";
 // Industry Solutions connector configurations
 const INDUSTRY_CONNECTORS = {
   // Communication & Collaboration
-  gmail: { 
-    name: "Gmail", 
-    category: "Communication", 
-    icon: "📧", 
+  gmail: {
+    name: "Gmail",
+    category: "Communication",
+    icon: "📧",
     color: "from-red-400 to-red-600",
-    description: "Email management and automation"
+    description: "Email management and automation",
   },
-  slack: { 
-    name: "Slack", 
-    category: "Communication", 
-    icon: "💬", 
+  slack: {
+    name: "Slack",
+    category: "Communication",
+    icon: "💬",
     color: "from-purple-400 to-purple-600",
-    description: "Team communication and workflows"
+    description: "Team communication and workflows",
   },
-  
+
   // Productivity & Organization
-  "google-drive": { 
-    name: "Google Drive", 
-    category: "Productivity", 
-    icon: "📁", 
+  "google-drive": {
+    name: "Google Drive",
+    category: "Productivity",
+    icon: "📁",
     color: "from-blue-400 to-blue-600",
-    description: "Document storage and collaboration"
+    description: "Document storage and collaboration",
   },
-  "google-calendar": { 
-    name: "Google Calendar", 
-    category: "Productivity", 
-    icon: "📅", 
+  "google-calendar": {
+    name: "Google Calendar",
+    category: "Productivity",
+    icon: "📅",
     color: "from-green-400 to-green-600",
-    description: "Schedule management and automation"
+    description: "Schedule management and automation",
   },
-  notion: { 
-    name: "Notion", 
-    category: "Productivity", 
-    icon: "📝", 
+  notion: {
+    name: "Notion",
+    category: "Productivity",
+    icon: "📝",
     color: "from-gray-400 to-gray-600",
-    description: "Workspace and knowledge management"
+    description: "Workspace and knowledge management",
   },
-  
+
   // Business & Sales
-  linkedin: { 
-    name: "LinkedIn", 
-    category: "Business", 
-    icon: "💼", 
+  linkedin: {
+    name: "LinkedIn",
+    category: "Business",
+    icon: "💼",
     color: "from-blue-500 to-blue-700",
-    description: "Professional networking and outreach"
+    description: "Professional networking and outreach",
   },
-  shopify: { 
-    name: "Shopify", 
-    category: "Business", 
-    icon: "🛒", 
+  shopify: {
+    name: "Shopify",
+    category: "Business",
+    icon: "🛒",
     color: "from-green-500 to-green-700",
-    description: "E-commerce platform integration"
+    description: "E-commerce platform integration",
   },
-  stripe: { 
-    name: "Stripe", 
-    category: "Business", 
-    icon: "💳", 
+  stripe: {
+    name: "Stripe",
+    category: "Business",
+    icon: "💳",
     color: "from-indigo-400 to-indigo-600",
-    description: "Payment processing and analytics"
+    description: "Payment processing and analytics",
   },
-  
+
   // Development & Technical
-  github: { 
-    name: "GitHub", 
-    category: "Development", 
-    icon: "🐙", 
+  github: {
+    name: "GitHub",
+    category: "Development",
+    icon: "🐙",
     color: "from-gray-600 to-gray-800",
-    description: "Code repository and project management"
+    description: "Code repository and project management",
   },
-  
+
   // Social & Marketing
-  facebook: { 
-    name: "Facebook", 
-    category: "Marketing", 
-    icon: "📘", 
+  facebook: {
+    name: "Facebook",
+    category: "Marketing",
+    icon: "📘",
     color: "from-blue-600 to-blue-800",
-    description: "Social media management and advertising"
+    description: "Social media management and advertising",
   },
-  
+
   // Data & Analytics
-  airtable: { 
-    name: "Airtable", 
-    category: "Data", 
-    icon: "📊", 
+  airtable: {
+    name: "Airtable",
+    category: "Data",
+    icon: "📊",
     color: "from-purple-500 to-purple-700",
-    description: "Database and workflow automation"
-  }
+    description: "Database and workflow automation",
+  },
 };
 
 // Category icons mapping
@@ -125,24 +125,24 @@ const CATEGORY_ICONS = {
   Business: ChartLine,
   Development: Gear,
   Marketing: Globe,
-  Data: Shield
+  Data: Shield,
 };
 
 // Connector Circle Component - Google-style design
-function ConnectorCircle({ 
-  connector, 
-  size = 40, 
-  onClick, 
+function ConnectorCircle({
+  connector,
+  size = 40,
+  onClick,
   onConnect,
   showStatus = true,
-  className = "" 
+  className = "",
 }) {
   const config = INDUSTRY_CONNECTORS[connector?.provider] || {
-    name: connector?.provider || 'Unknown',
-    category: 'Other',
-    icon: '🔗',
-    color: 'from-gray-400 to-gray-600',
-    description: 'External service integration'
+    name: connector?.provider || "Unknown",
+    category: "Other",
+    icon: "🔗",
+    color: "from-gray-400 to-gray-600",
+    description: "External service integration",
   };
 
   const getStatusIcon = (status) => {
@@ -150,7 +150,9 @@ function ConnectorCircle({
       case "connected":
         return <CheckCircle className="w-3 h-3 text-green-500" />;
       case "syncing":
-        return <ArrowsClockwise className="w-3 h-3 text-blue-500 animate-spin" />;
+        return (
+          <ArrowsClockwise className="w-3 h-3 text-blue-500 animate-spin" />
+        );
       case "error":
         return <XCircle className="w-3 h-3 text-red-500" />;
       case "pending":
@@ -199,47 +201,43 @@ function ConnectorCircle({
         style={{ width: size, height: size }}
       >
         {/* Main Circle */}
-        <div className={`
+        <div
+          className={`
           w-full h-full rounded-full flex items-center justify-center
           bg-gradient-to-br ${config.color} shadow-md
           ring-2 ring-white dark:ring-gray-800
           hover:ring-4 hover:ring-blue-200 dark:hover:ring-blue-900
           transition-all duration-200
           ${showStatus ? getStatusColor(connector?.status) : ""}
-        `}>
+        `}
+        >
           <span style={{ fontSize: size * 0.4 }}>{config.icon}</span>
         </div>
-        
+
         {/* Status Indicator */}
         {showStatus && (
           <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white dark:bg-gray-800 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center">
             {getStatusIcon(connector?.status)}
           </div>
         )}
-        
+
         {/* Sync Animation */}
         {connector?.status === "syncing" && (
           <div className="absolute inset-0 rounded-full animate-ping bg-blue-400 opacity-20" />
         )}
-        
+
         {/* Hover Tooltip */}
         <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 whitespace-nowrap">
           <div className="font-medium">{config.name}</div>
           <div className="text-gray-400">{config.description}</div>
           {connector?.status && (
-            <div className="text-gray-300 mt-1">
-              Status: {connector.status}
-            </div>
+            <div className="text-gray-300 mt-1">Status: {connector.status}</div>
           )}
         </div>
       </div>
 
       {/* Tooltip */}
-      <Tooltip
-        anchorSelect={`#${connectorId}`}
-        place="bottom"
-        className="z-50"
-      >
+      <Tooltip anchorSelect={`#${connectorId}`} place="bottom" className="z-50">
         <div className="text-center">
           <div className="font-medium">{config.name}</div>
           <div className="text-xs text-gray-400">{config.category}</div>
@@ -250,13 +248,13 @@ function ConnectorCircle({
 }
 
 // Industry Solutions Component
-export default function IndustrySolutions({ 
+export default function IndustrySolutions({
   className = "",
   onConnectorClick,
   onConnectConnector,
   maxVisible = 8,
   showCategories = true,
-  compact = false
+  compact = false,
 }) {
   const { slug } = useParams();
   const [connectors, setConnectors] = useState([]);
@@ -295,7 +293,7 @@ export default function IndustrySolutions({
       // Combine and deduplicate connectors
       const allConnectors = [...userConnectors, ...workspaceConnectors];
       const uniqueConnectors = allConnectors.reduce((acc, connector) => {
-        if (!acc.find(c => c.provider === connector.provider)) {
+        if (!acc.find((c) => c.provider === connector.provider)) {
           acc.push(connector);
         }
         return acc;
@@ -328,21 +326,24 @@ export default function IndustrySolutions({
   };
 
   // Group connectors by category
-  const groupedConnectors = Object.entries(INDUSTRY_CONNECTORS).reduce((acc, [provider, config]) => {
-    const connector = connectors.find(c => c.provider === provider);
-    if (!acc[config.category]) {
-      acc[config.category] = [];
-    }
-    acc[config.category].push({
-      provider,
-      ...config,
-      ...connector,
-      status: connector?.status || 'disconnected'
-    });
-    return acc;
-  }, {});
+  const groupedConnectors = Object.entries(INDUSTRY_CONNECTORS).reduce(
+    (acc, [provider, config]) => {
+      const connector = connectors.find((c) => c.provider === provider);
+      if (!acc[config.category]) {
+        acc[config.category] = [];
+      }
+      acc[config.category].push({
+        provider,
+        ...config,
+        ...connector,
+        status: connector?.status || "disconnected",
+      });
+      return acc;
+    },
+    {}
+  );
 
-  const visibleConnectors = showAll 
+  const visibleConnectors = showAll
     ? Object.values(groupedConnectors).flat()
     : Object.values(groupedConnectors).flat().slice(0, maxVisible);
 
@@ -351,10 +352,15 @@ export default function IndustrySolutions({
       <div className={`flex items-center gap-2 ${className}`}>
         <div className="flex gap-1">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+            <div
+              key={i}
+              className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"
+            />
           ))}
         </div>
-        <span className="text-xs text-gray-500 dark:text-gray-400">Loading...</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">
+          Loading...
+        </span>
       </div>
     );
   }
@@ -388,17 +394,18 @@ export default function IndustrySolutions({
               className="hover:z-10"
             />
           ))}
-          
+
           {/* Show More/Less Button - Hidden in compact mode */}
-          {!compact && Object.values(groupedConnectors).flat().length > maxVisible && (
-            <button
-              onClick={() => setShowAll(!showAll)}
-              className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
-              title={showAll ? "Show less" : "Show more"}
-            >
-              <Plus className="w-3 h-3 text-gray-500" />
-            </button>
-          )}
+          {!compact &&
+            Object.values(groupedConnectors).flat().length > maxVisible && (
+              <button
+                onClick={() => setShowAll(!showAll)}
+                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+                title={showAll ? "Show less" : "Show more"}
+              >
+                <Plus className="w-3 h-3 text-gray-500" />
+              </button>
+            )}
 
           {/* Business Chat Button */}
           {!compact && (
@@ -425,10 +432,10 @@ export default function IndustrySolutions({
           {/* Add New Connector Button */}
           <button
             onClick={() => onConnectConnector && onConnectConnector()}
-            className={`${compact ? 'w-7 h-7' : 'w-8 h-8'} rounded-full bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white flex items-center justify-center shadow-md hover:shadow-lg transition-all`}
+            className={`${compact ? "w-7 h-7" : "w-8 h-8"} rounded-full bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white flex items-center justify-center shadow-md hover:shadow-lg transition-all`}
             title="Add new connector"
           >
-            <Plus className={`${compact ? 'w-2.5 h-2.5' : 'w-3 h-3'}`} />
+            <Plus className={`${compact ? "w-2.5 h-2.5" : "w-3 h-3"}`} />
           </button>
         </div>
 
@@ -436,7 +443,9 @@ export default function IndustrySolutions({
         {!compact && connectors.length > 0 && (
           <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hidden lg:flex">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            <span>{connectors.filter(c => c.status === 'connected').length} active</span>
+            <span>
+              {connectors.filter((c) => c.status === "connected").length} active
+            </span>
           </div>
         )}
       </div>

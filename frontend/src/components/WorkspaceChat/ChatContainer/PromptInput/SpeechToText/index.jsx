@@ -43,7 +43,7 @@ export default function SpeechToText({ sendCommand }) {
         return;
       }
     }
-    
+
     if (!isMicrophoneAvailable) {
       alert(
         "Tredy does not have access to microphone. Please enable for this site to use this feature."
@@ -57,7 +57,7 @@ export default function SpeechToText({ sendCommand }) {
       continuous: browserSupportsContinuousListening,
       language: window?.navigator?.language ?? "en-US",
     });
-    
+
     // Vibrate on mobile to indicate recording started
     if (window.innerWidth < 640) {
       navigator.vibrate?.([50]);
@@ -143,23 +143,27 @@ export default function SpeechToText({ sendCommand }) {
       <button
         type="button"
         data-tooltip-id="tooltip-microphone-btn"
-        data-tooltip-content={window.innerWidth >= 640 ? `${t("chat_window.microphone")} (CTRL + M)` : t("chat_window.microphone")}
+        data-tooltip-content={
+          window.innerWidth >= 640
+            ? `${t("chat_window.microphone")} (CTRL + M)`
+            : t("chat_window.microphone")
+        }
         aria-label={t("chat_window.microphone")}
         onClick={listening ? endSTTSession : startSTTSession}
         className={`border-none relative flex justify-center items-center cursor-pointer touch-manipulation transition-all duration-200 rounded-xl ${
-          listening 
-            ? "text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20 scale-110 shadow-lg" 
+          listening
+            ? "text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20 scale-110 shadow-lg"
             : "text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:scale-105 active:scale-95"
         }`}
         style={{
-          WebkitTapHighlightColor: 'transparent',
-          minWidth: window.innerWidth < 640 ? '36px' : '44px',
-          minHeight: window.innerWidth < 640 ? '36px' : '44px'
+          WebkitTapHighlightColor: "transparent",
+          minWidth: window.innerWidth < 640 ? "36px" : "44px",
+          minHeight: window.innerWidth < 640 ? "36px" : "44px",
         }}
       >
         <Microphone
           weight="fill"
-          className={`${window.innerWidth < 640 ? 'w-4 h-4' : 'w-6 h-6'} pointer-events-none ${
+          className={`${window.innerWidth < 640 ? "w-4 h-4" : "w-6 h-6"} pointer-events-none ${
             listening ? "animate-pulse" : ""
           }`}
         />

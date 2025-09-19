@@ -28,12 +28,15 @@
 }
 
 .message-ultra-elegant-entrance {
-  animation: ultraElegantEntrance 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: ultraElegantEntrance 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+    forwards;
 }
 
 /* 2. ELEGANT TYPING INDICATOR */
 @keyframes elegantTyping {
-  0%, 60%, 100% {
+  0%,
+  60%,
+  100% {
     transform: translateY(0) scale(1);
     opacity: 0.4;
   }
@@ -193,7 +196,8 @@
 }
 
 .text-reveal-elegant {
-  animation: elegantTextReveal 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: elegantTextReveal 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+    forwards;
 }
 
 /* 8. ELEGANT BUTTON INTERACTIONS */
@@ -303,7 +307,7 @@
 }
 
 .progress-elegant::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -334,7 +338,8 @@
 }
 
 .modal-elegant {
-  animation: elegantModalEntrance 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: elegantModalEntrance 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+    forwards;
 }
 
 /* 13. SOPHISTICATED TOOLTIP ANIMATIONS */
@@ -378,7 +383,8 @@
 }
 
 .notification-elegant {
-  animation: elegantNotification 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: elegantNotification 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+    forwards;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(139, 92, 246, 0.2);
@@ -391,26 +397,37 @@
 /* 15. PREMIUM STAGGER ANIMATIONS */
 .stagger-elegant > * {
   animation-delay: calc(var(--stagger-delay, 0) * 0.1s);
-  animation: elegantTextReveal 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: elegantTextReveal 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+    forwards;
 }
 
-.stagger-elegant > *:nth-child(1) { --stagger-delay: 0; }
-.stagger-elegant > *:nth-child(2) { --stagger-delay: 1; }
-.stagger-elegant > *:nth-child(3) { --stagger-delay: 2; }
-.stagger-elegant > *:nth-child(4) { --stagger-delay: 3; }
-.stagger-elegant > *:nth-child(5) { --stagger-delay: 4; }
+.stagger-elegant > *:nth-child(1) {
+  --stagger-delay: 0;
+}
+.stagger-elegant > *:nth-child(2) {
+  --stagger-delay: 1;
+}
+.stagger-elegant > *:nth-child(3) {
+  --stagger-delay: 2;
+}
+.stagger-elegant > *:nth-child(4) {
+  --stagger-delay: 3;
+}
+.stagger-elegant > *:nth-child(5) {
+  --stagger-delay: 4;
+}
 
 /* 16. RESPONSIVE ANIMATION ADJUSTMENTS */
 @media (max-width: 768px) {
   .message-ultra-elegant-entrance {
     animation-duration: 0.6s;
   }
-  
+
   .typing-indicator-elegant {
     margin-left: 20px;
     padding: 10px 16px;
   }
-  
+
   .scroll-indicator-elegant {
     width: 36px;
     height: 36px;
@@ -451,7 +468,7 @@
     border-width: 2px;
     border-color: var(--theme-text-primary);
   }
-  
+
   .typing-dot-elegant {
     background: var(--theme-text-primary);
     box-shadow: none;

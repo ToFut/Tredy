@@ -20,44 +20,44 @@ export default function SkillNode({
       const res = await Admin.systemPreferencesByFields([
         "default_agent_skills",
         "disabled_agent_skills",
-        "imported_agent_skills"
+        "imported_agent_skills",
       ]);
-      
+
       const enabledSkills = res?.settings?.default_agent_skills || [];
       const disabledSkills = res?.settings?.disabled_agent_skills || [];
       const importedSkills = res?.settings?.imported_agent_skills || [];
-      
+
       // Build skills list from default skills
       const skills = [];
-      
+
       // Add default skills that are not disabled
       Object.entries(defaultSkills).forEach(([key, skill]) => {
         if (!disabledSkills.includes(key)) {
           skills.push({
             id: key,
             label: skill.title,
-            description: skill.description
+            description: skill.description,
           });
         }
       });
-      
+
       // Add configurable skills that are enabled
       Object.entries(configurableSkills).forEach(([key, skill]) => {
         if (enabledSkills.includes(key)) {
           skills.push({
             id: key,
             label: skill.title,
-            description: skill.description
+            description: skill.description,
           });
         }
       });
-      
+
       // Add imported skills
-      importedSkills.forEach(skill => {
+      importedSkills.forEach((skill) => {
         skills.push({
           id: skill.name,
           label: skill.name,
-          description: skill.description || "Imported skill"
+          description: skill.description || "Imported skill",
         });
       });
 
@@ -65,16 +65,18 @@ export default function SkillNode({
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch skills:", error);
-      
+
       // Fallback to showing all available skills
       const allSkills = [];
-      Object.entries({ ...defaultSkills, ...configurableSkills }).forEach(([key, skill]) => {
-        allSkills.push({
-          id: key,
-          label: skill.title,
-          description: skill.description
-        });
-      });
+      Object.entries({ ...defaultSkills, ...configurableSkills }).forEach(
+        ([key, skill]) => {
+          allSkills.push({
+            id: key,
+            label: skill.title,
+            description: skill.description,
+          });
+        }
+      );
       setAvailableSkills(allSkills);
       setLoading(false);
     }
@@ -87,12 +89,16 @@ export default function SkillNode({
           Skill
         </label>
         {loading ? (
-          <div className="text-sm text-theme-text-secondary">Loading skills...</div>
+          <div className="text-sm text-theme-text-secondary">
+            Loading skills...
+          </div>
         ) : (
           <select
             value={config?.skillType || ""}
             onChange={(e) => {
-              const selectedSkill = availableSkills.find(s => s.id === e.target.value);
+              const selectedSkill = availableSkills.find(
+                (s) => s.id === e.target.value
+              );
               onConfigChange({
                 ...config,
                 skillType: e.target.value,
@@ -111,7 +117,10 @@ export default function SkillNode({
         )}
         {config?.skillType && (
           <p className="text-xs text-theme-text-secondary mt-1">
-            {availableSkills.find(s => s.id === config.skillType)?.description}
+            {
+              availableSkills.find((s) => s.id === config.skillType)
+                ?.description
+            }
           </p>
         )}
       </div>

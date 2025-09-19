@@ -33,7 +33,9 @@ class AgentSchedulingEngine {
     try {
       // Load all active schedules
       const schedules = await AgentSchedule.getActive();
-      console.log(`[AgentScheduler] Loading ${schedules.length} active schedules`);
+      console.log(
+        `[AgentScheduler] Loading ${schedules.length} active schedules`
+      );
 
       for (const schedule of schedules) {
         await this.registerSchedule(schedule);
@@ -101,11 +103,15 @@ class AgentSchedulingEngine {
 
       // Don't register disabled schedules
       if (!schedule.enabled) {
-        console.log(`[AgentScheduler] Schedule ${schedule.id} is disabled, skipping registration`);
+        console.log(
+          `[AgentScheduler] Schedule ${schedule.id} is disabled, skipping registration`
+        );
         return;
       }
 
-      console.log(`[AgentScheduler] Registering schedule ${schedule.id}: ${schedule.name}`);
+      console.log(
+        `[AgentScheduler] Registering schedule ${schedule.id}: ${schedule.name}`
+      );
 
       // Create cron task
       const task = cron.schedule(
@@ -120,9 +126,14 @@ class AgentSchedulingEngine {
       );
 
       this.activeSchedules.set(schedule.id, task);
-      console.log(`[AgentScheduler] Schedule ${schedule.id} registered successfully`);
+      console.log(
+        `[AgentScheduler] Schedule ${schedule.id} registered successfully`
+      );
     } catch (error) {
-      console.error(`[AgentScheduler] Failed to register schedule ${schedule.id}:`, error);
+      console.error(
+        `[AgentScheduler] Failed to register schedule ${schedule.id}:`,
+        error
+      );
     }
   }
 
@@ -142,12 +153,16 @@ class AgentSchedulingEngine {
    * Execute a scheduled agent
    */
   async executeSchedule(schedule) {
-    console.log(`[AgentScheduler] Executing schedule ${schedule.id}: ${schedule.name}`);
+    console.log(
+      `[AgentScheduler] Executing schedule ${schedule.id}: ${schedule.name}`
+    );
 
     // Start execution tracking
     const execution = await ScheduleExecution.start(schedule.id);
     if (!execution) {
-      console.error(`[AgentScheduler] Failed to create execution record for schedule ${schedule.id}`);
+      console.error(
+        `[AgentScheduler] Failed to create execution record for schedule ${schedule.id}`
+      );
       return;
     }
 
@@ -171,9 +186,14 @@ class AgentSchedulingEngine {
       // Update schedule's last run time
       await AgentSchedule.updateLastRun(schedule.id);
 
-      console.log(`[AgentScheduler] Successfully executed schedule ${schedule.id}`);
+      console.log(
+        `[AgentScheduler] Successfully executed schedule ${schedule.id}`
+      );
     } catch (error) {
-      console.error(`[AgentScheduler] Failed to execute schedule ${schedule.id}:`, error);
+      console.error(
+        `[AgentScheduler] Failed to execute schedule ${schedule.id}:`,
+        error
+      );
 
       // Mark execution as failed
       await ScheduleExecution.fail(execution.id, error);
@@ -181,7 +201,9 @@ class AgentSchedulingEngine {
       // Optionally disable schedule after repeated failures
       const stats = await ScheduleExecution.getStats(schedule.id);
       if (stats.failedExecutions >= 5 && stats.successRate < 20) {
-        console.warn(`[AgentScheduler] Disabling schedule ${schedule.id} due to repeated failures`);
+        console.warn(
+          `[AgentScheduler] Disabling schedule ${schedule.id} due to repeated failures`
+        );
         await AgentSchedule.update(schedule.id, { enabled: false });
         this.unregisterSchedule(schedule.id);
       }
@@ -194,14 +216,16 @@ class AgentSchedulingEngine {
   async checkMissedSchedules() {
     try {
       const dueSchedules = await AgentSchedule.getDueSchedules();
-      
+
       for (const schedule of dueSchedules) {
         // Skip if already registered (will run on its own schedule)
         if (this.activeSchedules.has(schedule.id)) {
           continue;
         }
 
-        console.log(`[AgentScheduler] Found missed schedule ${schedule.id}, executing now`);
+        console.log(
+          `[AgentScheduler] Found missed schedule ${schedule.id}, executing now`
+        );
         await this.executeSchedule(schedule);
       }
     } catch (error) {
@@ -214,9 +238,13 @@ class AgentSchedulingEngine {
    */
   async cleanupOldExecutions() {
     try {
-      const { ScheduleExecution } = require("../../../models/scheduleExecution");
+      const {
+        ScheduleExecution,
+      } = require("../../../models/scheduleExecution");
       const deleted = await ScheduleExecution.cleanup(30); // Keep 30 days of history
-      console.log(`[AgentScheduler] Cleaned up ${deleted} old execution records`);
+      console.log(
+        `[AgentScheduler] Cleaned up ${deleted} old execution records`
+      );
     } catch (error) {
       console.error("[AgentScheduler] Error cleaning up executions:", error);
     }
@@ -227,7 +255,7 @@ class AgentSchedulingEngine {
    */
   async reloadSchedules() {
     console.log("[AgentScheduler] Reloading all schedules...");
-    
+
     // Stop all current schedules
     for (const [scheduleId, task] of this.activeSchedules.entries()) {
       task.stop();

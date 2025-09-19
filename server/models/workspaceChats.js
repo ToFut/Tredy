@@ -100,8 +100,8 @@ const WorkspaceChats = {
             select: {
               id: true,
               username: true,
-            }
-          }
+            },
+          },
         },
         ...(limit !== null ? { take: limit } : {}),
         ...(orderBy !== null ? { orderBy } : { orderBy: { id: "asc" } }),
@@ -219,16 +219,18 @@ const WorkspaceChats = {
     try {
       const chats = await prisma.workspace_chats.findMany({
         where: clause,
-        ...(includeUser ? {
-          include: {
-            users: {
-              select: {
-                id: true,
-                username: true,
-              }
+        ...(includeUser
+          ? {
+              include: {
+                users: {
+                  select: {
+                    id: true,
+                    username: true,
+                  },
+                },
+              },
             }
-          }
-        } : {}),
+          : {}),
         ...(limit !== null ? { take: limit } : {}),
         ...(offset !== null ? { skip: offset } : {}),
         ...(orderBy !== null ? { orderBy } : {}),

@@ -27,20 +27,20 @@ class NangoIntegrationGenerator {
       fieldMapping,
       apiEndpoint,
       workspaceId,
-      description
+      description,
     } = config;
 
     // Generate the Nango script
     const script = this.generateNangoScript(config);
-    
+
     // Generate the integration.yaml
     const integrationYaml = this.generateIntegrationYaml(config);
-    
+
     // Update MCP configuration to include new integration
     await this.updateMCPConfig(provider, integrationName, workspaceId);
-    
+
     // Configure vector sync if it's a sync integration
-    if (type === 'sync') {
+    if (type === "sync") {
       await this.configureVectorSync(provider, integrationName, workspaceId);
     }
 
@@ -49,7 +49,7 @@ class NangoIntegrationGenerator {
       integrationYaml,
       integrationName,
       provider,
-      type
+      type,
     };
   }
 
@@ -58,8 +58,8 @@ class NangoIntegrationGenerator {
    */
   generateNangoScript(config) {
     const { type, provider, apiEndpoint, fieldMapping, outputSchema } = config;
-    
-    if (type === 'sync') {
+
+    if (type === "sync") {
       return `
 import type { NangoSync, ${provider}Record } from './models';
 
@@ -79,11 +79,11 @@ export default async function fetchData(nango: NangoSync): Promise<void> {
         
         // Transform records according to field mapping
         const mappedRecords = records.map(record => ({
-            id: record.${fieldMapping.id || 'id'},
-            name: record.${fieldMapping.name || 'name'},
-            description: record.${fieldMapping.description || 'description'},
-            createdAt: record.${fieldMapping.createdAt || 'created_at'},
-            updatedAt: record.${fieldMapping.updatedAt || 'updated_at'},
+            id: record.${fieldMapping.id || "id"},
+            name: record.${fieldMapping.name || "name"},
+            description: record.${fieldMapping.description || "description"},
+            createdAt: record.${fieldMapping.createdAt || "created_at"},
+            updatedAt: record.${fieldMapping.updatedAt || "updated_at"},
             metadata: record
         }));
 
@@ -105,7 +105,7 @@ import type { NangoAction, ${provider}Input, ${provider}Output } from './models'
 export default async function runAction(nango: NangoAction): Promise<${provider}Output> {
     const input = nango.input as ${provider}Input;
     
-    const response = await nango.${input.method || 'post'}({
+    const response = await nango.${input.method || "post"}({
         endpoint: \`${apiEndpoint}\`,
         data: input.data
     });
@@ -123,9 +123,10 @@ export default async function runAction(nango: NangoAction): Promise<${provider}
    * Generate integration.yaml configuration
    */
   generateIntegrationYaml(config) {
-    const { integrationName, type, provider, description, outputSchema } = config;
-    
-    if (type === 'sync') {
+    const { integrationName, type, provider, description, outputSchema } =
+      config;
+
+    if (type === "sync") {
       return `
 integrations:
   ${integrationName}:
@@ -143,7 +144,7 @@ integrations:
     description: ${description}
     input: ${provider}Input
     output: ${provider}Output
-    endpoint: ${config.method || 'POST'} ${config.apiEndpoint}
+    endpoint: ${config.method || "POST"} ${config.apiEndpoint}
     scopes: ${config.scopes || []}
 `;
     }
@@ -155,11 +156,13 @@ integrations:
   async updateMCPConfig(provider, integrationName, workspaceId) {
     const { MCPNangoBridge } = require("./mcp-nango-bridge");
     const bridge = new MCPNangoBridge();
-    
+
     // Register the new integration with MCP
     await bridge.updateMCPServersForWorkspace(workspaceId);
-    
-    console.log(`[NangoGenerator] Updated MCP config for ${provider}:${integrationName}`);
+
+    console.log(
+      `[NangoGenerator] Updated MCP config for ${provider}:${integrationName}`
+    );
   }
 
   /**
@@ -168,20 +171,22 @@ integrations:
   async configureVectorSync(provider, integrationName, workspaceId) {
     const { Workspace } = require("../../models/workspace");
     const workspace = await Workspace.get({ id: workspaceId });
-    
+
     // Update workspace settings to enable vector sync for this integration
     const syncConfig = {
       provider,
       integrationName,
       syncToVector: true,
-      vectorFields: ['name', 'description', 'content'],
-      webhookUrl: `${process.env.SERVER_URL}/api/webhooks/nango`
+      vectorFields: ["name", "description", "content"],
+      webhookUrl: `${process.env.SERVER_URL}/api/webhooks/nango`,
     };
-    
+
     // Store sync configuration
     await workspace.updateVectorSyncConfig(syncConfig);
-    
-    console.log(`[NangoGenerator] Configured vector sync for ${provider}:${integrationName}`);
+
+    console.log(
+      `[NangoGenerator] Configured vector sync for ${provider}:${integrationName}`
+    );
   }
 
   /**
@@ -189,35 +194,35 @@ integrations:
    */
   generateMCPTools(integration) {
     const tools = [];
-    
-    if (integration.type === 'sync') {
+
+    if (integration.type === "sync") {
       // Generate search tool for synced data
       tools.push({
         name: `search_${integration.provider}_records`,
         description: `Search ${integration.provider} records from synced data`,
         parameters: {
-          query: { type: 'string', description: 'Search query' },
-          limit: { type: 'number', default: 10 }
-        }
+          query: { type: "string", description: "Search query" },
+          limit: { type: "number", default: 10 },
+        },
       });
-      
+
       // Generate get tool for specific record
       tools.push({
         name: `get_${integration.provider}_record`,
         description: `Get specific ${integration.provider} record by ID`,
         parameters: {
-          id: { type: 'string', description: 'Record ID' }
-        }
+          id: { type: "string", description: "Record ID" },
+        },
       });
     } else {
       // Generate action tool
       tools.push({
         name: `${integration.integrationName}_action`,
         description: integration.description,
-        parameters: integration.inputSchema || {}
+        parameters: integration.inputSchema || {},
       });
     }
-    
+
     return tools;
   }
 
@@ -225,11 +230,11 @@ integrations:
    * Test the generated integration
    */
   async testIntegration(integrationName, connectionId, input = null) {
-    const command = input 
+    const command = input
       ? `nango dryrun ${integrationName} ${connectionId} --validation --input '${JSON.stringify(input)}'`
       : `nango dryrun ${integrationName} ${connectionId} --validation`;
-    
-    const { exec } = require('child_process');
+
+    const { exec } = require("child_process");
     return new Promise((resolve, reject) => {
       exec(command, (error, stdout, stderr) => {
         if (error) {

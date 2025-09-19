@@ -8,7 +8,15 @@ const ConnectorTokens = {
   /**
    * Create or update a connector connection (supports both workspace and user level)
    */
-  upsert: async function ({ workspaceId, userId, provider, nangoConnectionId, status = "connected", metadata = {}, supabaseTokenRef = null }) {
+  upsert: async function ({
+    workspaceId,
+    userId,
+    provider,
+    nangoConnectionId,
+    status = "connected",
+    metadata = {},
+    supabaseTokenRef = null,
+  }) {
     try {
       const scope = userId ? "user" : "workspace";
       const data = {
@@ -29,19 +37,20 @@ const ConnectorTokens = {
         data.userId = null;
       }
 
-      const whereClause = scope === "user" 
-        ? {
-            userId_provider: {
-              userId: Number(userId),
-              provider,
-            },
-          }
-        : {
-            workspaceId_provider: {
-              workspaceId: Number(workspaceId),
-              provider,
-            },
-          };
+      const whereClause =
+        scope === "user"
+          ? {
+              userId_provider: {
+                userId: Number(userId),
+                provider,
+              },
+            }
+          : {
+              workspaceId_provider: {
+                workspaceId: Number(workspaceId),
+                provider,
+              },
+            };
 
       const connector = await prisma.connector_tokens.upsert({
         where: whereClause,
@@ -191,9 +200,9 @@ const ConnectorTokens = {
   forUser: async function (userId) {
     try {
       const connectors = await prisma.connector_tokens.findMany({
-        where: { 
+        where: {
           userId: Number(userId),
-          scope: "user"
+          scope: "user",
         },
       });
 
@@ -213,9 +222,9 @@ const ConnectorTokens = {
   getAvailableForWorkspace: async function (workspaceId, userId = null) {
     try {
       const conditions = [
-        { workspaceId: Number(workspaceId), scope: "workspace" }
+        { workspaceId: Number(workspaceId), scope: "workspace" },
       ];
-      
+
       // If userId is provided, also get user-level connectors
       if (userId) {
         conditions.push({ userId: Number(userId), scope: "user" });

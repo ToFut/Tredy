@@ -45,7 +45,10 @@ function workspaceEndpoints(app) {
 
   app.post(
     "/workspace/new",
-    [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default])],
+    [
+      validatedRequest,
+      flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default]),
+    ],
     async (request, response) => {
       try {
         const user = await userFromSession(request, response);
@@ -84,7 +87,10 @@ function workspaceEndpoints(app) {
 
   app.post(
     "/workspace/:slug/update",
-    [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default])],
+    [
+      validatedRequest,
+      flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default]),
+    ],
     async (request, response) => {
       try {
         const user = await userFromSession(request, response);
@@ -164,7 +170,10 @@ function workspaceEndpoints(app) {
 
   app.post(
     "/workspace/:slug/upload-link",
-    [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default])],
+    [
+      validatedRequest,
+      flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default]),
+    ],
     async (request, response) => {
       try {
         const Collector = new CollectorApi();
@@ -207,7 +216,10 @@ function workspaceEndpoints(app) {
 
   app.post(
     "/workspace/:slug/update-embeddings",
-    [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default])],
+    [
+      validatedRequest,
+      flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default]),
+    ],
     async (request, response) => {
       try {
         const user = await userFromSession(request, response);
@@ -251,7 +263,10 @@ function workspaceEndpoints(app) {
 
   app.delete(
     "/workspace/:slug",
-    [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default])],
+    [
+      validatedRequest,
+      flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default]),
+    ],
     async (request, response) => {
       try {
         const { slug = "" } = request.params;
@@ -294,7 +309,10 @@ function workspaceEndpoints(app) {
 
   app.delete(
     "/workspace/:slug/reset-vector-db",
-    [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default])],
+    [
+      validatedRequest,
+      flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default]),
+    ],
     async (request, response) => {
       try {
         const { slug = "" } = request.params;
@@ -538,7 +556,10 @@ function workspaceEndpoints(app) {
 
   app.post(
     "/workspace/:slug/suggested-messages",
-    [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default])],
+    [
+      validatedRequest,
+      flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default]),
+    ],
     async (request, response) => {
       try {
         const { messages = [] } = reqBody(request);
@@ -729,7 +750,10 @@ function workspaceEndpoints(app) {
 
   app.delete(
     "/workspace/:slug/remove-pfp",
-    [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default])],
+    [
+      validatedRequest,
+      flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default]),
+    ],
     async function (request, response) {
       try {
         const { slug } = request.params;
@@ -1073,41 +1097,45 @@ function workspaceEndpoints(app) {
       try {
         const { slug } = request.params;
         const workspace = await Workspace.get({ slug });
-        
+
         if (!workspace) {
-          return response.status(404).json({ 
-            success: false, 
-            error: "Workspace not found" 
+          return response.status(404).json({
+            success: false,
+            error: "Workspace not found",
           });
         }
 
         // Get workspace users if multi-user mode is enabled
         const { WorkspaceUser } = require("../models/workspaceUsers");
-        const workspaceUsers = await WorkspaceUser.where({ workspace_id: workspace.id });
-        
+        const workspaceUsers = await WorkspaceUser.where({
+          workspace_id: workspace.id,
+        });
+
         // Get full user details for each workspace user
         const { User } = require("../models/user");
         const users = await Promise.all(
           workspaceUsers.map(async (wu) => {
             const user = await User.get({ id: wu.user_id });
-            return user ? {
-              id: user.id,
-              username: user.username,
-              role: user.role,
-              createdAt: wu.createdAt
-            } : null;
+            return user
+              ? {
+                  id: user.id,
+                  username: user.username,
+                  role: user.role,
+                  createdAt: wu.createdAt,
+                }
+              : null;
           })
         );
 
-        response.status(200).json({ 
-          success: true, 
-          users: users.filter(u => u !== null)
+        response.status(200).json({
+          success: true,
+          users: users.filter((u) => u !== null),
         });
       } catch (error) {
         console.error("Error fetching workspace users:", error);
-        response.status(500).json({ 
-          success: false, 
-          error: "Failed to fetch workspace users" 
+        response.status(500).json({
+          success: false,
+          error: "Failed to fetch workspace users",
         });
       }
     }

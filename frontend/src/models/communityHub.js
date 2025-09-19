@@ -240,7 +240,8 @@ const CommunityHub = {
     })
       .then((res) => res.json())
       .then((res) => {
-        if (!res.success) throw new Error(res.error || "Failed to fetch installed items");
+        if (!res.success)
+          throw new Error(res.error || "Failed to fetch installed items");
         return res.items;
       })
       .catch((e) => {

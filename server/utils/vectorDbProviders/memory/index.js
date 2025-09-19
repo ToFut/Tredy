@@ -28,18 +28,21 @@ class InMemoryVectorDB {
     return ns ? ns.vectors.length : 0;
   }
 
-  async similarityResponse(namespace, query, similarityThreshold = 0.25, topN = 4) {
+  async similarityResponse(
+    namespace,
+    query,
+    similarityThreshold = 0.25,
+    topN = 4
+  ) {
     const ns = this.namespaces.get(namespace);
     if (!ns) return [];
 
     // Simple similarity: return random vectors for now
     // In production, you'd calculate actual cosine similarity
-    const results = ns.vectors
-      .slice(0, topN)
-      .map(vec => ({
-        ...vec,
-        score: Math.random() * 0.5 + 0.5 // Random score between 0.5 and 1
-      }));
+    const results = ns.vectors.slice(0, topN).map((vec) => ({
+      ...vec,
+      score: Math.random() * 0.5 + 0.5, // Random score between 0.5 and 1
+    }));
 
     return results;
   }
@@ -48,7 +51,7 @@ class InMemoryVectorDB {
     if (!this.namespaces.has(name)) {
       this.namespaces.set(name, {
         name,
-        vectors: []
+        vectors: [],
       });
     }
     return this.namespaces.get(name);
@@ -71,20 +74,20 @@ class InMemoryVectorDB {
   async deleteDocumentFromNamespace(namespace, docId) {
     const ns = this.namespaces.get(namespace);
     if (ns) {
-      ns.vectors = ns.vectors.filter(v => v.docId !== docId);
+      ns.vectors = ns.vectors.filter((v) => v.docId !== docId);
     }
   }
 
   async addDocumentToNamespace(namespace, documentData, fullFilePath) {
     const ns = await this.namespace(namespace);
-    
+
     // Store document chunks
-    const vectors = documentData.map(item => ({
+    const vectors = documentData.map((item) => ({
       id: uuidv4(),
       docId: fullFilePath,
       text: item.text,
       metadata: item.metadata || {},
-      embedding: new Array(1536).fill(0) // Dummy embedding
+      embedding: new Array(1536).fill(0), // Dummy embedding
     }));
 
     ns.vectors.push(...vectors);
@@ -105,73 +108,91 @@ let instance = null;
 
 const MemoryVectorDB = {
   name: "InMemoryVectorDB",
-  
-  connect: async function() {
+
+  connect: async function () {
     if (!instance) {
       instance = new InMemoryVectorDB();
     }
     return instance.connect();
   },
 
-  heartbeat: async function() {
+  heartbeat: async function () {
     if (!instance) instance = new InMemoryVectorDB();
     return instance.heartbeat();
   },
 
-  totalVectors: async function() {
+  totalVectors: async function () {
     if (!instance) instance = new InMemoryVectorDB();
     return instance.totalVectors();
   },
 
-  namespaceCount: async function(namespace) {
+  namespaceCount: async function (namespace) {
     if (!instance) instance = new InMemoryVectorDB();
     return instance.namespaceCount(namespace);
   },
 
-  similarityResponse: async function(namespace, query, similarityThreshold, topN) {
+  similarityResponse: async function (
+    namespace,
+    query,
+    similarityThreshold,
+    topN
+  ) {
     if (!instance) instance = new InMemoryVectorDB();
-    return instance.similarityResponse(namespace, query, similarityThreshold, topN);
+    return instance.similarityResponse(
+      namespace,
+      query,
+      similarityThreshold,
+      topN
+    );
   },
 
-  namespace: async function(name) {
+  namespace: async function (name) {
     if (!instance) instance = new InMemoryVectorDB();
     return instance.namespace(name);
   },
 
-  hasNamespace: async function(name) {
+  hasNamespace: async function (name) {
     if (!instance) instance = new InMemoryVectorDB();
     return instance.hasNamespace(name);
   },
 
-  namespaceExists: async function(client, name) {
+  namespaceExists: async function (client, name) {
     if (!instance) instance = new InMemoryVectorDB();
     return instance.namespaceExists(client, name);
   },
 
-  deleteVectorsInNamespace: async function(namespace) {
+  deleteVectorsInNamespace: async function (namespace) {
     if (!instance) instance = new InMemoryVectorDB();
     return instance.deleteVectorsInNamespace(namespace);
   },
 
-  deleteDocumentFromNamespace: async function(namespace, docId) {
+  deleteDocumentFromNamespace: async function (namespace, docId) {
     if (!instance) instance = new InMemoryVectorDB();
     return instance.deleteDocumentFromNamespace(namespace, docId);
   },
 
-  addDocumentToNamespace: async function(namespace, documentData, fullFilePath) {
+  addDocumentToNamespace: async function (
+    namespace,
+    documentData,
+    fullFilePath
+  ) {
     if (!instance) instance = new InMemoryVectorDB();
-    return instance.addDocumentToNamespace(namespace, documentData, fullFilePath);
+    return instance.addDocumentToNamespace(
+      namespace,
+      documentData,
+      fullFilePath
+    );
   },
 
-  updateOrCreateCollection: async function(client, name, dimensions) {
+  updateOrCreateCollection: async function (client, name, dimensions) {
     if (!instance) instance = new InMemoryVectorDB();
     return instance.updateOrCreateCollection(client, name, dimensions);
   },
 
-  distanceToSimilarity: function(distance) {
+  distanceToSimilarity: function (distance) {
     if (!instance) instance = new InMemoryVectorDB();
     return instance.distanceToSimilarity(distance);
-  }
+  },
 };
 
 module.exports = { MemoryVectorDB };

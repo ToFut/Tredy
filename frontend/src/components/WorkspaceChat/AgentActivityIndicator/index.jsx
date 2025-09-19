@@ -1,44 +1,47 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Brain, 
-  Sparkle as Sparkles, 
-  Code, 
-  MagnifyingGlass as Search, 
-  FileText, 
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Brain,
+  Sparkle as Sparkles,
+  Code,
+  MagnifyingGlass as Search,
+  FileText,
   Globe,
   Calendar,
   Envelope as Mail,
   Database,
   Lightning as Zap,
-  Activity
-} from '@phosphor-icons/react';
+  Activity,
+} from "@phosphor-icons/react";
 
 const agentIcons = {
-  'web-search': Globe,
-  'code-writer': Code,
-  'document-analyzer': FileText,
-  'web-browser': Search,
-  'scheduler': Calendar,
-  'email-handler': Mail,
-  'database-query': Database,
-  'task-planner': Brain,
-  'default': Sparkles
+  "web-search": Globe,
+  "code-writer": Code,
+  "document-analyzer": FileText,
+  "web-browser": Search,
+  scheduler: Calendar,
+  "email-handler": Mail,
+  "database-query": Database,
+  "task-planner": Brain,
+  default: Sparkles,
 };
 
 const agentColors = {
-  'web-search': 'from-blue-500 to-cyan-500',
-  'code-writer': 'from-purple-500 to-pink-500',
-  'document-analyzer': 'from-green-500 to-emerald-500',
-  'web-browser': 'from-orange-500 to-yellow-500',
-  'scheduler': 'from-indigo-500 to-purple-500',
-  'email-handler': 'from-red-500 to-pink-500',
-  'database-query': 'from-gray-600 to-gray-800',
-  'task-planner': 'from-violet-500 to-purple-600',
-  'default': 'from-slate-500 to-slate-700'
+  "web-search": "from-blue-500 to-cyan-500",
+  "code-writer": "from-purple-500 to-pink-500",
+  "document-analyzer": "from-green-500 to-emerald-500",
+  "web-browser": "from-orange-500 to-yellow-500",
+  scheduler: "from-indigo-500 to-purple-500",
+  "email-handler": "from-red-500 to-pink-500",
+  "database-query": "from-gray-600 to-gray-800",
+  "task-planner": "from-violet-500 to-purple-600",
+  default: "from-slate-500 to-slate-700",
 };
 
-export default function AgentActivityIndicator({ activeAgents = [], thinking = false }) {
+export default function AgentActivityIndicator({
+  activeAgents = [],
+  thinking = false,
+}) {
   const [expandedView, setExpandedView] = useState(false);
   const [pulseAnimation, setPulseAnimation] = useState(false);
 
@@ -79,7 +82,7 @@ export default function AgentActivityIndicator({ activeAgents = [], thinking = f
         >
           {/* Glow Effect */}
           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-xl animate-pulse" />
-          
+
           {/* Agent Count */}
           <div className="relative flex items-center gap-2 px-4">
             <Activity className="w-5 h-5 text-white animate-pulse" />
@@ -127,7 +130,7 @@ export default function AgentActivityIndicator({ activeAgents = [], thinking = f
                 <Zap className="w-3 h-3" />
                 ACTIVE AGENTS
               </div>
-              
+
               <div className="space-y-2 max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/20">
                 {activeAgents.map((agent, index) => {
                   const Icon = agentIcons[agent.type] || agentIcons.default;
@@ -139,7 +142,9 @@ export default function AgentActivityIndicator({ activeAgents = [], thinking = f
                       transition={{ delay: index * 0.05 }}
                       className="flex items-center gap-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
                     >
-                      <div className={`p-2 rounded-lg bg-gradient-to-r ${agentColors[agent.type] || agentColors.default}`}>
+                      <div
+                        className={`p-2 rounded-lg bg-gradient-to-r ${agentColors[agent.type] || agentColors.default}`}
+                      >
                         <Icon className="w-4 h-4 text-white" />
                       </div>
                       <div className="flex-1">
@@ -147,7 +152,7 @@ export default function AgentActivityIndicator({ activeAgents = [], thinking = f
                           {agent.name || agent.type}
                         </div>
                         <div className="text-white/40 text-xs">
-                          {agent.status || 'Processing...'}
+                          {agent.status || "Processing..."}
                         </div>
                       </div>
                       {agent.progress !== undefined && (

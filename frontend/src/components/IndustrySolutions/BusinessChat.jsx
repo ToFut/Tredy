@@ -9,7 +9,6 @@ import {
   MagnifyingGlass,
   Plus,
   ArrowRight,
-  Bulb,
   Target,
   Lightning,
   Brain,
@@ -358,7 +357,7 @@ export default function IndustrySolutionsBusinessChat({
             <div className="space-y-3">
               <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
                 <div className="flex items-start gap-3">
-                  <Bulb className="w-5 h-5 text-blue-500 mt-0.5" />
+                  <div className="w-5 h-5 bg-blue-500 rounded-full mt-0.5"></div>
                   <div>
                     <h4 className="font-medium text-blue-900 dark:text-blue-100 text-sm">
                       Workflow Optimization

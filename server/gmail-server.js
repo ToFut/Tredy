@@ -23,8 +23,7 @@ class UniversalGmailMCP {
 
     this.nangoConfig = {
       secretKey: process.env.NANGO_SECRET_KEY,
-      host: process.env.NANGO_HOST || 'https://api.nango.dev',
-      providerConfigKey: 'google-mail'
+      host: process.env.NANGO_HOST || 'https://api.nango.dev'
     };
 
     this.setupTools();
@@ -50,7 +49,7 @@ class UniversalGmailMCP {
     }
     
     // Secure fallback - use known working provider config
-    const fallbackConfig = 'google-mail';
+    const fallbackConfig = 'google-mail-urgd';
     console.error(`[Gmail MCP] No provider config found, using secure fallback: ${fallbackConfig}`);
     return fallbackConfig;
   }

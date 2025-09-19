@@ -5,7 +5,6 @@ import {
   Calendar,
   Envelope,
   Briefcase,
-  Activity,
   Clock,
   Target,
   Lightning,
@@ -22,7 +21,6 @@ import {
 const WIDGET_TYPES = {
   'workflow-metrics': {
     title: 'Workflow Metrics',
-    icon: Activity,
     color: 'from-blue-500 to-blue-600',
     description: 'Track your daily workflow efficiency'
   },

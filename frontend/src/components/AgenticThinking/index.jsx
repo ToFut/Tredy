@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Brain, Sparkle, MagnifyingGlass, Code, Database, FileSearch, ChartLine, Cpu, CaretDown, CaretRight, Globe, Terminal, Lightning, CheckCircle, Warning, Clock, CircleNotch, Copy, Check } from "@phosphor-icons/react";
+import { Brain, Sparkle, MagnifyingGlass, Code, Database, ChartLine, Cpu, CaretDown, CaretRight, Globe, Terminal, Lightning, CheckCircle, Warning, Clock, CircleNotch, Copy, Check } from "@phosphor-icons/react";
 
 export default function AgenticThinking({ stage = 'thinking', context = '', isActive = true, debugMessages = [], operations = [] }) {
   const [currentProcess, setCurrentProcess] = useState(0);

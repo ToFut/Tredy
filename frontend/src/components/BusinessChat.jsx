@@ -7,7 +7,7 @@ import {
   ChevronDown,
   ChevronRight,
   Clock,
-  CheckCircle2,
+  CheckCircle,
   Loader2,
   Bolt,
   Cpu,
@@ -750,7 +750,7 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         {content.footer && (
           <div className="bg-green-50 rounded-lg p-2 border border-green-200">
             <div className="flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3 text-green-600" />
+              <CheckCircle className="w-3 h-3 text-green-600" />
               <p className="text-xs text-green-800 font-medium">
                 {content.footer}
               </p>

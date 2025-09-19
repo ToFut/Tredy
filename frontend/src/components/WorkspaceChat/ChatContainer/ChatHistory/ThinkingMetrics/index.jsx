@@ -16,7 +16,6 @@ import {
   WarningCircle,
   CheckCircle,
   ArrowRight,
-  Activity
 } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -106,7 +105,7 @@ ${confidence ? `- Confidence: ${confidence.score}%` : ''}
         >
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <Activity className={`w-4 h-4 ${isThinking ? 'animate-pulse text-blue-500' : 'text-theme-text-secondary'}`} />
+              <ChartBar className={`w-4 h-4 ${isThinking ? 'animate-pulse text-blue-500' : 'text-theme-text-secondary'}`} />
               <span className="text-sm font-medium text-theme-text-primary">
                 {isThinking ? "Processing..." : "Process Metrics"}
               </span>

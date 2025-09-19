@@ -67,7 +67,7 @@ export default function AddConnectorModal({
                     )}
                   </div>
                 </div>
-                
+
                 {connector.scopes && (
                   <div className="mt-3 pt-3 border-t border-theme-border">
                     <p className="text-xs text-theme-text-secondary">

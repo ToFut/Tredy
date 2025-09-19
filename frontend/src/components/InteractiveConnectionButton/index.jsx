@@ -1,24 +1,24 @@
 import React, { useState } from "react";
-import { 
-  Link, 
-  CheckCircle, 
-  Warning, 
-  ArrowSquareOut, 
+import {
+  Link,
+  CheckCircle,
+  Warning,
+  ArrowSquareOut,
   Spinner,
   GoogleLogo,
   MicrosoftLogo,
   SlackLogo,
   DropboxLogo,
   GithubLogo,
-  LinkedinLogo
+  LinkedinLogo,
 } from "@phosphor-icons/react";
 import { Tooltip } from "react-tooltip";
 
 const providerIcons = {
   google: GoogleLogo,
   gmail: GoogleLogo,
-  'google-calendar': GoogleLogo,
-  'google-drive': GoogleLogo,
+  "google-calendar": GoogleLogo,
+  "google-drive": GoogleLogo,
   microsoft: MicrosoftLogo,
   outlook: MicrosoftLogo,
   slack: SlackLogo,
@@ -28,98 +28,103 @@ const providerIcons = {
 };
 
 const providerColors = {
-  google: 'from-red-500 to-orange-500',
-  gmail: 'from-red-500 to-orange-500',
-  'google-calendar': 'from-blue-500 to-cyan-500',
-  'google-drive': 'from-green-500 to-blue-500',
-  microsoft: 'from-blue-600 to-blue-800',
-  outlook: 'from-blue-600 to-blue-800',
-  slack: 'from-purple-500 to-pink-500',
-  dropbox: 'from-blue-500 to-blue-700',
-  github: 'from-gray-700 to-gray-900',
-  linkedin: 'from-blue-700 to-blue-900',
+  google: "from-red-500 to-orange-500",
+  gmail: "from-red-500 to-orange-500",
+  "google-calendar": "from-blue-500 to-cyan-500",
+  "google-drive": "from-green-500 to-blue-500",
+  microsoft: "from-blue-600 to-blue-800",
+  outlook: "from-blue-600 to-blue-800",
+  slack: "from-purple-500 to-pink-500",
+  dropbox: "from-blue-500 to-blue-700",
+  github: "from-gray-700 to-gray-900",
+  linkedin: "from-blue-700 to-blue-900",
 };
 
-export default function InteractiveConnectionButton({ 
-  provider = 'google', 
-  workspaceSlug = null, 
-  onConnectionStart = () => {}, 
+export default function InteractiveConnectionButton({
+  provider = "google",
+  workspaceSlug = null,
+  onConnectionStart = () => {},
   onConnectionComplete = () => {},
   onConnectionError = () => {},
-  className = ""
+  className = "",
 }) {
-  const [status, setStatus] = useState('idle'); // idle, connecting, connected, error
+  const [status, setStatus] = useState("idle"); // idle, connecting, connected, error
   const [error, setError] = useState(null);
 
   const ProviderIcon = providerIcons[provider] || Link;
-  const providerColor = providerColors[provider] || 'from-blue-500 to-purple-500';
-  const providerName = provider.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+  const providerColor =
+    providerColors[provider] || "from-blue-500 to-purple-500";
+  const providerName = provider
+    .replace("-", " ")
+    .replace(/\b\w/g, (l) => l.toUpperCase());
 
   const handleConnect = async () => {
-    setStatus('connecting');
+    setStatus("connecting");
     setError(null);
     onConnectionStart();
 
     try {
       // Use the same user-level connector flow as settings page
-      const response = await fetch('/api/user/connectors/connect', {
-        method: 'POST',
+      const response = await fetch("/api/user/connectors/connect", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
-        body: JSON.stringify({ provider })
+        credentials: "include",
+        body: JSON.stringify({ provider }),
       });
 
       const data = await response.json();
-      
+
       if (!data.success) {
-        if (data.error === 'Provider already connected') {
-          setStatus('connected');
-          onConnectionComplete({ success: true, message: 'Already connected' });
+        if (data.error === "Provider already connected") {
+          setStatus("connected");
+          onConnectionComplete({ success: true, message: "Already connected" });
           return;
         }
         throw new Error(data.error);
       }
-      
+
       // Open OAuth popup with user-level auth URL
       const popup = window.open(
         data.authUrl,
-        'oauth',
-        'width=600,height=700,scrollbars=yes,resizable=yes'
+        "oauth",
+        "width=600,height=700,scrollbars=yes,resizable=yes"
       );
 
       // Listen for popup completion
       const checkClosed = setInterval(() => {
         if (popup.closed) {
           clearInterval(checkClosed);
-          
+
           // Check if connection was successful
-          fetch('/api/user/connectors')
-            .then(res => res.json())
-            .then(connectorsData => {
-              const isConnected = connectorsData.success && 
-                connectorsData.connectors.some(c => c.provider === provider && c.status === 'connected');
-              
+          fetch("/api/user/connectors")
+            .then((res) => res.json())
+            .then((connectorsData) => {
+              const isConnected =
+                connectorsData.success &&
+                connectorsData.connectors.some(
+                  (c) => c.provider === provider && c.status === "connected"
+                );
+
               if (isConnected) {
-                setStatus('connected');
+                setStatus("connected");
                 onConnectionComplete({ success: true });
               } else {
-                setStatus('error');
-                setError('Connection failed. Please try again.');
-                onConnectionError(new Error('Connection failed'));
+                setStatus("error");
+                setError("Connection failed. Please try again.");
+                onConnectionError(new Error("Connection failed"));
               }
             })
-            .catch(err => {
-              setStatus('error');
-              setError('Failed to verify connection.');
+            .catch((err) => {
+              setStatus("error");
+              setError("Failed to verify connection.");
               onConnectionError(err);
             });
         }
       }, 1000);
-
     } catch (err) {
-      setStatus('error');
+      setStatus("error");
       setError(err.message);
       onConnectionError(err);
     }
@@ -127,11 +132,11 @@ export default function InteractiveConnectionButton({
 
   const getStatusIcon = () => {
     switch (status) {
-      case 'connecting':
+      case "connecting":
         return <Spinner className="w-4 h-4 animate-spin" />;
-      case 'connected':
+      case "connected":
         return <CheckCircle className="w-4 h-4" />;
-      case 'error':
+      case "error":
         return <Warning className="w-4 h-4" />;
       default:
         return <ArrowSquareOut className="w-4 h-4" />;
@@ -140,12 +145,12 @@ export default function InteractiveConnectionButton({
 
   const getStatusText = () => {
     switch (status) {
-      case 'connecting':
-        return 'Connecting...';
-      case 'connected':
-        return 'Connected!';
-      case 'error':
-        return 'Try Again';
+      case "connecting":
+        return "Connecting...";
+      case "connected":
+        return "Connected!";
+      case "error":
+        return "Try Again";
       default:
         return `Connect ${providerName}`;
     }
@@ -153,12 +158,12 @@ export default function InteractiveConnectionButton({
 
   const getStatusColor = () => {
     switch (status) {
-      case 'connecting':
-        return 'from-yellow-500 to-orange-500';
-      case 'connected':
-        return 'from-green-500 to-emerald-500';
-      case 'error':
-        return 'from-red-500 to-red-700';
+      case "connecting":
+        return "from-yellow-500 to-orange-500";
+      case "connected":
+        return "from-green-500 to-emerald-500";
+      case "error":
+        return "from-red-500 to-red-700";
       default:
         return providerColor;
     }
@@ -168,9 +173,11 @@ export default function InteractiveConnectionButton({
     <div className={`inline-block ${className}`}>
       <button
         onClick={handleConnect}
-        disabled={status === 'connecting' || status === 'connected'}
+        disabled={status === "connecting" || status === "connected"}
         data-tooltip-id={`connection-btn-${provider}`}
-        data-tooltip-content={error || `Connect your ${providerName} account to enable integration`}
+        data-tooltip-content={
+          error || `Connect your ${providerName} account to enable integration`
+        }
         className={`
           flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm text-white
           bg-gradient-to-r ${getStatusColor()}
@@ -194,7 +201,7 @@ export default function InteractiveConnectionButton({
         className="tooltip !text-xs z-99 max-w-xs"
       />
 
-      {error && status === 'error' && (
+      {error && status === "error" && (
         <div className="mt-2 text-xs text-red-400 bg-red-900/20 px-2 py-1 rounded border border-red-500/30">
           {error}
         </div>

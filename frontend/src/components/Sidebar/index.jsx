@@ -1,5 +1,13 @@
 import React, { useEffect, useRef, useState, Suspense, lazy } from "react";
-import { List, Plus, House, Gear, MagnifyingGlass, Brain, Funnel } from "@phosphor-icons/react";
+import {
+  List,
+  Plus,
+  House,
+  Gear,
+  MagnifyingGlass,
+  Brain,
+  Funnel,
+} from "@phosphor-icons/react";
 import { useNewWorkspaceModal } from "../Modals/NewWorkspace";
 import ActiveWorkspaces from "./ActiveWorkspaces";
 import useLogo from "@/hooks/useLogo";
@@ -15,7 +23,11 @@ import { useSidebarToggle, ToggleSidebarButton } from "./SidebarToggle";
 import SearchBox from "./SearchBox";
 
 // Lazy load the modal since it's only needed when creating a workspace
-const NewWorkspaceModal = lazy(() => import("../Modals/NewWorkspace").then(module => ({ default: module.default })));
+const NewWorkspaceModal = lazy(() =>
+  import("../Modals/NewWorkspace").then((module) => ({
+    default: module.default,
+  }))
+);
 
 export default function Sidebar() {
   const { user } = useUser();
@@ -32,22 +44,22 @@ export default function Sidebar() {
 
   const handleCreateTredy = async () => {
     console.log("Creating Tredy - slug:", slug);
-    
+
     if (!slug) {
       showToast("No workspace selected", "error");
       return;
     }
-    
+
     try {
       showToast("Creating new Tredy...", "info");
       const { thread, error } = await Workspace.threads.new(slug);
       console.log("Thread creation result:", { thread, error });
-      
+
       if (error) {
         showToast(`Could not create Tredy - ${error}`, "error");
         return;
       }
-      
+
       if (thread && thread.slug) {
         showToast("Tredy created successfully!", "success");
         window.location.replace(paths.workspace.thread(slug, thread.slug));
@@ -71,7 +83,11 @@ export default function Sidebar() {
         <div className="flex items-center justify-between h-full px-6">
           {/* Left: Tredy Logo with Menu */}
           <div className="flex items-center gap-4">
-            <Link to={paths.home()} aria-label="Home" className="flex items-center gap-2">
+            <Link
+              to={paths.home()}
+              aria-label="Home"
+              className="flex items-center gap-2"
+            >
               <img
                 src="/tredy_logo_name_slogan_purple.PNG"
                 alt="Tredy"
@@ -89,11 +105,14 @@ export default function Sidebar() {
               </button>
             )}
           </div>
-          
+
           {/* Center: Enhanced Search */}
           <div className="flex-1 max-w-3xl mx-8">
             <div className="relative group">
-              <MagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-purple-500 transition-colors" size={18} />
+              <MagnifyingGlass
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-purple-500 transition-colors"
+                size={18}
+              />
               <input
                 type="text"
                 placeholder="Search conversations, documents, or ask a question..."
@@ -112,10 +131,10 @@ export default function Sidebar() {
               </div>
             </div>
           </div>
-          
+
           {/* Right: User Actions */}
           <div className="flex items-center gap-3">
-            <button 
+            <button
               className="p-2 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-all relative group animate-slideInRight animate-stagger-1"
               title="AI Assistant"
             >
@@ -128,20 +147,26 @@ export default function Sidebar() {
             <div className="h-6 w-px bg-gray-300" />
             <div className="flex items-center gap-2 animate-slideInRight animate-stagger-3">
               <div className="text-right hidden lg:block">
-                <p className="text-xs font-medium text-gray-700">{user?.username || 'User'}</p>
+                <p className="text-xs font-medium text-gray-700">
+                  {user?.username || "User"}
+                </p>
                 <p className="text-[10px] text-gray-500">
-                  {user?.role === 'admin' ? 'Admin' : user?.role === 'manager' ? 'Manager' : 'Member'} Plan
+                  {user?.role === "admin"
+                    ? "Admin"
+                    : user?.role === "manager"
+                      ? "Manager"
+                      : "Member"}{" "}
+                  Plan
                 </p>
               </div>
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white font-medium text-sm interactive-scale hover:animate-glowPulse transition-all cursor-pointer">
-                {(user?.username || 'U').charAt(0).toUpperCase()}
+                {(user?.username || "U").charAt(0).toUpperCase()}
               </div>
             </div>
           </div>
         </div>
       </div>
-      
-      
+
       {/* Sidebar - Adjusted for fixed header */}
       <div
         style={{
@@ -155,9 +180,11 @@ export default function Sidebar() {
           ref={sidebarRef}
           className={`relative ${showSidebar ? "m-4" : "m-2"} rounded-3xl bg-gradient-to-b from-white/98 to-white/95 backdrop-blur-2xl border border-gray-200/40 shadow-xl ${showSidebar ? "min-w-[300px] p-5" : "w-[60px] p-3"} h-[calc(100vh-142px)] transition-all duration-500 hover:shadow-2xl hover:border-purple-200/50`}
           style={{
-            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%)',
-            backdropFilter: 'blur(32px)',
-            borderImage: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(168, 85, 247, 0.05)) 1',
+            background:
+              "linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%)",
+            backdropFilter: "blur(32px)",
+            borderImage:
+              "linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(168, 85, 247, 0.05)) 1",
           }}
         >
           <div className="flex flex-col h-full overflow-x-hidden">
@@ -171,7 +198,11 @@ export default function Sidebar() {
                     className="relative w-full px-5 py-3 bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:from-purple-600 hover:via-purple-700 hover:to-purple-800 text-white rounded-2xl transition-all flex items-center justify-center gap-3 shadow-lg hover:shadow-xl font-semibold group overflow-hidden"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                    <Plus size={20} weight="bold" className="group-hover:rotate-180 transition-transform duration-300 relative z-10" />
+                    <Plus
+                      size={20}
+                      weight="bold"
+                      className="group-hover:rotate-180 transition-transform duration-300 relative z-10"
+                    />
                     <span className="relative z-10 text-base">New Tredy</span>
                     <div className="absolute right-3 opacity-0 group-hover:opacity-100 transition-opacity">
                       <div className="w-2 h-2 bg-white/40 rounded-full animate-pulse" />
@@ -183,14 +214,20 @@ export default function Sidebar() {
                     className="px-3 py-2.5 bg-gradient-to-br from-gray-50/80 to-gray-100/60 hover:from-purple-50 hover:to-purple-100/80 border border-gray-200/60 hover:border-purple-200 rounded-xl transition-all flex items-center justify-center gap-2 text-sm text-gray-700 hover:text-purple-700 font-medium group backdrop-blur-sm"
                     title="Browse Templates"
                   >
-                    <House size={16} className="group-hover:scale-110 group-hover:text-purple-600 transition-all" />
+                    <House
+                      size={16}
+                      className="group-hover:scale-110 group-hover:text-purple-600 transition-all"
+                    />
                     <span>Templates</span>
                   </button>
                   <button
                     className="px-3 py-2.5 bg-gradient-to-br from-gray-50/80 to-gray-100/60 hover:from-blue-50 hover:to-blue-100/80 border border-gray-200/60 hover:border-blue-200 rounded-xl transition-all flex items-center justify-center gap-2 text-sm text-gray-700 hover:text-blue-700 font-medium group backdrop-blur-sm"
                     title="Recent Chats"
                   >
-                    <List size={16} className="group-hover:scale-110 group-hover:text-blue-600 transition-all" />
+                    <List
+                      size={16}
+                      className="group-hover:scale-110 group-hover:text-blue-600 transition-all"
+                    />
                     <span>Recent</span>
                   </button>
                 </div>
@@ -213,7 +250,9 @@ export default function Sidebar() {
               </div>
             )}
 
-            <div className={`flex-grow flex flex-col ${showSidebar ? "min-w-[260px]" : "min-w-[40px]"} overflow-hidden`}>
+            <div
+              className={`flex-grow flex flex-col ${showSidebar ? "min-w-[260px]" : "min-w-[40px]"} overflow-hidden`}
+            >
               <div className="relative h-full flex flex-col w-full">
                 <div className="flex flex-col gap-y-3 pb-[60px] overflow-y-auto custom-scrollbar">
                   <ActiveWorkspaces />
@@ -268,7 +307,7 @@ export function SidebarMobileHeader() {
       <div
         aria-label="Show sidebar"
         className="fixed top-0 left-0 right-0 z-10 flex items-center px-2 py-2 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700"
-        style={{ height: '48px' }}
+        style={{ height: "48px" }}
       >
         <button
           onClick={() => setShowSidebar(true)}
@@ -276,12 +315,13 @@ export function SidebarMobileHeader() {
         >
           <List className="h-5 w-5 text-gray-700 dark:text-gray-300" />
         </button>
-        
+
         <div className="flex items-center gap-1">
           <img src={logo} alt="Logo" className="h-7 w-7 rounded" />
-          <span className="font-medium text-gray-900 dark:text-white text-sm">Tredy</span>
+          <span className="font-medium text-gray-900 dark:text-white text-sm">
+            Tredy
+          </span>
         </div>
-        
       </div>
 
       {/* Mobile Sidebar */}
@@ -310,20 +350,34 @@ export function SidebarMobileHeader() {
                 <div className="flex items-center gap-3">
                   <img src={logo} alt="Logo" className="h-10 w-10 rounded-lg" />
                   <div>
-                    <h2 className="font-semibold text-gray-900 dark:text-white">Tredy</h2>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">AI Workspace</p>
+                    <h2 className="font-semibold text-gray-900 dark:text-white">
+                      Tredy
+                    </h2>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      AI Workspace
+                    </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowSidebar(false)}
                   className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
-              
+
               {/* Search */}
               {(!user || user?.role !== "default") && (
                 <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -346,27 +400,30 @@ export function SidebarMobileHeader() {
                   showNewWsModal={showNewWsModal}
                 />
               </div>
-              
+
               {/* Workspaces List */}
               <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-4">
                 <ActiveWorkspaces />
               </div>
-              
+
               {/* Bottom Navigation */}
               <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800">
                 <div className="grid grid-cols-3 gap-2 mb-4">
-                  <Link 
-                    to={paths.home()} 
+                  <Link
+                    to={paths.home()}
                     onClick={() => setShowSidebar(false)}
                     className="flex flex-col items-center gap-1 p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                   >
                     <House className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Home</span>
+                    <span className="text-xs text-gray-600 dark:text-gray-400">
+                      Home
+                    </span>
                   </Link>
-                  <button 
+                  <button
                     onClick={() => {
                       // Scroll to search box in sidebar
-                      const searchInput = sidebarRef.current?.querySelector('input[type="text"]');
+                      const searchInput =
+                        sidebarRef.current?.querySelector('input[type="text"]');
                       if (searchInput) {
                         searchInput.focus();
                       }
@@ -374,15 +431,23 @@ export function SidebarMobileHeader() {
                     className="flex flex-col items-center gap-1 p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                   >
                     <MagnifyingGlass className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Search</span>
+                    <span className="text-xs text-gray-600 dark:text-gray-400">
+                      Search
+                    </span>
                   </button>
-                  <Link 
-                    to={user?.role === 'admin' || user?.role === 'manager' ? paths.settings.users() : paths.settings.interface()} 
+                  <Link
+                    to={
+                      user?.role === "admin" || user?.role === "manager"
+                        ? paths.settings.users()
+                        : paths.settings.interface()
+                    }
                     onClick={() => setShowSidebar(false)}
                     className="flex flex-col items-center gap-1 p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                   >
                     <Gear className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Settings</span>
+                    <span className="text-xs text-gray-600 dark:text-gray-400">
+                      Settings
+                    </span>
                   </Link>
                 </div>
                 <Footer />

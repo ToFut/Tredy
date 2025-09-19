@@ -15,10 +15,10 @@ class WebSocketToolEmitter {
   emitToolDetection(messageId, tools) {
     this.messageId = messageId;
     this.socket.emit(`tool_executing_${messageId}`, {
-      tools: tools.map(t => ({
+      tools: tools.map((t) => ({
         name: this.cleanToolName(t),
-        status: 'preparing'
-      }))
+        status: "preparing",
+      })),
     });
   }
 
@@ -27,12 +27,14 @@ class WebSocketToolEmitter {
    */
   emitToolExecution(toolName) {
     if (!this.messageId) return;
-    
+
     this.socket.emit(`tool_executing_${this.messageId}`, {
-      tools: [{
-        name: this.cleanToolName(toolName),
-        status: 'executing'
-      }]
+      tools: [
+        {
+          name: this.cleanToolName(toolName),
+          status: "executing",
+        },
+      ],
     });
 
     // Also track in ThinkingTracker if available
@@ -46,20 +48,22 @@ class WebSocketToolEmitter {
    */
   async emitToolComplete(toolName, result) {
     if (!this.messageId) return;
-    
+
     // Get structured data from AI if LLM is available
     let structured = null;
     if (this.llmProvider) {
       structured = await this.getAIStructuredResponse(toolName, result);
     }
-    
+
     this.socket.emit(`tool_executing_${this.messageId}`, {
-      tools: [{
-        name: this.cleanToolName(toolName),
-        status: 'complete',
-        result: result,
-        structured: structured // AI-generated metadata
-      }]
+      tools: [
+        {
+          name: this.cleanToolName(toolName),
+          status: "complete",
+          result: result,
+          structured: structured, // AI-generated metadata
+        },
+      ],
     });
 
     // Track completion in ThinkingTracker if available
@@ -84,19 +88,19 @@ class WebSocketToolEmitter {
 - action: what happened (sent/created/fetched/etc)
 - target: what was affected
 - summary: one-line description
-- highlights: array of {label, value} for key details`
+- highlights: array of {label, value} for key details`,
           },
           {
             role: "user",
-            content: `Tool: ${toolName}\nResult: ${JSON.stringify(result).substring(0, 500)}`
-          }
+            content: `Tool: ${toolName}\nResult: ${JSON.stringify(result).substring(0, 500)}`,
+          },
         ],
         {
           temperature: 0,
-          response_format: { type: "json_object" }
+          response_format: { type: "json_object" },
         }
       );
-      
+
       return JSON.parse(response.choices[0].message.content);
     } catch (error) {
       console.log("Failed to get AI structured response:", error);
@@ -109,7 +113,7 @@ class WebSocketToolEmitter {
    */
   emitMetrics(metrics) {
     if (!this.messageId) return;
-    
+
     // Extract relevant metrics
     const cleanMetrics = {
       time: this.formatTime(metrics.duration || metrics.time),
@@ -117,9 +121,9 @@ class WebSocketToolEmitter {
       cost: metrics.cost,
       confidence: metrics.confidence,
       tokens: metrics.tokens,
-      thinking: metrics.thinking || []
+      thinking: metrics.thinking || [],
     };
-    
+
     this.socket.emit(`metrics_${this.messageId}`, cleanMetrics);
   }
 
@@ -128,9 +132,9 @@ class WebSocketToolEmitter {
    */
   cleanToolName(toolName) {
     return toolName
-      .replace(/^MCP::/, '')
-      .replace(/_ws\d+/, '')
-      .replace(/[_-]/g, ' ')
+      .replace(/^MCP::/, "")
+      .replace(/_ws\d+/, "")
+      .replace(/[_-]/g, " ")
       .trim();
   }
 
@@ -139,11 +143,11 @@ class WebSocketToolEmitter {
    */
   formatTime(time) {
     if (!time) return null;
-    
-    if (typeof time === 'number') {
+
+    if (typeof time === "number") {
       return time < 1000 ? `${time}ms` : `${(time / 1000).toFixed(1)}s`;
     }
-    
+
     return time;
   }
 
@@ -152,15 +156,15 @@ class WebSocketToolEmitter {
    */
   formatModel(model) {
     if (!model) return null;
-    
+
     const modelMap = {
-      'gpt-4o': 'GPT-4',
-      'gpt-3.5-turbo': 'GPT-3.5',
-      'claude-3-opus': 'Claude 3',
-      'claude-3-sonnet': 'Claude 3',
-      'gemini-pro': 'Gemini Pro'
+      "gpt-4o": "GPT-4",
+      "gpt-3.5-turbo": "GPT-3.5",
+      "claude-3-opus": "Claude 3",
+      "claude-3-sonnet": "Claude 3",
+      "gemini-pro": "Gemini Pro",
     };
-    
+
     return modelMap[model] || model;
   }
 }
@@ -170,29 +174,29 @@ class WebSocketToolEmitter {
  */
 function enhanceAgentHandler(agentHandler, socket) {
   const emitter = new WebSocketToolEmitter(socket);
-  
+
   // Inject thinkingTracker reference into emitter
   emitter.thinkingTracker = agentHandler.thinkingTracker;
-  
+
   // Inject LLM provider for structured responses
   emitter.llmProvider = agentHandler.llm || agentHandler.provider;
-  
+
   // Hook into agent lifecycle
   const originalRun = agentHandler.run;
-  
-  agentHandler.run = async function(...args) {
+
+  agentHandler.run = async function (...args) {
     const messageId = agentHandler.invocationId;
-    
+
     // Emit tool detection
     if (agentHandler.tools && agentHandler.tools.length > 0) {
       emitter.emitToolDetection(messageId, agentHandler.tools);
     }
-    
+
     // Hook into tool execution
     const originalCallTool = agentHandler.callTool;
-    agentHandler.callTool = async function(toolName, ...toolArgs) {
+    agentHandler.callTool = async function (toolName, ...toolArgs) {
       emitter.emitToolExecution(toolName);
-      
+
       try {
         const result = await originalCallTool.call(this, toolName, ...toolArgs);
         emitter.emitToolComplete(toolName, result);
@@ -202,10 +206,10 @@ function enhanceAgentHandler(agentHandler, socket) {
         throw error;
       }
     };
-    
+
     // Run original handler
     const result = await originalRun.call(this, ...args);
-    
+
     // Emit final metrics
     if (agentHandler.metrics) {
       emitter.emitMetrics(agentHandler.metrics);
@@ -220,17 +224,17 @@ function enhanceAgentHandler(agentHandler, socket) {
         model: displayData.modelsUsed[0]?.model,
         confidence: displayData.confidence?.score,
         tools: displayData.toolsUsed,
-        cost: null // Could be calculated if needed
+        cost: null, // Could be calculated if needed
       });
     }
-    
+
     return result;
   };
-  
+
   return agentHandler;
 }
 
 module.exports = {
   WebSocketToolEmitter,
-  enhanceAgentHandler
+  enhanceAgentHandler,
 };

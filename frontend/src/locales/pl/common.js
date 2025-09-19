@@ -153,8 +153,7 @@ const TRANSLATIONS = {
     checklist: {
       title: "Pierwsze kroki",
       tasksLeft: "- zadania do wykonania",
-      completed:
-        "Jesteś na najlepszej drodze do zostania ekspertem Tredy!",
+      completed: "Jesteś na najlepszej drodze do zostania ekspertem Tredy!",
       dismiss: "zamknij",
       tasks: {
         create_workspace: {
@@ -455,8 +454,7 @@ const TRANSLATIONS = {
     },
     branding: {
       title: "Branding i white-labeling",
-      description:
-        "Oznakuj swoją instancję Tredy niestandardowym brandingiem.",
+      description: "Oznakuj swoją instancję Tredy niestandardowym brandingiem.",
     },
     chat: {
       title: "Czat",

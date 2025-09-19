@@ -4,7 +4,13 @@ import PromptReply from "./PromptReply";
 import StatusResponse from "./StatusResponse";
 import { useManageWorkspaceModal } from "../../../Modals/ManageWorkspace";
 import ManageWorkspace from "../../../Modals/ManageWorkspace";
-import { ArrowDown, Brain, Sparkle, Lightning, ChatsCircle } from "@phosphor-icons/react";
+import {
+  ArrowDown,
+  Brain,
+  Sparkle,
+  Lightning,
+  ChatsCircle,
+} from "@phosphor-icons/react";
 import debounce from "lodash.debounce";
 import useUser from "@/hooks/useUser";
 import Chartable from "./Chartable";
@@ -36,7 +42,8 @@ export default function ChatHistory({
   const chatHistoryRef = useRef(null);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
   const isStreaming = history[history.length - 1]?.animate;
-  const hasStatusResponse = history[history.length - 1]?.type === "statusResponse";
+  const hasStatusResponse =
+    history[history.length - 1]?.type === "statusResponse";
   const { showScrollbar } = Appearance.getSettings();
   const { textSizeClass } = useTextSize();
   const { getMessageAlignment } = useChatMessageAlignment();
@@ -48,7 +55,7 @@ export default function ChatHistory({
 
   // Modern auto-scroll implementation like ChatGPT/Claude
   const SCROLL_THRESHOLD = 100; // Distance from bottom to trigger auto-scroll
-  
+
   // Check if user is near bottom (within threshold)
   const checkIsNearBottom = useCallback(() => {
     if (!chatHistoryRef.current) return true;
@@ -59,12 +66,12 @@ export default function ChatHistory({
   // Smooth scroll to bottom - only called when needed
   const scrollToBottom = useCallback((instant = false) => {
     if (!chatHistoryRef.current) return;
-    
+
     const element = chatHistoryRef.current;
     try {
       element.scrollTo({
         top: element.scrollHeight,
-        behavior: instant ? 'instant' : 'smooth'
+        behavior: instant ? "instant" : "smooth",
       });
     } catch (error) {
       // Fallback for older browsers or edge cases
@@ -215,39 +222,42 @@ export default function ChatHistory({
     (item, index) => {
       const hasSubsequentMessages = index < compiledHistory.length - 1;
       const isThinking = !hasSubsequentMessages && lastMessageInfo.isAnimating;
-      
+
       // Check if we have thinking metrics from our new system
       const lastMessage = history[history.length - 1];
       const hasThinkingMetrics = lastMessage?.thinkingMetrics;
-      
+
       // If we have thinking metrics and this is an active thinking state, use ThinkingMetrics
       if (hasThinkingMetrics && isThinking) {
         return (
-          <div key={`thinking-metrics-${index}`} className="flex justify-center w-full">
+          <div
+            key={`thinking-metrics-${index}`}
+            className="flex justify-center w-full"
+          >
             <ThinkingMetrics
               metrics={lastMessage.thinkingMetrics}
               isThinking={isThinking}
-              debugMessages={item.map(msg => msg.content).filter(Boolean)}
+              debugMessages={item.map((msg) => msg.content).filter(Boolean)}
             />
           </div>
         );
       }
-      
+
       // Check if these status messages contain tool information that will be handled by HistoricalMessage
-      const hasToolInformation = item.some(msg => 
-        msg.content && (
-          msg.content.includes('MCP server:') ||
-          msg.content.includes('Executing MCP server:') ||
-          msg.content.includes('completed successfully')
-        )
+      const hasToolInformation = item.some(
+        (msg) =>
+          msg.content &&
+          (msg.content.includes("MCP server:") ||
+            msg.content.includes("Executing MCP server:") ||
+            msg.content.includes("completed successfully"))
       );
-      
+
       // If tool information exists and we're not actively thinking, don't render StatusResponse
       // The tool metrics will be handled by the HistoricalMessage component
       if (hasToolInformation && !isThinking) {
         return null;
       }
-      
+
       // Fall back to old StatusResponse for non-tool status messages only
       return (
         <StatusResponse
@@ -272,23 +282,25 @@ export default function ChatHistory({
           <div className="w-14 h-14 sm:w-16 sm:h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-4 sm:mb-6">
             <Brain className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600 dark:text-blue-400" />
           </div>
-          
+
           {/* Mobile-responsive heading */}
           <div className="text-center mb-6 sm:mb-8">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 leading-tight">
-              {workspace?.name ? `Welcome to ${workspace.name}` : "Start a Conversation"}
+              {workspace?.name
+                ? `Welcome to ${workspace.name}`
+                : "Start a Conversation"}
             </h1>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 px-2">
               Ask me anything about your workspace documents and data.
             </p>
           </div>
-          
+
           {/* Simple suggestions if available */}
           <WorkspaceChatSuggestions
             suggestions={workspace?.suggestedMessages || []}
             sendSuggestion={handleSendSuggestedMessage}
           />
-          
+
           {/* Mobile-optimized setup guidance */}
           {(!workspace?.documents || workspace.documents.length === 0) && (
             <div className="mt-6 sm:mt-8 p-4 sm:p-5 bg-blue-50 dark:bg-blue-900/30 rounded-xl border border-blue-200 dark:border-blue-800 mx-4 sm:mx-0">
@@ -303,7 +315,7 @@ export default function ChatHistory({
               </button>
             </div>
           )}
-          
+
           {showing && (
             <ManageWorkspace
               hideModal={hideModal}
@@ -322,24 +334,27 @@ export default function ChatHistory({
     >
       <div
         className="flex-1 overflow-y-auto overflow-x-hidden"
-        style={{ 
-          scrollBehavior: 'smooth',
-          overflowAnchor: 'auto', // Modern scroll anchoring
-          WebkitOverflowScrolling: 'touch',
+        style={{
+          scrollBehavior: "smooth",
+          overflowAnchor: "auto", // Modern scroll anchoring
+          WebkitOverflowScrolling: "touch",
           // Better mobile scroll performance
-          transform: 'translate3d(0,0,0)',
-          WebkitTransform: 'translate3d(0,0,0)'
+          transform: "translate3d(0,0,0)",
+          WebkitTransform: "translate3d(0,0,0)",
         }}
         id="chat-history"
         ref={chatHistoryRef}
         data-chat-history // Add data attribute for container selector
       >
-          <div className="px-2 sm:px-4 py-2 pb-4 sm:pb-6">
+        <div className="px-2 sm:px-4 py-2 pb-4 sm:pb-6">
           {compiledHistory.map((item, index) =>
             Array.isArray(item) ? renderStatusResponse(item, index) : item
           )}
           {showing && (
-            <ManageWorkspace hideModal={hideModal} providedSlug={workspace.slug} />
+            <ManageWorkspace
+              hideModal={hideModal}
+              providedSlug={workspace.slug}
+            />
           )}
           {/* Scroll anchor for Intersection Observer */}
           <div ref={scrollAnchorRef} style={{ height: 1 }} />
@@ -350,7 +365,7 @@ export default function ChatHistory({
           <button
             onClick={manualScrollToBottom}
             className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 active:scale-95 touch-manipulation animate-pulse"
-            style={{ minWidth: '48px', minHeight: '48px' }}
+            style={{ minWidth: "48px", minHeight: "48px" }}
             aria-label="Scroll to bottom"
           >
             <ArrowDown className="w-6 h-6 md:w-7 md:h-7" weight="bold" />
@@ -371,9 +386,9 @@ const getLastMessageInfo = (history) => {
 
 function WorkspaceChatSuggestions({ suggestions = [], sendSuggestion }) {
   if (suggestions.length === 0) return null;
-  
+
   const icons = [Lightning, Brain, Sparkle, ChatsCircle];
-  
+
   return (
     <div className="w-full max-w-2xl">
       <div className="text-center mb-4">
@@ -388,7 +403,9 @@ function WorkspaceChatSuggestions({ suggestions = [], sendSuggestion }) {
             <button
               key={index}
               className="text-left p-4 rounded-xl bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all"
-              onClick={() => sendSuggestion(suggestion.heading, suggestion.message)}
+              onClick={() =>
+                sendSuggestion(suggestion.heading, suggestion.message)
+              }
             >
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
@@ -441,26 +458,39 @@ function buildMessages({
         <Chartable key={props.uuid} workspace={workspace} props={props} />
       );
     } else if (props.type === "workflowPreview" && !!props.content) {
-      const workflowData = typeof props.content === 'string' 
-        ? JSON.parse(props.content) 
-        : props.content;
-      
+      const workflowData =
+        typeof props.content === "string"
+          ? JSON.parse(props.content)
+          : props.content;
+
       acc.push(
-        <WorkflowPreview 
-          key={props.uuid} 
+        <WorkflowPreview
+          key={props.uuid}
           workflowData={workflowData}
           onSave={async (workflowId, name) => {
             // Handle save via sendCommand
-            await sendCommand({ text: `@agent save workflow ${workflowId} as ${name}`, autoSubmit: true });
+            await sendCommand({
+              text: `@agent save workflow ${workflowId} as ${name}`,
+              autoSubmit: true,
+            });
           }}
           onTest={async (workflowId) => {
-            await sendCommand({ text: `@agent test workflow ${workflowId}`, autoSubmit: true });
+            await sendCommand({
+              text: `@agent test workflow ${workflowId}`,
+              autoSubmit: true,
+            });
           }}
           onEdit={async (workflowId) => {
-            await sendCommand({ text: `@agent edit workflow ${workflowId}`, autoSubmit: true });
+            await sendCommand({
+              text: `@agent edit workflow ${workflowId}`,
+              autoSubmit: true,
+            });
           }}
           onCancel={async (workflowId) => {
-            await sendCommand({ text: `@agent cancel workflow creation ${workflowId}`, autoSubmit: true });
+            await sendCommand({
+              text: `@agent cancel workflow creation ${workflowId}`,
+              autoSubmit: true,
+            });
           }}
         />
       );
@@ -483,7 +513,10 @@ function buildMessages({
       // Add ThinkingMetrics for completed assistant messages with thinking data
       if (props.role === "assistant" && props.thinkingMetrics) {
         acc.push(
-          <div key={`${index}-thinking`} className="flex justify-center w-full mb-2">
+          <div
+            key={`${index}-thinking`}
+            className="flex justify-center w-full mb-2"
+          >
             <ThinkingMetrics
               metrics={props.thinkingMetrics}
               isThinking={false}
@@ -492,10 +525,10 @@ function buildMessages({
           </div>
         );
       }
-      
+
       // Extract tool information from subsequent StatusResponse messages
       let toolMetrics = props.metrics || {};
-      
+
       // Look ahead for StatusResponse messages that belong to this assistant message
       const subsequentStatusResponses = [];
       for (let i = index + 1; i < history.length; i++) {
@@ -507,27 +540,27 @@ function buildMessages({
           break;
         }
       }
-      
+
       // Parse tool information from StatusResponse messages
       if (subsequentStatusResponses.length > 0) {
         const toolInfo = [];
-        
+
         // Collect all unique tools from all status responses
         const allTools = new Set();
-        
-        subsequentStatusResponses.forEach(msg => {
+
+        subsequentStatusResponses.forEach((msg) => {
           const content = msg.content;
-          
+
           // MCP server execution - more flexible pattern
-          if (content && content.includes('MCP server:')) {
+          if (content && content.includes("MCP server:")) {
             // Try different patterns to extract server name
             const patterns = [
-              /MCP server: ([^\s:]+)/,  // Original pattern
-              /MCP server: ([^:]+):/,   // Include colon in capture
-              /Executing MCP server: ([^\s]+)/,  // Alternative format
+              /MCP server: ([^\s:]+)/, // Original pattern
+              /MCP server: ([^:]+):/, // Include colon in capture
+              /Executing MCP server: ([^\s]+)/, // Alternative format
             ];
-            
-            let server = '';
+
+            let server = "";
             for (const pattern of patterns) {
               const match = content.match(pattern);
               if (match) {
@@ -535,66 +568,78 @@ function buildMessages({
                 break;
               }
             }
-            
+
             // Clean up server name and map to proper tool names
-            let toolName = server.replace(/[_-]/g, ' ').replace(/ws\d+/g, '').trim();
-            
+            let toolName = server
+              .replace(/[_-]/g, " ")
+              .replace(/ws\d+/g, "")
+              .trim();
+
             // Map common server names to proper display names
-            if (toolName.toLowerCase().includes('linkedin')) {
-              toolName = 'LinkedIn';
-            } else if (toolName.toLowerCase().includes('gmail')) {
-              toolName = 'Gmail';
-            } else if (toolName.toLowerCase().includes('calendar')) {
-              toolName = 'Google Calendar';
-            } else if (toolName.toLowerCase().includes('drive')) {
-              toolName = 'Google Drive';
-            } else if (toolName.toLowerCase().includes('slack')) {
-              toolName = 'Slack';
-            } else if (toolName.toLowerCase().includes('github')) {
-              toolName = 'GitHub';
-            } else if (toolName.toLowerCase().includes('figma')) {
-              toolName = 'Figma';
-            } else if (toolName.toLowerCase().includes('jira')) {
-              toolName = 'Jira';
-            } else if (toolName.toLowerCase().includes('notion')) {
-              toolName = 'Notion';
+            if (toolName.toLowerCase().includes("linkedin")) {
+              toolName = "LinkedIn";
+            } else if (toolName.toLowerCase().includes("gmail")) {
+              toolName = "Gmail";
+            } else if (toolName.toLowerCase().includes("calendar")) {
+              toolName = "Google Calendar";
+            } else if (toolName.toLowerCase().includes("drive")) {
+              toolName = "Google Drive";
+            } else if (toolName.toLowerCase().includes("slack")) {
+              toolName = "Slack";
+            } else if (toolName.toLowerCase().includes("github")) {
+              toolName = "GitHub";
+            } else if (toolName.toLowerCase().includes("figma")) {
+              toolName = "Figma";
+            } else if (toolName.toLowerCase().includes("jira")) {
+              toolName = "Jira";
+            } else if (toolName.toLowerCase().includes("notion")) {
+              toolName = "Notion";
             }
-            
+
             if (toolName && !allTools.has(toolName)) {
               allTools.add(toolName);
               toolInfo.push({
                 name: toolName,
-                status: content.includes('completed') ? 'complete' : 'executing'
+                status: content.includes("completed")
+                  ? "complete"
+                  : "executing",
               });
             }
           }
         });
-        
+
         // Also detect tools from the message content itself
-        const messageContent = props.content || '';
-        
+        const messageContent = props.content || "";
+
         // Check message for tool mentions
-        if (messageContent.toLowerCase().includes('linkedin') && !allTools.has('LinkedIn')) {
-          toolInfo.push({ name: 'LinkedIn', status: 'complete' });
-          allTools.add('LinkedIn');
+        if (
+          messageContent.toLowerCase().includes("linkedin") &&
+          !allTools.has("LinkedIn")
+        ) {
+          toolInfo.push({ name: "LinkedIn", status: "complete" });
+          allTools.add("LinkedIn");
         }
-        
-        if ((messageContent.toLowerCase().includes('email') || messageContent.includes('@')) && !allTools.has('Gmail')) {
-          toolInfo.push({ name: 'Gmail', status: 'complete' });
-          allTools.add('Gmail');
+
+        if (
+          (messageContent.toLowerCase().includes("email") ||
+            messageContent.includes("@")) &&
+          !allTools.has("Gmail")
+        ) {
+          toolInfo.push({ name: "Gmail", status: "complete" });
+          allTools.add("Gmail");
         }
-        
+
         if (toolInfo.length > 0) {
           toolMetrics = {
             ...toolMetrics,
             tools: toolInfo,
-            time: toolInfo.length > 1 ? '3.2s' : '1.2s',  // Longer time for multiple tools
-            confidence: 92,  // Slightly lower for complex multi-tool tasks
-            model: 'GPT-4'
+            time: toolInfo.length > 1 ? "3.2s" : "1.2s", // Longer time for multiple tools
+            confidence: 92, // Slightly lower for complex multi-tool tasks
+            model: "GPT-4",
           };
         }
       }
-      
+
       acc.push(
         <HistoricalMessage
           key={index}

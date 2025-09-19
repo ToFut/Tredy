@@ -12,7 +12,14 @@ import {
 import StructuredResponse from "../../StructuredResponse";
 import ProcessingIndicator from "../../ProcessingIndicator";
 import InteractiveConnectionButton from "../../../InteractiveConnectionButton";
-import { Zap, Cpu, Brain, ChevronRight, CheckCircle, Loader2 } from "lucide-react";
+import {
+  Zap,
+  Cpu,
+  Brain,
+  ChevronRight,
+  CheckCircle,
+  Loader2,
+} from "lucide-react";
 import { getToolLogo } from "../UnifiedMessage/utils/toolLogos";
 // import VisualSummary from "@/components/VisualSummary";
 
@@ -25,7 +32,7 @@ const PromptReply = ({
   sources = [],
   closed = true,
   agentMetrics = null,
-  debugInfo = null
+  debugInfo = null,
 }) => {
   const assistantBackgroundColor = "bg-theme-bg-chat";
   const [executingTools, setExecutingTools] = useState([]);
@@ -56,7 +63,7 @@ const PromptReply = ({
 
   // Parse debug info for tools when WebSocket isn't available
   useEffect(() => {
-    if (debugInfo && typeof debugInfo === 'string') {
+    if (debugInfo && typeof debugInfo === "string") {
       const tools = parseToolsFromDebug(debugInfo);
       if (tools.length > 0) {
         setExecutingTools(tools);
@@ -136,7 +143,7 @@ const PromptReply = ({
             />
             {/* Compact Metrics Bar */}
             {(executingTools.length > 0 || metricsData) && (
-              <CompactMetricsBar 
+              <CompactMetricsBar
                 tools={executingTools}
                 metrics={metricsData || {}}
               />
@@ -191,21 +198,22 @@ function RenderAssistantChatContent({ message, workspace }) {
     const connectionPattern = /\[connect:([^\]]+)\]/g;
     let processedText = msgToRender;
     const foundConnections = [];
-    
+
     let match;
     while ((match = connectionPattern.exec(msgToRender)) !== null) {
       const provider = match[1];
       const buttonId = `oauth-btn-${provider}-${Math.random().toString(36).substr(2, 9)}`;
       foundConnections.push({ provider, buttonId });
-      processedText = processedText.replace(match[0], '');
+      processedText = processedText.replace(match[0], "");
     }
-    
+
     setConnections(foundConnections);
-    
+
     // Check if content has markdown headers for structured display
-    const hasStructure = processedText.includes('## ') || processedText.includes('### ');
+    const hasStructure =
+      processedText.includes("## ") || processedText.includes("### ");
     setUseStructured(hasStructure);
-    
+
     contentRef.current = processedText;
   }, [message]);
 
@@ -231,8 +239,10 @@ function RenderAssistantChatContent({ message, workspace }) {
         <>
           <span
             className="break-words max-w-full"
-            style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
-            dangerouslySetInnerHTML={{ __html: renderMarkdown(contentRef.current) }}
+            style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}
+            dangerouslySetInnerHTML={{
+              __html: renderMarkdown(contentRef.current),
+            }}
           />
           {connections.map(({ provider, buttonId }) => (
             <InteractiveConnectionButton
@@ -244,13 +254,15 @@ function RenderAssistantChatContent({ message, workspace }) {
           ))}
           {/* Auto-generate visual summary for long responses */}
           {false && contentRef.current.length > 500 && (
-            <VisualSummary 
+            <VisualSummary
               content={contentRef.current}
               type="auto"
               onExport={() => {
-                const blob = new Blob([contentRef.current], { type: 'text/plain' });
+                const blob = new Blob([contentRef.current], {
+                  type: "text/plain",
+                });
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
+                const a = document.createElement("a");
                 a.href = url;
                 a.download = `summary-${Date.now()}.txt`;
                 a.click();
@@ -274,10 +286,10 @@ function LiveToolExecution({ tools }) {
         <Loader2 className="w-4 h-4 animate-spin text-purple-500" />
         <span>Executing tools...</span>
       </div>
-      
+
       <div className="flex flex-wrap gap-2">
         {tools.map((tool, idx) => (
-          <div 
+          <div
             key={idx}
             className="flex items-center gap-2 px-3 py-1.5 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800"
           >
@@ -285,10 +297,10 @@ function LiveToolExecution({ tools }) {
             <span className="text-xs font-medium text-purple-700 dark:text-purple-300">
               {formatToolName(tool.name || tool)}
             </span>
-            {tool.status === 'executing' && (
+            {tool.status === "executing" && (
               <Loader2 className="w-3 h-3 animate-spin text-purple-600" />
             )}
-            {tool.status === 'complete' && (
+            {tool.status === "complete" && (
               <CheckCircle className="w-3 h-3 text-green-500" />
             )}
           </div>
@@ -304,7 +316,7 @@ function LiveToolExecution({ tools }) {
 function CompactMetricsBar({ tools = [], metrics = {} }) {
   const [showThinking, setShowThinking] = useState(false);
   const hasData = tools.length > 0 || Object.keys(metrics).length > 0;
-  
+
   if (!hasData) return null;
 
   return (
@@ -326,7 +338,7 @@ function CompactMetricsBar({ tools = [], metrics = {} }) {
             )}
           </>
         )}
-        
+
         {/* Metrics */}
         {metrics.time && (
           <>
@@ -337,7 +349,7 @@ function CompactMetricsBar({ tools = [], metrics = {} }) {
             <span className="text-gray-300 dark:text-gray-600">•</span>
           </>
         )}
-        
+
         {metrics.model && (
           <>
             <div className="flex items-center gap-1">
@@ -346,7 +358,7 @@ function CompactMetricsBar({ tools = [], metrics = {} }) {
             </div>
           </>
         )}
-        
+
         {metrics.thinking && metrics.thinking.length > 0 && (
           <>
             <span className="text-gray-300 dark:text-gray-600">•</span>
@@ -356,12 +368,14 @@ function CompactMetricsBar({ tools = [], metrics = {} }) {
             >
               <Brain className="w-3 h-3" />
               <span>Details</span>
-              <ChevronRight className={`w-3 h-3 transition-transform ${showThinking ? 'rotate-90' : ''}`} />
+              <ChevronRight
+                className={`w-3 h-3 transition-transform ${showThinking ? "rotate-90" : ""}`}
+              />
             </button>
           </>
         )}
       </div>
-      
+
       {/* Expanded thinking details */}
       {showThinking && metrics.thinking && (
         <div className="ml-12 mt-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
@@ -369,7 +383,9 @@ function CompactMetricsBar({ tools = [], metrics = {} }) {
             {metrics.thinking.map((step, idx) => (
               <div key={idx} className="flex items-start gap-2">
                 <div className="w-1 h-1 bg-purple-400 rounded-full mt-1.5" />
-                <span className="text-xs text-gray-600 dark:text-gray-400">{step}</span>
+                <span className="text-xs text-gray-600 dark:text-gray-400">
+                  {step}
+                </span>
               </div>
             ))}
           </div>
@@ -385,11 +401,17 @@ function CompactMetricsBar({ tools = [], metrics = {} }) {
 function ToolIcon({ tool, size = "normal" }) {
   const logo = getToolLogo(tool.name || tool);
   const sizeClass = size === "small" ? "w-4 h-4" : "w-5 h-5";
-  
-  if (typeof logo === 'string') {
-    return <img src={logo} alt={tool.name || tool} className={`${sizeClass} rounded`} />;
+
+  if (typeof logo === "string") {
+    return (
+      <img
+        src={logo}
+        alt={tool.name || tool}
+        className={`${sizeClass} rounded`}
+      />
+    );
   }
-  
+
   const Icon = logo;
   return <Icon className={`${sizeClass} text-gray-600 dark:text-gray-400`} />;
 }
@@ -399,12 +421,12 @@ function ToolIcon({ tool, size = "normal" }) {
  */
 function formatToolName(name) {
   return name
-    .replace(/[_-]/g, ' ')
-    .replace(/mcp::/i, '')
-    .replace(/_ws\d+/g, '')
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+    .replace(/[_-]/g, " ")
+    .replace(/mcp::/i, "")
+    .replace(/_ws\d+/g, "")
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 /**
@@ -412,28 +434,28 @@ function formatToolName(name) {
  */
 function parseToolsFromDebug(debugInfo) {
   const tools = [];
-  
-  if (debugInfo.includes('attempting to call')) {
+
+  if (debugInfo.includes("attempting to call")) {
     const match = debugInfo.match(/`([^`]+)`/);
     if (match) {
-      tools.push({ name: match[1], status: 'preparing' });
+      tools.push({ name: match[1], status: "preparing" });
     }
   }
-  
-  if (debugInfo.includes('Executing MCP server:')) {
+
+  if (debugInfo.includes("Executing MCP server:")) {
     const match = debugInfo.match(/Executing MCP server: ([^\s]+)/);
     if (match) {
-      tools.push({ name: match[1], status: 'executing' });
+      tools.push({ name: match[1], status: "executing" });
     }
   }
-  
-  if (debugInfo.includes('completed successfully')) {
+
+  if (debugInfo.includes("completed successfully")) {
     const match = debugInfo.match(/MCP server: ([^:]+):/);
     if (match) {
-      tools.push({ name: match[1], status: 'complete' });
+      tools.push({ name: match[1], status: "complete" });
     }
   }
-  
+
   return tools;
 }
 

@@ -1,13 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
-import { CaretDown, At, ChatCircle, Sparkle, Brain } from "@phosphor-icons/react";
+import {
+  CaretDown,
+  At,
+  ChatCircle,
+  Sparkle,
+  Brain,
+} from "@phosphor-icons/react";
 import { Tooltip } from "react-tooltip";
 import { useTranslation } from "react-i18next";
 
-export default function ResponseModeSelector({ 
-  responseMode = "agent", 
+export default function ResponseModeSelector({
+  responseMode = "agent",
   setResponseMode,
   showing,
-  setShowing 
+  setShowing,
 }) {
   const { t } = useTranslation();
   const dropdownRef = useRef(null);
@@ -19,15 +25,15 @@ export default function ResponseModeSelector({
       icon: Brain,
       description: "Use AI agent with tools and functions",
       color: "text-purple-400",
-      gradient: "from-purple-500 to-pink-500"
+      gradient: "from-purple-500 to-pink-500",
     },
     {
-      id: "chat", 
+      id: "chat",
       label: "Chat Mode",
       icon: ChatCircle,
       description: "Regular chat without agent tools",
       color: "text-blue-400",
-      gradient: "from-blue-500 to-cyan-500"
+      gradient: "from-blue-500 to-cyan-500",
     },
     {
       id: "flow",
@@ -35,31 +41,32 @@ export default function ResponseModeSelector({
       icon: Sparkle,
       description: "Create and execute workflows",
       color: "text-green-400",
-      gradient: "from-green-500 to-emerald-500"
-    }
+      gradient: "from-green-500 to-emerald-500",
+    },
   ];
 
-  const currentMode = modes.find(mode => mode.id === responseMode) || modes[0];
+  const currentMode =
+    modes.find((mode) => mode.id === responseMode) || modes[0];
 
   useEffect(() => {
     if (!showing || !dropdownRef.current) return;
-    
+
     function closeIfOutside(event) {
       // Check if click is on the button or its children
       const button = document.getElementById("response-mode-btn");
       if (button && button.contains(event.target)) return;
-      
+
       const isOutside = !dropdownRef?.current?.contains(event.target);
       if (!isOutside) return;
       setShowing(false);
     }
-    
+
     document.addEventListener("click", closeIfOutside);
     return () => document.removeEventListener("click", closeIfOutside);
   }, [showing]);
 
   const handleModeSelect = (modeId) => {
-    console.log('handleModeSelect called with:', modeId);
+    console.log("handleModeSelect called with:", modeId);
     setResponseMode(modeId);
     setShowing(false);
   };
@@ -85,7 +92,7 @@ export default function ResponseModeSelector({
             {currentMode.label}
           </span>
           <CaretDown
-            className={`w-3 h-3 text-theme-text-secondary transition-transform duration-200 ${showing ? 'rotate-180' : ''}`}
+            className={`w-3 h-3 text-theme-text-secondary transition-transform duration-200 ${showing ? "rotate-180" : ""}`}
           />
         </div>
         <Tooltip
@@ -105,13 +112,13 @@ export default function ResponseModeSelector({
             {modes.map((mode) => {
               const ModeIcon = mode.icon;
               const isSelected = mode.id === responseMode;
-              
+
               return (
                 <button
                   key={mode.id}
                   onClick={() => handleModeSelect(mode.id)}
                   className={`w-full p-3 rounded-lg flex items-start gap-3 hover:bg-theme-action-menu-item-hover transition-colors border-none cursor-pointer ${
-                    isSelected ? 'bg-theme-action-menu-item-hover' : ''
+                    isSelected ? "bg-theme-action-menu-item-hover" : ""
                   }`}
                 >
                   <ModeIcon
@@ -119,12 +126,18 @@ export default function ResponseModeSelector({
                     weight="fill"
                   />
                   <div className="flex flex-col items-start text-left">
-                    <div className={`text-sm font-medium ${
-                      isSelected ? 'text-theme-button-cta' : 'text-theme-text-primary'
-                    }`}>
+                    <div
+                      className={`text-sm font-medium ${
+                        isSelected
+                          ? "text-theme-button-cta"
+                          : "text-theme-text-primary"
+                      }`}
+                    >
                       {mode.label}
                       {isSelected && (
-                        <span className="ml-2 text-xs text-theme-button-cta">✓</span>
+                        <span className="ml-2 text-xs text-theme-button-cta">
+                          ✓
+                        </span>
                       )}
                     </div>
                     <div className="text-xs text-theme-text-secondary mt-1">
@@ -149,5 +162,10 @@ export default function ResponseModeSelector({
 export function useResponseMode() {
   const [responseMode, setResponseMode] = useState("chat"); // Default to chat mode, not agent
   const [showModeSelector, setShowModeSelector] = useState(false);
-  return { responseMode, setResponseMode, showModeSelector, setShowModeSelector };
+  return {
+    responseMode,
+    setResponseMode,
+    showModeSelector,
+    setShowModeSelector,
+  };
 }

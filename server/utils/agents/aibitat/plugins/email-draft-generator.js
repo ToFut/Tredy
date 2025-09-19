@@ -22,7 +22,11 @@ const emailDraftGenerator = {
       },
     },
   },
-  plugin: function ({ GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, EMAIL_TEMPLATES_PATH }) {
+  plugin: function ({
+    GMAIL_CLIENT_ID,
+    GMAIL_CLIENT_SECRET,
+    EMAIL_TEMPLATES_PATH,
+  }) {
     return {
       name: this.name,
       setup(aibitat) {
@@ -33,26 +37,28 @@ const emailDraftGenerator = {
             "Automatically generate personalized email draft responses based on incoming emails. Analyzes email content, determines intent, and creates appropriate replies using the workspace's AI provider. Supports multiple email categories like partnerships, pricing, support, and cold outreach.",
           examples: [
             {
-              prompt: "Generate a draft reply for the partnership email in my inbox",
-              call: JSON.stringify({ 
+              prompt:
+                "Generate a draft reply for the partnership email in my inbox",
+              call: JSON.stringify({
                 action: "generateDraft",
                 emailId: "latest",
-                category: "partnership"
+                category: "partnership",
               }),
             },
             {
               prompt: "Create email drafts for all unread support queries",
-              call: JSON.stringify({ 
+              call: JSON.stringify({
                 action: "batchGenerate",
-                filter: { label: "support", unread: true }
+                filter: { label: "support", unread: true },
               }),
             },
             {
-              prompt: "Analyze my inbox and draft replies for high-priority emails",
-              call: JSON.stringify({ 
+              prompt:
+                "Analyze my inbox and draft replies for high-priority emails",
+              call: JSON.stringify({
                 action: "smartInbox",
                 priority: "high",
-                maxDrafts: 5
+                maxDrafts: 5,
               }),
             },
           ],
@@ -62,12 +68,20 @@ const emailDraftGenerator = {
             properties: {
               action: {
                 type: "string",
-                enum: ["generateDraft", "batchGenerate", "smartInbox", "analyzeEmail", "listTemplates"],
-                description: "Action to perform: generateDraft (single email), batchGenerate (multiple), smartInbox (AI-powered inbox zero), analyzeEmail (categorize), listTemplates (show available templates)",
+                enum: [
+                  "generateDraft",
+                  "batchGenerate",
+                  "smartInbox",
+                  "analyzeEmail",
+                  "listTemplates",
+                ],
+                description:
+                  "Action to perform: generateDraft (single email), batchGenerate (multiple), smartInbox (AI-powered inbox zero), analyzeEmail (categorize), listTemplates (show available templates)",
               },
               emailId: {
                 type: "string",
-                description: "Email ID or 'latest' for most recent email (for generateDraft action)",
+                description:
+                  "Email ID or 'latest' for most recent email (for generateDraft action)",
               },
               filter: {
                 type: "object",
@@ -100,8 +114,17 @@ const emailDraftGenerator = {
               },
               category: {
                 type: "string",
-                enum: ["partnership", "pricing", "support", "sales", "feedback", "general", "auto"],
-                description: "Email category for template selection (auto = AI decides)",
+                enum: [
+                  "partnership",
+                  "pricing",
+                  "support",
+                  "sales",
+                  "feedback",
+                  "general",
+                  "auto",
+                ],
+                description:
+                  "Email category for template selection (auto = AI decides)",
               },
               priority: {
                 type: "string",
@@ -110,12 +133,19 @@ const emailDraftGenerator = {
               },
               maxDrafts: {
                 type: "number",
-                description: "Maximum number of drafts to generate in batch mode",
+                description:
+                  "Maximum number of drafts to generate in batch mode",
                 default: 10,
               },
               tone: {
                 type: "string",
-                enum: ["professional", "friendly", "casual", "formal", "enthusiastic"],
+                enum: [
+                  "professional",
+                  "friendly",
+                  "casual",
+                  "formal",
+                  "enthusiastic",
+                ],
                 description: "Tone of voice for the draft",
                 default: "professional",
               },
@@ -132,20 +162,20 @@ const emailDraftGenerator = {
             required: ["action"],
             additionalProperties: false,
           },
-          handler: async function ({ 
-            action, 
-            emailId, 
-            filter, 
-            category = "auto", 
+          handler: async function ({
+            action,
+            emailId,
+            filter,
+            category = "auto",
             priority = "all",
             maxDrafts = 10,
             tone = "professional",
-            templateOverrides = {}
+            templateOverrides = {},
           }) {
             try {
               // Use the workspace's AI provider instead of hardcoded OpenAI
               const aiProvider = this.super.introspect ? this.super : aibitat;
-              
+
               this.super.introspect(
                 `${this.caller}: Executing email draft generator action: ${action}`
               );
@@ -154,15 +184,33 @@ const emailDraftGenerator = {
 
               switch (action) {
                 case "generateDraft":
-                  result = await this.generateSingleDraft(emailId, category, tone, templateOverrides, aiProvider);
+                  result = await this.generateSingleDraft(
+                    emailId,
+                    category,
+                    tone,
+                    templateOverrides,
+                    aiProvider
+                  );
                   break;
 
                 case "batchGenerate":
-                  result = await this.batchGenerateDrafts(filter, category, tone, maxDrafts, templateOverrides, aiProvider);
+                  result = await this.batchGenerateDrafts(
+                    filter,
+                    category,
+                    tone,
+                    maxDrafts,
+                    templateOverrides,
+                    aiProvider
+                  );
                   break;
 
                 case "smartInbox":
-                  result = await this.smartInboxZero(priority, maxDrafts, tone, aiProvider);
+                  result = await this.smartInboxZero(
+                    priority,
+                    maxDrafts,
+                    tone,
+                    aiProvider
+                  );
                   break;
 
                 case "analyzeEmail":
@@ -187,7 +235,13 @@ const emailDraftGenerator = {
             }
           },
 
-          generateSingleDraft: async function(emailId, category, tone, templateOverrides, aiProvider) {
+          generateSingleDraft: async function (
+            emailId,
+            category,
+            tone,
+            templateOverrides,
+            aiProvider
+          ) {
             // Simulate fetching email content
             const email = await this.fetchEmail(emailId);
             if (!email) return `Email ${emailId} not found`;
@@ -208,14 +262,14 @@ Respond in JSON format.`;
             const analysisResponse = await aiProvider.completion({
               messages: [{ role: "user", content: analysisPrompt }],
             });
-            
+
             const analysis = this.parseAIResponse(analysisResponse, {
               category: category === "auto" ? "general" : category,
               intent: "general inquiry",
               priority: 5,
-              keyPoints: []
+              keyPoints: [],
             });
-            
+
             // Generate draft using workspace AI
             const draftPrompt = `Generate a ${tone} email response to:
 From: ${email.from}
@@ -235,8 +289,11 @@ Create a professional response that addresses their points and proposes next ste
             });
 
             const draft = {
-              content: draftResponse.text || draftResponse.content || "Thank you for your email. I'll review and respond shortly.",
-              subject: `Re: ${email.subject}`
+              content:
+                draftResponse.text ||
+                draftResponse.content ||
+                "Thank you for your email. I'll review and respond shortly.",
+              subject: `Re: ${email.subject}`,
             };
 
             // Save draft to Gmail
@@ -260,10 +317,17 @@ ${draft.content}
 ✅ Estimated response time saved: 5-10 minutes`;
           },
 
-          batchGenerateDrafts: async function(filter, category, tone, maxDrafts, templateOverrides, aiProvider) {
+          batchGenerateDrafts: async function (
+            filter,
+            category,
+            tone,
+            maxDrafts,
+            templateOverrides,
+            aiProvider
+          ) {
             // Fetch emails matching filter
             const emails = await this.fetchEmailsByFilter(filter, maxDrafts);
-            
+
             if (emails.length === 0) {
               return "No emails found matching the specified filters";
             }
@@ -276,10 +340,10 @@ ${draft.content}
                 const analysisResponse = await aiProvider.completion({
                   messages: [{ role: "user", content: analysisPrompt }],
                 });
-                
+
                 const analysis = this.parseAIResponse(analysisResponse, {
                   category: category === "auto" ? "general" : category,
-                  priority: 5
+                  priority: 5,
                 });
 
                 // Generate draft
@@ -289,31 +353,36 @@ ${draft.content}
                 });
 
                 const draft = {
-                  content: draftResponse.text || draftResponse.content || "Draft pending",
-                  subject: `Re: ${email.subject}`
+                  content:
+                    draftResponse.text ||
+                    draftResponse.content ||
+                    "Draft pending",
+                  subject: `Re: ${email.subject}`,
                 };
 
                 const draftId = await this.saveDraftToGmail(email.id, draft);
-                
+
                 results.push({
                   email: email.subject,
                   from: email.from,
                   category: analysis.category,
                   draftId: draftId,
-                  status: "success"
+                  status: "success",
                 });
               } catch (error) {
                 results.push({
                   email: email.subject,
                   from: email.from,
                   status: "failed",
-                  error: error.message
+                  error: error.message,
                 });
               }
             }
 
-            const successful = results.filter(r => r.status === "success").length;
-            const failed = results.filter(r => r.status === "failed").length;
+            const successful = results.filter(
+              (r) => r.status === "success"
+            ).length;
+            const failed = results.filter((r) => r.status === "failed").length;
 
             return `📧 **Batch Draft Generation Complete**
             
@@ -322,36 +391,50 @@ ${draft.content}
 **Failed:** ${failed} emails
 
 **Results:**
-${results.map(r => 
-  `• ${r.from} - "${r.email.substring(0, 50)}..." 
+${results
+  .map(
+    (r) =>
+      `• ${r.from} - "${r.email.substring(0, 50)}..." 
    Status: ${r.status === "success" ? `✅ Draft saved (${r.category})` : `❌ ${r.error}`}`
-).join('\n')}
+  )
+  .join("\n")}
 
 **Time Saved:** ~${successful * 7} minutes
 **Next Step:** Review drafts in your Gmail drafts folder`;
           },
 
-          smartInboxZero: async function(priority, maxDrafts, tone, aiProvider) {
+          smartInboxZero: async function (
+            priority,
+            maxDrafts,
+            tone,
+            aiProvider
+          ) {
             // Fetch unread emails
-            const emails = await this.fetchEmailsByFilter({ unread: true }, maxDrafts * 2);
-            
+            const emails = await this.fetchEmailsByFilter(
+              { unread: true },
+              maxDrafts * 2
+            );
+
             // Use AI to prioritize emails
             const priorityPrompt = `Prioritize these emails by importance (1-10):
-${emails.map((e, i) => `${i+1}. From: ${e.from}, Subject: ${e.subject}`).join('\n')}
+${emails.map((e, i) => `${i + 1}. From: ${e.from}, Subject: ${e.subject}`).join("\n")}
 Return as JSON array with email index and priority score.`;
 
             const priorityResponse = await aiProvider.completion({
               messages: [{ role: "user", content: priorityPrompt }],
             });
-            
-            const priorities = this.parseAIResponse(priorityResponse, emails.map((_, i) => ({ index: i, priority: 5 })));
-            
+
+            const priorities = this.parseAIResponse(
+              priorityResponse,
+              emails.map((_, i) => ({ index: i, priority: 5 }))
+            );
+
             // Sort by priority and take top emails
             const sortedEmails = priorities
               .sort((a, b) => b.priority - a.priority)
               .slice(0, maxDrafts)
-              .map(p => emails[p.index]);
-            
+              .map((p) => emails[p.index]);
+
             const results = [];
 
             for (const email of sortedEmails) {
@@ -362,16 +445,21 @@ Return as JSON array with email index and priority score.`;
               });
 
               const draft = {
-                content: draftResponse.text || draftResponse.content || "Draft pending",
-                subject: `Re: ${email.subject}`
+                content:
+                  draftResponse.text ||
+                  draftResponse.content ||
+                  "Draft pending",
+                subject: `Re: ${email.subject}`,
               };
-              
+
               const draftId = await this.saveDraftToGmail(email.id, draft);
-              
+
               results.push({
                 email: email,
-                priority: priorities.find(p => emails[p.index] === email)?.priority || 5,
-                draftId: draftId
+                priority:
+                  priorities.find((p) => emails[p.index] === email)?.priority ||
+                  5,
+                draftId: draftId,
               });
             }
 
@@ -382,18 +470,21 @@ Return as JSON array with email index and priority score.`;
 **Drafts generated:** ${results.length}
 
 **Generated Drafts:**
-${results.map(r => 
-  `📨 **${r.email.from}**
+${results
+  .map(
+    (r) =>
+      `📨 **${r.email.from}**
    Subject: ${r.email.subject}
    Priority: ${r.priority}/10
    Draft ID: ${r.draftId}`
-).join('\n\n')}
+  )
+  .join("\n\n")}
 
 **Estimated Time Saved:** ${results.length * 8} minutes
 **Inbox Status:** ${emails.length - results.length} emails remaining for manual review`;
           },
 
-          analyzeEmailIntent: async function(emailId, aiProvider) {
+          analyzeEmailIntent: async function (emailId, aiProvider) {
             const email = await this.fetchEmail(emailId);
             if (!email) return `Email ${emailId} not found`;
 
@@ -407,7 +498,7 @@ Include: category, intent, sentiment, priority (1-10), urgency, key points, sugg
             const response = await aiProvider.completion({
               messages: [{ role: "user", content: analysisPrompt }],
             });
-            
+
             const analysis = this.parseAIResponse(response, {
               category: "general",
               intent: "inquiry",
@@ -418,9 +509,9 @@ Include: category, intent, sentiment, priority (1-10), urgency, key points, sugg
               suggestedResponse: "acknowledgment",
               recommendedTone: "professional",
               actionItems: [],
-              draftStrategy: "Address main points and propose next steps"
+              draftStrategy: "Address main points and propose next steps",
             });
-            
+
             return `📊 **Email Analysis Report**
             
 **Email Details:**
@@ -436,29 +527,32 @@ Include: category, intent, sentiment, priority (1-10), urgency, key points, sugg
 • Urgency: ${analysis.urgency}
 
 **Key Points Detected:**
-${analysis.keyPoints.map(point => `• ${point}`).join('\n')}
+${analysis.keyPoints.map((point) => `• ${point}`).join("\n")}
 
 **Suggested Response Type:** ${analysis.suggestedResponse}
 **Recommended Tone:** ${analysis.recommendedTone}
 
 **Action Items:**
-${analysis.actionItems.map(item => `☐ ${item}`).join('\n')}
+${analysis.actionItems.map((item) => `☐ ${item}`).join("\n")}
 
 **Draft Strategy:**
 ${analysis.draftStrategy}`;
           },
 
-          listAvailableTemplates: async function() {
+          listAvailableTemplates: async function () {
             const templates = await this.loadTemplates();
-            
+
             return `📝 **Available Email Templates**
             
-${templates.map(t => 
-  `**${t.name}** (${t.category})
+${templates
+  .map(
+    (t) =>
+      `**${t.name}** (${t.category})
    Description: ${t.description}
-   Use cases: ${t.useCases.join(', ')}
-   Variables: ${t.variables.join(', ')}`
-).join('\n\n')}
+   Use cases: ${t.useCases.join(", ")}
+   Variables: ${t.variables.join(", ")}`
+  )
+  .join("\n\n")}
 
 **Custom Template Options:**
 • Tone: professional, friendly, casual, formal, enthusiastic
@@ -470,11 +564,11 @@ ${templates.map(t =>
           },
 
           // Helper functions
-          parseAIResponse: function(response, defaultValue) {
+          parseAIResponse: function (response, defaultValue) {
             try {
               const text = response.text || response.content || "";
               // Try to parse as JSON
-              if (text.includes('{') || text.includes('[')) {
+              if (text.includes("{") || text.includes("[")) {
                 const jsonMatch = text.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
                 if (jsonMatch) {
                   return JSON.parse(jsonMatch[1]);
@@ -486,30 +580,31 @@ ${templates.map(t =>
             }
           },
 
-          fetchEmail: async function(emailId) {
+          fetchEmail: async function (emailId) {
             // Gmail API integration would go here
             // For demo purposes, return mock data
             return {
               id: emailId,
               from: "partner@company.com",
               subject: "Partnership Opportunity",
-              content: "We'd like to discuss a potential partnership with your company. We believe there are significant synergies between our organizations.",
-              date: new Date().toISOString()
+              content:
+                "We'd like to discuss a potential partnership with your company. We believe there are significant synergies between our organizations.",
+              date: new Date().toISOString(),
             };
           },
 
-          fetchEmailsByFilter: async function(filter, limit) {
+          fetchEmailsByFilter: async function (filter, limit) {
             // Gmail API integration for fetching multiple emails
             // For demo, return empty array
             return [];
           },
 
-          saveDraftToGmail: async function(emailId, draft) {
+          saveDraftToGmail: async function (emailId, draft) {
             // Gmail API integration for saving drafts
             return `draft_${Date.now()}`;
           },
 
-          loadTemplates: async function() {
+          loadTemplates: async function () {
             // Load email templates from storage
             return [
               {
@@ -517,22 +612,22 @@ ${templates.map(t =>
                 category: "partnership",
                 description: "Template for responding to partnership inquiries",
                 useCases: ["B2B partnerships", "Strategic alliances"],
-                variables: ["company_name", "partnership_type", "next_steps"]
+                variables: ["company_name", "partnership_type", "next_steps"],
               },
               {
                 name: "Pricing Inquiry",
                 category: "pricing",
                 description: "Template for responding to pricing questions",
                 useCases: ["Sales inquiries", "Quote requests"],
-                variables: ["product_name", "pricing_tier", "discount_options"]
+                variables: ["product_name", "pricing_tier", "discount_options"],
               },
               {
                 name: "Support Response",
                 category: "support",
                 description: "Template for customer support responses",
                 useCases: ["Technical issues", "Feature requests"],
-                variables: ["issue_type", "resolution_steps", "follow_up"]
-              }
+                variables: ["issue_type", "resolution_steps", "follow_up"],
+              },
             ];
           },
         });

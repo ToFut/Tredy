@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { CaretRight, Copy, ArrowsOut, Sparkle } from '@phosphor-icons/react';
-import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import React, { useState, useEffect } from "react";
+import { CaretRight, Copy, ArrowsOut, Sparkle } from "@phosphor-icons/react";
+import ReactMarkdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 export default function StructuredResponse({ content, workspaceSlug }) {
   const [expandedSections, setExpandedSections] = useState({});
@@ -10,43 +10,45 @@ export default function StructuredResponse({ content, workspaceSlug }) {
 
   // Parse content into structured sections
   const parseContent = (text) => {
-    if (typeof text !== 'string') return { sections: [] };
-    
+    if (typeof text !== "string") return { sections: [] };
+
     // Check if content has markdown headers
-    const hasHeaders = text.includes('## ') || text.includes('### ');
+    const hasHeaders = text.includes("## ") || text.includes("### ");
     if (!hasHeaders) {
       return {
-        sections: [{
-          id: 'main',
-          title: 'Response',
-          type: 'general',
-          content: text,
-          icon: '💬'
-        }]
+        sections: [
+          {
+            id: "main",
+            title: "Response",
+            type: "general",
+            content: text,
+            icon: "💬",
+          },
+        ],
       };
     }
 
     const sections = [];
-    const lines = text.split('\n');
+    const lines = text.split("\n");
     let currentSection = null;
     let currentContent = [];
 
     lines.forEach((line) => {
-      if (line.startsWith('## ')) {
+      if (line.startsWith("## ")) {
         if (currentSection) {
-          currentSection.content = currentContent.join('\n').trim();
+          currentSection.content = currentContent.join("\n").trim();
           sections.push(currentSection);
         }
-        const title = line.replace('## ', '').trim();
+        const title = line.replace("## ", "").trim();
         currentSection = {
           id: `section-${sections.length}`,
           title,
           type: detectSectionType(title),
           icon: getSectionIcon(title),
-          content: ''
+          content: "",
         };
         currentContent = [];
-      } else if (line.startsWith('### ') && currentSection) {
+      } else if (line.startsWith("### ") && currentSection) {
         currentContent.push(line);
       } else {
         currentContent.push(line);
@@ -54,7 +56,7 @@ export default function StructuredResponse({ content, workspaceSlug }) {
     });
 
     if (currentSection) {
-      currentSection.content = currentContent.join('\n').trim();
+      currentSection.content = currentContent.join("\n").trim();
       sections.push(currentSection);
     }
 
@@ -63,41 +65,48 @@ export default function StructuredResponse({ content, workspaceSlug }) {
 
   const detectSectionType = (title) => {
     const lower = title.toLowerCase();
-    if (lower.includes('overview') || lower.includes('summary')) return 'overview';
-    if (lower.includes('code') || lower.includes('implementation')) return 'code';
-    if (lower.includes('analysis') || lower.includes('data')) return 'analysis';
-    if (lower.includes('step') || lower.includes('instruction')) return 'steps';
-    if (lower.includes('example')) return 'example';
-    if (lower.includes('conclusion') || lower.includes('recommendation')) return 'conclusion';
-    return 'general';
+    if (lower.includes("overview") || lower.includes("summary"))
+      return "overview";
+    if (lower.includes("code") || lower.includes("implementation"))
+      return "code";
+    if (lower.includes("analysis") || lower.includes("data")) return "analysis";
+    if (lower.includes("step") || lower.includes("instruction")) return "steps";
+    if (lower.includes("example")) return "example";
+    if (lower.includes("conclusion") || lower.includes("recommendation"))
+      return "conclusion";
+    return "general";
   };
 
   const getSectionIcon = (title) => {
     const lower = title.toLowerCase();
-    if (lower.includes('overview') || lower.includes('summary')) return '📋';
-    if (lower.includes('code') || lower.includes('implementation')) return '💻';
-    if (lower.includes('analysis') || lower.includes('data')) return '📊';
-    if (lower.includes('step') || lower.includes('instruction')) return '📝';
-    if (lower.includes('example')) return '💡';
-    if (lower.includes('warning') || lower.includes('important')) return '⚠️';
-    if (lower.includes('tip') || lower.includes('note')) return '💡';
-    if (lower.includes('conclusion')) return '🎯';
-    return '📄';
+    if (lower.includes("overview") || lower.includes("summary")) return "📋";
+    if (lower.includes("code") || lower.includes("implementation")) return "💻";
+    if (lower.includes("analysis") || lower.includes("data")) return "📊";
+    if (lower.includes("step") || lower.includes("instruction")) return "📝";
+    if (lower.includes("example")) return "💡";
+    if (lower.includes("warning") || lower.includes("important")) return "⚠️";
+    if (lower.includes("tip") || lower.includes("note")) return "💡";
+    if (lower.includes("conclusion")) return "🎯";
+    return "📄";
   };
 
   const getContentIndicatorClass = (type) => {
     switch (type) {
-      case 'code': return 'content-indicator code';
-      case 'analysis': return 'content-indicator analysis';
-      case 'overview': return 'content-indicator research';
-      default: return 'content-indicator creative';
+      case "code":
+        return "content-indicator code";
+      case "analysis":
+        return "content-indicator analysis";
+      case "overview":
+        return "content-indicator research";
+      default:
+        return "content-indicator creative";
     }
   };
 
   const toggleSection = (sectionId) => {
-    setExpandedSections(prev => ({
+    setExpandedSections((prev) => ({
       ...prev,
-      [sectionId]: !prev[sectionId]
+      [sectionId]: !prev[sectionId],
     }));
   };
 
@@ -119,14 +128,18 @@ export default function StructuredResponse({ content, workspaceSlug }) {
   }, [content]);
 
   // If no structured content, return simple markdown
-  if (sections.length === 1 && sections[0].type === 'general' && !content.includes('##')) {
+  if (
+    sections.length === 1 &&
+    sections[0].type === "general" &&
+    !content.includes("##")
+  ) {
     return (
       <div className="text-theme-text-primary">
         <ReactMarkdown
           children={content}
           components={{
-            code({node, inline, className, children, ...props}) {
-              const match = /language-(\w+)/.exec(className || '');
+            code({ node, inline, className, children, ...props }) {
+              const match = /language-(\w+)/.exec(className || "");
               return !inline && match ? (
                 <SyntaxHighlighter
                   style={atomDark}
@@ -134,14 +147,17 @@ export default function StructuredResponse({ content, workspaceSlug }) {
                   PreTag="div"
                   {...props}
                 >
-                  {String(children).replace(/\n$/, '')}
+                  {String(children).replace(/\n$/, "")}
                 </SyntaxHighlighter>
               ) : (
-                <code className="bg-theme-bg-chat px-1.5 py-0.5 rounded text-sm" {...props}>
+                <code
+                  className="bg-theme-bg-chat px-1.5 py-0.5 rounded text-sm"
+                  {...props}
+                >
                   {children}
                 </code>
               );
-            }
+            },
           }}
         />
       </div>
@@ -162,7 +178,9 @@ export default function StructuredResponse({ content, workspaceSlug }) {
                 key={section.id}
                 onClick={() => {
                   toggleSection(section.id);
-                  document.getElementById(section.id)?.scrollIntoView({ behavior: 'smooth' });
+                  document
+                    .getElementById(section.id)
+                    ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className="toc-item"
               >
@@ -177,15 +195,11 @@ export default function StructuredResponse({ content, workspaceSlug }) {
       {/* Sections */}
       <div className="space-y-3">
         {sections.map((section) => (
-          <div
-            key={section.id}
-            id={section.id}
-            className="collapsible-section"
-          >
+          <div key={section.id} id={section.id} className="collapsible-section">
             {/* Section Header */}
             <div
               onClick={() => toggleSection(section.id)}
-              className={`collapsible-header ${expandedSections[section.id] ? 'active' : ''}`}
+              className={`collapsible-header ${expandedSections[section.id] ? "active" : ""}`}
             >
               <div className="flex items-center gap-3">
                 <span className="text-xl">{section.icon}</span>
@@ -196,22 +210,24 @@ export default function StructuredResponse({ content, workspaceSlug }) {
                   {section.type}
                 </span>
               </div>
-              <CaretRight 
+              <CaretRight
                 className={`collapsible-icon w-5 h-5 text-theme-text-secondary`}
                 weight="bold"
               />
             </div>
 
             {/* Section Content */}
-            <div className={`collapsible-content ${expandedSections[section.id] ? 'expanded' : ''}`}>
+            <div
+              className={`collapsible-content ${expandedSections[section.id] ? "expanded" : ""}`}
+            >
               <div className="prose prose-invert max-w-none">
                 <ReactMarkdown
                   children={section.content}
                   components={{
-                    code({node, inline, className, children, ...props}) {
-                      const match = /language-(\w+)/.exec(className || '');
-                      const codeString = String(children).replace(/\n$/, '');
-                      
+                    code({ node, inline, className, children, ...props }) {
+                      const match = /language-(\w+)/.exec(className || "");
+                      const codeString = String(children).replace(/\n$/, "");
+
                       return !inline && match ? (
                         <div className="relative group">
                           <SyntaxHighlighter
@@ -220,8 +236,8 @@ export default function StructuredResponse({ content, workspaceSlug }) {
                             PreTag="div"
                             customStyle={{
                               margin: 0,
-                              borderRadius: '8px',
-                              background: 'var(--theme-bg-chat)'
+                              borderRadius: "8px",
+                              background: "var(--theme-bg-chat)",
                             }}
                             {...props}
                           >
@@ -238,25 +254,32 @@ export default function StructuredResponse({ content, workspaceSlug }) {
                           </button>
                         </div>
                       ) : (
-                        <code className="bg-theme-bg-chat px-1.5 py-0.5 rounded text-sm" {...props}>
+                        <code
+                          className="bg-theme-bg-chat px-1.5 py-0.5 rounded text-sm"
+                          {...props}
+                        >
                           {children}
                         </code>
                       );
                     },
-                    h3: ({children}) => (
-                      <h3 className="text-theme-text-primary font-medium mt-4 mb-2">{children}</h3>
+                    h3: ({ children }) => (
+                      <h3 className="text-theme-text-primary font-medium mt-4 mb-2">
+                        {children}
+                      </h3>
                     ),
-                    ul: ({children}) => (
+                    ul: ({ children }) => (
                       <ul className="list-disc pl-5 space-y-1">{children}</ul>
                     ),
-                    ol: ({children}) => (
-                      <ol className="list-decimal pl-5 space-y-1">{children}</ol>
+                    ol: ({ children }) => (
+                      <ol className="list-decimal pl-5 space-y-1">
+                        {children}
+                      </ol>
                     ),
-                    blockquote: ({children}) => (
+                    blockquote: ({ children }) => (
                       <blockquote className="border-l-4 border-theme-button-cta pl-4 italic">
                         {children}
                       </blockquote>
-                    )
+                    ),
                   }}
                 />
               </div>
@@ -271,7 +294,7 @@ export default function StructuredResponse({ content, workspaceSlug }) {
                   className="interactive-button flex items-center gap-1.5"
                 >
                   <Copy className="w-3 h-3" />
-                  {copiedSection === section.id ? 'Copied!' : 'Copy'}
+                  {copiedSection === section.id ? "Copied!" : "Copy"}
                 </button>
                 <button className="interactive-button flex items-center gap-1.5">
                   <ArrowsOut className="w-3 h-3" />

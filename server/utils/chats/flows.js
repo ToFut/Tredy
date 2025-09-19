@@ -24,12 +24,12 @@ async function grepFlow({
 }) {
   // Check if message starts with @flow
   if (!message.startsWith("@flow")) return false;
-  
+
   console.log("🌊 [grepFlow] Detected @flow command:", message);
 
   // Extract the flow description after @flow
-  const flowDescription = message.replace(/^@flow\s*/i, '').trim();
-  
+  const flowDescription = message.replace(/^@flow\s*/i, "").trim();
+
   // Convert to agent command that ONLY allows create-workflow function
   // This format forces the LLM to use the function and nothing else
   const agentMessage = `@agent You must ONLY use the 'create-workflow' function to create a visual workflow. Do NOT execute any tasks directly. The workflow description is: "${flowDescription}". Call create-workflow with description parameter.`;
@@ -46,7 +46,8 @@ async function grepFlow({
     writeResponseChunk(response, {
       id: uuid,
       type: "statusResponse",
-      textResponse: "Flow creator could not be invoked. Chat will be handled as default chat.",
+      textResponse:
+        "Flow creator could not be invoked. Chat will be handled as default chat.",
       sources: [],
       close: true,
       animate: false,
@@ -77,7 +78,7 @@ async function grepFlow({
     animate: true,
     agentName: "workflow-creator",
   });
-  
+
   return true;
 }
 

@@ -31,7 +31,7 @@ function oauthCallbackEndpoints(app) {
         </body>
         </html>
       `;
-      
+
       response.send(html);
     } catch (error) {
       console.error("[OAuth] Callback error:", error);

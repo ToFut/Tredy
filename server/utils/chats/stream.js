@@ -238,7 +238,7 @@ async function streamChatWithWorkspace(
     });
 
     // Generate summary in background (non-blocking)
-    generateAutoSummary(workspace, thread?.id || null).catch(err => {
+    generateAutoSummary(workspace, thread?.id || null).catch((err) => {
       console.error("Failed to generate auto summary:", err);
     });
 
@@ -307,7 +307,7 @@ async function streamChatWithWorkspace(
     });
 
     // Generate summary in background (non-blocking)
-    generateAutoSummary(workspace, thread?.id || null).catch(err => {
+    generateAutoSummary(workspace, thread?.id || null).catch((err) => {
       console.error("Failed to generate auto summary:", err);
     });
 

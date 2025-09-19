@@ -3,8 +3,15 @@ process.env.NODE_ENV === "development"
   : require("dotenv").config();
 
 const { default: slugify } = require("slugify");
-const { isValidUrl, safeJsonParse } = require("../utils/interfaces/systemInterfaces");
-const { SYSTEM_SETTINGS, validateSetting, emitSettingUpdate } = require("../utils/interfaces/systemSettingsInterface");
+const {
+  isValidUrl,
+  safeJsonParse,
+} = require("../utils/interfaces/systemInterfaces");
+const {
+  SYSTEM_SETTINGS,
+  validateSetting,
+  emitSettingUpdate,
+} = require("../utils/interfaces/systemSettingsInterface");
 const prisma = require("../utils/prisma");
 const { v4 } = require("uuid");
 const { MetaGenerator } = require("../utils/boot/MetaGenerator");

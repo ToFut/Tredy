@@ -84,39 +84,43 @@ const websocket = {
         };
 
         // Add method to track tool calls
-        aibitat.trackToolCall = (toolName, params, status = 'pending') => {
+        aibitat.trackToolCall = (toolName, params, status = "pending") => {
           const toolCall = {
             id: require("uuid").v4(),
             name: toolName,
             params: params,
             status: status,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           };
-          
+
           if (!this.toolCalls) this.toolCalls = [];
           this.toolCalls.push(toolCall);
-          
+
           // Send tool tracking update to frontend
-          socket.send(JSON.stringify({
-            type: "toolCall",
-            content: toolCall
-          }));
-          
+          socket.send(
+            JSON.stringify({
+              type: "toolCall",
+              content: toolCall,
+            })
+          );
+
           return toolCall.id;
         };
-        
+
         // Update tool call status
         aibitat.updateToolCall = (toolId, updates) => {
-          const toolCall = this.toolCalls?.find(tc => tc.id === toolId);
+          const toolCall = this.toolCalls?.find((tc) => tc.id === toolId);
           if (toolCall) {
             Object.assign(toolCall, updates);
-            socket.send(JSON.stringify({
-              type: "toolCallUpdate", 
-              content: { id: toolId, ...updates }
-            }));
+            socket.send(
+              JSON.stringify({
+                type: "toolCallUpdate",
+                content: { id: toolId, ...updates },
+              })
+            );
           }
         };
-        
+
         // expose function for sockets across aibitat
         // type param must be set or else msg will not be shown or handled in UI.
         aibitat.socket = {
@@ -133,24 +137,31 @@ const websocket = {
           if (message.from !== "USER")
             Telemetry.sendTelemetry("agent_chat_sent");
           if (message.from === "USER" && muteUserReply) return;
-          
+
           // Debug: Log message being sent to identify duplicates
-          console.log(`[WebSocket Plugin] Sending message from ${message.from} to ${message.to}: ${message.content?.substring(0, 50)}...`);
+          console.log(
+            `[WebSocket Plugin] Sending message from ${message.from} to ${message.to}: ${message.content?.substring(0, 50)}...`
+          );
           socket.send(JSON.stringify(message));
         });
 
         aibitat.onTerminate(() => {
           // Send final tool usage summary before closing
           if (this.toolCalls && this.toolCalls.length > 0) {
-            socket.send(JSON.stringify({
-              type: "toolUsageSummary",
-              content: {
-                tools: this.toolCalls,
-                totalCount: this.toolCalls.length,
-                successCount: this.toolCalls.filter(t => t.status === 'success').length,
-                errorCount: this.toolCalls.filter(t => t.status === 'error').length
-              }
-            }));
+            socket.send(
+              JSON.stringify({
+                type: "toolUsageSummary",
+                content: {
+                  tools: this.toolCalls,
+                  totalCount: this.toolCalls.length,
+                  successCount: this.toolCalls.filter(
+                    (t) => t.status === "success"
+                  ).length,
+                  errorCount: this.toolCalls.filter((t) => t.status === "error")
+                    .length,
+                },
+              })
+            );
           }
           // console.log("🚀 chat finished");
           socket.close();

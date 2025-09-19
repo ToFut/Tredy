@@ -38,8 +38,7 @@ const TRANSLATIONS = {
     },
     survey: {
       title: "Velkommen til Tredy",
-      description:
-        "Hjælp os med at gøre Tredy tilpasset dine behov. Valgfrit.",
+      description: "Hjælp os med at gøre Tredy tilpasset dine behov. Valgfrit.",
       email: "Hvad er din e-mail?",
       useCase: "Hvad vil du bruge Tredy til?",
       useCaseWork: "Til arbejde",
@@ -53,8 +52,7 @@ const TRANSLATIONS = {
     },
     workspace: {
       title: "Opret dit første arbejdsområde",
-      description:
-        "Opret dit første arbejdsområde og kom i gang med Tredy.",
+      description: "Opret dit første arbejdsområde og kom i gang med Tredy.",
     },
   },
   common: {

@@ -3,10 +3,19 @@ process.env.NODE_ENV === "development"
   : require("dotenv").config();
 
 // Auto-enable authentication for Railway deployments if not configured
-if (process.env.RAILWAY_ENVIRONMENT && !process.env.AUTH_TOKEN && !process.env.DISABLE_AUTH) {
-  console.log("[Railway] Production deployment detected - enabling authentication");
-  process.env.AUTH_TOKEN = process.env.AUTH_TOKEN || "changeThisPasswordInRailway";
-  console.log("[Railway] AUTH_TOKEN has been set. Change it in Railway environment variables!");
+if (
+  process.env.RAILWAY_ENVIRONMENT &&
+  !process.env.AUTH_TOKEN &&
+  !process.env.DISABLE_AUTH
+) {
+  console.log(
+    "[Railway] Production deployment detected - enabling authentication"
+  );
+  process.env.AUTH_TOKEN =
+    process.env.AUTH_TOKEN || "changeThisPasswordInRailway";
+  console.log(
+    "[Railway] AUTH_TOKEN has been set. Change it in Railway environment variables!"
+  );
 }
 
 require("./utils/logger")();
@@ -38,11 +47,15 @@ const { agentScheduleEndpoints } = require("./endpoints/agentSchedule");
 const { agentFlowEndpoints } = require("./endpoints/agentFlows");
 const { mcpServersEndpoints } = require("./endpoints/mcpServers");
 const { mobileEndpoints } = require("./endpoints/mobile");
-const { supabaseIntegrationEndpoints } = require("./endpoints/supabaseIntegration");
+const {
+  supabaseIntegrationEndpoints,
+} = require("./endpoints/supabaseIntegration");
 const { supabaseAuthEndpoints } = require("./endpoints/supabaseAuth");
 const { threadSharingEndpoints } = require("./endpoints/threadSharing");
 const { userConnectorEndpoints } = require("./endpoints/user/connectors");
-const { apiWorkspaceConnectorEndpoints } = require("./endpoints/api/workspace/connectors");
+const {
+  apiWorkspaceConnectorEndpoints,
+} = require("./endpoints/api/workspace/connectors");
 const { waitlistEndpoints } = require("./endpoints/waitlist");
 const { WelcomeMessages } = require("./models/welcomeMessages");
 const { initializeDatabase } = require("./utils/database/init");
@@ -104,10 +117,10 @@ if (process.env.NODE_ENV !== "development") {
   const IndexPage = new MetaGenerator();
 
   // Serve static frontend files from the correct location
-  const frontendDistPath = process.env.FRONTEND_BUILD_DIR 
+  const frontendDistPath = process.env.FRONTEND_BUILD_DIR
     ? path.resolve(process.env.FRONTEND_BUILD_DIR)
     : path.resolve(__dirname, "../frontend/dist");
-    
+
   app.use(
     express.static(frontendDistPath, {
       extensions: ["js"],
@@ -168,13 +181,18 @@ app.all("*", function (_, response) {
   try {
     // Initialize database schema first
     await initializeDatabase();
-    
+
     // Then initialize default welcome messages
     await WelcomeMessages.initializeDefaults();
-    
+
     // Initialize MCP servers for production (Railway/non-Docker deployments)
-    if (process.env.NODE_ENV === "production" || process.env.RAILWAY_ENVIRONMENT) {
-      const { startMCPServersForProduction } = require("./utils/MCP/railway-startup");
+    if (
+      process.env.NODE_ENV === "production" ||
+      process.env.RAILWAY_ENVIRONMENT
+    ) {
+      const {
+        startMCPServersForProduction,
+      } = require("./utils/MCP/railway-startup");
       await startMCPServersForProduction();
     }
   } catch (error) {
@@ -184,4 +202,5 @@ app.all("*", function (_, response) {
 
 // In non-https mode we need to boot at the end since the server has not yet
 // started and is `.listen`ing.
-if (!process.env.ENABLE_HTTPS) bootHTTP(app, process.env.SERVER_PORT || process.env.PORT || 3001);
+if (!process.env.ENABLE_HTTPS)
+  bootHTTP(app, process.env.SERVER_PORT || process.env.PORT || 3001);

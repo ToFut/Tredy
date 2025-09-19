@@ -3,7 +3,9 @@ import AgentSchedule from "@/models/agentSchedule";
 
 export default function CronBuilder({ value, onChange, disabled = false }) {
   const [mode, setMode] = useState("preset");
-  const [customExpression, setCustomExpression] = useState(value || "0 * * * *");
+  const [customExpression, setCustomExpression] = useState(
+    value || "0 * * * *"
+  );
   const [isValid, setIsValid] = useState(true);
   const [description, setDescription] = useState("");
 
@@ -35,7 +37,7 @@ export default function CronBuilder({ value, onChange, disabled = false }) {
     setCustomExpression(expression);
     const valid = AgentSchedule.validateCronExpression(expression);
     setIsValid(valid);
-    
+
     if (valid) {
       onChange(expression);
       updateDescription(expression);
@@ -112,7 +114,8 @@ export default function CronBuilder({ value, onChange, disabled = false }) {
             </p>
           )}
           <p className="text-xs text-theme-text-secondary">
-            Format: minute (0-59) hour (0-23) day (1-31) month (1-12) weekday (0-6)
+            Format: minute (0-59) hour (0-23) day (1-31) month (1-12) weekday
+            (0-6)
           </p>
         </div>
       )}

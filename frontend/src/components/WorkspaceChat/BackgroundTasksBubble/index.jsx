@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Clock, CheckCircle, XCircle, CircleNotch } from "@phosphor-icons/react";
+import {
+  Clock,
+  CheckCircle,
+  XCircle,
+  CircleNotch,
+} from "@phosphor-icons/react";
 import AgentSchedule from "@/models/agentSchedule";
 import useUser from "@/hooks/useUser";
 
@@ -21,17 +26,17 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
   // Setup WebSocket connection
   useEffect(() => {
     if (!workspace?.slug) return;
-    
+
     // Connect to workspace WebSocket
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${window.location.host}/ws/workspace/${workspace.slug}`;
     const ws = new WebSocket(wsUrl);
-    
+
     ws.onopen = () => {
       console.log("Connected to schedule events");
       setSocket(ws);
     };
-    
+
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
@@ -40,16 +45,16 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
         console.error("Error parsing WebSocket message:", error);
       }
     };
-    
+
     ws.onerror = (error) => {
       console.error("WebSocket error:", error);
     };
-    
+
     ws.onclose = () => {
       console.log("Disconnected from schedule events");
       setSocket(null);
     };
-    
+
     return () => {
       if (ws.readyState === WebSocket.OPEN) {
         ws.close();
@@ -64,10 +69,11 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
         setIsOpen(false);
       }
     }
-    
+
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [isOpen]);
 
@@ -85,69 +91,69 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
   const handleScheduleEvent = (data) => {
     switch (data.type) {
       case "schedule:started":
-        setActiveExecutions(prev => ({
+        setActiveExecutions((prev) => ({
           ...prev,
           [data.scheduleId]: {
             name: data.scheduleName,
             startedAt: data.timestamp,
-            status: "running"
-          }
+            status: "running",
+          },
         }));
         showNotification(`Started: ${data.scheduleName}`, "info");
         break;
-        
+
       case "schedule:completed":
         // Move from active to completed
-        setActiveExecutions(prev => {
+        setActiveExecutions((prev) => {
           const updated = { ...prev };
           delete updated[data.scheduleId];
           return updated;
         });
-        
-        setRecentCompleted(prev => [
+
+        setRecentCompleted((prev) => [
           {
             id: data.scheduleId,
             name: data.scheduleName,
             completedAt: data.timestamp,
             success: true,
             result: data.result,
-            duration: data.duration
+            duration: data.duration,
           },
-          ...prev.slice(0, 4) // Keep only 5 recent
+          ...prev.slice(0, 4), // Keep only 5 recent
         ]);
-        
+
         showNotification(`Completed: ${data.scheduleName}`, "success");
         break;
-        
+
       case "schedule:failed":
-        setActiveExecutions(prev => {
+        setActiveExecutions((prev) => {
           const updated = { ...prev };
           delete updated[data.scheduleId];
           return updated;
         });
-        
-        setRecentCompleted(prev => [
+
+        setRecentCompleted((prev) => [
           {
             id: data.scheduleId,
             name: data.scheduleName,
             completedAt: data.timestamp,
             success: false,
-            error: data.error
+            error: data.error,
           },
-          ...prev.slice(0, 4)
+          ...prev.slice(0, 4),
         ]);
-        
+
         showNotification(`Failed: ${data.scheduleName}`, "error");
         break;
-        
+
       case "schedule:progress":
-        setActiveExecutions(prev => ({
+        setActiveExecutions((prev) => ({
           ...prev,
           [data.scheduleId]: {
             ...prev[data.scheduleId],
             progress: data.progress,
-            message: data.message
-          }
+            message: data.message,
+          },
         }));
         break;
     }
@@ -159,7 +165,7 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
       new Notification("Tredy Schedule", {
         body: message,
         icon: "/favicon.ico",
-        tag: "schedule-notification"
+        tag: "schedule-notification",
       });
     }
   };
@@ -184,24 +190,28 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
   // Bubble styled like Avatar/ConnectorBubble
   return (
     <div className="relative">
-      <div 
+      <div
         className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105"
         onClick={() => setIsOpen(!isOpen)}
         style={{ width: size, height: size }}
       >
         {/* Main Bubble - Matches Avatar/Connector style */}
-        <div className={`
+        <div
+          className={`
           w-full h-full rounded-full flex items-center justify-center
-          ${hasActivity 
-            ? 'bg-gradient-to-br from-blue-400 to-blue-600' 
-            : 'bg-gradient-to-br from-gray-400 to-gray-600'}
+          ${
+            hasActivity
+              ? "bg-gradient-to-br from-blue-400 to-blue-600"
+              : "bg-gradient-to-br from-gray-400 to-gray-600"
+          }
           text-white shadow-lg
           ring-2 ring-white dark:ring-gray-800
           hover:ring-4 hover:ring-blue-200 dark:hover:ring-blue-900
-        `}>
+        `}
+        >
           <Clock size={size * 0.5} weight="bold" />
         </div>
-        
+
         {/* Status Badge - Active indicator */}
         {activeCount > 0 && (
           <div className="absolute -bottom-1 -right-1 flex items-center justify-center">
@@ -211,17 +221,22 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
             </span>
           </div>
         )}
-        
+
         {/* Hover Tooltip */}
         <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
           Background Tasks
-          {activeCount > 0 && <span className="text-gray-400 ml-1">• {activeCount} running</span>}
+          {activeCount > 0 && (
+            <span className="text-gray-400 ml-1">• {activeCount} running</span>
+          )}
         </div>
       </div>
 
       {/* Dropdown Panel */}
       {isOpen && (
-        <div ref={dropdownRef} className="absolute right-0 md:right-auto md:left-auto mt-2 w-[calc(100vw-2rem)] md:w-96 max-w-96 bg-gray-800 rounded-lg shadow-2xl z-50 border border-gray-700 max-h-[60vh] md:max-h-[600px] overflow-hidden flex flex-col">
+        <div
+          ref={dropdownRef}
+          className="absolute right-0 md:right-auto md:left-auto mt-2 w-[calc(100vw-2rem)] md:w-96 max-w-96 bg-gray-800 rounded-lg shadow-2xl z-50 border border-gray-700 max-h-[60vh] md:max-h-[600px] overflow-hidden flex flex-col"
+        >
           {/* Header */}
           <div className="p-4 border-b border-gray-700">
             <div className="flex items-center justify-between">
@@ -236,8 +251,18 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
                 }}
                 className="text-gray-400 hover:text-white transition-colors"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -248,9 +273,14 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
             {/* Active Executions */}
             {activeCount > 0 && (
               <div className="mb-4">
-                <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Running Now</p>
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">
+                  Running Now
+                </p>
                 {Object.entries(activeExecutions).map(([id, execution]) => (
-                  <div key={id} className="bg-gray-900 rounded-lg p-3 mb-2 border border-gray-700">
+                  <div
+                    key={id}
+                    className="bg-gray-900 rounded-lg p-3 mb-2 border border-gray-700"
+                  >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-medium text-white flex items-center gap-2">
                         <CircleNotch className="w-4 h-4 text-green-500 animate-spin" />
@@ -263,13 +293,15 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
                     {execution.progress && (
                       <div className="mt-2">
                         <div className="w-full bg-gray-700 rounded-full h-1.5">
-                          <div 
+                          <div
                             className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
                             style={{ width: `${execution.progress}%` }}
                           ></div>
                         </div>
                         {execution.message && (
-                          <p className="text-xs text-gray-400 mt-1">{execution.message}</p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {execution.message}
+                          </p>
                         )}
                       </div>
                     )}
@@ -281,15 +313,26 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
             {/* Recent Completed */}
             {recentCompleted.length > 0 && (
               <div className="mb-4">
-                <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Recent Completed</p>
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">
+                  Recent Completed
+                </p>
                 {recentCompleted.map((task, index) => (
-                  <div key={`${task.id}-${index}`} className="bg-gray-900 rounded-lg p-3 mb-2 border border-gray-700">
+                  <div
+                    key={`${task.id}-${index}`}
+                    className="bg-gray-900 rounded-lg p-3 mb-2 border border-gray-700"
+                  >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-medium text-white flex items-center gap-2">
                         {task.success ? (
-                          <CheckCircle className="w-4 h-4 text-green-500" weight="fill" />
+                          <CheckCircle
+                            className="w-4 h-4 text-green-500"
+                            weight="fill"
+                          />
                         ) : (
-                          <XCircle className="w-4 h-4 text-red-500" weight="fill" />
+                          <XCircle
+                            className="w-4 h-4 text-red-500"
+                            weight="fill"
+                          />
                         )}
                         {task.name}
                       </span>
@@ -317,23 +360,35 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
             {schedules.length > 0 && (
               <div>
                 <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">
-                  Scheduled ({schedules.filter(s => s.enabled).length} active)
+                  Scheduled ({schedules.filter((s) => s.enabled).length} active)
                 </p>
                 {schedules.slice(0, 5).map((schedule) => (
-                  <div key={schedule.id} className="bg-gray-900 rounded-lg p-3 mb-2 border border-gray-700">
+                  <div
+                    key={schedule.id}
+                    className="bg-gray-900 rounded-lg p-3 mb-2 border border-gray-700"
+                  >
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-white">{schedule.name}</span>
-                      <span className={`
+                      <span className="text-sm font-medium text-white">
+                        {schedule.name}
+                      </span>
+                      <span
+                        className={`
                         text-xs px-2 py-0.5 rounded-full
-                        ${schedule.enabled 
-                          ? 'bg-green-900/50 text-green-400' 
-                          : 'bg-gray-700 text-gray-400'}
-                      `}>
-                        {schedule.enabled ? 'Active' : 'Paused'}
+                        ${
+                          schedule.enabled
+                            ? "bg-green-900/50 text-green-400"
+                            : "bg-gray-700 text-gray-400"
+                        }
+                      `}
+                      >
+                        {schedule.enabled ? "Active" : "Paused"}
                       </span>
                     </div>
                     <p className="text-xs text-gray-400 mt-1">
-                      {schedule.cron_expression} • Next: {schedule.next_run_at ? new Date(schedule.next_run_at).toLocaleString() : 'N/A'}
+                      {schedule.cron_expression} • Next:{" "}
+                      {schedule.next_run_at
+                        ? new Date(schedule.next_run_at).toLocaleString()
+                        : "N/A"}
                     </p>
                   </div>
                 ))}
@@ -348,7 +403,10 @@ export default function BackgroundTasksBubble({ workspace, size = 40 }) {
             {/* Empty State */}
             {!hasActivity && schedules.length === 0 && (
               <div className="text-center py-8">
-                <Clock className="w-12 h-12 text-gray-600 mx-auto mb-3" weight="thin" />
+                <Clock
+                  className="w-12 h-12 text-gray-600 mx-auto mb-3"
+                  weight="thin"
+                />
                 <p className="text-gray-400 mb-1">No scheduled tasks</p>
                 <p className="text-xs text-gray-500">
                   Ask the agent to schedule a task for you

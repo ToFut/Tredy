@@ -1,11 +1,11 @@
 import React from "react";
-import { 
-  CheckCircle, 
-  XCircle, 
+import {
+  CheckCircle,
+  XCircle,
   Clock,
   ArrowsClockwise,
   Gear,
-  Link as LinkIcon
+  Link as LinkIcon,
 } from "@phosphor-icons/react";
 import { Tooltip } from "react-tooltip";
 
@@ -14,7 +14,7 @@ const getConnectorIcon = (provider) => {
   // Use actual logos from public directory or icon libraries
   const iconPaths = {
     gmail: "/icons/gmail.svg",
-    slack: "/icons/slack.svg", 
+    slack: "/icons/slack.svg",
     "google-drive": "/icons/google.svg",
     "google-calendar": "/icons/google.svg",
     linkedin: "/icons/linkedin.svg",
@@ -24,7 +24,7 @@ const getConnectorIcon = (provider) => {
     stripe: "/icons/stripe.svg",
     airtable: "/icons/airtable.svg",
     facebook: "/icons/facebook.svg",
-    default: "/icons/link.svg"
+    default: "/icons/link.svg",
   };
   return iconPaths[provider] || iconPaths.default;
 };
@@ -34,7 +34,7 @@ const getConnectorName = (provider) => {
     gmail: "Gmail",
     slack: "Slack",
     "google-drive": "Google Drive",
-    "google-calendar": "Google Calendar", 
+    "google-calendar": "Google Calendar",
     linkedin: "LinkedIn",
     github: "GitHub",
     notion: "Notion",
@@ -42,7 +42,7 @@ const getConnectorName = (provider) => {
     stripe: "Stripe",
     airtable: "Airtable",
     facebook: "Facebook",
-    default: "Service"
+    default: "Service",
   };
   return names[provider] || names.default;
 };
@@ -77,24 +77,27 @@ const getStatusColor = (status) => {
   }
 };
 
-export default function ConnectorBadge({ 
-  connector, 
-  size = "sm", 
-  onClick, 
+export default function ConnectorBadge({
+  connector,
+  size = "sm",
+  onClick,
   onSync,
   onSettings,
   showTooltip = true,
-  className = "" 
+  className = "",
 }) {
   const isConnected = connector?.status === "connected";
-  const lastSync = connector?.lastSync ? new Date(connector.lastSync).toLocaleString() : "Never";
-  const scopeLabel = connector?.scope === "user" ? "All workspaces" : "This workspace";
+  const lastSync = connector?.lastSync
+    ? new Date(connector.lastSync).toLocaleString()
+    : "Never";
+  const scopeLabel =
+    connector?.scope === "user" ? "All workspaces" : "This workspace";
 
   const sizeClasses = {
     xs: "w-6 h-6 text-xs",
-    sm: "w-8 h-8 text-sm", 
+    sm: "w-8 h-8 text-sm",
     md: "w-10 h-10 text-base",
-    lg: "w-12 h-12 text-lg"
+    lg: "w-12 h-12 text-lg",
   };
 
   const badgeId = `connector-badge-${connector?.provider}-${Math.random().toString(36).substr(2, 9)}`;
@@ -131,26 +134,24 @@ export default function ConnectorBadge({
         `}
       >
         {/* Connector Logo */}
-        <img 
+        <img
           src={getConnectorIcon(connector?.provider)}
           alt={getConnectorName(connector?.provider)}
           className="relative z-10 w-5 h-5 object-contain"
           onError={(e) => {
             // Fallback to generic link icon if logo fails to load
-            e.target.style.display = 'none';
-            e.target.nextSibling.style.display = 'flex';
+            e.target.style.display = "none";
+            e.target.nextSibling.style.display = "flex";
           }}
         />
         {/* Fallback icon */}
-        <LinkIcon 
-          className="relative z-10 w-4 h-4 text-gray-500 hidden"
-        />
-        
+        <LinkIcon className="relative z-10 w-4 h-4 text-gray-500 hidden" />
+
         {/* Status Indicator */}
         <div className="absolute -bottom-0.5 -right-0.5 z-20">
           {getStatusIcon(connector?.status)}
         </div>
-        
+
         {/* User/Workspace Scope Indicator */}
         {connector?.scope === "user" && (
           <div className="absolute -top-1 -left-1 w-3 h-3 bg-blue-500 rounded-full border border-white dark:border-gray-800 flex items-center justify-center">
@@ -167,20 +168,24 @@ export default function ConnectorBadge({
           className="!bg-gray-900 !text-white !text-xs !rounded-lg !px-3 !py-2 !max-w-xs"
           content={
             <div className="space-y-1">
-              <div className="font-semibold">{getConnectorName(connector?.provider)}</div>
-              <div className="text-gray-300">Status: {connector?.status || "unknown"}</div>
+              <div className="font-semibold">
+                {getConnectorName(connector?.provider)}
+              </div>
+              <div className="text-gray-300">
+                Status: {connector?.status || "unknown"}
+              </div>
               <div className="text-gray-300">Scope: {scopeLabel}</div>
               <div className="text-gray-300">Last sync: {lastSync}</div>
               {isConnected && (
                 <div className="flex gap-2 pt-1 mt-2 border-t border-gray-700">
-                  <div 
+                  <div
                     onClick={handleSync}
                     className="text-blue-400 hover:text-blue-300 text-xs flex items-center gap-1 cursor-pointer"
                   >
                     <ArrowsClockwise className="w-3 h-3" />
                     Sync
                   </div>
-                  <div 
+                  <div
                     onClick={handleSettings}
                     className="text-gray-400 hover:text-gray-300 text-xs flex items-center gap-1 cursor-pointer"
                   >
@@ -197,14 +202,14 @@ export default function ConnectorBadge({
   );
 }
 
-export function ConnectorBadgeGroup({ 
-  connectors = [], 
+export function ConnectorBadgeGroup({
+  connectors = [],
   maxVisible = 4,
   onConnectorClick,
   onConnectorSync,
   onConnectorSettings,
   onShowAll,
-  className = ""
+  className = "",
 }) {
   const visibleConnectors = connectors.slice(0, maxVisible);
   const hiddenCount = Math.max(0, connectors.length - maxVisible);
@@ -221,7 +226,7 @@ export function ConnectorBadgeGroup({
           onSettings={onConnectorSettings}
         />
       ))}
-      
+
       {hiddenCount > 0 && (
         <button
           onClick={onShowAll}
@@ -238,9 +243,9 @@ export function ConnectorBadgeGroup({
 export function AddConnectorButton({ onClick, size = "sm", className = "" }) {
   const sizeClasses = {
     xs: "w-6 h-6 text-xs",
-    sm: "w-8 h-8 text-sm", 
+    sm: "w-8 h-8 text-sm",
     md: "w-10 h-10 text-base",
-    lg: "w-12 h-12 text-lg"
+    lg: "w-12 h-12 text-lg",
   };
 
   return (

@@ -5,7 +5,14 @@ import renderMarkdown from "@/utils/chat/markdown";
 import Citations from "../Citation";
 import ThinkingMetrics from "../ThinkingMetrics";
 import { getToolLogo } from "../UnifiedMessage/utils/toolLogos";
-import { Zap, Cpu, Brain, ChevronRight, CheckCircle, Loader2 } from "lucide-react";
+import {
+  Zap,
+  Cpu,
+  Brain,
+  ChevronRight,
+  CheckCircle,
+  Loader2,
+} from "lucide-react";
 
 /**
  * Enhanced PromptReply - Modified version with inline metrics
@@ -22,7 +29,7 @@ const EnhancedPromptReply = ({
   // New props for agent data
   agentTools = [],
   agentMetrics = null,
-  debugInfo = null
+  debugInfo = null,
 }) => {
   const assistantBackgroundColor = "bg-theme-bg-chat";
   const [showThinking, setShowThinking] = useState(false);
@@ -63,7 +70,9 @@ const EnhancedPromptReply = ({
 
   if (pending) {
     return (
-      <div className={`flex justify-center items-end w-full ${assistantBackgroundColor}`}>
+      <div
+        className={`flex justify-center items-end w-full ${assistantBackgroundColor}`}
+      >
         <div className="py-6 px-4 w-full flex gap-x-5 md:max-w-[80%] flex-col">
           <div className="flex gap-x-5">
             <WorkspaceProfileImage workspace={workspace} />
@@ -86,12 +95,17 @@ const EnhancedPromptReply = ({
 
   if (error) {
     return (
-      <div className={`flex justify-center items-end w-full ${assistantBackgroundColor}`}>
+      <div
+        className={`flex justify-center items-end w-full ${assistantBackgroundColor}`}
+      >
         <div className="py-6 px-4 w-full flex gap-x-5 md:max-w-[80%] flex-col">
           <div className="flex gap-x-5">
             <WorkspaceProfileImage workspace={workspace} />
-            <span className={`inline-block p-2 rounded-lg bg-red-50 text-red-500`}>
-              <Warning className="h-4 w-4 mb-1 inline-block" /> Could not respond to message.
+            <span
+              className={`inline-block p-2 rounded-lg bg-red-50 text-red-500`}
+            >
+              <Warning className="h-4 w-4 mb-1 inline-block" /> Could not
+              respond to message.
               <span className="text-xs">Reason: {error || "unknown"}</span>
             </span>
           </div>
@@ -101,20 +115,23 @@ const EnhancedPromptReply = ({
   }
 
   return (
-    <div key={uuid} className={`flex justify-center items-end w-full ${assistantBackgroundColor}`}>
+    <div
+      key={uuid}
+      className={`flex justify-center items-end w-full ${assistantBackgroundColor}`}
+    >
       <div className="py-8 px-4 w-full flex gap-x-5 md:max-w-[80%] flex-col">
         <div className="flex gap-x-5">
           <WorkspaceProfileImage workspace={workspace} />
           <div className="flex-1">
             {/* Main message content */}
-            <div 
+            <div
               className="prose prose-sm dark:prose-invert max-w-none"
               dangerouslySetInnerHTML={{ __html: renderMarkdown(reply) }}
             />
-            
+
             {/* Compact Metrics Bar (like landing page) */}
             {(executingTools.length > 0 || metricsData || agentMetrics) && (
-              <CompactMetricsBar 
+              <CompactMetricsBar
                 tools={executingTools.length > 0 ? executingTools : agentTools}
                 metrics={metricsData || agentMetrics}
                 onToggleThinking={() => setShowThinking(!showThinking)}
@@ -123,7 +140,7 @@ const EnhancedPromptReply = ({
             )}
           </div>
         </div>
-        
+
         <Citations sources={sources} />
       </div>
     </div>
@@ -140,10 +157,10 @@ function LiveToolExecution({ tools }) {
         <Loader2 className="w-4 h-4 animate-spin text-purple-500" />
         <span>Executing tools...</span>
       </div>
-      
+
       <div className="flex flex-wrap gap-2">
         {tools.map((tool, idx) => (
-          <div 
+          <div
             key={idx}
             className="flex items-center gap-2 px-3 py-1.5 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800"
           >
@@ -151,10 +168,10 @@ function LiveToolExecution({ tools }) {
             <span className="text-xs font-medium text-purple-700 dark:text-purple-300">
               {formatToolName(tool.name || tool)}
             </span>
-            {tool.status === 'executing' && (
+            {tool.status === "executing" && (
               <Loader2 className="w-3 h-3 animate-spin text-purple-600" />
             )}
-            {tool.status === 'complete' && (
+            {tool.status === "complete" && (
               <CheckCircle className="w-3 h-3 text-green-500" />
             )}
           </div>
@@ -167,9 +184,14 @@ function LiveToolExecution({ tools }) {
 /**
  * Compact Metrics Bar Component
  */
-function CompactMetricsBar({ tools = [], metrics = {}, onToggleThinking, showThinking }) {
+function CompactMetricsBar({
+  tools = [],
+  metrics = {},
+  onToggleThinking,
+  showThinking,
+}) {
   const hasData = tools.length > 0 || Object.keys(metrics).length > 0;
-  
+
   if (!hasData) return null;
 
   return (
@@ -191,7 +213,7 @@ function CompactMetricsBar({ tools = [], metrics = {}, onToggleThinking, showThi
             )}
           </>
         )}
-        
+
         {/* Metrics */}
         {metrics.time && (
           <>
@@ -202,7 +224,7 @@ function CompactMetricsBar({ tools = [], metrics = {}, onToggleThinking, showThi
             <span className="text-gray-300 dark:text-gray-600">•</span>
           </>
         )}
-        
+
         {metrics.model && (
           <>
             <div className="flex items-center gap-1">
@@ -211,7 +233,7 @@ function CompactMetricsBar({ tools = [], metrics = {}, onToggleThinking, showThi
             </div>
           </>
         )}
-        
+
         {metrics.thinking && (
           <>
             <span className="text-gray-300 dark:text-gray-600">•</span>
@@ -221,12 +243,14 @@ function CompactMetricsBar({ tools = [], metrics = {}, onToggleThinking, showThi
             >
               <Brain className="w-3 h-3" />
               <span>Details</span>
-              <ChevronRight className={`w-3 h-3 transition-transform ${showThinking ? 'rotate-90' : ''}`} />
+              <ChevronRight
+                className={`w-3 h-3 transition-transform ${showThinking ? "rotate-90" : ""}`}
+              />
             </button>
           </>
         )}
       </div>
-      
+
       {/* Expanded thinking details */}
       {showThinking && metrics.thinking && (
         <div className="ml-12 mt-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
@@ -234,7 +258,9 @@ function CompactMetricsBar({ tools = [], metrics = {}, onToggleThinking, showThi
             {metrics.thinking.map((step, idx) => (
               <div key={idx} className="flex items-start gap-2">
                 <div className="w-1 h-1 bg-purple-400 rounded-full mt-1.5" />
-                <span className="text-xs text-gray-600 dark:text-gray-400">{step}</span>
+                <span className="text-xs text-gray-600 dark:text-gray-400">
+                  {step}
+                </span>
               </div>
             ))}
           </div>
@@ -250,11 +276,17 @@ function CompactMetricsBar({ tools = [], metrics = {}, onToggleThinking, showThi
 function ToolIcon({ tool, size = "normal" }) {
   const logo = getToolLogo(tool.name || tool);
   const sizeClass = size === "small" ? "w-4 h-4" : "w-5 h-5";
-  
-  if (typeof logo === 'string') {
-    return <img src={logo} alt={tool.name || tool} className={`${sizeClass} rounded`} />;
+
+  if (typeof logo === "string") {
+    return (
+      <img
+        src={logo}
+        alt={tool.name || tool}
+        className={`${sizeClass} rounded`}
+      />
+    );
   }
-  
+
   const Icon = logo;
   return <Icon className={`${sizeClass} text-gray-600 dark:text-gray-400`} />;
 }
@@ -264,12 +296,12 @@ function ToolIcon({ tool, size = "normal" }) {
  */
 function formatToolName(name) {
   return name
-    .replace(/[_-]/g, ' ')
-    .replace(/mcp::/i, '')
-    .replace(/ws\d+/g, '')
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+    .replace(/[_-]/g, " ")
+    .replace(/mcp::/i, "")
+    .replace(/ws\d+/g, "")
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 /**
@@ -277,28 +309,28 @@ function formatToolName(name) {
  */
 function parseToolsFromDebug(debugInfo) {
   const tools = [];
-  
-  if (debugInfo.includes('attempting to call')) {
+
+  if (debugInfo.includes("attempting to call")) {
     const match = debugInfo.match(/`([^`]+)`/);
     if (match) {
-      tools.push({ name: match[1], status: 'preparing' });
+      tools.push({ name: match[1], status: "preparing" });
     }
   }
-  
-  if (debugInfo.includes('Executing MCP server:')) {
+
+  if (debugInfo.includes("Executing MCP server:")) {
     const match = debugInfo.match(/Executing MCP server: ([^\s]+)/);
     if (match) {
-      tools.push({ name: match[1], status: 'executing' });
+      tools.push({ name: match[1], status: "executing" });
     }
   }
-  
-  if (debugInfo.includes('completed successfully')) {
+
+  if (debugInfo.includes("completed successfully")) {
     const match = debugInfo.match(/MCP server: ([^:]+):/);
     if (match) {
-      tools.push({ name: match[1], status: 'complete' });
+      tools.push({ name: match[1], status: "complete" });
     }
   }
-  
+
   return tools;
 }
 

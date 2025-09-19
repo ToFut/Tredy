@@ -31,7 +31,7 @@ export default function LoadingChat() {
           </div>
         </div>
       </div>
-      
+
       {/* AI Message Skeleton */}
       <div className="flex justify-center w-full bg-theme-bg-secondary border-b border-white/5">
         <div className="w-full max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8">
@@ -67,7 +67,7 @@ export default function LoadingChat() {
           </div>
         </div>
       </div>
-      
+
       {/* User Message Skeleton */}
       <div className="flex justify-center w-full bg-theme-bg-chat">
         <div className="w-full max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8">
@@ -92,7 +92,7 @@ export default function LoadingChat() {
           </div>
         </div>
       </div>
-      
+
       {/* AI Message with thinking indicator */}
       <div className="flex justify-center w-full bg-theme-bg-secondary border-b border-white/5">
         <div className="w-full max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8">

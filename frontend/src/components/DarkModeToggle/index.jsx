@@ -6,31 +6,45 @@ export default function DarkModeToggle() {
 
   useEffect(() => {
     // Check for saved preference or default to dark for agentic feel
-    const savedTheme = localStorage.getItem('tready-theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-    
+    const savedTheme = localStorage.getItem("tready-theme");
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    const shouldBeDark = savedTheme === "dark" || (!savedTheme && prefersDark);
+
     setIsDark(shouldBeDark);
     updateTheme(shouldBeDark);
   }, []);
 
   const updateTheme = (dark) => {
     if (dark) {
-      document.documentElement.classList.add('dark-theme');
-      document.body.classList.add('dark-theme');
+      document.documentElement.classList.add("dark-theme");
+      document.body.classList.add("dark-theme");
       // Update CSS variables for dark mode
-      document.documentElement.style.setProperty('--theme-bg-primary', 'var(--dark-bg-primary)');
-      document.documentElement.style.setProperty('--theme-bg-secondary', 'var(--dark-bg-secondary)');
-      document.documentElement.style.setProperty('--theme-text-primary', 'var(--dark-text-primary)');
-      document.documentElement.style.setProperty('--theme-text-secondary', 'var(--dark-text-secondary)');
+      document.documentElement.style.setProperty(
+        "--theme-bg-primary",
+        "var(--dark-bg-primary)"
+      );
+      document.documentElement.style.setProperty(
+        "--theme-bg-secondary",
+        "var(--dark-bg-secondary)"
+      );
+      document.documentElement.style.setProperty(
+        "--theme-text-primary",
+        "var(--dark-text-primary)"
+      );
+      document.documentElement.style.setProperty(
+        "--theme-text-secondary",
+        "var(--dark-text-secondary)"
+      );
     } else {
-      document.documentElement.classList.remove('dark-theme');
-      document.body.classList.remove('dark-theme');
+      document.documentElement.classList.remove("dark-theme");
+      document.body.classList.remove("dark-theme");
       // Reset to light theme
-      document.documentElement.style.removeProperty('--theme-bg-primary');
-      document.documentElement.style.removeProperty('--theme-bg-secondary');
-      document.documentElement.style.removeProperty('--theme-text-primary');
-      document.documentElement.style.removeProperty('--theme-text-secondary');
+      document.documentElement.style.removeProperty("--theme-bg-primary");
+      document.documentElement.style.removeProperty("--theme-bg-secondary");
+      document.documentElement.style.removeProperty("--theme-text-primary");
+      document.documentElement.style.removeProperty("--theme-text-secondary");
     }
   };
 
@@ -38,7 +52,7 @@ export default function DarkModeToggle() {
     const newTheme = !isDark;
     setIsDark(newTheme);
     updateTheme(newTheme);
-    localStorage.setItem('tready-theme', newTheme ? 'dark' : 'light');
+    localStorage.setItem("tready-theme", newTheme ? "dark" : "light");
   };
 
   return (
@@ -47,7 +61,9 @@ export default function DarkModeToggle() {
       className="fixed top-4 right-4 z-50 p-3 rounded-xl glass-card transition-all hover:scale-105"
       aria-label="Toggle dark mode"
     >
-      <div className={`relative w-6 h-6 transition-transform duration-500 ${isDark ? 'rotate-180' : ''}`}>
+      <div
+        className={`relative w-6 h-6 transition-transform duration-500 ${isDark ? "rotate-180" : ""}`}
+      >
         {isDark ? (
           <Moon className="w-6 h-6 text-amber-400" weight="fill" />
         ) : (

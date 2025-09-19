@@ -11,11 +11,14 @@ import {
   useWatchForAutoPlayAssistantTTSResponse,
 } from "../contexts/TTSProvider";
 
-
 // Lazy load the heavy ChatContainer component
 const ChatContainer = lazy(() => import("./ChatContainer/index.jsx"));
 
-export default function WorkspaceChat({ loading, workspace, onSendCommandReady }) {
+export default function WorkspaceChat({
+  loading,
+  workspace,
+  onSendCommandReady,
+}) {
   useWatchForAutoPlayAssistantTTSResponse();
   const { threadSlug = null } = useParams();
   const [history, setHistory] = useState([]);
@@ -84,7 +87,11 @@ export default function WorkspaceChat({ loading, workspace, onSendCommandReady }
     <TTSProvider>
       <DnDFileUploaderProvider workspace={workspace} threadSlug={threadSlug}>
         <Suspense fallback={<LoadingChat />}>
-          <ChatContainer workspace={workspace} knownHistory={history} onSendCommandReady={onSendCommandReady} />
+          <ChatContainer
+            workspace={workspace}
+            knownHistory={history}
+            onSendCommandReady={onSendCommandReady}
+          />
         </Suspense>
       </DnDFileUploaderProvider>
     </TTSProvider>

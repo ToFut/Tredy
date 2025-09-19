@@ -122,14 +122,17 @@ const System = {
 
   checkDocumentProcessorOnline: async () => {
     try {
-      const response = await fetch(`${API_BASE}/system/document-processing-status`, {
-        headers: baseHeaders(),
-        signal: AbortSignal.timeout(5000), // 5 second timeout
-      });
+      const response = await fetch(
+        `${API_BASE}/system/document-processing-status`,
+        {
+          headers: baseHeaders(),
+          signal: AbortSignal.timeout(5000), // 5 second timeout
+        }
+      );
       return response.ok;
     } catch (error) {
       // Document processor is offline or unreachable
-      console.log('Document processor status check failed:', error.message);
+      console.log("Document processor status check failed:", error.message);
       return false;
     }
   },

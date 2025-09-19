@@ -1,7 +1,9 @@
 const { Workspace } = require("../../../models/workspace");
 const { ConnectorTokens } = require("../../../models/connectorTokens");
 const { SyncCursors } = require("../../../models/syncCursors");
-const { MCPNangoBridge } = require("../../../utils/connectors/mcp-nango-bridge");
+const {
+  MCPNangoBridge,
+} = require("../../../utils/connectors/mcp-nango-bridge");
 const { validatedRequest } = require("../../../utils/http");
 const { reqBody } = require("../../../utils/http");
 
@@ -39,38 +41,45 @@ function apiWorkspaceConnectorEndpoints(app) {
       try {
         const { slug } = request.params;
         const workspace = await Workspace.get({ slug });
-        
+
         if (!workspace) {
           return response.status(404).json({ error: "Workspace not found" });
         }
 
         // Get workspace-specific connectors
-        const workspaceConnectors = await ConnectorTokens.forWorkspace(workspace.id);
-        
+        const workspaceConnectors = await ConnectorTokens.forWorkspace(
+          workspace.id
+        );
+
         // Get user-level connectors (if user exists)
         let availableConnectors = [...workspaceConnectors];
         if (response.locals.user?.id) {
-          const userConnectors = await ConnectorTokens.getAvailableForWorkspace(workspace.id, response.locals.user.id);
-          
+          const userConnectors = await ConnectorTokens.getAvailableForWorkspace(
+            workspace.id,
+            response.locals.user.id
+          );
+
           // Add user connectors that aren't overridden by workspace-level ones
-          const workspaceProviders = new Set(workspaceConnectors.map(c => c.provider));
+          const workspaceProviders = new Set(
+            workspaceConnectors.map((c) => c.provider)
+          );
           const inheritedConnectors = userConnectors
-            .filter(c => !workspaceProviders.has(c.provider))
-            .map(c => ({
+            .filter((c) => !workspaceProviders.has(c.provider))
+            .map((c) => ({
               ...c,
               inherited: true,
-              scope: 'user'
+              scope: "user",
             }));
-          
+
           availableConnectors = [
-            ...workspaceConnectors.map(c => ({ ...c, scope: 'workspace' })),
-            ...inheritedConnectors
+            ...workspaceConnectors.map((c) => ({ ...c, scope: "workspace" })),
+            ...inheritedConnectors,
           ];
         }
 
-        response.status(200).json({ 
+        response.status(200).json({
           connectors: availableConnectors,
-          inheritanceSupported: true 
+          inheritanceSupported: true,
         });
       } catch (error) {
         console.error("Failed to list connectors:", error);
@@ -90,7 +99,7 @@ function apiWorkspaceConnectorEndpoints(app) {
       try {
         const { slug } = request.params;
         const { provider } = reqBody(request);
-        
+
         const workspace = await Workspace.get({ slug });
         if (!workspace) {
           return response.status(404).json({ error: "Workspace not found" });
@@ -101,7 +110,7 @@ function apiWorkspaceConnectorEndpoints(app) {
           workspaceId: workspace.id,
           provider,
         });
-        
+
         if (existing && existing.status === "connected") {
           return response.status(200).json({
             success: true,
@@ -113,13 +122,17 @@ function apiWorkspaceConnectorEndpoints(app) {
         // Check if Nango is configured
         if (!process.env.NANGO_SECRET_KEY || !process.env.NANGO_PUBLIC_KEY) {
           return response.status(400).json({
-            error: "Nango integration not configured. Please set NANGO_SECRET_KEY and NANGO_PUBLIC_KEY environment variables.",
+            error:
+              "Nango integration not configured. Please set NANGO_SECRET_KEY and NANGO_PUBLIC_KEY environment variables.",
           });
         }
 
         // Generate OAuth config via Nango
         try {
-          const authConfig = await bridge.generateAuthUrl(provider, workspace.id);
+          const authConfig = await bridge.generateAuthUrl(
+            provider,
+            workspace.id
+          );
           return response.status(200).json({
             success: true,
             authConfig, // Frontend will use Nango.auth() with this config
@@ -149,18 +162,22 @@ function apiWorkspaceConnectorEndpoints(app) {
       try {
         const { slug } = request.params;
         const { provider, connectionId } = reqBody(request);
-        
+
         const workspace = await Workspace.get({ slug });
         if (!workspace) {
           return response.status(404).json({ error: "Workspace not found" });
         }
 
-        const result = await bridge.handleCallback(provider, workspace.id, connectionId);
-        
+        const result = await bridge.handleCallback(
+          provider,
+          workspace.id,
+          connectionId
+        );
+
         response.status(200).json({
           success: true,
           message: "Connected successfully",
-          ...result
+          ...result,
         });
       } catch (error) {
         console.error("OAuth callback failed:", error);
@@ -180,13 +197,13 @@ function apiWorkspaceConnectorEndpoints(app) {
       try {
         const { slug, provider } = request.params;
         const workspace = await Workspace.get({ slug });
-        
+
         if (!workspace) {
           return response.status(404).json({ error: "Workspace not found" });
         }
 
         await bridge.disconnect(provider, workspace.id);
-        
+
         response.status(200).json({
           success: true,
           message: "Disconnected successfully",
@@ -210,7 +227,7 @@ function apiWorkspaceConnectorEndpoints(app) {
         const { slug, provider } = request.params;
         const { settings } = reqBody(request);
         const workspace = await Workspace.get({ slug });
-        
+
         if (!workspace) {
           return response.status(404).json({ error: "Workspace not found" });
         }
@@ -223,8 +240,9 @@ function apiWorkspaceConnectorEndpoints(app) {
           });
 
           if (!userConnector) {
-            return response.status(404).json({ 
-              error: "User connector not found. You must connect this service at the user level first." 
+            return response.status(404).json({
+              error:
+                "User connector not found. You must connect this service at the user level first.",
             });
           }
 
@@ -252,8 +270,8 @@ function apiWorkspaceConnectorEndpoints(app) {
             message: "Workspace override created successfully",
           });
         } else {
-          return response.status(401).json({ 
-            error: "User authentication required for connector overrides" 
+          return response.status(401).json({
+            error: "User authentication required for connector overrides",
           });
         }
       } catch (error) {
@@ -275,7 +293,7 @@ function apiWorkspaceConnectorEndpoints(app) {
         const { slug, provider } = request.params;
         const { syncName, syncAll = false } = reqBody(request);
         const workspace = await Workspace.get({ slug });
-        
+
         if (!workspace) {
           return response.status(404).json({ error: "Workspace not found" });
         }
@@ -283,28 +301,30 @@ function apiWorkspaceConnectorEndpoints(app) {
         // Check if connector is connected
         const connector = await ConnectorTokens.get({
           workspaceId: workspace.id,
-          provider
+          provider,
         });
-        
-        if (!connector || connector.status !== 'connected') {
-          return response.status(400).json({ 
-            error: "Connector not connected. Please authenticate first." 
+
+        if (!connector || connector.status !== "connected") {
+          return response.status(400).json({
+            error: "Connector not connected. Please authenticate first.",
           });
         }
 
         // Update lastSync timestamp
         await ConnectorTokens.updateLastSync(workspace.id, provider);
-        
+
         // Trigger sync via Nango
-        const { NangoIntegration } = require("../../../utils/connectors/nango-integration");
+        const {
+          NangoIntegration,
+        } = require("../../../utils/connectors/nango-integration");
         const nango = new NangoIntegration();
-        
+
         if (!nango.nango) {
-          return response.status(500).json({ 
-            error: "Nango integration not configured" 
+          return response.status(500).json({
+            error: "Nango integration not configured",
           });
         }
-        
+
         // Get all available syncs for provider if syncAll is true
         let syncsToRun = [];
         if (syncAll) {
@@ -315,26 +335,26 @@ function apiWorkspaceConnectorEndpoints(app) {
           // Default to first sync
           syncsToRun = [getSyncNamesForProvider(provider)[0]];
         }
-        
+
         // Trigger syncs with retry logic
         const results = [];
         for (const sync of syncsToRun) {
           try {
             await nango.triggerSync(provider, workspace.id, sync);
-            results.push({ sync, status: 'triggered' });
+            results.push({ sync, status: "triggered" });
           } catch (error) {
             console.error(`Failed to trigger ${sync} sync:`, error);
-            results.push({ sync, status: 'failed', error: error.message });
+            results.push({ sync, status: "failed", error: error.message });
           }
         }
-        
+
         // Also update MCP servers
         await bridge.updateMCPServersForWorkspace(workspace.id);
-        
+
         response.status(200).json({
           success: true,
           message: "Sync triggered",
-          results
+          results,
         });
       } catch (error) {
         console.error("Failed to sync connector:", error);
@@ -342,7 +362,7 @@ function apiWorkspaceConnectorEndpoints(app) {
       }
     }
   );
-  
+
   /**
    * GET /api/workspace/:slug/connectors/:provider/sync/status
    * Get sync status for a connector
@@ -354,69 +374,71 @@ function apiWorkspaceConnectorEndpoints(app) {
       try {
         const { slug, provider } = request.params;
         const workspace = await Workspace.get({ slug });
-        
+
         if (!workspace) {
           return response.status(404).json({ error: "Workspace not found" });
         }
 
-        const { NangoIntegration } = require("../../../utils/connectors/nango-integration");
+        const {
+          NangoIntegration,
+        } = require("../../../utils/connectors/nango-integration");
         const nango = new NangoIntegration();
-        
+
         if (!nango.nango) {
-          return response.status(500).json({ 
-            error: "Nango integration not configured" 
+          return response.status(500).json({
+            error: "Nango integration not configured",
           });
         }
-        
+
         // Get sync status from Nango
         const connectionId = `workspace_${workspace.id}`;
         const syncs = getSyncNamesForProvider(provider);
         const statuses = [];
-        
+
         for (const syncName of syncs) {
           try {
             // This would need to be implemented in Nango SDK
-            const status = await nango.nango.getSyncStatus(
-              provider,
-              connectionId,
-              syncName
-            ).catch(() => ({ status: 'unknown' }));
-            
+            const status = await nango.nango
+              .getSyncStatus(provider, connectionId, syncName)
+              .catch(() => ({ status: "unknown" }));
+
             statuses.push({
               sync: syncName,
-              ...status
+              ...status,
             });
           } catch (error) {
             statuses.push({
               sync: syncName,
-              status: 'error',
-              error: error.message
+              status: "error",
+              error: error.message,
             });
           }
         }
-        
+
         // Get last sync info from database
         const connector = await ConnectorTokens.get({
           workspaceId: workspace.id,
-          provider
+          provider,
         });
-        
+
         // Get sync cursors for detailed history
         const syncCursors = await SyncCursors.getForWorkspace(workspace.id);
-        const providerCursors = syncCursors.filter(c => c.provider === provider);
-        
+        const providerCursors = syncCursors.filter(
+          (c) => c.provider === provider
+        );
+
         response.status(200).json({
           provider,
-          connectionStatus: connector?.status || 'disconnected',
+          connectionStatus: connector?.status || "disconnected",
           lastSync: connector?.lastSync,
           syncs: statuses,
-          syncHistory: providerCursors.map(c => ({
+          syncHistory: providerCursors.map((c) => ({
             model: c.model,
             lastSyncAt: c.lastSyncAt,
             recordCount: c.recordCount,
             status: c.status,
-            error: c.error
-          }))
+            error: c.error,
+          })),
         });
       } catch (error) {
         console.error("Failed to get sync status:", error);
@@ -429,23 +451,23 @@ function apiWorkspaceConnectorEndpoints(app) {
 // Helper function to get sync names for each provider
 function getSyncNamesForProvider(provider) {
   const syncMap = {
-    'linkedin': ['profile', 'posts'],
-    'google-mail': ['emails'],
-    'gmail': ['emails'],
-    'slack': ['users', 'messages'],
-    'github': ['issues', 'pull_requests'],
-    'shopify': ['products', 'orders'],
-    'google-calendar': ['events'],
-    'google-drive': ['documents'],
-    'hubspot': ['contacts', 'companies', 'deals'],
-    'salesforce': ['accounts', 'contacts', 'opportunities'],
-    'stripe': ['customers', 'payments'],
-    'zoom': ['meetings', 'recordings'],
-    'twitter': ['tweets', 'mentions'],
-    'facebook': ['posts', 'pages'],
-    'instagram': ['posts', 'stories']
+    linkedin: ["profile", "posts"],
+    "google-mail": ["emails"],
+    gmail: ["emails"],
+    slack: ["users", "messages"],
+    github: ["issues", "pull_requests"],
+    shopify: ["products", "orders"],
+    "google-calendar": ["events"],
+    "google-drive": ["documents"],
+    hubspot: ["contacts", "companies", "deals"],
+    salesforce: ["accounts", "contacts", "opportunities"],
+    stripe: ["customers", "payments"],
+    zoom: ["meetings", "recordings"],
+    twitter: ["tweets", "mentions"],
+    facebook: ["posts", "pages"],
+    instagram: ["posts", "stories"],
   };
-  
+
   return syncMap[provider] || [];
 }
 

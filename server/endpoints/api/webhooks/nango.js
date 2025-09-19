@@ -7,7 +7,7 @@ function nangoWebhookEndpoints(app) {
   app.post("/webhooks-from-nango", async (req, res) => {
     await handleNangoWebhook(req, res);
   });
-  
+
   // Keep legacy endpoint for backwards compatibility
   app.post("/api/webhooks/nango", async (req, res) => {
     await handleNangoWebhook(req, res);

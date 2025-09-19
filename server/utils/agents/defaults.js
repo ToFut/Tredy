@@ -15,7 +15,7 @@ const DEFAULT_SKILLS = [
   AgentPlugins.websocket.name, // Enable websocket for real-time flow updates
   AgentPlugins.workflowCreator.name, // Enhanced workflow creation system
   AgentPlugins.createWorkflow.name, // Simple create-workflow function
-  // AgentPlugins.unifiedWorkflow.name, // Disabled - replaced with simple workflow  
+  // AgentPlugins.unifiedWorkflow.name, // Disabled - replaced with simple workflow
   // AgentPlugins.summaryGenerator.name, // Temporarily disabled - causing setup issues
   // AgentPlugins.multiActionHandler.name, // Temporarily disabled - causing infinite loops
 ];
@@ -32,12 +32,12 @@ const USER_AGENT = {
 
 const WORKSPACE_AGENT = {
   name: "@agent",
-  
+
   // Deduplicate functions by name to prevent duplicate tool calls
   dedupeFunctions: async (functions) => {
     const seen = new Set();
     const deduped = [];
-    
+
     for (const func of functions) {
       const key = func.name || func;
       if (!seen.has(key)) {
@@ -45,11 +45,13 @@ const WORKSPACE_AGENT = {
         deduped.push(func);
       }
     }
-    
-    console.log(`[WORKSPACE_AGENT] Deduped ${functions.length} functions to ${deduped.length} unique functions`);
+
+    console.log(
+      `[WORKSPACE_AGENT] Deduped ${functions.length} functions to ${deduped.length} unique functions`
+    );
     return deduped;
   },
-  
+
   getDefinition: async (provider = null, workspaceId = null) => {
     return {
       role: Provider.systemPrompt(provider),
@@ -80,8 +82,7 @@ async function agentSkillsFromSystemSettings() {
     []
   );
   DEFAULT_SKILLS.forEach((skill) => {
-    if (!_disabledDefaultSkills.includes(skill))
-      systemFunctions.push(skill); // skill is already the name
+    if (!_disabledDefaultSkills.includes(skill)) systemFunctions.push(skill); // skill is already the name
   });
 
   // Load non-imported built-in skills that are configurable.

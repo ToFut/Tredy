@@ -6,7 +6,7 @@ import { Tooltip } from "react-tooltip";
 const getConnectorIcon = (provider) => {
   const iconPaths = {
     gmail: "/icons/gmail.svg",
-    slack: "/icons/slack.svg", 
+    slack: "/icons/slack.svg",
     "google-drive": "/icons/google.svg",
     "google-calendar": "/icons/google.svg",
     linkedin: "/icons/linkedin.svg",
@@ -16,7 +16,7 @@ const getConnectorIcon = (provider) => {
     stripe: "/icons/stripe.svg",
     airtable: "/icons/airtable.svg",
     facebook: "/icons/facebook.svg",
-    default: "/icons/link.svg"
+    default: "/icons/link.svg",
   };
   return iconPaths[provider] || iconPaths.default;
 };
@@ -26,7 +26,7 @@ const getConnectorName = (provider) => {
     gmail: "Gmail",
     slack: "Slack",
     "google-drive": "Google Drive",
-    "google-calendar": "Google Calendar", 
+    "google-calendar": "Google Calendar",
     linkedin: "LinkedIn",
     github: "GitHub",
     notion: "Notion",
@@ -34,7 +34,7 @@ const getConnectorName = (provider) => {
     stripe: "Stripe",
     airtable: "Airtable",
     facebook: "Facebook",
-    default: "Service"
+    default: "Service",
   };
   return names[provider] || names.default;
 };
@@ -55,15 +55,15 @@ const getStatusColor = (status) => {
 };
 
 // Individual connector avatar
-function ConnectorAvatar({ 
-  connector, 
-  size = 32, 
-  onClick, 
+function ConnectorAvatar({
+  connector,
+  size = 32,
+  onClick,
   showStatus = true,
-  className = "" 
+  className = "",
 }) {
   const avatarId = `connector-avatar-${connector?.provider}-${Math.random().toString(36).substr(2, 9)}`;
-  
+
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -92,12 +92,12 @@ function ConnectorAvatar({
             ${showStatus ? "ring-2" : ""}
           `}
           onError={(e) => {
-            e.target.style.display = 'none';
-            e.target.nextSibling.style.display = 'flex';
+            e.target.style.display = "none";
+            e.target.nextSibling.style.display = "flex";
           }}
         />
         {/* Fallback icon */}
-        <div 
+        <div
           className={`
             hidden w-full h-full rounded-full bg-gray-200 dark:bg-gray-700 
             border-2 border-white dark:border-gray-700 items-center justify-center
@@ -116,10 +116,16 @@ function ConnectorAvatar({
         className="!bg-gray-900 !text-white !text-xs !rounded-lg !px-3 !py-2"
         content={
           <div className="text-center">
-            <div className="font-semibold">{getConnectorName(connector?.provider)}</div>
-            <div className="text-gray-300 capitalize">{connector?.status || "unknown"}</div>
+            <div className="font-semibold">
+              {getConnectorName(connector?.provider)}
+            </div>
+            <div className="text-gray-300 capitalize">
+              {connector?.status || "unknown"}
+            </div>
             {connector?.scope === "user" && (
-              <div className="text-blue-300 text-xs">Available in all workspaces</div>
+              <div className="text-blue-300 text-xs">
+                Available in all workspaces
+              </div>
             )}
           </div>
         }
@@ -129,8 +135,8 @@ function ConnectorAvatar({
 }
 
 // Main avatar group component (like Discord/Slack member avatars)
-export default function ConnectorAvatarGroup({ 
-  connectors = [], 
+export default function ConnectorAvatarGroup({
+  connectors = [],
   maxVisible = 4,
   avatarSize = 32,
   spacing = -8, // Negative for overlap
@@ -139,7 +145,7 @@ export default function ConnectorAvatarGroup({
   onShowAll,
   showAddButton = true,
   showStatus = true,
-  className = "" 
+  className = "",
 }) {
   const visibleConnectors = connectors.slice(0, maxVisible);
   const hiddenCount = Math.max(0, connectors.length - maxVisible);
@@ -158,7 +164,7 @@ export default function ConnectorAvatarGroup({
             className={`relative z-${10 + index}`} // Higher z-index for later items
           />
         ))}
-        
+
         {/* "+X more" avatar if there are hidden connectors */}
         {hiddenCount > 0 && (
           <div
@@ -171,10 +177,10 @@ export default function ConnectorAvatarGroup({
               border-2 border-white dark:border-gray-700
               text-gray-600 dark:text-gray-300 font-semibold text-xs
             `}
-            style={{ 
-              width: avatarSize, 
+            style={{
+              width: avatarSize,
               height: avatarSize,
-              marginLeft: spacing > 0 ? spacing : Math.abs(spacing)
+              marginLeft: spacing > 0 ? spacing : Math.abs(spacing),
             }}
             title={`View all ${connectors.length} connectors`}
           >
@@ -182,7 +188,7 @@ export default function ConnectorAvatarGroup({
           </div>
         )}
       </div>
-      
+
       {/* Add connector button */}
       {showAddButton && (
         <button
@@ -207,16 +213,16 @@ export default function ConnectorAvatarGroup({
 }
 
 // Compact version for mobile/small spaces
-export function ConnectorAvatarGroupCompact({ 
-  connectors = [], 
+export function ConnectorAvatarGroupCompact({
+  connectors = [],
   maxVisible = 3,
   onConnectorClick,
   onAddConnector,
   onShowAll,
-  className = "" 
+  className = "",
 }) {
   const hasConnectors = connectors.length > 0;
-  
+
   if (!hasConnectors) {
     return (
       <button
@@ -246,7 +252,7 @@ export function ConnectorAvatarGroupCompact({
         showAddButton={false}
         showStatus={false}
       />
-      
+
       {/* Compact info */}
       <div className="flex items-center gap-1">
         <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -264,16 +270,16 @@ export function ConnectorAvatarGroupCompact({
 }
 
 // Just the count with avatars (for status bars)
-export function ConnectorAvatarSummary({ 
-  connectors = [], 
+export function ConnectorAvatarSummary({
+  connectors = [],
   maxVisible = 5,
   onShowAll,
-  className = "" 
+  className = "",
 }) {
   if (connectors.length === 0) return null;
 
   return (
-    <div 
+    <div
       onClick={onShowAll}
       className={`
         flex items-center gap-2 cursor-pointer hover:bg-gray-100 
@@ -289,7 +295,8 @@ export function ConnectorAvatarSummary({
         showStatus={false}
       />
       <span className="text-xs text-gray-600 dark:text-gray-400">
-        {connectors.length} service{connectors.length !== 1 ? 's' : ''} connected
+        {connectors.length} service{connectors.length !== 1 ? "s" : ""}{" "}
+        connected
       </span>
     </div>
   );

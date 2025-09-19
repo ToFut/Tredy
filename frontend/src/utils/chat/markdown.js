@@ -59,8 +59,9 @@ markdown.renderer.rules.strong_open = () => '<strong class="text-white">';
 markdown.renderer.rules.strong_close = () => "</strong>";
 
 // Ultra-elegant paragraph rendering
-markdown.renderer.rules.paragraph_open = () => '<p class="prose-ultra-elegant-p">';
-markdown.renderer.rules.paragraph_close = () => '</p>';
+markdown.renderer.rules.paragraph_open = () =>
+  '<p class="prose-ultra-elegant-p">';
+markdown.renderer.rules.paragraph_close = () => "</p>";
 
 // Ultra-elegant heading rendering
 markdown.renderer.rules.heading_open = (tokens, idx) => {
@@ -75,12 +76,15 @@ markdown.renderer.rules.heading_close = (tokens, idx) => {
 };
 
 // Ultra-elegant list rendering
-markdown.renderer.rules.bullet_list_open = () => '<ul class="prose-ultra-elegant-ul">';
-markdown.renderer.rules.bullet_list_close = () => '</ul>';
-markdown.renderer.rules.ordered_list_open = () => '<ol class="prose-ultra-elegant-ol">';
-markdown.renderer.rules.ordered_list_close = () => '</ol>';
-markdown.renderer.rules.list_item_open = () => '<li class="prose-ultra-elegant-li">';
-markdown.renderer.rules.list_item_close = () => '</li>';
+markdown.renderer.rules.bullet_list_open = () =>
+  '<ul class="prose-ultra-elegant-ul">';
+markdown.renderer.rules.bullet_list_close = () => "</ul>";
+markdown.renderer.rules.ordered_list_open = () =>
+  '<ol class="prose-ultra-elegant-ol">';
+markdown.renderer.rules.ordered_list_close = () => "</ol>";
+markdown.renderer.rules.list_item_open = () =>
+  '<li class="prose-ultra-elegant-li">';
+markdown.renderer.rules.list_item_close = () => "</li>";
 
 // Ultra-elegant code rendering
 markdown.renderer.rules.code_inline = (tokens, idx) => {
@@ -93,25 +97,29 @@ markdown.renderer.rules.link_open = (tokens, idx) => {
   const href = token.attrs.find((attr) => attr[0] === "href");
   return `<a href="${href[1]}" target="_blank" rel="noopener noreferrer" class="prose-ultra-elegant-link">`;
 };
-markdown.renderer.rules.link_close = () => '</a>';
+markdown.renderer.rules.link_close = () => "</a>";
 
 // Ultra-elegant blockquote rendering
-markdown.renderer.rules.blockquote_open = () => '<blockquote class="prose-ultra-elegant-blockquote">';
-markdown.renderer.rules.blockquote_close = () => '</blockquote>';
+markdown.renderer.rules.blockquote_open = () =>
+  '<blockquote class="prose-ultra-elegant-blockquote">';
+markdown.renderer.rules.blockquote_close = () => "</blockquote>";
 
 // Ultra-elegant table rendering
-markdown.renderer.rules.table_open = () => '<table class="prose-ultra-elegant-table">';
-markdown.renderer.rules.table_close = () => '</table>';
-markdown.renderer.rules.thead_open = () => '<thead class="prose-ultra-elegant-thead">';
-markdown.renderer.rules.thead_close = () => '</thead>';
-markdown.renderer.rules.tbody_open = () => '<tbody class="prose-ultra-elegant-tbody">';
-markdown.renderer.rules.tbody_close = () => '</tbody>';
+markdown.renderer.rules.table_open = () =>
+  '<table class="prose-ultra-elegant-table">';
+markdown.renderer.rules.table_close = () => "</table>";
+markdown.renderer.rules.thead_open = () =>
+  '<thead class="prose-ultra-elegant-thead">';
+markdown.renderer.rules.thead_close = () => "</thead>";
+markdown.renderer.rules.tbody_open = () =>
+  '<tbody class="prose-ultra-elegant-tbody">';
+markdown.renderer.rules.tbody_close = () => "</tbody>";
 markdown.renderer.rules.tr_open = () => '<tr class="prose-ultra-elegant-tr">';
-markdown.renderer.rules.tr_close = () => '</tr>';
+markdown.renderer.rules.tr_close = () => "</tr>";
 markdown.renderer.rules.th_open = () => '<th class="prose-ultra-elegant-th">';
-markdown.renderer.rules.th_close = () => '</th>';
+markdown.renderer.rules.th_close = () => "</th>";
 markdown.renderer.rules.td_open = () => '<td class="prose-ultra-elegant-td">';
-markdown.renderer.rules.td_close = () => '</td>';
+markdown.renderer.rules.td_close = () => "</td>";
 
 // Custom renderer for responsive images rendered in markdown
 markdown.renderer.rules.image = function (tokens, idx) {

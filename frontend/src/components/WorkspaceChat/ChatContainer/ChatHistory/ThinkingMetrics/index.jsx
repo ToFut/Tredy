@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Clock, 
-  Brain, 
-  Wrench, 
-  ChartBar, 
-  CaretDown, 
+import {
+  Clock,
+  Brain,
+  Wrench,
+  ChartBar,
+  CaretDown,
   CaretRight,
   Copy,
   ArrowClockwise,
@@ -16,23 +16,24 @@ import {
   WarningCircle,
   CheckCircle,
   ArrowRight,
+  Activity,
 } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Tool icon mapping
 const TOOL_ICONS = {
-  'web-search': Globe,
-  'web-scraping': Globe,
-  'document-summarizer': FileText,
-  'rag-memory': Brain,
-  'sql-query': Database,
-  'create-chart': ChartBar,
-  'create-workflow': Sparkle,
-  'filesystem': FileText,
-  'gmail': Globe,
-  'calendar': Clock,
-  'linkedin': Globe,
-  'default': Wrench
+  "web-search": Globe,
+  "web-scraping": Globe,
+  "document-summarizer": FileText,
+  "rag-memory": Brain,
+  "sql-query": Database,
+  "create-chart": ChartBar,
+  "create-workflow": Sparkle,
+  filesystem: FileText,
+  gmail: Globe,
+  calendar: Clock,
+  linkedin: Globe,
+  default: Wrench,
 };
 
 // Get tool icon
@@ -43,12 +44,12 @@ const getToolIcon = (toolName) => {
   return TOOL_ICONS.default;
 };
 
-export default function ThinkingMetrics({ 
-  metrics = {}, 
+export default function ThinkingMetrics({
+  metrics = {},
   debugMessages = [],
   isThinking = false,
   onCopy,
-  onRegenerate 
+  onRegenerate,
 }) {
   const [expanded, setExpanded] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
@@ -65,7 +66,7 @@ export default function ThinkingMetrics({
     confidence = null,
     errorCount = 0,
     retryCount = 0,
-    thoughtProcess = []
+    thoughtProcess = [],
   } = metrics;
 
   const handleCopyMetrics = () => {
@@ -73,15 +74,15 @@ export default function ThinkingMetrics({
 Thinking Metrics:
 - Duration: ${duration}
 - Thinking Time: ${thinkingTime}
-- Tools Used: ${toolsUsed.map(t => t.name).join(', ')}
+- Tools Used: ${toolsUsed.map((t) => t.name).join(", ")}
 - Workflows: ${workflowCount}
-- Models: ${modelsUsed.map(m => `${m.provider}:${m.model}`).join(', ')}
+- Models: ${modelsUsed.map((m) => `${m.provider}:${m.model}`).join(", ")}
 - Tokens: ${tokensUsed}
-${confidence ? `- Confidence: ${confidence.score}%` : ''}
+${confidence ? `- Confidence: ${confidence.score}%` : ""}
 - Errors: ${errorCount}
 - Retries: ${retryCount}
     `.trim();
-    
+
     navigator.clipboard.writeText(metricsText);
     setCopiedMetrics(true);
     setTimeout(() => setCopiedMetrics(false), 2000);
@@ -105,12 +106,14 @@ ${confidence ? `- Confidence: ${confidence.score}%` : ''}
         >
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <ChartBar className={`w-4 h-4 ${isThinking ? 'animate-pulse text-blue-500' : 'text-theme-text-secondary'}`} />
+              <Activity
+                className={`w-4 h-4 ${isThinking ? "animate-pulse text-blue-500" : "text-theme-text-secondary"}`}
+              />
               <span className="text-sm font-medium text-theme-text-primary">
                 {isThinking ? "Processing..." : "Process Metrics"}
               </span>
             </div>
-            
+
             {/* Quick Stats */}
             <div className="flex items-center gap-3 text-xs text-theme-text-secondary">
               <span className="flex items-center gap-1">
@@ -135,7 +138,7 @@ ${confidence ? `- Confidence: ${confidence.score}%` : ''}
               </span>
             </div>
           </div>
-          
+
           {expanded ? (
             <CaretDown className="w-4 h-4 text-theme-text-secondary" />
           ) : (
@@ -160,16 +163,22 @@ ${confidence ? `- Confidence: ${confidence.score}%` : ''}
                   <div className="bg-theme-bg-primary/50 rounded-md p-3">
                     <div className="flex items-center gap-2 mb-1">
                       <Brain className="w-3.5 h-3.5 text-purple-500" />
-                      <span className="text-xs text-theme-text-secondary">Thinking</span>
+                      <span className="text-xs text-theme-text-secondary">
+                        Thinking
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-theme-text-primary">{thinkingTime}</span>
+                    <span className="text-sm font-medium text-theme-text-primary">
+                      {thinkingTime}
+                    </span>
                   </div>
 
                   {/* Execution Time */}
                   <div className="bg-theme-bg-primary/50 rounded-md p-3">
                     <div className="flex items-center gap-2 mb-1">
                       <Clock className="w-3.5 h-3.5 text-blue-500" />
-                      <span className="text-xs text-theme-text-secondary">Execution</span>
+                      <span className="text-xs text-theme-text-secondary">
+                        Execution
+                      </span>
                     </div>
                     <span className="text-sm font-medium text-theme-text-primary">
                       {duration !== thinkingTime ? duration : "0s"}
@@ -181,7 +190,9 @@ ${confidence ? `- Confidence: ${confidence.score}%` : ''}
                     <div className="bg-theme-bg-primary/50 rounded-md p-3">
                       <div className="flex items-center gap-2 mb-1">
                         <Brain className="w-3.5 h-3.5 text-green-500" />
-                        <span className="text-xs text-theme-text-secondary">Model</span>
+                        <span className="text-xs text-theme-text-secondary">
+                          Model
+                        </span>
                       </div>
                       <span className="text-sm font-medium text-theme-text-primary truncate">
                         {modelsUsed[0].model}
@@ -194,7 +205,9 @@ ${confidence ? `- Confidence: ${confidence.score}%` : ''}
                     <div className="bg-theme-bg-primary/50 rounded-md p-3">
                       <div className="flex items-center gap-2 mb-1">
                         <ChartBar className="w-3.5 h-3.5 text-emerald-500" />
-                        <span className="text-xs text-theme-text-secondary">Confidence</span>
+                        <span className="text-xs text-theme-text-secondary">
+                          Confidence
+                        </span>
                       </div>
                       <span className="text-sm font-medium text-theme-text-primary">
                         {confidence.score}%
@@ -207,10 +220,13 @@ ${confidence ? `- Confidence: ${confidence.score}%` : ''}
                     <div className="bg-red-50 dark:bg-red-900/20 rounded-md p-3">
                       <div className="flex items-center gap-2 mb-1">
                         <WarningCircle className="w-3.5 h-3.5 text-red-500" />
-                        <span className="text-xs text-red-600 dark:text-red-400">Errors</span>
+                        <span className="text-xs text-red-600 dark:text-red-400">
+                          Errors
+                        </span>
                       </div>
                       <span className="text-sm font-medium text-red-700 dark:text-red-300">
-                        {errorCount} {retryCount > 0 && `(${retryCount} retries)`}
+                        {errorCount}{" "}
+                        {retryCount > 0 && `(${retryCount} retries)`}
                       </span>
                     </div>
                   )}
@@ -219,7 +235,9 @@ ${confidence ? `- Confidence: ${confidence.score}%` : ''}
                 {/* Tools Used */}
                 {toolsUsed.length > 0 && (
                   <div className="space-y-2">
-                    <div className="text-xs font-medium text-theme-text-secondary">Tools Used</div>
+                    <div className="text-xs font-medium text-theme-text-secondary">
+                      Tools Used
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       {toolsUsed.map((tool, idx) => {
                         const Icon = getToolIcon(tool.name);
@@ -229,9 +247,13 @@ ${confidence ? `- Confidence: ${confidence.score}%` : ''}
                             className="flex items-center gap-2 px-3 py-1.5 bg-theme-bg-primary/50 rounded-md"
                           >
                             <Icon className="w-3.5 h-3.5 text-theme-text-secondary" />
-                            <span className="text-xs text-theme-text-primary">{tool.name}</span>
+                            <span className="text-xs text-theme-text-primary">
+                              {tool.name}
+                            </span>
                             {tool.duration && (
-                              <span className="text-xs text-theme-text-secondary">({tool.duration})</span>
+                              <span className="text-xs text-theme-text-secondary">
+                                ({tool.duration})
+                              </span>
                             )}
                           </div>
                         );
@@ -249,7 +271,7 @@ ${confidence ? `- Confidence: ${confidence.score}%` : ''}
                     <Code className="w-3.5 h-3.5" />
                     {showTimeline ? "Hide" : "View"} Detailed Timeline
                   </button>
-                  
+
                   <button
                     onClick={handleCopyMetrics}
                     className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-theme-text-secondary hover:text-theme-text-primary hover:bg-theme-bg-primary/50 rounded-md transition-colors"
@@ -283,7 +305,9 @@ ${confidence ? `- Confidence: ${confidence.score}%` : ''}
             className="mt-3 bg-theme-bg-secondary/30 rounded-lg border border-theme-border p-4"
           >
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              <h4 className="text-xs font-medium text-theme-text-secondary mb-3">Execution Timeline</h4>
+              <h4 className="text-xs font-medium text-theme-text-secondary mb-3">
+                Execution Timeline
+              </h4>
               {thoughtProcess.map((event, idx) => (
                 <TimelineItem key={idx} event={event} />
               ))}
@@ -320,25 +344,33 @@ ${confidence ? `- Confidence: ${confidence.score}%` : ''}
 // Timeline Item Component
 function TimelineItem({ event }) {
   const getEventIcon = () => {
-    switch(event.type) {
-      case 'thinking': return <Brain className="w-3.5 h-3.5 text-purple-500" />;
-      case 'tool': return <Wrench className="w-3.5 h-3.5 text-blue-500" />;
-      case 'workflow': return <Sparkle className="w-3.5 h-3.5 text-amber-500" />;
-      case 'error': return <WarningCircle className="w-3.5 h-3.5 text-red-500" />;
-      case 'retry': return <ArrowClockwise className="w-3.5 h-3.5 text-orange-500" />;
-      default: return <ArrowRight className="w-3.5 h-3.5 text-theme-text-secondary" />;
+    switch (event.type) {
+      case "thinking":
+        return <Brain className="w-3.5 h-3.5 text-purple-500" />;
+      case "tool":
+        return <Wrench className="w-3.5 h-3.5 text-blue-500" />;
+      case "workflow":
+        return <Sparkle className="w-3.5 h-3.5 text-amber-500" />;
+      case "error":
+        return <WarningCircle className="w-3.5 h-3.5 text-red-500" />;
+      case "retry":
+        return <ArrowClockwise className="w-3.5 h-3.5 text-orange-500" />;
+      default:
+        return <ArrowRight className="w-3.5 h-3.5 text-theme-text-secondary" />;
     }
   };
 
   return (
     <div className="flex gap-3 text-xs">
       <div className="flex-shrink-0 w-16 text-theme-text-secondary">
-        {new Date(event.timestamp).toLocaleTimeString('en-US', { 
-          hour12: false,
-          minute: '2-digit',
-          second: '2-digit',
-          fractionalSecondDigits: 3
-        }).slice(3)}
+        {new Date(event.timestamp)
+          .toLocaleTimeString("en-US", {
+            hour12: false,
+            minute: "2-digit",
+            second: "2-digit",
+            fractionalSecondDigits: 3,
+          })
+          .slice(3)}
       </div>
       <div className="flex-shrink-0">{getEventIcon()}</div>
       <div className="flex-1 text-theme-text-primary">

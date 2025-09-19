@@ -1,13 +1,13 @@
 import React, { useState, useRef, useCallback } from "react";
 import { Copy, ArrowClockwise, Heart, Trash } from "@phosphor-icons/react";
 
-export default function SwipeableMessage({ 
-  children, 
+export default function SwipeableMessage({
+  children,
   onCopy,
   onRegenerate,
   onFavorite,
   onDelete,
-  role = "assistant"
+  role = "assistant",
 }) {
   const [swipeX, setSwipeX] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
@@ -18,25 +18,28 @@ export default function SwipeableMessage({
     setTouchStart(e.touches[0].clientX);
   }, []);
 
-  const handleTouchMove = useCallback((e) => {
-    if (!touchStart) return;
-    
-    const touchX = e.touches[0].clientX;
-    const distance = touchX - touchStart;
-    
-    // Only allow swipe left
-    if (distance < 0) {
-      const adjustedDistance = Math.max(distance * 0.5, -120);
-      setSwipeX(adjustedDistance);
-    }
-  }, [touchStart]);
+  const handleTouchMove = useCallback(
+    (e) => {
+      if (!touchStart) return;
+
+      const touchX = e.touches[0].clientX;
+      const distance = touchX - touchStart;
+
+      // Only allow swipe left
+      if (distance < 0) {
+        const adjustedDistance = Math.max(distance * 0.5, -120);
+        setSwipeX(adjustedDistance);
+      }
+    },
+    [touchStart]
+  );
 
   const handleTouchEnd = useCallback(() => {
     if (swipeX < -60) {
       // Show actions
       setSwipeX(-100);
       setShowActions(true);
-      
+
       // Haptic feedback
       if (navigator.vibrate) {
         navigator.vibrate(5);
@@ -54,7 +57,7 @@ export default function SwipeableMessage({
     if (navigator.vibrate) {
       navigator.vibrate(10);
     }
-    
+
     action();
     setSwipeX(0);
     setShowActions(false);
@@ -63,11 +66,11 @@ export default function SwipeableMessage({
   return (
     <div className="relative overflow-hidden">
       {/* Action buttons */}
-      <div 
+      <div
         className="absolute right-0 top-0 bottom-0 flex items-center gap-2 px-4"
         style={{
           opacity: Math.abs(swipeX) / 100,
-          pointerEvents: showActions ? 'auto' : 'none'
+          pointerEvents: showActions ? "auto" : "none",
         }}
       >
         {onCopy && (
@@ -103,7 +106,7 @@ export default function SwipeableMessage({
           </button>
         )}
       </div>
-      
+
       {/* Message content */}
       <div
         ref={containerRef}
@@ -112,7 +115,9 @@ export default function SwipeableMessage({
         onTouchEnd={handleTouchEnd}
         style={{
           transform: `translateX(${swipeX}px)`,
-          transition: touchStart ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+          transition: touchStart
+            ? "none"
+            : "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
       >
         {children}

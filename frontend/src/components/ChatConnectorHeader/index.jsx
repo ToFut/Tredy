@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { isMobile } from "react-device-detect";
-import { 
+import {
   List,
   Plus,
   Gear,
   X,
   Plug,
   ArrowsClockwise,
-  MagnifyingGlass
+  MagnifyingGlass,
 } from "@phosphor-icons/react";
 import { AddConnectorButton } from "../ConnectorBadge";
 import ConnectorAvatarGroup from "../ConnectorAvatarGroup";
@@ -19,7 +19,12 @@ import showToast from "@/utils/toast";
 import ModalWrapper from "../ModalWrapper";
 
 // Quick Connect Modal Component
-function QuickConnectModal({ isOpen, onClose, availableConnectors = [], onConnect }) {
+function QuickConnectModal({
+  isOpen,
+  onClose,
+  availableConnectors = [],
+  onConnect,
+}) {
   const [connecting, setConnecting] = useState(null);
 
   const handleConnect = async (provider) => {
@@ -65,12 +70,12 @@ function QuickConnectModal({ isOpen, onClose, availableConnectors = [], onConnec
                 disabled={connecting === connector.id}
                 className="flex flex-col items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <img 
+                <img
                   src={connector.logo}
                   alt={connector.name}
                   className="w-8 h-8 object-contain"
                   onError={(e) => {
-                    e.target.style.display = 'none';
+                    e.target.style.display = "none";
                   }}
                 />
                 <div className="text-center">
@@ -101,13 +106,13 @@ function QuickConnectModal({ isOpen, onClose, availableConnectors = [], onConnec
 }
 
 // Desktop Chat Header
-export function DesktopChatConnectorHeader({ 
-  connectors = [], 
+export function DesktopChatConnectorHeader({
+  connectors = [],
   onConnectorClick,
   onConnectorSync,
   onConnectorSettings,
   onAddConnector,
-  onManageConnectors 
+  onManageConnectors,
 }) {
   return (
     <div className="border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm">
@@ -128,7 +133,7 @@ export function DesktopChatConnectorHeader({
 
         {/* Right: Actions */}
         <div className="flex items-center gap-2">
-          <AddConnectorButton 
+          <AddConnectorButton
             onClick={onAddConnector}
             size="sm"
             className="hover:scale-105"
@@ -147,13 +152,13 @@ export function DesktopChatConnectorHeader({
 }
 
 // Enhanced Mobile Header with Connectors - includes full sidebar functionality
-export function MobileChatConnectorHeader({ 
+export function MobileChatConnectorHeader({
   connectors = [],
   onConnectorClick,
   onConnectorSync,
   onConnectorSettings,
   onAddConnector,
-  onManageConnectors
+  onManageConnectors,
 }) {
   const { logo } = useLogo();
   const { user } = useUser();
@@ -179,9 +184,9 @@ export function MobileChatConnectorHeader({
     <>
       {/* Main Header */}
       <div className="fixed top-0 left-0 right-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
-        <div 
+        <div
           className="flex justify-between items-center px-4 py-3"
-          style={{ height: 'var(--app-header-height, 64px)' }}
+          style={{ height: "var(--app-header-height, 64px)" }}
         >
           {/* Left: Menu + Logo */}
           <div className="flex items-center gap-3">
@@ -193,7 +198,9 @@ export function MobileChatConnectorHeader({
             </button>
             <div className="flex items-center gap-2">
               <img src={logo} alt="Logo" className="h-6 w-6 rounded" />
-              <span className="font-semibold text-gray-900 dark:text-white text-sm">Tredy</span>
+              <span className="font-semibold text-gray-900 dark:text-white text-sm">
+                Tredy
+              </span>
             </div>
           </div>
 
@@ -209,10 +216,7 @@ export function MobileChatConnectorHeader({
               onShowAll={onManageConnectors}
               showAddButton={false}
             />
-            <AddConnectorButton 
-              onClick={onAddConnector}
-              size="sm"
-            />
+            <AddConnectorButton onClick={onAddConnector} size="sm" />
           </div>
         </div>
 
@@ -221,7 +225,8 @@ export function MobileChatConnectorHeader({
           <div className="px-4 py-2 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <span className="text-xs text-gray-600 dark:text-gray-400">
-                {connectors.length} service{connectors.length !== 1 ? 's' : ''} connected
+                {connectors.length} service{connectors.length !== 1 ? "s" : ""}{" "}
+                connected
               </span>
               <button
                 onClick={onManageConnectors}
@@ -260,8 +265,12 @@ export function MobileChatConnectorHeader({
                 <div className="flex items-center gap-3">
                   <img src={logo} alt="Logo" className="h-10 w-10 rounded-lg" />
                   <div>
-                    <h2 className="font-semibold text-gray-900 dark:text-white">Tredy</h2>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">AI Workspace</p>
+                    <h2 className="font-semibold text-gray-900 dark:text-white">
+                      Tredy
+                    </h2>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      AI Workspace
+                    </p>
                   </div>
                 </div>
                 <button
@@ -271,7 +280,7 @@ export function MobileChatConnectorHeader({
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              
+
               {/* Connected Services Section */}
               {connectors.length > 0 && (
                 <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -298,7 +307,7 @@ export function MobileChatConnectorHeader({
                   />
                 </div>
               )}
-              
+
               {/* Search */}
               {(!user || user?.role !== "default") && (
                 <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -354,7 +363,7 @@ export default function ChatConnectorHeader() {
           UserConnector.list(),
           UserConnector.getAvailable(),
         ]);
-        
+
         setConnectors(userConnectors || []);
         setAvailableConnectors(available || []);
       } catch (error) {
@@ -365,16 +374,16 @@ export default function ChatConnectorHeader() {
     }
 
     fetchConnectors();
-    
+
     // Listen for connector updates from chat buttons
     const handleConnectorUpdate = () => {
       refreshConnectors();
     };
-    
-    window.addEventListener('connector-updated', handleConnectorUpdate);
-    
+
+    window.addEventListener("connector-updated", handleConnectorUpdate);
+
     return () => {
-      window.removeEventListener('connector-updated', handleConnectorUpdate);
+      window.removeEventListener("connector-updated", handleConnectorUpdate);
     };
   }, []);
 
@@ -414,7 +423,7 @@ export default function ChatConnectorHeader() {
           "connector_auth",
           "width=600,height=700"
         );
-        
+
         // Listen for OAuth callback
         const checkInterval = setInterval(() => {
           if (authWindow.closed) {

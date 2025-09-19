@@ -5,7 +5,8 @@ const stockMarket = {
       ALPHA_VANTAGE_API_KEY: {
         type: "string",
         required: false,
-        description: "Alpha Vantage API key for stock data. Get free at alphavantage.co/support/#api-key",
+        description:
+          "Alpha Vantage API key for stock data. Get free at alphavantage.co/support/#api-key",
         default: process.env.ALPHA_VANTAGE_API_KEY || "",
       },
     },
@@ -22,24 +23,24 @@ const stockMarket = {
           examples: [
             {
               prompt: "What's the current price of Apple stock?",
-              call: JSON.stringify({ 
-                symbol: "AAPL", 
-                dataType: "quote" 
+              call: JSON.stringify({
+                symbol: "AAPL",
+                dataType: "quote",
               }),
             },
             {
               prompt: "Show me Tesla's technical indicators",
-              call: JSON.stringify({ 
-                symbol: "TSLA", 
+              call: JSON.stringify({
+                symbol: "TSLA",
                 dataType: "technical",
-                indicator: "RSI"
+                indicator: "RSI",
               }),
             },
             {
               prompt: "Get Microsoft company overview and fundamentals",
-              call: JSON.stringify({ 
-                symbol: "MSFT", 
-                dataType: "overview" 
+              call: JSON.stringify({
+                symbol: "MSFT",
+                dataType: "overview",
               }),
             },
           ],
@@ -54,26 +55,35 @@ const stockMarket = {
               dataType: {
                 type: "string",
                 enum: ["quote", "overview", "technical", "news"],
-                description: "Type of data to fetch: quote (price), overview (company info), technical (indicators), news",
+                description:
+                  "Type of data to fetch: quote (price), overview (company info), technical (indicators), news",
               },
               indicator: {
                 type: "string",
                 enum: ["SMA", "EMA", "RSI", "MACD", "STOCH"],
-                description: "Technical indicator to calculate (only for technical dataType)",
+                description:
+                  "Technical indicator to calculate (only for technical dataType)",
               },
               timePeriod: {
                 type: "number",
-                description: "Time period for technical indicators (default: 14 for RSI, 20 for SMA/EMA)",
+                description:
+                  "Time period for technical indicators (default: 14 for RSI, 20 for SMA/EMA)",
                 default: 14,
               },
             },
             required: ["symbol", "dataType"],
             additionalProperties: false,
           },
-          handler: async function ({ symbol, dataType, indicator, timePeriod }) {
+          handler: async function ({
+            symbol,
+            dataType,
+            indicator,
+            timePeriod,
+          }) {
             try {
-              const apiKey = ALPHA_VANTAGE_API_KEY || process.env.ALPHA_VANTAGE_API_KEY;
-              
+              const apiKey =
+                ALPHA_VANTAGE_API_KEY || process.env.ALPHA_VANTAGE_API_KEY;
+
               if (!apiKey) {
                 return "Stock market data requires an Alpha Vantage API key. Get a free key at: https://www.alphavantage.co/support/#api-key\n\nSet it in your environment as ALPHA_VANTAGE_API_KEY or configure it in the agent settings.";
               }
@@ -99,7 +109,12 @@ const stockMarket = {
                   if (!indicator) {
                     return "Please specify a technical indicator (SMA, EMA, RSI, MACD, or STOCH)";
                   }
-                  url = await this.buildTechnicalUrl(symbol, indicator, timePeriod, apiKey);
+                  url = await this.buildTechnicalUrl(
+                    symbol,
+                    indicator,
+                    timePeriod,
+                    apiKey
+                  );
                   result = await this.fetchTechnical(url, symbol, indicator);
                   break;
 
@@ -122,7 +137,7 @@ const stockMarket = {
             }
           },
 
-          fetchQuote: async function(url, symbol) {
+          fetchQuote: async function (url, symbol) {
             const response = await fetch(url);
             const data = await response.json();
 
@@ -143,7 +158,9 @@ const stockMarket = {
             const change = parseFloat(quote["09. change"]).toFixed(2);
             const changePercent = quote["10. change percent"];
             const volume = parseInt(quote["06. volume"]).toLocaleString();
-            const previousClose = parseFloat(quote["08. previous close"]).toFixed(2);
+            const previousClose = parseFloat(
+              quote["08. previous close"]
+            ).toFixed(2);
             const open = parseFloat(quote["02. open"]).toFixed(2);
             const high = parseFloat(quote["03. high"]).toFixed(2);
             const low = parseFloat(quote["04. low"]).toFixed(2);
@@ -161,7 +178,7 @@ Volume: ${volume}
 Last Updated: ${quote["07. latest trading day"]}`;
           },
 
-          fetchOverview: async function(url, symbol) {
+          fetchOverview: async function (url, symbol) {
             const response = await fetch(url);
             const data = await response.json();
 
@@ -169,10 +186,10 @@ Last Updated: ${quote["07. latest trading day"]}`;
               return `No company data found for symbol: ${symbol}`;
             }
 
-            const marketCap = data.MarketCapitalization 
-              ? `$${(parseInt(data.MarketCapitalization) / 1e9).toFixed(2)}B` 
+            const marketCap = data.MarketCapitalization
+              ? `$${(parseInt(data.MarketCapitalization) / 1e9).toFixed(2)}B`
               : "N/A";
-            
+
             return `**${data.Name || symbol.toUpperCase()} Company Overview**
 
 📊 **Fundamentals:**
@@ -199,13 +216,18 @@ Last Updated: ${quote["07. latest trading day"]}`;
 ${data.Description ? data.Description.substring(0, 300) + "..." : "No description available"}`;
           },
 
-          buildTechnicalUrl: async function(symbol, indicator, timePeriod, apiKey) {
+          buildTechnicalUrl: async function (
+            symbol,
+            indicator,
+            timePeriod,
+            apiKey
+          ) {
             const indicatorMap = {
-              "SMA": "SMA",
-              "EMA": "EMA", 
-              "RSI": "RSI",
-              "MACD": "MACD",
-              "STOCH": "STOCH"
+              SMA: "SMA",
+              EMA: "EMA",
+              RSI: "RSI",
+              MACD: "MACD",
+              STOCH: "STOCH",
             };
 
             const func = indicatorMap[indicator];
@@ -218,7 +240,7 @@ ${data.Description ? data.Description.substring(0, 300) + "..." : "No descriptio
             return url;
           },
 
-          fetchTechnical: async function(url, symbol, indicator) {
+          fetchTechnical: async function (url, symbol, indicator) {
             const response = await fetch(url);
             const data = await response.json();
 
@@ -258,7 +280,7 @@ ${data.Description ? data.Description.substring(0, 300) + "..." : "No descriptio
             if (interpretation) result += `\nSignal: ${interpretation}`;
             result += `\n\n**Recent Values:**\n`;
 
-            dates.forEach(date => {
+            dates.forEach((date) => {
               const value = technicalData[date][indicator];
               result += `• ${date}: ${parseFloat(value).toFixed(2)}\n`;
             });
@@ -266,7 +288,7 @@ ${data.Description ? data.Description.substring(0, 300) + "..." : "No descriptio
             return result;
           },
 
-          fetchNews: async function(symbol) {
+          fetchNews: async function (symbol) {
             // Simplified news fetching - in production, integrate with a news API
             return `📰 **${symbol.toUpperCase()} Latest News**
 

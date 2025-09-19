@@ -9,8 +9,9 @@ class SupabaseTokenManager {
   constructor() {
     this.supabaseUrl = process.env.SUPABASE_URL;
     this.supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
-    this.encryptionKey = process.env.TOKEN_ENCRYPTION_KEY || process.env.JWT_SECRET;
-    
+    this.encryptionKey =
+      process.env.TOKEN_ENCRYPTION_KEY || process.env.JWT_SECRET;
+
     if (this.supabaseUrl && this.supabaseServiceKey) {
       this.supabase = createClient(this.supabaseUrl, this.supabaseServiceKey, {
         auth: {
@@ -38,15 +39,21 @@ class SupabaseTokenManager {
 
     const algorithm = "aes-256-gcm";
     const salt = crypto.randomBytes(16);
-    const key = crypto.pbkdf2Sync(this.encryptionKey, salt, 100000, 32, "sha256");
+    const key = crypto.pbkdf2Sync(
+      this.encryptionKey,
+      salt,
+      100000,
+      32,
+      "sha256"
+    );
     const iv = crypto.randomBytes(16);
     const cipher = crypto.createCipheriv(algorithm, key, iv);
-    
+
     let encrypted = cipher.update(text, "utf8", "hex");
     encrypted += cipher.final("hex");
-    
+
     const authTag = cipher.getAuthTag();
-    
+
     return {
       encrypted,
       salt: salt.toString("hex"),
@@ -65,16 +72,22 @@ class SupabaseTokenManager {
 
     const algorithm = "aes-256-gcm";
     const salt = Buffer.from(encryptedData.salt, "hex");
-    const key = crypto.pbkdf2Sync(this.encryptionKey, salt, 100000, 32, "sha256");
+    const key = crypto.pbkdf2Sync(
+      this.encryptionKey,
+      salt,
+      100000,
+      32,
+      "sha256"
+    );
     const iv = Buffer.from(encryptedData.iv, "hex");
     const authTag = Buffer.from(encryptedData.authTag, "hex");
     const decipher = crypto.createDecipheriv(algorithm, key, iv);
-    
+
     decipher.setAuthTag(authTag);
-    
+
     let decrypted = decipher.update(encryptedData.encrypted, "hex", "utf8");
     decrypted += decipher.final("utf8");
-    
+
     return decrypted;
   }
 
@@ -90,10 +103,10 @@ class SupabaseTokenManager {
     try {
       // Encrypt the tokens
       const encryptedTokens = this.encrypt(JSON.stringify(tokens));
-      
+
       // Generate a unique reference ID
       const tokenRef = crypto.randomUUID();
-      
+
       // Store in Supabase
       const { data, error } = await this.supabase
         .from("secure_connector_tokens")
@@ -163,7 +176,7 @@ class SupabaseTokenManager {
     try {
       // Encrypt the new tokens
       const encryptedTokens = this.encrypt(JSON.stringify(newTokens));
-      
+
       const { error } = await this.supabase
         .from("secure_connector_tokens")
         .update({

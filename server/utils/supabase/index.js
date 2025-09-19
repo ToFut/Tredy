@@ -2,7 +2,7 @@ process.env.NODE_ENV === "development"
   ? require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` })
   : require("dotenv").config();
 
-const { createClient } = require('@supabase/supabase-js');
+const { createClient } = require("@supabase/supabase-js");
 
 // Only initialize Supabase if credentials are provided
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -14,24 +14,17 @@ let supabase = null;
 
 if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
   // Server-side Supabase client with service role key for admin operations
-  supabaseAdmin = createClient(
-    SUPABASE_URL,
-    SUPABASE_SERVICE_ROLE_KEY,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
-    }
-  );
+  supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
 }
 
 if (SUPABASE_URL && SUPABASE_ANON_KEY) {
   // Client-side Supabase client for user operations
-  supabase = createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
+  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
 /**
@@ -41,11 +34,14 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
  */
 async function validateSupabaseJWT(token) {
   if (!supabaseAdmin) {
-    return { user: null, error: 'Supabase is not configured' };
+    return { user: null, error: "Supabase is not configured" };
   }
   try {
-    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error,
+    } = await supabaseAdmin.auth.getUser(token);
+
     if (error) {
       console.log("Supabase JWT validation error:", error.message);
       return { user: null, error: error.message };
@@ -65,11 +61,14 @@ async function validateSupabaseJWT(token) {
  */
 async function getSupabaseUser(userId) {
   if (!supabaseAdmin) {
-    return { user: null, error: 'Supabase is not configured' };
+    return { user: null, error: "Supabase is not configured" };
   }
   try {
-    const { data: { user }, error } = await supabaseAdmin.auth.admin.getUserById(userId);
-    
+    const {
+      data: { user },
+      error,
+    } = await supabaseAdmin.auth.admin.getUserById(userId);
+
     if (error) {
       return { user: null, error: error.message };
     }
@@ -89,14 +88,14 @@ async function getSupabaseUser(userId) {
  */
 async function listSupabaseUsers(page = 1, perPage = 1000) {
   if (!supabaseAdmin) {
-    return { users: [], error: 'Supabase is not configured' };
+    return { users: [], error: "Supabase is not configured" };
   }
   try {
     const { data, error } = await supabaseAdmin.auth.admin.listUsers({
       page,
-      perPage
+      perPage,
     });
-    
+
     if (error) {
       return { users: [], error: error.message };
     }
@@ -116,14 +115,16 @@ async function listSupabaseUsers(page = 1, perPage = 1000) {
  */
 async function updateUserMetadata(userId, metadata) {
   if (!supabaseAdmin) {
-    return { user: null, error: 'Supabase is not configured' };
+    return { user: null, error: "Supabase is not configured" };
   }
   try {
-    const { data: { user }, error } = await supabaseAdmin.auth.admin.updateUserById(
-      userId,
-      { app_metadata: metadata }
-    );
-    
+    const {
+      data: { user },
+      error,
+    } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+      app_metadata: metadata,
+    });
+
     if (error) {
       return { user: null, error: error.message };
     }

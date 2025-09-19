@@ -190,7 +190,10 @@ export default function DefaultChatContainer() {
                 <React.Fragment key={`user-${index}`}>
                   <MessageContainer>
                     <MessageContent alignmentCls={getMessageAlignment("user")}>
-                      <UserIcon user={{ uid: userFromStorage()?.username }} role={"user"} />
+                      <UserIcon
+                        user={{ uid: userFromStorage()?.username }}
+                        role={"user"}
+                      />
                       <MessageText>{fetchedMessage.user}</MessageText>
                     </MessageContent>
                   </MessageContainer>
@@ -201,9 +204,11 @@ export default function DefaultChatContainer() {
               allMessages.push(
                 <React.Fragment key={`system-${index}`}>
                   <MessageContainer>
-                    <MessageContent alignmentCls={getMessageAlignment("assistant")}>
+                    <MessageContent
+                      alignmentCls={getMessageAlignment("assistant")}
+                    >
                       <UserIcon user={{ uid: "system" }} role={"assistant"} />
-                      <MessageText style={{ whiteSpace: 'pre-line' }}>
+                      <MessageText style={{ whiteSpace: "pre-line" }}>
                         {fetchedMessage.response}
                       </MessageText>
                     </MessageContent>
@@ -227,7 +232,10 @@ export default function DefaultChatContainer() {
                 <React.Fragment key={`user-${index}`}>
                   <MessageContainer>
                     <MessageContent alignmentCls={getMessageAlignment("user")}>
-                      <UserIcon user={{ uid: userFromStorage()?.username }} role={"user"} />
+                      <UserIcon
+                        user={{ uid: userFromStorage()?.username }}
+                        role={"user"}
+                      />
                       <MessageText>{fetchedMessage.user}</MessageText>
                     </MessageContent>
                   </MessageContainer>
@@ -245,9 +253,11 @@ export default function DefaultChatContainer() {
               const systemMsg = (
                 <React.Fragment key={`system-${index}`}>
                   <MessageContainer>
-                    <MessageContent alignmentCls={getMessageAlignment("assistant")}>
+                    <MessageContent
+                      alignmentCls={getMessageAlignment("assistant")}
+                    >
                       <UserIcon user={{ uid: "system" }} role={"assistant"} />
-                      <MessageText style={{ whiteSpace: 'pre-line' }}>
+                      <MessageText style={{ whiteSpace: "pre-line" }}>
                         {fetchedMessage.response}
                       </MessageText>
                     </MessageContent>

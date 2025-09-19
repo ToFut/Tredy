@@ -1,7 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
-import { 
-  House, ChatCircle, Gear, Users, Brain, Search, Plus, 
-  CaretDown, CaretRight, Bookmark, Clock, Archive 
+import {
+  House,
+  ChatCircle,
+  Gear,
+  Users,
+  Brain,
+  Search,
+  Plus,
+  CaretDown,
+  CaretRight,
+  Bookmark,
+  Clock,
+  Archive,
 } from "@phosphor-icons/react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -14,41 +24,62 @@ export default function ImprovedSidebar() {
   const { logo } = useLogo();
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
-  const [expandedSections, setExpandedSections] = useState(new Set(['workspaces']));
+  const [expandedSections, setExpandedSections] = useState(
+    new Set(["workspaces"])
+  );
 
   // Navigation structure
   const navigation = [
     {
-      id: 'main',
-      label: 'Main',
+      id: "main",
+      label: "Main",
       items: [
-        { icon: House, label: 'Home', path: '/', badge: null },
-        { icon: ChatCircle, label: 'Chat', path: '/workspace', badge: null },
-      ]
+        { icon: House, label: "Home", path: "/", badge: null },
+        { icon: ChatCircle, label: "Chat", path: "/workspace", badge: null },
+      ],
     },
     {
-      id: 'workspaces',
-      label: 'Workspaces',
+      id: "workspaces",
+      label: "Workspaces",
       collapsible: true,
       items: [
-        { icon: ChatCircle, label: 'General', path: '/workspace/general', badge: '3' },
-        { icon: Brain, label: 'AI Research', path: '/workspace/research', badge: null },
-        { icon: Bookmark, label: 'Documentation', path: '/workspace/docs', badge: '1' },
+        {
+          icon: ChatCircle,
+          label: "General",
+          path: "/workspace/general",
+          badge: "3",
+        },
+        {
+          icon: Brain,
+          label: "AI Research",
+          path: "/workspace/research",
+          badge: null,
+        },
+        {
+          icon: Bookmark,
+          label: "Documentation",
+          path: "/workspace/docs",
+          badge: "1",
+        },
       ],
       actions: [
-        { icon: Plus, label: 'New Workspace', action: () => console.log('New workspace') }
-      ]
+        {
+          icon: Plus,
+          label: "New Workspace",
+          action: () => console.log("New workspace"),
+        },
+      ],
     },
     {
-      id: 'admin',
-      label: 'Administration',
-      show: user?.role === 'admin',
+      id: "admin",
+      label: "Administration",
+      show: user?.role === "admin",
       items: [
-        { icon: Users, label: 'Users', path: '/settings/users', badge: null },
-        { icon: Brain, label: 'Agents', path: '/settings/agents', badge: null },
-        { icon: Gear, label: 'Settings', path: '/settings', badge: null },
-      ]
-    }
+        { icon: Users, label: "Users", path: "/settings/users", badge: null },
+        { icon: Brain, label: "Agents", path: "/settings/agents", badge: null },
+        { icon: Gear, label: "Settings", path: "/settings", badge: null },
+      ],
+    },
   ];
 
   const toggleSection = (sectionId) => {
@@ -62,7 +93,9 @@ export default function ImprovedSidebar() {
   };
 
   const isActive = (path) => {
-    return location.pathname === path || location.pathname.startsWith(path + '/');
+    return (
+      location.pathname === path || location.pathname.startsWith(path + "/")
+    );
   };
 
   return (
@@ -93,9 +126,9 @@ export default function ImprovedSidebar() {
       <nav className="flex-1 px-4 pb-4 space-y-6 overflow-y-auto">
         {navigation.map((section) => {
           if (section.show === false) return null;
-          
+
           const isExpanded = expandedSections.has(section.id);
-          
+
           return (
             <div key={section.id} className="space-y-2">
               {/* Section Header */}
@@ -123,18 +156,20 @@ export default function ImprovedSidebar() {
                   {section.items?.map((item) => {
                     const Icon = item.icon;
                     const active = isActive(item.path);
-                    
+
                     return (
                       <Link
                         key={item.path}
                         to={item.path}
                         className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                           active
-                            ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                            : 'text-gray-700 hover:bg-gray-50'
+                            ? "bg-blue-50 text-blue-700 border border-blue-200"
+                            : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        <Icon className={`w-5 h-5 ${active ? 'text-blue-700' : 'text-gray-500'}`} />
+                        <Icon
+                          className={`w-5 h-5 ${active ? "text-blue-700" : "text-gray-500"}`}
+                        />
                         <span className="flex-1 font-medium">{item.label}</span>
                         {item.badge && (
                           <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded-full">
@@ -144,7 +179,7 @@ export default function ImprovedSidebar() {
                       </Link>
                     );
                   })}
-                  
+
                   {/* Section Actions */}
                   {section.actions?.map((action, index) => {
                     const Icon = action.icon;
@@ -174,15 +209,20 @@ export default function ImprovedSidebar() {
           </h3>
           <div className="space-y-1">
             {[
-              { icon: Clock, label: 'Project Planning', time: '2m ago' },
-              { icon: Archive, label: 'Code Review', time: '1h ago' },
+              { icon: Clock, label: "Project Planning", time: "2m ago" },
+              { icon: Archive, label: "Code Review", time: "1h ago" },
             ].map((item, index) => {
               const Icon = item.icon;
               return (
-                <div key={index} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                <div
+                  key={index}
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer"
+                >
                   <Icon className="w-4 h-4 text-gray-400" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{item.label}</p>
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {item.label}
+                    </p>
                     <p className="text-xs text-gray-500">{item.time}</p>
                   </div>
                 </div>
@@ -197,14 +237,16 @@ export default function ImprovedSidebar() {
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
             <span className="text-white text-sm font-medium">
-              {user?.username?.charAt(0)?.toUpperCase() || 'U'}
+              {user?.username?.charAt(0)?.toUpperCase() || "U"}
             </span>
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">
-              {user?.username || 'User'}
+              {user?.username || "User"}
             </p>
-            <p className="text-xs text-gray-500 capitalize">{user?.role || 'user'}</p>
+            <p className="text-xs text-gray-500 capitalize">
+              {user?.role || "user"}
+            </p>
           </div>
           <button className="p-1 rounded hover:bg-gray-100">
             <Gear className="w-4 h-4 text-gray-400" />
@@ -227,7 +269,7 @@ export function ImprovedMobileHeader() {
           <img src={logo} alt="Logo" className="h-8 w-auto" />
           <span className="font-semibold text-lg text-gray-900">Tredy</span>
         </Link>
-        
+
         <button
           onClick={() => setIsMenuOpen(true)}
           className="p-2 rounded-lg hover:bg-gray-100"
@@ -239,7 +281,7 @@ export function ImprovedMobileHeader() {
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
-          <div 
+          <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setIsMenuOpen(false)}
           />

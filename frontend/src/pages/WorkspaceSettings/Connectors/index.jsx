@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Plug, Plus, Trash, ArrowClockwise, Check, X } from "@phosphor-icons/react";
+import {
+  Plug,
+  Plus,
+  Trash,
+  ArrowClockwise,
+  Check,
+  X,
+} from "@phosphor-icons/react";
 import Workspace from "@/models/workspace";
 import { useParams } from "react-router-dom";
 import PreLoader from "@/components/Preloader";
@@ -20,14 +27,15 @@ export default function WorkspaceConnectors({ workspace }) {
   const fetchConnectorData = async () => {
     if (!slug) return;
     setLoading(true);
-    
+
     try {
       // Fetch available providers, current connections, and Nango status in parallel
-      const [providersResponse, connectorsResponse, nangoConfigured] = await Promise.all([
-        Workspace.connectors.getAvailable(slug),
-        Workspace.connectors.list(slug),
-        nangoService.isConfigured(),
-      ]);
+      const [providersResponse, connectorsResponse, nangoConfigured] =
+        await Promise.all([
+          Workspace.connectors.getAvailable(slug),
+          Workspace.connectors.list(slug),
+          nangoService.isConfigured(),
+        ]);
 
       setAvailableProviders(providersResponse?.providers || []);
       setConnectors(connectorsResponse?.connectors || []);
@@ -41,7 +49,7 @@ export default function WorkspaceConnectors({ workspace }) {
 
   const handleConnect = async (provider) => {
     setSaving(provider.id);
-    
+
     try {
       // Get provider config key mapping from backend
       const response = await Workspace.connectors.connect(slug, {
@@ -50,17 +58,23 @@ export default function WorkspaceConnectors({ workspace }) {
 
       if (response.authConfig) {
         const { connectionId, providerConfigKey } = response.authConfig;
-        
+
         console.log(`[Connectors] Starting OAuth for ${provider.name}:`, {
           providerConfigKey,
-          connectionId
+          connectionId,
         });
-        
+
         // Use Nango's recommended Connect UI
-        const result = await nangoService.connect(providerConfigKey, connectionId);
-        
-        console.log(`[Connectors] OAuth completed for ${provider.name}:`, result);
-        
+        const result = await nangoService.connect(
+          providerConfigKey,
+          connectionId
+        );
+
+        console.log(
+          `[Connectors] OAuth completed for ${provider.name}:`,
+          result
+        );
+
         // Notify backend that connection is established
         try {
           await Workspace.connectors.callback(slug, {
@@ -70,10 +84,9 @@ export default function WorkspaceConnectors({ workspace }) {
         } catch (e) {
           console.log("Callback processing:", e);
         }
-        
+
         // Refresh the connector list
         await fetchConnectorData();
-        
       } else if (response.success) {
         // Direct connection successful
         await fetchConnectorData();
@@ -88,9 +101,9 @@ export default function WorkspaceConnectors({ workspace }) {
 
   const handleDisconnect = async (provider) => {
     if (!confirm(`Are you sure you want to disconnect ${provider}?`)) return;
-    
+
     setSaving(provider);
-    
+
     try {
       await Workspace.connectors.disconnect(slug, provider);
       await fetchConnectorData();
@@ -103,7 +116,7 @@ export default function WorkspaceConnectors({ workspace }) {
 
   const handleSync = async (provider) => {
     setSaving(`sync-${provider}`);
-    
+
     try {
       await Workspace.connectors.sync(slug, provider);
       await fetchConnectorData();
@@ -115,7 +128,9 @@ export default function WorkspaceConnectors({ workspace }) {
   };
 
   const isConnected = (providerId) => {
-    return connectors.some((c) => c.provider === providerId && c.status === "connected");
+    return connectors.some(
+      (c) => c.provider === providerId && c.status === "connected"
+    );
   };
 
   const getConnectionStatus = (providerId) => {
@@ -126,12 +141,12 @@ export default function WorkspaceConnectors({ workspace }) {
   const getLastSync = (providerId) => {
     const connector = connectors.find((c) => c.provider === providerId);
     if (!connector?.lastSync) return "Never";
-    
+
     const date = new Date(connector.lastSync);
     const now = new Date();
     const diffMs = now - date;
     const diffMins = Math.floor(diffMs / 60000);
-    
+
     if (diffMins < 60) return `${diffMins} minutes ago`;
     if (diffMins < 1440) return `${Math.floor(diffMins / 60)} hours ago`;
     return `${Math.floor(diffMins / 1440)} days ago`;
@@ -160,11 +175,17 @@ export default function WorkspaceConnectors({ workspace }) {
           Data Connectors
         </h2>
         <p className="text-xs leading-[18px] font-base text-white/60">
-          Connect external data sources to enhance your workspace with real-time information.
+          Connect external data sources to enhance your workspace with real-time
+          information.
           {nangoConfigured ? (
-            <span className="text-green-400 ml-1">✓ OAuth enabled via Nango</span>
+            <span className="text-green-400 ml-1">
+              ✓ OAuth enabled via Nango
+            </span>
           ) : (
-            <span className="text-yellow-400 ml-1">⚠ OAuth not configured. Add NANGO_SECRET_KEY to enable OAuth authentication.</span>
+            <span className="text-yellow-400 ml-1">
+              ⚠ OAuth not configured. Add NANGO_SECRET_KEY to enable OAuth
+              authentication.
+            </span>
           )}
         </p>
       </div>
@@ -172,7 +193,9 @@ export default function WorkspaceConnectors({ workspace }) {
       {/* Connected Services */}
       {connectors.length > 0 && (
         <div className="flex flex-col gap-y-4">
-          <h3 className="text-sm font-semibold text-white">Connected Services</h3>
+          <h3 className="text-sm font-semibold text-white">
+            Connected Services
+          </h3>
           <div className="flex flex-col gap-y-2">
             {connectors.map((connector) => (
               <div
@@ -200,7 +223,9 @@ export default function WorkspaceConnectors({ workspace }) {
                   >
                     <ArrowClockwise
                       className={`w-4 h-4 text-white ${
-                        saving === `sync-${connector.provider}` ? "animate-spin" : ""
+                        saving === `sync-${connector.provider}`
+                          ? "animate-spin"
+                          : ""
                       }`}
                     />
                   </button>
@@ -220,7 +245,9 @@ export default function WorkspaceConnectors({ workspace }) {
 
       {/* Available Connectors */}
       <div className="flex flex-col gap-y-4">
-        <h3 className="text-sm font-semibold text-white">Available Connectors</h3>
+        <h3 className="text-sm font-semibold text-white">
+          Available Connectors
+        </h3>
         {Object.entries(categories).map(([category, providers]) => (
           <div key={category} className="flex flex-col gap-y-2">
             <h4 className="text-xs font-medium text-white/60 uppercase tracking-wider">
@@ -230,7 +257,7 @@ export default function WorkspaceConnectors({ workspace }) {
               {providers.map((provider) => {
                 const connected = isConnected(provider.id);
                 const status = getConnectionStatus(provider.id);
-                
+
                 return (
                   <button
                     key={provider.id}
@@ -252,24 +279,24 @@ export default function WorkspaceConnectors({ workspace }) {
                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                       </div>
                     )}
-                    
+
                     {/* Provider icon */}
                     <div className="flex justify-center mb-2">
                       <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
                         <Plug className="w-5 h-5 text-white" />
                       </div>
                     </div>
-                    
+
                     {/* Provider name */}
                     <h5 className="text-xs font-medium text-white text-center">
                       {provider.name}
                     </h5>
-                    
+
                     {/* Status text */}
                     <p className="text-xs text-white/40 text-center mt-1">
                       {connected ? "Connected" : "Click to connect"}
                     </p>
-                    
+
                     {/* Loading indicator */}
                     {saving === provider.id && (
                       <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
@@ -287,11 +314,13 @@ export default function WorkspaceConnectors({ workspace }) {
       {/* Info box */}
       <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
         <p className="text-xs text-blue-300">
-          <strong>How it works:</strong> Connected services become available as agent tools. 
-          Your AI assistant can query and interact with these services automatically.
+          <strong>How it works:</strong> Connected services become available as
+          agent tools. Your AI assistant can query and interact with these
+          services automatically.
           {!nangoConfigured && (
             <span className="block mt-2 text-yellow-300">
-              Note: OAuth is not configured. Add NANGO_SECRET_KEY and NANGO_PUBLIC_KEY to enable OAuth authentication.
+              Note: OAuth is not configured. Add NANGO_SECRET_KEY and
+              NANGO_PUBLIC_KEY to enable OAuth authentication.
             </span>
           )}
         </p>

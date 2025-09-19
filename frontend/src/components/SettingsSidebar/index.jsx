@@ -421,9 +421,7 @@ const SidebarOptions = ({ user = null, t }) => (
 function HoldToReveal({ children, holdForMs = 3_000 }) {
   let timeout = null;
   const [showing, setShowing] = useState(
-    window.localStorage.getItem(
-      "tredy_experimental_feature_preview_unlocked"
-    )
+    window.localStorage.getItem("tredy_experimental_feature_preview_unlocked")
   );
 
   useEffect(() => {

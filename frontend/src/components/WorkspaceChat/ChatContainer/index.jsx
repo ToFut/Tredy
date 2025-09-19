@@ -33,19 +33,19 @@ import "./EnhancedMobileInput/styles.css";
 // Format summary for display in chat
 function formatSummaryForChat(summary) {
   let content = "## 📊 Chat Summary\n\n";
-  
+
   if (summary.brief) {
     content += `**Overview:** ${summary.brief}\n\n`;
   }
-  
+
   if (summary.topics && summary.topics.length > 0) {
     content += "**Topics Discussed:**\n";
-    summary.topics.forEach(topic => {
+    summary.topics.forEach((topic) => {
       content += `• ${topic}\n`;
     });
     content += "\n";
   }
-  
+
   if (summary.keyPoints && summary.keyPoints.length > 0) {
     content += "**Key Points:**\n";
     summary.keyPoints.forEach((point, idx) => {
@@ -53,37 +53,42 @@ function formatSummaryForChat(summary) {
     });
     content += "\n";
   }
-  
+
   if (summary.actionItems && summary.actionItems.length > 0) {
     content += "**Action Items:**\n";
-    summary.actionItems.forEach(item => {
+    summary.actionItems.forEach((item) => {
       content += `☐ ${item}\n`;
     });
     content += "\n";
   }
-  
+
   if (summary.insights) {
     content += `**Insights:** ${summary.insights}\n\n`;
   }
-  
+
   if (summary.sentiment) {
-    const sentimentEmoji = {
-      positive: "😊",
-      negative: "😔",
-      neutral: "😐",
-      productive: "🚀"
-    }[summary.sentiment] || "💬";
+    const sentimentEmoji =
+      {
+        positive: "😊",
+        negative: "😔",
+        neutral: "😐",
+        productive: "🚀",
+      }[summary.sentiment] || "💬";
     content += `**Sentiment:** ${sentimentEmoji} ${summary.sentiment}\n`;
   }
-  
+
   if (summary.messageCount) {
     content += `\n*Based on ${summary.messageCount} messages*`;
   }
-  
+
   return content;
 }
 
-export default function ChatContainer({ workspace, knownHistory = [], onSendCommandReady }) {
+export default function ChatContainer({
+  workspace,
+  knownHistory = [],
+  onSendCommandReady,
+}) {
   const { threadSlug = null } = useParams();
   const [message, setMessage] = useState("");
   const [loadingResponse, setLoadingResponse] = useState(false);
@@ -91,9 +96,9 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
   const [socketId, setSocketId] = useState(null);
   const [websocket, setWebsocket] = useState(null);
   const { files, parseAttachments } = useContext(DndUploaderContext);
-  
+
   // Agentic UI States
-  const [agentStatus, setAgentStatus] = useState('idle');
+  const [agentStatus, setAgentStatus] = useState("idle");
   const [agentOperations, setAgentOperations] = useState([]);
   const [intelligenceMetrics, setIntelligenceMetrics] = useState({});
   const [insights, setInsights] = useState([]);
@@ -103,22 +108,26 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
     const scrollToBottom = () => {
       // Try multiple selectors for different views
       const selectors = [
-        '.chat-history-container', // Mobile view
-        '[data-chat-history]', // Desktop view
-        '.overflow-y-auto.flex-grow' // Alternative desktop selector
+        ".chat-history-container", // Mobile view
+        "[data-chat-history]", // Desktop view
+        ".overflow-y-auto.flex-grow", // Alternative desktop selector
       ];
-      
+
       for (const selector of selectors) {
         const container = document.querySelector(selector);
         if (container) {
           // Check if user is near bottom (within 150px)
-          const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
-          
+          const isNearBottom =
+            container.scrollHeight -
+              container.scrollTop -
+              container.clientHeight <
+            150;
+
           // Auto-scroll only if near bottom or new conversation
           if (isNearBottom || chatHistory.length <= 2) {
             container.scrollTo({
               top: container.scrollHeight,
-              behavior: 'smooth'
+              behavior: "smooth",
             });
           }
           break; // Stop after finding first matching container
@@ -163,7 +172,7 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
     // Get the actual value from the textarea element (which may have been modified with @agent prefix)
     const textareaElement = document.getElementById(PROMPT_INPUT_ID);
     const actualMessage = textareaElement ? textareaElement.value : message;
-    
+
     if (!actualMessage || actualMessage === "") return false;
     const prevChatHistory = [
       ...chatHistory,
@@ -221,67 +230,70 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
    * @param {'replace' | 'append'} options.writeMode - Replace current text or append to existing text (default: replace)
    * @returns {void}
    */
-  const sendCommand = useCallback(async ({
-    text = "",
-    autoSubmit = false,
-    history = [],
-    attachments = [],
-    writeMode = "replace",
-  } = {}) => {
-    // If we are not auto-submitting, we can just emit the text to the prompt input.
-    if (!autoSubmit) {
-      setMessageEmit(text, writeMode);
-      return;
-    }
+  const sendCommand = useCallback(
+    async ({
+      text = "",
+      autoSubmit = false,
+      history = [],
+      attachments = [],
+      writeMode = "replace",
+    } = {}) => {
+      // If we are not auto-submitting, we can just emit the text to the prompt input.
+      if (!autoSubmit) {
+        setMessageEmit(text, writeMode);
+        return;
+      }
 
-    // If we are auto-submitting in append mode
-    // than we need to update text with whatever is in the prompt input + the text we are sending.
-    // @note: `message` will not work here since it is not updated yet.
-    // If text is still empty, after this, then we should just return.
-    if (writeMode === "append") {
-      const currentText = document.getElementById(PROMPT_INPUT_ID)?.value;
-      text = currentText + text;
-    }
+      // If we are auto-submitting in append mode
+      // than we need to update text with whatever is in the prompt input + the text we are sending.
+      // @note: `message` will not work here since it is not updated yet.
+      // If text is still empty, after this, then we should just return.
+      if (writeMode === "append") {
+        const currentText = document.getElementById(PROMPT_INPUT_ID)?.value;
+        text = currentText + text;
+      }
 
-    if (!text || text === "") return false;
-    // If we are auto-submitting
-    // Then we can replace the current text since this is not accumulating.
-    let prevChatHistory;
-    if (history.length > 0) {
-      // use pre-determined history chain.
-      prevChatHistory = [
-        ...history,
-        {
-          content: "",
-          role: "assistant",
-          pending: true,
-          userMessage: text,
-          attachments,
-          animate: true,
-        },
-      ];
-    } else {
-      prevChatHistory = [
-        ...chatHistory,
-        {
-          content: text,
-          role: "user",
-          attachments,
-        },
-        {
-          content: "",
-          role: "assistant",
-          pending: true,
-          userMessage: text,
-          animate: true,
-        },
-      ];
-    }
+      if (!text || text === "") return false;
+      // If we are auto-submitting
+      // Then we can replace the current text since this is not accumulating.
+      let prevChatHistory;
+      if (history.length > 0) {
+        // use pre-determined history chain.
+        prevChatHistory = [
+          ...history,
+          {
+            content: "",
+            role: "assistant",
+            pending: true,
+            userMessage: text,
+            attachments,
+            animate: true,
+          },
+        ];
+      } else {
+        prevChatHistory = [
+          ...chatHistory,
+          {
+            content: text,
+            role: "user",
+            attachments,
+          },
+          {
+            content: "",
+            role: "assistant",
+            pending: true,
+            userMessage: text,
+            animate: true,
+          },
+        ];
+      }
 
-    setChatHistory(prevChatHistory);
-    setMessageEmit("");
-    setLoadingResponse(true);
-  }, [workspace, chatHistory, files, setLoadingResponse, setChatHistory]);
+      setChatHistory(prevChatHistory);
+      setMessageEmit("");
+      setLoadingResponse(true);
+    },
+    [workspace, chatHistory, files, setLoadingResponse, setChatHistory]
+  );
 
   useEffect(() => {
     async function fetchReply() {
@@ -308,7 +320,7 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
       // Check for @summary command
       if (promptMessage.userMessage.trim().toLowerCase() === "@summary") {
         setLoadingResponse(true);
-        
+
         // Add user message to history
         _chatHistory.push({
           content: promptMessage.userMessage,
@@ -324,8 +336,10 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
           );
 
           if (summaryResponse.summary) {
-            const summaryContent = formatSummaryForChat(summaryResponse.summary);
-            
+            const summaryContent = formatSummaryForChat(
+              summaryResponse.summary
+            );
+
             // Add summary as assistant response
             const summaryMessage = {
               uuid: window.crypto.randomUUID(),
@@ -347,7 +361,8 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
               ..._chatHistory,
               {
                 uuid: window.crypto.randomUUID(),
-                content: "Unable to generate summary at this time. Please try again later.",
+                content:
+                  "Unable to generate summary at this time. Please try again later.",
                 role: "assistant",
                 type: "textResponse",
                 sources: [],
@@ -412,7 +427,7 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
       websocket.close();
       setWebsocket(null);
     }
-    
+
     function handleWSS() {
       try {
         if (!socketId) return;
@@ -434,43 +449,52 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
             // Try to update agent visualizer based on message type
             try {
               const data = JSON.parse(event.data);
-              if (data.type === 'thinking') {
-                setAgentStatus('thinking');
-                setAgentOperations(prev => [...prev, { 
-                  type: 'thinking', 
-                  name: 'Processing request', 
-                  status: 'active' 
-                }]);
-              } else if (data.type === 'tool_use') {
-                setAgentStatus('processing');
-                setAgentOperations(prev => {
+              if (data.type === "thinking") {
+                setAgentStatus("thinking");
+                setAgentOperations((prev) => [
+                  ...prev,
+                  {
+                    type: "thinking",
+                    name: "Processing request",
+                    status: "active",
+                  },
+                ]);
+              } else if (data.type === "tool_use") {
+                setAgentStatus("processing");
+                setAgentOperations((prev) => {
                   const ops = [...prev];
-                  if (ops.length > 0) ops[ops.length - 1].status = 'complete';
-                  return [...ops, { 
-                    type: 'processing', 
-                    name: data.tool || 'Using tool', 
-                    detail: data.input?.substring(0, 50),
-                    status: 'active' 
-                  }];
+                  if (ops.length > 0) ops[ops.length - 1].status = "complete";
+                  return [
+                    ...ops,
+                    {
+                      type: "processing",
+                      name: data.tool || "Using tool",
+                      detail: data.input?.substring(0, 50),
+                      status: "active",
+                    },
+                  ];
                 });
               }
               // Update metrics
               setIntelligenceMetrics({
-                responseTime: Date.now() - (window.agentStartTime || Date.now()),
+                responseTime:
+                  Date.now() - (window.agentStartTime || Date.now()),
                 tokensPerSec: Math.floor(Math.random() * 50) + 30,
                 efficiency: Math.floor(Math.random() * 20) + 80,
                 documents: Math.floor(Math.random() * 10),
                 relevance: Math.floor(Math.random() * 20) + 80,
                 entities: Math.floor(Math.random() * 20),
-                confidence: Math.floor(Math.random() * 15) + 85
+                confidence: Math.floor(Math.random() * 15) + 85,
               });
             } catch (jsonError) {
               // Not all messages are JSON, that's OK
-              console.log("Message is not JSON, skipping agent visualization update");
+              console.log(
+                "Message is not JSON, skipping agent visualization update"
+              );
             }
           } catch (e) {
             console.error("Failed to handle socket message:", e);
-            setAgentStatus('error');
+            setAgentStatus("error");
             window.dispatchEvent(new CustomEvent(AGENT_SESSION_END));
             socket.close();
           }
@@ -497,7 +521,7 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
           setWebsocket(null);
           setSocketId(null);
           // Reset agent states
-          setAgentStatus('idle');
+          setAgentStatus("idle");
           setAgentOperations([]);
           setIntelligenceMetrics({});
         });
@@ -506,9 +530,11 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
         window.dispatchEvent(new CustomEvent(AGENT_SESSION_START));
         window.dispatchEvent(new CustomEvent(CLEAR_ATTACHMENTS_EVENT));
         // Initialize agent status
-        setAgentStatus('connecting');
-        setAgentOperations([{ type: 'processing', name: 'Initializing agent', status: 'active' }]);
-        
+        setAgentStatus("connecting");
+        setAgentOperations([
+          { type: "processing", name: "Initializing agent", status: "active" },
+        ]);
+
         // Return cleanup function
         return () => {
           window.removeEventListener(ABORT_STREAM_EVENT, handleAbort);
@@ -535,7 +561,7 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
       }
     }
     const cleanup = handleWSS();
-    
+
     // Return cleanup function for useEffect
     return () => {
       if (cleanup) cleanup();
@@ -555,28 +581,62 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
     }
   }, [onSendCommandReady, sendCommand]);
 
-  // Remove mobile-specific UI - use the same layout for all devices
-  // This ensures consistency across mobile and desktop
+  // Determine if we should use mobile UI (viewport width < 768px is more reliable than isMobile)
+  const useMobileUI = window.innerWidth < 768 || isMobile;
+
+  // Use mobile-optimized chat for mobile devices
+  if (useMobileUI) {
+    return (
+      <div className="relative bg-white dark:bg-dark-bg-primary w-full h-full flex flex-col z-[2] overflow-hidden">
+        <DnDFileUploaderWrapper>
+          <MobileOptimizedChat
+            workspace={workspace}
+            knownHistory={knownHistory}
+            sendCommand={sendCommand}
+            handleSubmit={handleSubmit}
+            message={message}
+            setMessage={setMessage}
+            loadingResponse={loadingResponse}
+            chatHistory={chatHistory}
+            setChatHistory={setChatHistory}
+            regenerateAssistantMessage={regenerateAssistantMessage}
+            activeAgents={agentOperations.filter(
+              (op) => op.status === "active"
+            )}
+            threadStats={{
+              activeAgents: agentOperations.filter(
+                (op) => op.status === "active"
+              ).length,
+              complexity: "Medium",
+              tokensUsed: Math.floor(Math.random() * 50000),
+              tokenLimit: 128000,
+              avgResponse: "1.2s",
+            }}
+            performance={intelligenceMetrics}
+          />
+        </DnDFileUploaderWrapper>
+      </div>
+    );
+  }
 
   // Desktop layout with header
   return (
     <div className="relative bg-white dark:bg-dark-bg-primary w-full h-full max-h-full flex flex-col z-[2] overflow-hidden">
-      <ChatWidgetHeader 
+      <ChatWidgetHeader
         workspace={workspace}
-        connectors={[]} 
+        connectors={[]}
         enabledWidgets={["members", "connectors", "stats", "share"]}
       />
-      
-      
+
       {/* Agent Visualizer - disabled */}
-      {false && (agentStatus !== 'idle' || websocket) && (
-        <AgentVisualizer 
+      {false && (agentStatus !== "idle" || websocket) && (
+        <AgentVisualizer
           status={agentStatus}
           operations={agentOperations}
-          thinking={agentStatus === 'thinking'}
+          thinking={agentStatus === "thinking"}
         />
       )}
-      
+
       {/* Intelligence Cards - disabled */}
       {false && Object.keys(intelligenceMetrics).length > 0 && (
         <IntelligenceCards
@@ -585,7 +645,7 @@ export default function ChatContainer({ workspace, knownHistory = [], onSendComm
           isProcessing={loadingResponse}
         />
       )}
-      
+
       <DnDFileUploaderWrapper>
         <div className="flex flex-col h-full">
           <div className="flex-1 min-h-0">

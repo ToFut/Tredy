@@ -1,4 +1,4 @@
-import Nango from '@nangohq/frontend';
+import Nango from "@nangohq/frontend";
 
 /**
  * Modular Nango service for handling OAuth connections
@@ -18,31 +18,33 @@ class NangoService {
 
     try {
       // Get Nango config from backend
-      const response = await fetch('/api/v1/system/nango-config');
-      
+      const response = await fetch("/api/v1/system/nango-config");
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       const config = await response.json();
-      
+
       if (!config.publicKey) {
-        throw new Error('Nango public key not configured');
+        throw new Error("Nango public key not configured");
       }
 
       this.publicKey = config.publicKey;
-      this.nango = new Nango({ 
+      this.nango = new Nango({
         publicKey: this.publicKey,
-        host: config.host || 'https://api.nango.dev'
+        host: config.host || "https://api.nango.dev",
       });
-      
+
       // Store environment info
-      this.environment = config.environment || 'development';
-      this.isProduction = this.environment === 'production';
-      
+      this.environment = config.environment || "development";
+      this.isProduction = this.environment === "production";
+
       this.initialized = true;
-      console.log(`[NangoService] Initialized successfully in ${this.environment.toUpperCase()} mode`);
+      console.log(
+        `[NangoService] Initialized successfully in ${this.environment.toUpperCase()} mode`
+      );
     } catch (error) {
-      console.error('[NangoService] Failed to initialize:', error);
+      console.error("[NangoService] Failed to initialize:", error);
       throw error;
     }
   }
@@ -54,21 +56,23 @@ class NangoService {
     await this.initialize();
 
     if (!this.nango) {
-      throw new Error('Nango not initialized');
+      throw new Error("Nango not initialized");
     }
 
     try {
-      console.log(`[NangoService] Starting OAuth for ${providerConfigKey} with connection ${connectionId}`);
-      
+      console.log(
+        `[NangoService] Starting OAuth for ${providerConfigKey} with connection ${connectionId}`
+      );
+
       const result = await this.nango.auth(providerConfigKey, connectionId, {
         detectClosedAuthWindow: true,
-        ...options
+        ...options,
       });
 
-      console.log('[NangoService] OAuth completed:', result);
+      console.log("[NangoService] OAuth completed:", result);
       return result;
     } catch (error) {
-      console.error('[NangoService] OAuth failed:', error);
+      console.error("[NangoService] OAuth failed:", error);
       throw error;
     }
   }
@@ -80,13 +84,13 @@ class NangoService {
     await this.initialize();
 
     if (!this.nango) {
-      throw new Error('Nango not initialized');
+      throw new Error("Nango not initialized");
     }
 
     try {
       return await this.nango.getConnection(providerConfigKey, connectionId);
     } catch (error) {
-      console.error('[NangoService] Failed to get connection:', error);
+      console.error("[NangoService] Failed to get connection:", error);
       return null;
     }
   }
@@ -98,13 +102,13 @@ class NangoService {
     await this.initialize();
 
     if (!this.nango) {
-      throw new Error('Nango not initialized');
+      throw new Error("Nango not initialized");
     }
 
     try {
       return await this.nango.deleteConnection(providerConfigKey, connectionId);
     } catch (error) {
-      console.error('[NangoService] Failed to delete connection:', error);
+      console.error("[NangoService] Failed to delete connection:", error);
       throw error;
     }
   }

@@ -1,42 +1,100 @@
 import React, { useState, useEffect } from "react";
-import { Brain, Sparkle, MagnifyingGlass, Code, Database, ChartLine, Cpu, CaretDown, CaretRight, Globe, Terminal, Lightning, CheckCircle, Warning, Clock, CircleNotch, Copy, Check } from "@phosphor-icons/react";
+import {
+  Brain,
+  Sparkle,
+  MagnifyingGlass,
+  Code,
+  Database,
+  FileSearch,
+  ChartLine,
+  Cpu,
+  CaretDown,
+  CaretRight,
+  Globe,
+  Terminal,
+  Lightning,
+  CheckCircle,
+  Warning,
+  Clock,
+  CircleNotch,
+  Copy,
+  Check,
+} from "@phosphor-icons/react";
 
-export default function AgenticThinking({ stage = 'thinking', context = '', isActive = true, debugMessages = [], operations = [] }) {
+export default function AgenticThinking({
+  stage = "thinking",
+  context = "",
+  isActive = true,
+  debugMessages = [],
+  operations = [],
+}) {
   const [currentProcess, setCurrentProcess] = useState(0);
-  const [dots, setDots] = useState('');
-  
+  const [dots, setDots] = useState("");
+
   const processes = [
-    { icon: Brain, label: "Processing request", color: "from-purple-500 to-pink-500" },
-    { icon: Code, label: "Executing task", color: "from-amber-500 to-orange-500" },
-    { icon: CheckCircle, label: "Completing operation", color: "from-green-500 to-emerald-500" }
+    {
+      icon: Brain,
+      label: "Processing request",
+      color: "from-purple-500 to-pink-500",
+    },
+    {
+      icon: Code,
+      label: "Executing task",
+      color: "from-amber-500 to-orange-500",
+    },
+    {
+      icon: CheckCircle,
+      label: "Completing operation",
+      color: "from-green-500 to-emerald-500",
+    },
   ];
 
   // Tool icons mapping
   const TOOL_ICONS = {
-    'universal-linkedin': Globe,
-    'mcp-server': Terminal,
-    'database': Database,
-    'api': Globe,
-    'code': Code,
-    'facebook': Globe,
-    'messenger': Globe,
-    'linkedin': Globe,
-    'gmail': Globe,
-    'slack': Globe,
-    'default': Lightning
+    "universal-linkedin": Globe,
+    "mcp-server": Terminal,
+    database: Database,
+    api: Globe,
+    code: Code,
+    facebook: Globe,
+    messenger: Globe,
+    linkedin: Globe,
+    gmail: Globe,
+    slack: Globe,
+    default: Lightning,
   };
 
   // Status configuration
   const STATUS_CONFIG = {
-    pending: { icon: Clock, color: 'gray', bgColor: 'bg-gray-100', textColor: 'text-gray-600' },
-    running: { icon: CircleNotch, color: 'blue', bgColor: 'bg-blue-100', textColor: 'text-blue-600' },
-    success: { icon: CheckCircle, color: 'green', bgColor: 'bg-green-100', textColor: 'text-green-600' },
-    error: { icon: Warning, color: 'red', bgColor: 'bg-red-100', textColor: 'text-red-600' }
+    pending: {
+      icon: Clock,
+      color: "gray",
+      bgColor: "bg-gray-100",
+      textColor: "text-gray-600",
+    },
+    running: {
+      icon: CircleNotch,
+      color: "blue",
+      bgColor: "bg-blue-100",
+      textColor: "text-blue-600",
+    },
+    success: {
+      icon: CheckCircle,
+      color: "green",
+      bgColor: "bg-green-100",
+      textColor: "text-green-600",
+    },
+    error: {
+      icon: Warning,
+      color: "red",
+      bgColor: "bg-red-100",
+      textColor: "text-red-600",
+    },
   };
 
   // Helper functions
   const toggleExpanded = (id) => {
-    setExpandedOps(prev => {
+    setExpandedOps((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(id)) {
         newSet.delete(id);
@@ -55,132 +113,134 @@ export default function AgenticThinking({ stage = 'thinking', context = '', isAc
 
   // Helper function to get readable tool information
   const getReadableToolInfo = (tool) => {
-    if (tool.includes('facebook_messenger')) {
+    if (tool.includes("facebook_messenger")) {
       return {
-        name: 'Facebook Messenger',
-        toolIcon: 'facebook',
-        description: '📱 Preparing to send Facebook message'
+        name: "Facebook Messenger",
+        toolIcon: "facebook",
+        description: "📱 Preparing to send Facebook message",
       };
-    } else if (tool.includes('linkedin')) {
+    } else if (tool.includes("linkedin")) {
       return {
-        name: 'LinkedIn',
-        toolIcon: 'linkedin',
-        description: '💼 Preparing LinkedIn action'
+        name: "LinkedIn",
+        toolIcon: "linkedin",
+        description: "💼 Preparing LinkedIn action",
       };
-    } else if (tool.includes('gmail')) {
+    } else if (tool.includes("gmail")) {
       return {
-        name: 'Gmail',
-        toolIcon: 'gmail',
-        description: '📧 Preparing email action'
+        name: "Gmail",
+        toolIcon: "gmail",
+        description: "📧 Preparing email action",
       };
-    } else if (tool.includes('slack')) {
+    } else if (tool.includes("slack")) {
       return {
-        name: 'Slack',
-        toolIcon: 'slack',
-        description: '💬 Preparing Slack message'
+        name: "Slack",
+        toolIcon: "slack",
+        description: "💬 Preparing Slack message",
       };
     }
-    
+
     return {
-      name: tool.replace(/[_-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-      toolIcon: 'default',
-      description: '🔧 Preparing to use external tool'
+      name: tool.replace(/[_-]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+      toolIcon: "default",
+      description: "🔧 Preparing to use external tool",
     };
   };
 
   // Helper function to get readable action from server execution
   const getReadableServerInfo = (server, params) => {
-    if (server.toLowerCase().includes('facebook')) {
-      const text = params?.text || '';
-      const page = params?.page || 'Page';
+    if (server.toLowerCase().includes("facebook")) {
+      const text = params?.text || "";
+      const page = params?.page || "Page";
       return {
-        name: 'Facebook Messenger',
-        toolIcon: 'facebook',
-        description: `📱 Sending message "${text.substring(0, 30)}${text.length > 30 ? '...' : ''}" to ${page}`
+        name: "Facebook Messenger",
+        toolIcon: "facebook",
+        description: `📱 Sending message "${text.substring(0, 30)}${text.length > 30 ? "..." : ""}" to ${page}`,
       };
-    } else if (server.toLowerCase().includes('linkedin')) {
+    } else if (server.toLowerCase().includes("linkedin")) {
       return {
-        name: 'LinkedIn',
-        toolIcon: 'linkedin',
-        description: '💼 Executing LinkedIn action'
+        name: "LinkedIn",
+        toolIcon: "linkedin",
+        description: "💼 Executing LinkedIn action",
       };
-    } else if (server.toLowerCase().includes('gmail')) {
+    } else if (server.toLowerCase().includes("gmail")) {
       return {
-        name: 'Gmail',
-        toolIcon: 'gmail',
-        description: '📧 Processing email request'
+        name: "Gmail",
+        toolIcon: "gmail",
+        description: "📧 Processing email request",
       };
-    } else if (server.toLowerCase().includes('slack')) {
+    } else if (server.toLowerCase().includes("slack")) {
       return {
-        name: 'Slack',
-        toolIcon: 'slack',
-        description: '💬 Sending team message'
+        name: "Slack",
+        toolIcon: "slack",
+        description: "💬 Sending team message",
       };
     }
-    
+
     return {
-      name: server.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-      toolIcon: 'default',
-      description: `🔧 Executing ${server} integration`
+      name: server.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+      toolIcon: "default",
+      description: `🔧 Executing ${server} integration`,
     };
   };
 
   const parseOperations = () => {
     if (operations && operations.length > 0) return operations;
-    
+
     // Parse debug messages into operations
-    return debugMessages.map((msg, index) => {
-      if (msg.includes('@agent is attempting to call')) {
-        const toolMatch = msg.match(/`([^`]+)`/);
-        const tool = toolMatch ? toolMatch[1] : 'unknown';
-        const toolInfo = getReadableToolInfo(tool);
-        
-        return {
-          id: index,
-          name: toolInfo.name,
-          tool: toolInfo.toolIcon,
-          status: 'pending',
-          description: toolInfo.description,
-          debugMsg: msg
-        };
-      } else if (msg.includes('Executing MCP server:')) {
-        const serverMatch = msg.match(/Executing MCP server: ([^\s]+)/);
-        const server = serverMatch ? serverMatch[1] : 'unknown';
-        let params = null;
-        try {
-          const paramsMatch = msg.match(/with (.+)$/);
-          if (paramsMatch) {
-            params = JSON.parse(paramsMatch[1]);
-          }
-        } catch (e) {}
-        
-        const serverInfo = getReadableServerInfo(server, params);
-        
-        return {
-          id: index,
-          name: serverInfo.name,
-          tool: serverInfo.toolIcon,
-          status: 'running',
-          description: serverInfo.description,
-          params: params,
-          debugMsg: msg
-        };
-      } else if (msg.includes('completed successfully')) {
-        const serverMatch = msg.match(/MCP server: ([^:]+):/);
-        const server = serverMatch ? serverMatch[1] : 'unknown';
-        const serverInfo = getReadableServerInfo(server, null);
-        
-        return {
-          id: index,
-          name: serverInfo.name,
-          tool: serverInfo.toolIcon,
-          status: 'success',
-          description: '✅ Task completed successfully',
-          debugMsg: msg
-        };
-      }
-      return null;
-    }).filter(Boolean);
+    return debugMessages
+      .map((msg, index) => {
+        if (msg.includes("@agent is attempting to call")) {
+          const toolMatch = msg.match(/`([^`]+)`/);
+          const tool = toolMatch ? toolMatch[1] : "unknown";
+          const toolInfo = getReadableToolInfo(tool);
+
+          return {
+            id: index,
+            name: toolInfo.name,
+            tool: toolInfo.toolIcon,
+            status: "pending",
+            description: toolInfo.description,
+            debugMsg: msg,
+          };
+        } else if (msg.includes("Executing MCP server:")) {
+          const serverMatch = msg.match(/Executing MCP server: ([^\s]+)/);
+          const server = serverMatch ? serverMatch[1] : "unknown";
+          let params = null;
+          try {
+            const paramsMatch = msg.match(/with (.+)$/);
+            if (paramsMatch) {
+              params = JSON.parse(paramsMatch[1]);
+            }
+          } catch (e) {}
+
+          const serverInfo = getReadableServerInfo(server, params);
+
+          return {
+            id: index,
+            name: serverInfo.name,
+            tool: serverInfo.toolIcon,
+            status: "running",
+            description: serverInfo.description,
+            params: params,
+            debugMsg: msg,
+          };
+        } else if (msg.includes("completed successfully")) {
+          const serverMatch = msg.match(/MCP server: ([^:]+):/);
+          const server = serverMatch ? serverMatch[1] : "unknown";
+          const serverInfo = getReadableServerInfo(server, null);
+
+          return {
+            id: index,
+            name: serverInfo.name,
+            tool: serverInfo.toolIcon,
+            status: "success",
+            description: "✅ Task completed successfully",
+            debugMsg: msg,
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
   };
 
   const parsedOperations = parseOperations();
@@ -188,7 +248,7 @@ export default function AgenticThinking({ stage = 'thinking', context = '', isAc
   // Animate dots
   useEffect(() => {
     const interval = setInterval(() => {
-      setDots(prev => {
+      setDots((prev) => {
         if (prev === "...") return "";
         return prev + ".";
       });
@@ -199,7 +259,7 @@ export default function AgenticThinking({ stage = 'thinking', context = '', isAc
   // Progress through processes
   useEffect(() => {
     if (!isActive) return;
-    
+
     const interval = setInterval(() => {
       setCurrentProcess((prev) => (prev + 1) % processes.length);
     }, 2000);
@@ -223,12 +283,12 @@ export default function AgenticThinking({ stage = 'thinking', context = '', isAc
         {processes.slice(0, currentProcess + 1).map((process, index) => {
           const isCompleted = index < currentProcess;
           const isCurrent = index === currentProcess;
-          
+
           return (
             <div
               key={index}
               className={`flex items-start gap-[8px] transition-opacity duration-300 ${
-                isCurrent ? 'opacity-100' : 'opacity-70'
+                isCurrent ? "opacity-100" : "opacity-70"
               }`}
             >
               {/* Animated bullet */}
@@ -239,12 +299,15 @@ export default function AgenticThinking({ stage = 'thinking', context = '', isAc
                   <div className="w-[3px] h-[3px] bg-gray-800 rounded-full animate-pulse" />
                 )}
               </div>
-              
+
               {/* Animated text */}
-              <span className={`text-[12px] leading-[18px] font-normal ${
-                isCompleted ? 'text-gray-600' : 'text-gray-800'
-              }`}>
-                {process.label}{isCurrent ? dots : ''}
+              <span
+                className={`text-[12px] leading-[18px] font-normal ${
+                  isCompleted ? "text-gray-600" : "text-gray-800"
+                }`}
+              >
+                {process.label}
+                {isCurrent ? dots : ""}
               </span>
             </div>
           );
@@ -257,10 +320,10 @@ export default function AgenticThinking({ stage = 'thinking', context = '', isAc
 // Simplified inline thinking indicator
 export function InlineThinking({ message = "Processing" }) {
   const [dots, setDots] = useState(0);
-  
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setDots(prev => (prev + 1) % 4);
+      setDots((prev) => (prev + 1) % 4);
     }, 500);
     return () => clearInterval(interval);
   }, []);
@@ -272,7 +335,8 @@ export function InlineThinking({ message = "Processing" }) {
         <Sparkle className="w-3 h-3 text-amber-500 animate-pulse" />
       </div>
       <span className="text-sm font-medium text-purple-700">
-        {message}{'.'.repeat(dots)}
+        {message}
+        {".".repeat(dots)}
       </span>
     </div>
   );
@@ -288,22 +352,22 @@ export function ThinkingBar({ processes = [], currentStep = 0 }) {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center animate-pulse">
             <Brain className="w-4 h-4 text-white" />
           </div>
-          
+
           {/* Process name */}
           <div className="flex-1">
             <p className="text-xs text-gray-500">AI Processing</p>
             <p className="text-sm font-medium text-gray-900">
-              {processes[currentStep] || 'Thinking...'}
+              {processes[currentStep] || "Thinking..."}
             </p>
           </div>
-          
+
           {/* Progress */}
           <div className="flex gap-1">
             {processes.map((_, i) => (
               <div
                 key={i}
                 className={`w-1.5 h-1.5 rounded-full transition-all ${
-                  i <= currentStep ? 'bg-purple-500' : 'bg-gray-300'
+                  i <= currentStep ? "bg-purple-500" : "bg-gray-300"
                 }`}
               />
             ))}

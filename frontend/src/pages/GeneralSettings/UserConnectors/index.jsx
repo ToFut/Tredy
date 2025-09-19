@@ -34,7 +34,7 @@ export default function UserConnectors() {
           UserConnector.list(),
           UserConnector.getAvailable(),
         ]);
-        
+
         setConnectors(userConnectors);
         setAvailableConnectors(available);
       } catch (error) {
@@ -58,7 +58,7 @@ export default function UserConnectors() {
           "connector_auth",
           "width=600,height=700"
         );
-        
+
         // Listen for OAuth callback
         const checkInterval = setInterval(() => {
           if (authWindow.closed) {
@@ -126,8 +126,9 @@ export default function UserConnectors() {
               <Plug className="w-6 h-6 text-theme-text-secondary" />
             </div>
             <p className="text-sm text-theme-text-secondary">
-              Connect your accounts and services to access data across all your workspaces.
-              These integrations are available to you in every workspace you create or join.
+              Connect your accounts and services to access data across all your
+              workspaces. These integrations are available to you in every
+              workspace you create or join.
             </p>
           </div>
 
@@ -153,7 +154,8 @@ export default function UserConnectors() {
                   No connectors configured
                 </h3>
                 <p className="text-sm text-theme-text-secondary mb-6">
-                  Connect your first data source to start accessing external data in your chats.
+                  Connect your first data source to start accessing external
+                  data in your chats.
                 </p>
                 <button
                   onClick={() => setShowAddModal(true)}
@@ -187,11 +189,21 @@ export default function UserConnectors() {
                   About User Connectors
                 </h3>
                 <ul className="text-sm text-theme-text-secondary space-y-1">
-                  <li>• Connectors are tied to your user account, not individual workspaces</li>
-                  <li>• All your workspaces automatically have access to these data sources</li>
+                  <li>
+                    • Connectors are tied to your user account, not individual
+                    workspaces
+                  </li>
+                  <li>
+                    • All your workspaces automatically have access to these
+                    data sources
+                  </li>
                   <li>• OAuth tokens are securely encrypted and stored</li>
-                  <li>• Data is synced automatically based on the connector type</li>
-                  <li>• You can manage permissions and scopes for each connector</li>
+                  <li>
+                    • Data is synced automatically based on the connector type
+                  </li>
+                  <li>
+                    • You can manage permissions and scopes for each connector
+                  </li>
                 </ul>
               </div>
             </div>

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Cpu, 
-  Stack as Layers, 
-  Lightning as Zap, 
-  TrendingUp,
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Cpu,
+  Stack as Layers,
+  Lightning as Zap,
   ChartLine,
   Shield,
   Clock,
@@ -12,62 +11,64 @@ import {
   Users,
   Trophy as Award,
   ChartBar as BarChart3,
-  Sparkle as Sparkles
-} from '@phosphor-icons/react';
+  Sparkle as Sparkles,
+} from "@phosphor-icons/react";
 
-export default function SmartContextPills({ 
-  threadStats = {}, 
+export default function SmartContextPills({
+  threadStats = {},
   workspace = {},
-  performance = {}
+  performance = {},
 }) {
   const [selectedPill, setSelectedPill] = useState(null);
-  
+
   const pills = [
     {
-      id: 'agents',
+      id: "agents",
       icon: Users,
-      label: 'Agents',
+      label: "Agents",
       value: threadStats.activeAgents || 0,
-      color: 'from-purple-500 to-pink-500',
+      color: "from-purple-500 to-pink-500",
       detail: `${threadStats.totalAgentCalls || 0} total calls this session`,
-      trend: threadStats.agentTrend || '+12%'
+      trend: threadStats.agentTrend || "+12%",
     },
     {
-      id: 'complexity',
+      id: "complexity",
       icon: Layers,
-      label: 'Complexity',
-      value: threadStats.complexity || 'Medium',
-      color: 'from-blue-500 to-cyan-500',
-      detail: 'Based on context switches and tool usage',
-      score: threadStats.complexityScore || 65
+      label: "Complexity",
+      value: threadStats.complexity || "Medium",
+      color: "from-blue-500 to-cyan-500",
+      detail: "Based on context switches and tool usage",
+      score: threadStats.complexityScore || 65,
     },
     {
-      id: 'tokens',
+      id: "tokens",
       icon: Zap,
-      label: 'Tokens',
+      label: "Tokens",
       value: `${(threadStats.tokensUsed || 0) / 1000}k`,
-      color: 'from-yellow-500 to-orange-500',
+      color: "from-yellow-500 to-orange-500",
       detail: `${threadStats.tokenLimit || 128}k limit`,
-      percentage: ((threadStats.tokensUsed || 0) / (threadStats.tokenLimit || 128000)) * 100
+      percentage:
+        ((threadStats.tokensUsed || 0) / (threadStats.tokenLimit || 128000)) *
+        100,
     },
     {
-      id: 'quality',
+      id: "quality",
       icon: Award,
-      label: 'Quality',
-      value: performance.qualityScore || '98%',
-      color: 'from-green-500 to-emerald-500',
-      detail: 'Response accuracy and relevance',
-      badge: performance.badge || 'Excellent'
+      label: "Quality",
+      value: performance.qualityScore || "98%",
+      color: "from-green-500 to-emerald-500",
+      detail: "Response accuracy and relevance",
+      badge: performance.badge || "Excellent",
     },
     {
-      id: 'speed',
+      id: "speed",
       icon: Clock,
-      label: 'Speed',
-      value: performance.avgResponseTime || '1.2s',
-      color: 'from-indigo-500 to-purple-500',
-      detail: 'Average response generation time',
-      comparison: 'Faster than 89% of sessions'
-    }
+      label: "Speed",
+      value: performance.avgResponseTime || "1.2s",
+      color: "from-indigo-500 to-purple-500",
+      detail: "Average response generation time",
+      comparison: "Faster than 89% of sessions",
+    },
   ];
 
   const handlePillTouch = (pill) => {
@@ -92,7 +93,7 @@ export default function SmartContextPills({
                 onClick={() => handlePillTouch(pill)}
                 className={`
                   flex-shrink-0 relative group cursor-pointer select-none
-                  ${selectedPill?.id === pill.id ? 'z-10' : 'z-0'}
+                  ${selectedPill?.id === pill.id ? "z-10" : "z-0"}
                 `}
               >
                 {/* Pill Container */}
@@ -102,14 +103,16 @@ export default function SmartContextPills({
                     flex items-center gap-2 px-3 py-2 rounded-full
                     bg-black/60 backdrop-blur-xl border border-white/10
                     transition-all duration-200
-                    ${selectedPill?.id === pill.id ? 'ring-2 ring-white/30' : ''}
+                    ${selectedPill?.id === pill.id ? "ring-2 ring-white/30" : ""}
                   `}
                 >
                   {/* Icon with Gradient Background */}
-                  <div className={`p-1.5 rounded-full bg-gradient-to-r ${pill.color}`}>
+                  <div
+                    className={`p-1.5 rounded-full bg-gradient-to-r ${pill.color}`}
+                  >
                     <Icon className="w-3 h-3 text-white" />
                   </div>
-                  
+
                   {/* Label and Value */}
                   <div className="flex flex-col">
                     <span className="text-white/60 text-[10px] font-medium leading-tight">
@@ -165,7 +168,7 @@ export default function SmartContextPills({
                 </motion.div>
 
                 {/* Active Pulse Animation */}
-                {pill.id === 'agents' && threadStats.activeAgents > 0 && (
+                {pill.id === "agents" && threadStats.activeAgents > 0 && (
                   <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 animate-pulse pointer-events-none" />
                 )}
               </motion.div>
@@ -183,13 +186,15 @@ export default function SmartContextPills({
         {selectedPill && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="px-4 overflow-hidden"
           >
             <div className="bg-black/40 backdrop-blur-xl rounded-xl border border-white/10 p-3 mt-2">
               <div className="flex items-start gap-3">
-                <div className={`p-2 rounded-lg bg-gradient-to-r ${selectedPill.color}`}>
+                <div
+                  className={`p-2 rounded-lg bg-gradient-to-r ${selectedPill.color}`}
+                >
                   <selectedPill.icon className="w-4 h-4 text-white" />
                 </div>
                 <div className="flex-1">

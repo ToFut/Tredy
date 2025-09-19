@@ -27,15 +27,15 @@ export function websocketURI() {
 
 // Check if a message is a debug message that should be captured for thinking display
 function isDebugMessage(message) {
-  if (!message || typeof message !== 'string') return false;
-  
+  if (!message || typeof message !== "string") return false;
+
   return (
-    message.includes('[debug]:') ||
-    message.includes('@agent is attempting to call') ||
-    message.includes('Executing MCP server:') ||
-    message.includes('MCP server:') ||
-    message.includes('completed successfully') ||
-    message.includes('failed with error')
+    message.includes("[debug]:") ||
+    message.includes("@agent is attempting to call") ||
+    message.includes("Executing MCP server:") ||
+    message.includes("MCP server:") ||
+    message.includes("completed successfully") ||
+    message.includes("failed with error")
   );
 }
 
@@ -50,14 +50,17 @@ export default function handleSocketResponse(event, setChatHistory) {
   // that we need to print to the user as a system response
   if (!data.hasOwnProperty("type")) {
     // Handle both string messages and object messages without type
-    const messageContent = typeof data === 'string' ? data : (data.content || data.message || JSON.stringify(data));
-    
+    const messageContent =
+      typeof data === "string"
+        ? data
+        : data.content || data.message || JSON.stringify(data);
+
     // Skip empty messages
-    if (!messageContent || messageContent.trim() === '') {
+    if (!messageContent || messageContent.trim() === "") {
       console.log("[Agent Response] Skipping empty message");
       return;
     }
-    
+
     // Check if this is a debug message and mark it for special styling
     if (isDebugMessage(messageContent)) {
       return setChatHistory((prev) => {
@@ -78,7 +81,7 @@ export default function handleSocketResponse(event, setChatHistory) {
         ];
       });
     }
-    
+
     return setChatHistory((prev) => {
       // Remove any pending messages first
       const filtered = prev.filter((msg) => !msg.pending);
@@ -101,7 +104,10 @@ export default function handleSocketResponse(event, setChatHistory) {
   // Allow messages with types not in handledEvents if they have content and look like assistant messages
   if (!handledEvents.includes(data.type)) {
     if (data.content && data.role === "assistant") {
-      console.log("[Agent Response] Handling unregistered message type as assistant message:", data.type);
+      console.log(
+        "[Agent Response] Handling unregistered message type as assistant message:",
+        data.type
+      );
       return setChatHistory((prev) => {
         const filtered = prev.filter((msg) => !msg.pending);
         return [
@@ -169,7 +175,7 @@ export default function handleSocketResponse(event, setChatHistory) {
     return setChatHistory((prev) => {
       const lastMessage = prev[prev.length - 1];
       if (!lastMessage || lastMessage.role !== "assistant") return prev;
-      
+
       // Update the last assistant message with thinking metrics
       return prev.map((msg, idx) => {
         if (idx === prev.length - 1) {
@@ -178,8 +184,8 @@ export default function handleSocketResponse(event, setChatHistory) {
             thinkingMetrics: {
               ...msg.thinkingMetrics,
               [data.eventType]: data.data,
-              lastUpdate: data.timestamp
-            }
+              lastUpdate: data.timestamp,
+            },
           };
         }
         return msg;
@@ -192,7 +198,9 @@ export default function handleSocketResponse(event, setChatHistory) {
     // Store tool call in the last assistant message
     return setChatHistory((prev) => {
       const messages = [...prev];
-      const lastAssistantMsg = messages.filter(m => m.role === "assistant").pop();
+      const lastAssistantMsg = messages
+        .filter((m) => m.role === "assistant")
+        .pop();
       if (lastAssistantMsg) {
         if (!lastAssistantMsg.toolCalls) lastAssistantMsg.toolCalls = [];
         lastAssistantMsg.toolCalls.push(data.content);
@@ -205,9 +213,13 @@ export default function handleSocketResponse(event, setChatHistory) {
     // Update existing tool call status
     return setChatHistory((prev) => {
       const messages = [...prev];
-      const lastAssistantMsg = messages.filter(m => m.role === "assistant").pop();
+      const lastAssistantMsg = messages
+        .filter((m) => m.role === "assistant")
+        .pop();
       if (lastAssistantMsg && lastAssistantMsg.toolCalls) {
-        const toolCall = lastAssistantMsg.toolCalls.find(tc => tc.id === data.content.id);
+        const toolCall = lastAssistantMsg.toolCalls.find(
+          (tc) => tc.id === data.content.id
+        );
         if (toolCall) {
           Object.assign(toolCall, data.content);
         }

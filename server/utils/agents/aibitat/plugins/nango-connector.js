@@ -19,7 +19,8 @@ const nangoConnector = {
         aibitat.function({
           super: aibitat,
           name: "list-connected-services",
-          description: "List all connected external services for this workspace",
+          description:
+            "List all connected external services for this workspace",
           parameters: {
             $schema: "http://json-schema.org/draft-07/schema#",
             type: "object",
@@ -28,15 +29,16 @@ const nangoConnector = {
           },
           handler: async function () {
             try {
-              const workspaceId = this.super.handlerProps.invocation.workspace_id;
+              const workspaceId =
+                this.super.handlerProps.invocation.workspace_id;
               const connections = await nango.listConnections(workspaceId);
-              
+
               if (connections.length === 0) {
                 return "No services connected. Ask the user to connect services in workspace settings.";
               }
 
               return `Connected services:\n${connections
-                .map(c => `- ${c.provider_config_key}: ${c.connection_id}`)
+                .map((c) => `- ${c.provider_config_key}: ${c.connection_id}`)
                 .join("\n")}`;
             } catch (error) {
               return `Error listing connections: ${error.message}`;
@@ -67,7 +69,8 @@ const nangoConnector = {
           },
           handler: async function ({ action, data = {} }) {
             try {
-              const workspaceId = this.super.handlerProps.invocation.workspace_id;
+              const workspaceId =
+                this.super.handlerProps.invocation.workspace_id;
 
               if (action === "list") {
                 // List upcoming events
@@ -90,7 +93,10 @@ const nangoConnector = {
                 }
 
                 return `Upcoming events:\n${events
-                  .map(e => `- ${e.summary}: ${e.start?.dateTime || e.start?.date}`)
+                  .map(
+                    (e) =>
+                      `- ${e.summary}: ${e.start?.dateTime || e.start?.date}`
+                  )
                   .join("\n")}`;
               }
 
@@ -147,7 +153,8 @@ const nangoConnector = {
           },
           handler: async function ({ resource, limit = 10 }) {
             try {
-              const workspaceId = this.super.handlerProps.invocation.workspace_id;
+              const workspaceId =
+                this.super.handlerProps.invocation.workspace_id;
 
               const response = await nango.proxyRequest({
                 provider: "shopify",
@@ -165,17 +172,23 @@ const nangoConnector = {
               switch (resource) {
                 case "products":
                   return `Products:\n${items
-                    .map(p => `- ${p.title}: ${p.variants?.[0]?.price} ${p.currency}`)
+                    .map(
+                      (p) =>
+                        `- ${p.title}: ${p.variants?.[0]?.price} ${p.currency}`
+                    )
                     .join("\n")}`;
 
                 case "orders":
                   return `Recent orders:\n${items
-                    .map(o => `- Order #${o.order_number}: ${o.total_price} ${o.currency} (${o.financial_status})`)
+                    .map(
+                      (o) =>
+                        `- Order #${o.order_number}: ${o.total_price} ${o.currency} (${o.financial_status})`
+                    )
                     .join("\n")}`;
 
                 case "customers":
                   return `Customers:\n${items
-                    .map(c => `- ${c.first_name} ${c.last_name}: ${c.email}`)
+                    .map((c) => `- ${c.first_name} ${c.last_name}: ${c.email}`)
                     .join("\n")}`;
 
                 default:
@@ -214,7 +227,8 @@ const nangoConnector = {
           },
           handler: async function ({ action, repo, data = {} }) {
             try {
-              const workspaceId = this.super.handlerProps.invocation.workspace_id;
+              const workspaceId =
+                this.super.handlerProps.invocation.workspace_id;
 
               switch (action) {
                 case "list-repos":
@@ -227,12 +241,16 @@ const nangoConnector = {
                   });
 
                   return `Repositories:\n${repos
-                    .map(r => `- ${r.full_name}: ${r.description || "No description"}`)
+                    .map(
+                      (r) =>
+                        `- ${r.full_name}: ${r.description || "No description"}`
+                    )
                     .join("\n")}`;
 
                 case "list-issues":
-                  if (!repo) return "Repository name required for listing issues.";
-                  
+                  if (!repo)
+                    return "Repository name required for listing issues.";
+
                   const issues = await nango.proxyRequest({
                     provider: "github",
                     workspaceId,
@@ -242,12 +260,13 @@ const nangoConnector = {
                   });
 
                   return `Open issues in ${repo}:\n${issues
-                    .map(i => `- #${i.number}: ${i.title}`)
+                    .map((i) => `- #${i.number}: ${i.title}`)
                     .join("\n")}`;
 
                 case "create-issue":
-                  if (!repo) return "Repository name required for creating issue.";
-                  
+                  if (!repo)
+                    return "Repository name required for creating issue.";
+
                   const issue = await nango.proxyRequest({
                     provider: "github",
                     workspaceId,
@@ -275,14 +294,16 @@ const nangoConnector = {
         aibitat.function({
           super: aibitat,
           name: "nango-api-request",
-          description: "Make authenticated API request to any connected service",
+          description:
+            "Make authenticated API request to any connected service",
           parameters: {
             $schema: "http://json-schema.org/draft-07/schema#",
             type: "object",
             properties: {
               provider: {
                 type: "string",
-                description: "Provider key (e.g., 'shopify', 'google-calendar', 'github')",
+                description:
+                  "Provider key (e.g., 'shopify', 'google-calendar', 'github')",
               },
               method: {
                 type: "string",
@@ -302,7 +323,8 @@ const nangoConnector = {
           },
           handler: async function ({ provider, method, endpoint, data }) {
             try {
-              const workspaceId = this.super.handlerProps.invocation.workspace_id;
+              const workspaceId =
+                this.super.handlerProps.invocation.workspace_id;
 
               const response = await nango.proxyRequest({
                 provider,
@@ -341,10 +363,15 @@ const nangoConnector = {
           },
           handler: async function ({ provider, syncName }) {
             try {
-              const workspaceId = this.super.handlerProps.invocation.workspace_id;
+              const workspaceId =
+                this.super.handlerProps.invocation.workspace_id;
 
-              const records = await nango.getSyncedData(provider, workspaceId, syncName);
-              
+              const records = await nango.getSyncedData(
+                provider,
+                workspaceId,
+                syncName
+              );
+
               if (!records || records.length === 0) {
                 return `No synced data found for ${syncName} from ${provider}.`;
               }

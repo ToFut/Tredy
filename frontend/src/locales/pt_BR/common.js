@@ -150,8 +150,7 @@ const TRANSLATIONS = {
     checklist: {
       title: "Primeiros Passos",
       tasksLeft: "tarefas restantes",
-      completed:
-        "Você está no caminho para se tornar um expert em Tredy!",
+      completed: "Você está no caminho para se tornar um expert em Tredy!",
       dismiss: "fechar",
       tasks: {
         create_workspace: {

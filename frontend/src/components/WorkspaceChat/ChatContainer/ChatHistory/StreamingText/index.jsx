@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 
-export default function StreamingText({ 
-  text = "", 
+export default function StreamingText({
+  text = "",
   speed = 30,
   onComplete = () => {},
-  showCursor = true 
+  showCursor = true,
 }) {
   const [displayedText, setDisplayedText] = useState("");
   const [isComplete, setIsComplete] = useState(false);
@@ -12,7 +12,7 @@ export default function StreamingText({
 
   useEffect(() => {
     if (!text) return;
-    
+
     // Reset when text changes
     setDisplayedText("");
     setIsComplete(false);
@@ -52,11 +52,7 @@ export function TypewriterEffect({ children, delay = 0 }) {
 
   if (!show) return null;
 
-  return (
-    <div className="animate-fadeIn">
-      {children}
-    </div>
-  );
+  return <div className="animate-fadeIn">{children}</div>;
 }
 
 // Add this CSS to your styles

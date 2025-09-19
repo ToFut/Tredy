@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { 
+import {
   Send,
   Bot,
   Activity,
@@ -7,9 +7,9 @@ import {
   ChevronDown,
   ChevronRight,
   Clock,
-  CheckCircle,
+  CheckCircle2,
   Loader2,
-  Bolt,
+  Zap,
   Cpu,
   Sparkles,
   Menu,
@@ -19,48 +19,58 @@ import {
   Settings,
   Users,
   FileText,
-  GitBranch,
+  Workflow,
   TrendingUp,
   Target,
   Calendar,
   Mail,
   MessageSquare,
   FolderOpen,
-  Database
+  Database,
 } from "lucide-react";
 
 // Tool logos mapping - Real Estate Purchasing Tools
 const toolLogos = {
-  "Property Search": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg",
-  "Financial Analysis": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg",
-  "Legal Documents": "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg",
-  "CRM": "https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg",
-  "AI Analysis": "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
-  "AI Engine": "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
-  "Analytics": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Google_Chrome_icon_%282011%29.svg",
-  "Property Matching": "https://upload.wikimedia.org/wikipedia/commons/3/33/Figma-logo.svg",
-  "Loan Processing": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Jira_Logo.svg",
-  "Agent Coordination": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Slack_icon_2019.svg",
-  "Document Generation": "https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg",
-  "Market Analysis": "https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png"
+  "Property Search":
+    "https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg",
+  "Financial Analysis":
+    "https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg",
+  "Legal Documents":
+    "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg",
+  CRM: "https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg",
+  "AI Analysis":
+    "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
+  "AI Engine":
+    "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
+  Analytics:
+    "https://upload.wikimedia.org/wikipedia/commons/3/3f/Google_Chrome_icon_%282011%29.svg",
+  "Property Matching":
+    "https://upload.wikimedia.org/wikipedia/commons/3/33/Figma-logo.svg",
+  "Loan Processing":
+    "https://upload.wikimedia.org/wikipedia/commons/8/8a/Jira_Logo.svg",
+  "Agent Coordination":
+    "https://upload.wikimedia.org/wikipedia/commons/d/d5/Slack_icon_2019.svg",
+  "Document Generation":
+    "https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg",
+  "Market Analysis":
+    "https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png",
 };
 
-export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
+export default function BusinessChat({ selectedIndustry = "Real Estate" }) {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [expandedDetails, setExpandedDetails] = useState({});
   const [typingMessage, setTypingMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [isMenuCollapsed, setIsMenuCollapsed] = useState(false);
-  const [mobileView, setMobileView] = useState('chat'); // 'chat' or 'dashboard'
-  const [error, setError] = useState(null);
+  const [mobileView, setMobileView] = useState("chat"); // 'chat' or 'dashboard'
   const chatContainerRef = useRef(null);
   const scrollTimeoutRef = useRef(null);
   const isScrollingRef = useRef(false);
 
   // Industry-specific data
   const industryData = {
-    'Real Estate': {
+    "Real Estate": {
       menuItems: [
         { icon: Home, label: "Dashboard", active: true },
         { icon: BarChart3, label: "Property Analytics" },
@@ -70,8 +80,8 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         { icon: MessageSquare, label: "Client Communication" },
         { icon: FolderOpen, label: "Property Documents" },
         { icon: Database, label: "Property CRM" },
-        { icon: GitBranch, label: "Purchase Automation" },
-        { icon: Settings, label: "Settings" }
+        { icon: Workflow, label: "Purchase Automation" },
+        { icon: Settings, label: "Settings" },
       ],
       dashboardData: {
         title: "Real Estate Success Dashboard",
@@ -82,32 +92,104 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
           challenge: "Manual property acquisition process taking 3-6 months",
           solution: "AI-powered property matching and automated due diligence",
           results: [
-            { metric: "Deal Closure Time", before: "3-6 months", after: "2-3 weeks", improvement: "85% faster" },
-            { metric: "Due Diligence Accuracy", before: "78%", after: "96%", improvement: "+18%" },
-            { metric: "Cost per Transaction", before: "$45,000", after: "$12,000", improvement: "73% reduction" },
-            { metric: "Deal Success Rate", before: "23%", after: "67%", improvement: "+44%" }
-          ]
+            {
+              metric: "Deal Closure Time",
+              before: "3-6 months",
+              after: "2-3 weeks",
+              improvement: "85% faster",
+            },
+            {
+              metric: "Due Diligence Accuracy",
+              before: "78%",
+              after: "96%",
+              improvement: "+18%",
+            },
+            {
+              metric: "Cost per Transaction",
+              before: "$45,000",
+              after: "$12,000",
+              improvement: "73% reduction",
+            },
+            {
+              metric: "Deal Success Rate",
+              before: "23%",
+              after: "67%",
+              improvement: "+44%",
+            },
+          ],
         },
         visualizations: [
-          { type: "chart", title: "Property Acquisition Timeline", data: "Before vs After comparison" },
-          { type: "map", title: "Active Property Pipeline", data: "12 properties in negotiation" },
-          { type: "graph", title: "ROI Analysis", data: "Average 23% ROI improvement" }
+          {
+            type: "chart",
+            title: "Property Acquisition Timeline",
+            data: "Before vs After comparison",
+          },
+          {
+            type: "map",
+            title: "Active Property Pipeline",
+            data: "12 properties in negotiation",
+          },
+          {
+            type: "graph",
+            title: "ROI Analysis",
+            data: "Average 23% ROI improvement",
+          },
         ],
         recentActivity: [
-          { type: "deal", message: "$2.4M office building acquisition completed", time: "2 min ago", status: "closed" },
-          { type: "analysis", message: "Market analysis for downtown property updated", time: "5 min ago", status: "completed" },
-          { type: "financing", message: "Loan pre-approval processed for 3 properties", time: "8 min ago", status: "approved" },
-          { type: "legal", message: "Purchase agreement generated for warehouse deal", time: "12 min ago", status: "ready" }
+          {
+            type: "deal",
+            message: "$2.4M office building acquisition completed",
+            time: "2 min ago",
+            status: "closed",
+          },
+          {
+            type: "analysis",
+            message: "Market analysis for downtown property updated",
+            time: "5 min ago",
+            status: "completed",
+          },
+          {
+            type: "financing",
+            message: "Loan pre-approval processed for 3 properties",
+            time: "8 min ago",
+            status: "approved",
+          },
+          {
+            type: "legal",
+            message: "Purchase agreement generated for warehouse deal",
+            time: "12 min ago",
+            status: "ready",
+          },
         ],
         automations: [
-          { name: "Property Matching", status: "active", efficiency: "95%", value: "Saves 40 hours/week" },
-          { name: "Financial Analysis", status: "active", efficiency: "100%", value: "Reduces errors by 85%" },
-          { name: "Document Processing", status: "active", efficiency: "98%", value: "Processes 50 docs/hour" },
-          { name: "Market Intelligence", status: "active", efficiency: "92%", value: "Real-time market data" }
-        ]
-      }
+          {
+            name: "Property Matching",
+            status: "active",
+            efficiency: "95%",
+            value: "Saves 40 hours/week",
+          },
+          {
+            name: "Financial Analysis",
+            status: "active",
+            efficiency: "100%",
+            value: "Reduces errors by 85%",
+          },
+          {
+            name: "Document Processing",
+            status: "active",
+            efficiency: "98%",
+            value: "Processes 50 docs/hour",
+          },
+          {
+            name: "Market Intelligence",
+            status: "active",
+            efficiency: "92%",
+            value: "Real-time market data",
+          },
+        ],
+      },
     },
-    'Healthcare': {
+    Healthcare: {
       menuItems: [
         { icon: Home, label: "Dashboard", active: true },
         { icon: BarChart3, label: "Patient Analytics" },
@@ -117,8 +199,8 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         { icon: MessageSquare, label: "Telemedicine" },
         { icon: FolderOpen, label: "Medical Records" },
         { icon: Database, label: "Patient CRM" },
-        { icon: GitBranch, label: "Care Automation" },
-        { icon: Settings, label: "Settings" }
+        { icon: Workflow, label: "Care Automation" },
+        { icon: Settings, label: "Settings" },
       ],
       dashboardData: {
         title: "Healthcare Excellence Dashboard",
@@ -127,34 +209,107 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
           company: "Regional Medical Center",
           location: "Austin, Texas",
           challenge: "Patient wait times averaging 2.5 hours, 30% no-show rate",
-          solution: "AI-powered patient flow optimization and predictive scheduling",
+          solution:
+            "AI-powered patient flow optimization and predictive scheduling",
           results: [
-            { metric: "Average Wait Time", before: "2.5 hours", after: "18 minutes", improvement: "88% reduction" },
-            { metric: "No-Show Rate", before: "30%", after: "8%", improvement: "73% reduction" },
-            { metric: "Patient Satisfaction", before: "6.2/10", after: "9.1/10", improvement: "+47%" },
-            { metric: "Daily Patient Capacity", before: "45 patients", after: "78 patients", improvement: "+73%" }
-          ]
+            {
+              metric: "Average Wait Time",
+              before: "2.5 hours",
+              after: "18 minutes",
+              improvement: "88% reduction",
+            },
+            {
+              metric: "No-Show Rate",
+              before: "30%",
+              after: "8%",
+              improvement: "73% reduction",
+            },
+            {
+              metric: "Patient Satisfaction",
+              before: "6.2/10",
+              after: "9.1/10",
+              improvement: "+47%",
+            },
+            {
+              metric: "Daily Patient Capacity",
+              before: "45 patients",
+              after: "78 patients",
+              improvement: "+73%",
+            },
+          ],
         },
         visualizations: [
-          { type: "chart", title: "Patient Flow Optimization", data: "Real-time wait time tracking" },
-          { type: "graph", title: "Appointment Success Rate", data: "92% on-time completion" },
-          { type: "heatmap", title: "Peak Hours Analysis", data: "Optimized scheduling patterns" }
+          {
+            type: "chart",
+            title: "Patient Flow Optimization",
+            data: "Real-time wait time tracking",
+          },
+          {
+            type: "graph",
+            title: "Appointment Success Rate",
+            data: "92% on-time completion",
+          },
+          {
+            type: "heatmap",
+            title: "Peak Hours Analysis",
+            data: "Optimized scheduling patterns",
+          },
         ],
         recentActivity: [
-          { type: "patient", message: "High-risk patient flagged for immediate follow-up", time: "2 min ago", status: "urgent" },
-          { type: "appointment", message: "Telemedicine consultation completed successfully", time: "5 min ago", status: "completed" },
-          { type: "records", message: "Lab results automatically integrated into patient chart", time: "8 min ago", status: "synced" },
-          { type: "care", message: "Post-surgery care plan generated for patient", time: "12 min ago", status: "active" }
+          {
+            type: "patient",
+            message: "High-risk patient flagged for immediate follow-up",
+            time: "2 min ago",
+            status: "urgent",
+          },
+          {
+            type: "appointment",
+            message: "Telemedicine consultation completed successfully",
+            time: "5 min ago",
+            status: "completed",
+          },
+          {
+            type: "records",
+            message: "Lab results automatically integrated into patient chart",
+            time: "8 min ago",
+            status: "synced",
+          },
+          {
+            type: "care",
+            message: "Post-surgery care plan generated for patient",
+            time: "12 min ago",
+            status: "active",
+          },
         ],
         automations: [
-          { name: "Patient Flow", status: "active", efficiency: "98%", value: "Reduces wait time by 88%" },
-          { name: "Predictive Scheduling", status: "active", efficiency: "96%", value: "Prevents 73% no-shows" },
-          { name: "Clinical Decision Support", status: "active", efficiency: "100%", value: "Improves diagnosis accuracy" },
-          { name: "Care Coordination", status: "active", efficiency: "94%", value: "Seamless provider communication" }
-        ]
-      }
+          {
+            name: "Patient Flow",
+            status: "active",
+            efficiency: "98%",
+            value: "Reduces wait time by 88%",
+          },
+          {
+            name: "Predictive Scheduling",
+            status: "active",
+            efficiency: "96%",
+            value: "Prevents 73% no-shows",
+          },
+          {
+            name: "Clinical Decision Support",
+            status: "active",
+            efficiency: "100%",
+            value: "Improves diagnosis accuracy",
+          },
+          {
+            name: "Care Coordination",
+            status: "active",
+            efficiency: "94%",
+            value: "Seamless provider communication",
+          },
+        ],
+      },
     },
-    'E-commerce': {
+    "E-commerce": {
       menuItems: [
         { icon: Home, label: "Dashboard", active: true },
         { icon: BarChart3, label: "Sales Analytics" },
@@ -164,8 +319,8 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         { icon: MessageSquare, label: "Customer Support" },
         { icon: FolderOpen, label: "Product Catalog" },
         { icon: Database, label: "Order Management" },
-        { icon: GitBranch, label: "Sales Automation" },
-        { icon: Settings, label: "Settings" }
+        { icon: Workflow, label: "Sales Automation" },
+        { icon: Settings, label: "Settings" },
       ],
       dashboardData: {
         title: "E-commerce Growth Dashboard",
@@ -173,35 +328,109 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         caseStudy: {
           company: "StyleHub Fashion",
           location: "Los Angeles, California",
-          challenge: "Manual order processing causing 24-hour delays, 15% cart abandonment",
-          solution: "AI-powered inventory optimization and personalized customer experience",
+          challenge:
+            "Manual order processing causing 24-hour delays, 15% cart abandonment",
+          solution:
+            "AI-powered inventory optimization and personalized customer experience",
           results: [
-            { metric: "Order Processing Time", before: "24 hours", after: "2.3 minutes", improvement: "99% faster" },
-            { metric: "Cart Abandonment Rate", before: "15%", after: "4.2%", improvement: "72% reduction" },
-            { metric: "Customer Lifetime Value", before: "$127", after: "$389", improvement: "+206%" },
-            { metric: "Inventory Turnover", before: "3.2x/year", after: "8.7x/year", improvement: "+172%" }
-          ]
+            {
+              metric: "Order Processing Time",
+              before: "24 hours",
+              after: "2.3 minutes",
+              improvement: "99% faster",
+            },
+            {
+              metric: "Cart Abandonment Rate",
+              before: "15%",
+              after: "4.2%",
+              improvement: "72% reduction",
+            },
+            {
+              metric: "Customer Lifetime Value",
+              before: "$127",
+              after: "$389",
+              improvement: "+206%",
+            },
+            {
+              metric: "Inventory Turnover",
+              before: "3.2x/year",
+              after: "8.7x/year",
+              improvement: "+172%",
+            },
+          ],
         },
         visualizations: [
-          { type: "chart", title: "Sales Performance Trends", data: "Real-time revenue tracking" },
-          { type: "funnel", title: "Conversion Funnel Analysis", data: "Cart abandonment optimization" },
-          { type: "map", title: "Global Sales Distribution", data: "Multi-region performance" }
+          {
+            type: "chart",
+            title: "Sales Performance Trends",
+            data: "Real-time revenue tracking",
+          },
+          {
+            type: "funnel",
+            title: "Conversion Funnel Analysis",
+            data: "Cart abandonment optimization",
+          },
+          {
+            type: "map",
+            title: "Global Sales Distribution",
+            data: "Multi-region performance",
+          },
         ],
         recentActivity: [
-          { type: "order", message: "VIP customer order processed with priority shipping", time: "2 min ago", status: "shipped" },
-          { type: "inventory", message: "Low stock alert triggered for best-selling items", time: "5 min ago", status: "reordered" },
-          { type: "customer", message: "Personalized product recommendations sent", time: "8 min ago", status: "delivered" },
-          { type: "marketing", message: "Dynamic pricing updated for seasonal items", time: "12 min ago", status: "optimized" }
+          {
+            type: "order",
+            message: "VIP customer order processed with priority shipping",
+            time: "2 min ago",
+            status: "shipped",
+          },
+          {
+            type: "inventory",
+            message: "Low stock alert triggered for best-selling items",
+            time: "5 min ago",
+            status: "reordered",
+          },
+          {
+            type: "customer",
+            message: "Personalized product recommendations sent",
+            time: "8 min ago",
+            status: "delivered",
+          },
+          {
+            type: "marketing",
+            message: "Dynamic pricing updated for seasonal items",
+            time: "12 min ago",
+            status: "optimized",
+          },
         ],
         automations: [
-          { name: "Smart Inventory", status: "active", efficiency: "99%", value: "Prevents stockouts by 95%" },
-          { name: "Personalization Engine", status: "active", efficiency: "97%", value: "Increases conversion by 67%" },
-          { name: "Dynamic Pricing", status: "active", efficiency: "92%", value: "Maximizes profit margins" },
-          { name: "Customer Journey", status: "active", efficiency: "95%", value: "Reduces churn by 58%" }
-        ]
-      }
+          {
+            name: "Smart Inventory",
+            status: "active",
+            efficiency: "99%",
+            value: "Prevents stockouts by 95%",
+          },
+          {
+            name: "Personalization Engine",
+            status: "active",
+            efficiency: "97%",
+            value: "Increases conversion by 67%",
+          },
+          {
+            name: "Dynamic Pricing",
+            status: "active",
+            efficiency: "92%",
+            value: "Maximizes profit margins",
+          },
+          {
+            name: "Customer Journey",
+            status: "active",
+            efficiency: "95%",
+            value: "Reduces churn by 58%",
+          },
+        ],
+      },
     },
-    'Finance': {
+    Finance: {
       menuItems: [
         { icon: Home, label: "Dashboard", active: true },
         { icon: BarChart3, label: "Financial Analytics" },
@@ -211,8 +440,8 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         { icon: MessageSquare, label: "Financial Advisory" },
         { icon: FolderOpen, label: "Financial Reports" },
         { icon: Database, label: "Portfolio Management" },
-        { icon: GitBranch, label: "Risk Automation" },
-        { icon: Settings, label: "Settings" }
+        { icon: Workflow, label: "Risk Automation" },
+        { icon: Settings, label: "Settings" },
       ],
       dashboardData: {
         title: "Financial Services Excellence Dashboard",
@@ -220,35 +449,109 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         caseStudy: {
           company: "Premier Wealth Advisors",
           location: "New York, New York",
-          challenge: "Manual portfolio rebalancing taking 2-3 days, compliance reporting delays",
-          solution: "AI-powered portfolio optimization and real-time risk monitoring",
+          challenge:
+            "Manual portfolio rebalancing taking 2-3 days, compliance reporting delays",
+          solution:
+            "AI-powered portfolio optimization and real-time risk monitoring",
           results: [
-            { metric: "Portfolio Rebalancing", before: "2-3 days", after: "15 minutes", improvement: "99% faster" },
-            { metric: "Risk Analysis Accuracy", before: "78%", after: "96%", improvement: "+18%" },
-            { metric: "Client AUM Growth", before: "$2.1B", after: "$4.7B", improvement: "+124%" },
-            { metric: "Compliance Score", before: "87%", after: "99.8%", improvement: "+15%" }
-          ]
+            {
+              metric: "Portfolio Rebalancing",
+              before: "2-3 days",
+              after: "15 minutes",
+              improvement: "99% faster",
+            },
+            {
+              metric: "Risk Analysis Accuracy",
+              before: "78%",
+              after: "96%",
+              improvement: "+18%",
+            },
+            {
+              metric: "Client AUM Growth",
+              before: "$2.1B",
+              after: "$4.7B",
+              improvement: "+124%",
+            },
+            {
+              metric: "Compliance Score",
+              before: "87%",
+              after: "99.8%",
+              improvement: "+15%",
+            },
+          ],
         },
         visualizations: [
-          { type: "chart", title: "Portfolio Performance Analytics", data: "Real-time asset allocation" },
-          { type: "graph", title: "Risk-Return Optimization", data: "Dynamic risk modeling" },
-          { type: "dashboard", title: "Client Satisfaction Metrics", data: "NPS score tracking" }
+          {
+            type: "chart",
+            title: "Portfolio Performance Analytics",
+            data: "Real-time asset allocation",
+          },
+          {
+            type: "graph",
+            title: "Risk-Return Optimization",
+            data: "Dynamic risk modeling",
+          },
+          {
+            type: "dashboard",
+            title: "Client Satisfaction Metrics",
+            data: "NPS score tracking",
+          },
         ],
         recentActivity: [
-          { type: "portfolio", message: "$50M portfolio rebalanced for optimal risk-return", time: "2 min ago", status: "optimized" },
-          { type: "risk", message: "Market volatility alert triggered for tech stocks", time: "5 min ago", status: "monitoring" },
-          { type: "compliance", message: "SEC filing completed automatically", time: "8 min ago", status: "submitted" },
-          { type: "client", message: "High-net-worth client onboarding completed", time: "12 min ago", status: "active" }
+          {
+            type: "portfolio",
+            message: "$50M portfolio rebalanced for optimal risk-return",
+            time: "2 min ago",
+            status: "optimized",
+          },
+          {
+            type: "risk",
+            message: "Market volatility alert triggered for tech stocks",
+            time: "5 min ago",
+            status: "monitoring",
+          },
+          {
+            type: "compliance",
+            message: "SEC filing completed automatically",
+            time: "8 min ago",
+            status: "submitted",
+          },
+          {
+            type: "client",
+            message: "High-net-worth client onboarding completed",
+            time: "12 min ago",
+            status: "active",
+          },
         ],
         automations: [
-          { name: "Portfolio Optimization", status: "active", efficiency: "98%", value: "Increases returns by 23%" },
-          { name: "Risk Management", status: "active", efficiency: "96%", value: "Reduces volatility by 34%" },
-          { name: "Compliance Automation", status: "active", efficiency: "100%", value: "Zero regulatory violations" },
-          { name: "Client Intelligence", status: "active", efficiency: "94%", value: "Personalized investment strategies" }
-        ]
-      }
+          {
+            name: "Portfolio Optimization",
+            status: "active",
+            efficiency: "98%",
+            value: "Increases returns by 23%",
+          },
+          {
+            name: "Risk Management",
+            status: "active",
+            efficiency: "96%",
+            value: "Reduces volatility by 34%",
+          },
+          {
+            name: "Compliance Automation",
+            status: "active",
+            efficiency: "100%",
+            value: "Zero regulatory violations",
+          },
+          {
+            name: "Client Intelligence",
+            status: "active",
+            efficiency: "94%",
+            value: "Personalized investment strategies",
+          },
+        ],
+      },
     },
-    'Manufacturing': {
+    Manufacturing: {
       menuItems: [
         { icon: Home, label: "Dashboard", active: true },
         { icon: BarChart3, label: "Production Analytics" },
@@ -258,8 +561,8 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         { icon: MessageSquare, label: "Quality Control" },
         { icon: FolderOpen, label: "Production Reports" },
         { icon: Database, label: "Inventory Management" },
-        { icon: GitBranch, label: "Production Automation" },
-        { icon: Settings, label: "Settings" }
+        { icon: Workflow, label: "Production Automation" },
+        { icon: Settings, label: "Settings" },
       ],
       dashboardData: {
         title: "Manufacturing Excellence Dashboard",
@@ -267,35 +570,109 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         caseStudy: {
           company: "Precision Manufacturing Corp",
           location: "Detroit, Michigan",
-          challenge: "Production downtime 15%, quality defects 8%, manual scheduling inefficiencies",
-          solution: "IoT-enabled predictive maintenance and AI-powered production optimization",
+          challenge:
+            "Production downtime 15%, quality defects 8%, manual scheduling inefficiencies",
+          solution:
+            "IoT-enabled predictive maintenance and AI-powered production optimization",
           results: [
-            { metric: "Production Efficiency", before: "67%", after: "94%", improvement: "+40%" },
-            { metric: "Quality Defect Rate", before: "8%", after: "0.8%", improvement: "90% reduction" },
-            { metric: "Unplanned Downtime", before: "15%", after: "3%", improvement: "80% reduction" },
-            { metric: "Energy Consumption", before: "100%", after: "73%", improvement: "27% reduction" }
-          ]
+            {
+              metric: "Production Efficiency",
+              before: "67%",
+              after: "94%",
+              improvement: "+40%",
+            },
+            {
+              metric: "Quality Defect Rate",
+              before: "8%",
+              after: "0.8%",
+              improvement: "90% reduction",
+            },
+            {
+              metric: "Unplanned Downtime",
+              before: "15%",
+              after: "3%",
+              improvement: "80% reduction",
+            },
+            {
+              metric: "Energy Consumption",
+              before: "100%",
+              after: "73%",
+              improvement: "27% reduction",
+            },
+          ],
         },
         visualizations: [
-          { type: "chart", title: "Production Line Performance", data: "Real-time efficiency tracking" },
-          { type: "graph", title: "Quality Control Metrics", data: "Defect rate monitoring" },
-          { type: "dashboard", title: "Predictive Maintenance Alerts", data: "Equipment health status" }
+          {
+            type: "chart",
+            title: "Production Line Performance",
+            data: "Real-time efficiency tracking",
+          },
+          {
+            type: "graph",
+            title: "Quality Control Metrics",
+            data: "Defect rate monitoring",
+          },
+          {
+            type: "dashboard",
+            title: "Predictive Maintenance Alerts",
+            data: "Equipment health status",
+          },
         ],
         recentActivity: [
-          { type: "production", message: "Line 3 optimized for 15% efficiency gain", time: "2 min ago", status: "optimized" },
-          { type: "quality", message: "Zero defects achieved for 48-hour production run", time: "5 min ago", status: "perfect" },
-          { type: "maintenance", message: "Predictive maintenance prevented $50K equipment failure", time: "8 min ago", status: "prevented" },
-          { type: "supply", message: "Smart inventory triggered automatic supplier reorder", time: "12 min ago", status: "ordered" }
+          {
+            type: "production",
+            message: "Line 3 optimized for 15% efficiency gain",
+            time: "2 min ago",
+            status: "optimized",
+          },
+          {
+            type: "quality",
+            message: "Zero defects achieved for 48-hour production run",
+            time: "5 min ago",
+            status: "perfect",
+          },
+          {
+            type: "maintenance",
+            message: "Predictive maintenance prevented $50K equipment failure",
+            time: "8 min ago",
+            status: "prevented",
+          },
+          {
+            type: "supply",
+            message: "Smart inventory triggered automatic supplier reorder",
+            time: "12 min ago",
+            status: "ordered",
+          },
         ],
         automations: [
-          { name: "Smart Production", status: "active", efficiency: "97%", value: "Increases output by 40%" },
-          { name: "Quality Intelligence", status: "active", efficiency: "99%", value: "Reduces defects by 90%" },
-          { name: "Predictive Maintenance", status: "active", efficiency: "95%", value: "Prevents 80% downtime" },
-          { name: "Supply Chain", status: "active", efficiency: "92%", value: "Optimizes inventory costs" }
-        ]
-      }
+          {
+            name: "Smart Production",
+            status: "active",
+            efficiency: "97%",
+            value: "Increases output by 40%",
+          },
+          {
+            name: "Quality Intelligence",
+            status: "active",
+            efficiency: "99%",
+            value: "Reduces defects by 90%",
+          },
+          {
+            name: "Predictive Maintenance",
+            status: "active",
+            efficiency: "95%",
+            value: "Prevents 80% downtime",
+          },
+          {
+            name: "Supply Chain",
+            status: "active",
+            efficiency: "92%",
+            value: "Optimizes inventory costs",
+          },
+        ],
+      },
     },
-    'Education': {
+    Education: {
       menuItems: [
         { icon: Home, label: "Dashboard", active: true },
         { icon: BarChart3, label: "Learning Analytics" },
@@ -305,8 +682,8 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         { icon: MessageSquare, label: "Online Learning" },
         { icon: FolderOpen, label: "Course Materials" },
         { icon: Database, label: "Student Records" },
-        { icon: GitBranch, label: "Learning Automation" },
-        { icon: Settings, label: "Settings" }
+        { icon: Workflow, label: "Learning Automation" },
+        { icon: Settings, label: "Settings" },
       ],
       dashboardData: {
         title: "Education Excellence Dashboard",
@@ -314,220 +691,340 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         caseStudy: {
           company: "Metropolitan State University",
           location: "Chicago, Illinois",
-          challenge: "Student dropout rate 23%, manual grading taking 2-3 weeks, low engagement",
-          solution: "AI-powered personalized learning paths and automated assessment system",
+          challenge:
+            "Student dropout rate 23%, manual grading taking 2-3 weeks, low engagement",
+          solution:
+            "AI-powered personalized learning paths and automated assessment system",
           results: [
-            { metric: "Student Retention", before: "77%", after: "94%", improvement: "+22%" },
-            { metric: "Grading Speed", before: "2-3 weeks", after: "24 hours", improvement: "95% faster" },
-            { metric: "Course Completion", before: "68%", after: "89%", improvement: "+31%" },
-            { metric: "Student Satisfaction", before: "6.8/10", after: "9.2/10", improvement: "+35%" }
-          ]
+            {
+              metric: "Student Retention",
+              before: "77%",
+              after: "94%",
+              improvement: "+22%",
+            },
+            {
+              metric: "Grading Speed",
+              before: "2-3 weeks",
+              after: "24 hours",
+              improvement: "95% faster",
+            },
+            {
+              metric: "Course Completion",
+              before: "68%",
+              after: "89%",
+              improvement: "+31%",
+            },
+            {
+              metric: "Student Satisfaction",
+              before: "6.8/10",
+              after: "9.2/10",
+              improvement: "+35%",
+            },
+          ],
         },
         visualizations: [
-          { type: "chart", title: "Student Performance Analytics", data: "Real-time learning progress" },
-          { type: "graph", title: "Course Engagement Metrics", data: "Interactive learning tracking" },
-          { type: "dashboard", title: "Predictive Dropout Prevention", data: "Early intervention alerts" }
+          {
+            type: "chart",
+            title: "Student Performance Analytics",
+            data: "Real-time learning progress",
+          },
+          {
+            type: "graph",
+            title: "Course Engagement Metrics",
+            data: "Interactive learning tracking",
+          },
+          {
+            type: "dashboard",
+            title: "Predictive Dropout Prevention",
+            data: "Early intervention alerts",
+          },
         ],
         recentActivity: [
-          { type: "enrollment", message: "AI-matched 47 students to optimal course paths", time: "2 min ago", status: "optimized" },
-          { type: "learning", message: "Personalized study plan generated for struggling student", time: "5 min ago", status: "created" },
-          { type: "assessment", message: "Automated grading completed for 156 assignments", time: "8 min ago", status: "graded" },
-          { type: "engagement", message: "Interactive learning module increased participation by 67%", time: "12 min ago", status: "active" }
+          {
+            type: "enrollment",
+            message: "AI-matched 47 students to optimal course paths",
+            time: "2 min ago",
+            status: "optimized",
+          },
+          {
+            type: "learning",
+            message: "Personalized study plan generated for struggling student",
+            time: "5 min ago",
+            status: "created",
+          },
+          {
+            type: "assessment",
+            message: "Automated grading completed for 156 assignments",
+            time: "8 min ago",
+            status: "graded",
+          },
+          {
+            type: "engagement",
+            message:
+              "Interactive learning module increased participation by 67%",
+            time: "12 min ago",
+            status: "active",
+          },
         ],
         automations: [
-          { name: "Personalized Learning", status: "active", efficiency: "98%", value: "Increases retention by 22%" },
-          { name: "Smart Assessment", status: "active", efficiency: "96%", value: "Grades 95% faster" },
-          { name: "Engagement Analytics", status: "active", efficiency: "94%", value: "Boosts completion by 31%" },
-          { name: "Predictive Support", status: "active", efficiency: "99%", value: "Prevents 78% dropouts" }
-        ]
-      }
-    }
+          {
+            name: "Personalized Learning",
+            status: "active",
+            efficiency: "98%",
+            value: "Increases retention by 22%",
+          },
+          {
+            name: "Smart Assessment",
+            status: "active",
+            efficiency: "96%",
+            value: "Grades 95% faster",
+          },
+          {
+            name: "Engagement Analytics",
+            status: "active",
+            efficiency: "94%",
+            value: "Boosts completion by 31%",
+          },
+          {
+            name: "Predictive Support",
+            status: "active",
+            efficiency: "99%",
+            value: "Prevents 78% dropouts",
+          },
+        ],
+      },
+    },
   };
 
-  // Get current industry data with error handling
-  const currentIndustryData = industryData[selectedIndustry] || industryData['Real Estate'];
-  const menuItems = currentIndustryData?.menuItems || [];
-  const dashboardData = currentIndustryData?.dashboardData || {};
+  // Get current industry data
+  const currentIndustryData = industryData[selectedIndustry];
+  const menuItems = currentIndustryData.menuItems;
+  const dashboardData = currentIndustryData.dashboardData;
 
   // Industry-specific chat messages
   const industryChatMessages = {
-    'Real Estate': [
+    "Real Estate": [
       {
         type: "assistant",
         status: "complete",
-        message: "Hi! I'm Tredy, your real estate automation assistant. I can help you automate your property purchasing workflow. What type of property are you looking to purchase?",
-        timestamp: "9:31 AM"
+        message:
+          "Hi! I'm Tredy, your real estate automation assistant. I can help you automate your property purchasing workflow. What type of property are you looking to purchase?",
+        timestamp: "9:31 AM",
       },
       {
         type: "user",
-        message: "I'm looking to buy a commercial property for my business expansion. Can you help me automate the entire purchasing process?",
-        timestamp: "9:32 AM"
+        message:
+          "I'm looking to buy a commercial property for my business expansion. Can you help me automate the entire purchasing process?",
+        timestamp: "9:32 AM",
       },
       {
         type: "assistant",
         status: "processing",
-        message: "Commercial property purchase detected! 🏢 Setting up automated purchasing workflow...",
-        tools: ["Property Search", "Financial Analysis", "Legal Documents", "CRM"],
+        message:
+          "Commercial property purchase detected! 🏢 Setting up automated purchasing workflow...",
+        tools: [
+          "Property Search",
+          "Financial Analysis",
+          "Legal Documents",
+          "CRM",
+        ],
         metrics: { time: "1.8s", confidence: 94, model: "GPT-4", tokens: 189 },
         thinking: [
           "Analyzing commercial property requirements",
           "Setting up automated property search criteria",
           "Preparing financial analysis tools",
-          "Configuring legal document automation"
+          "Configuring legal document automation",
         ],
-        timestamp: "9:32 AM"
-      }
+        timestamp: "9:32 AM",
+      },
     ],
-    'Healthcare': [
+    Healthcare: [
       {
         type: "assistant",
         status: "complete",
-        message: "Hi! I'm Tredy, your healthcare automation assistant. I can help you automate patient care workflows and streamline your medical practice. What type of healthcare automation do you need?",
-        timestamp: "9:31 AM"
+        message:
+          "Hi! I'm Tredy, your healthcare automation assistant. I can help you automate patient care workflows and streamline your medical practice. What type of healthcare automation do you need?",
+        timestamp: "9:31 AM",
       },
       {
         type: "user",
-        message: "I need to automate patient intake, appointment scheduling, and medical record management for my clinic. Can you help?",
-        timestamp: "9:32 AM"
+        message:
+          "I need to automate patient intake, appointment scheduling, and medical record management for my clinic. Can you help?",
+        timestamp: "9:32 AM",
       },
       {
         type: "assistant",
         status: "processing",
-        message: "Healthcare clinic automation detected! 🏥 Setting up patient care workflow...",
-        tools: ["Patient Intake", "Appointment Scheduling", "Medical Records", "CRM"],
+        message:
+          "Healthcare clinic automation detected! 🏥 Setting up patient care workflow...",
+        tools: [
+          "Patient Intake",
+          "Appointment Scheduling",
+          "Medical Records",
+          "CRM",
+        ],
         metrics: { time: "2.1s", confidence: 96, model: "GPT-4", tokens: 201 },
         thinking: [
           "Analyzing clinic workflow requirements",
           "Setting up automated patient intake system",
           "Preparing appointment scheduling tools",
-          "Configuring medical record automation"
+          "Configuring medical record automation",
         ],
-        timestamp: "9:32 AM"
-      }
+        timestamp: "9:32 AM",
+      },
     ],
-    'E-commerce': [
+    "E-commerce": [
       {
         type: "assistant",
         status: "complete",
-        message: "Hi! I'm Tredy, your e-commerce automation assistant. I can help you automate order processing, inventory management, and customer support. What e-commerce automation do you need?",
-        timestamp: "9:31 AM"
+        message:
+          "Hi! I'm Tredy, your e-commerce automation assistant. I can help you automate order processing, inventory management, and customer support. What e-commerce automation do you need?",
+        timestamp: "9:31 AM",
       },
       {
         type: "user",
-        message: "I need to automate order processing, inventory management, and customer support for my online store. Can you set this up?",
-        timestamp: "9:32 AM"
+        message:
+          "I need to automate order processing, inventory management, and customer support for my online store. Can you set this up?",
+        timestamp: "9:32 AM",
       },
       {
         type: "assistant",
         status: "processing",
-        message: "E-commerce automation detected! 🛒 Setting up sales workflow...",
-        tools: ["Order Processing", "Inventory Management", "Customer Support", "CRM"],
+        message:
+          "E-commerce automation detected! 🛒 Setting up sales workflow...",
+        tools: [
+          "Order Processing",
+          "Inventory Management",
+          "Customer Support",
+          "CRM",
+        ],
         metrics: { time: "1.9s", confidence: 95, model: "GPT-4", tokens: 187 },
         thinking: [
           "Analyzing e-commerce workflow requirements",
           "Setting up automated order processing",
           "Preparing inventory management tools",
-          "Configuring customer support automation"
+          "Configuring customer support automation",
         ],
-        timestamp: "9:32 AM"
-      }
+        timestamp: "9:32 AM",
+      },
     ],
-    'Finance': [
+    Finance: [
       {
         type: "assistant",
         status: "complete",
-        message: "Hi! I'm Tredy, your financial services automation assistant. I can help you automate portfolio management, risk analysis, and compliance reporting. What financial automation do you need?",
-        timestamp: "9:31 AM"
+        message:
+          "Hi! I'm Tredy, your financial services automation assistant. I can help you automate portfolio management, risk analysis, and compliance reporting. What financial automation do you need?",
+        timestamp: "9:31 AM",
       },
       {
         type: "user",
-        message: "I need to automate portfolio management, risk analysis, and compliance reporting for my financial advisory firm. Can you help?",
-        timestamp: "9:32 AM"
+        message:
+          "I need to automate portfolio management, risk analysis, and compliance reporting for my financial advisory firm. Can you help?",
+        timestamp: "9:32 AM",
       },
       {
         type: "assistant",
         status: "processing",
-        message: "Financial services automation detected! 💰 Setting up portfolio workflow...",
-        tools: ["Portfolio Management", "Risk Analysis", "Compliance Monitoring", "CRM"],
+        message:
+          "Financial services automation detected! 💰 Setting up portfolio workflow...",
+        tools: [
+          "Portfolio Management",
+          "Risk Analysis",
+          "Compliance Monitoring",
+          "CRM",
+        ],
         metrics: { time: "2.2s", confidence: 97, model: "GPT-4", tokens: 203 },
         thinking: [
           "Analyzing financial workflow requirements",
           "Setting up automated portfolio management",
           "Preparing risk analysis tools",
-          "Configuring compliance monitoring"
+          "Configuring compliance monitoring",
         ],
-        timestamp: "9:32 AM"
-      }
+        timestamp: "9:32 AM",
+      },
     ],
-    'Manufacturing': [
+    Manufacturing: [
       {
         type: "assistant",
         status: "complete",
-        message: "Hi! I'm Tredy, your manufacturing automation assistant. I can help you automate production scheduling, quality control, and supply chain management. What manufacturing automation do you need?",
-        timestamp: "9:31 AM"
+        message:
+          "Hi! I'm Tredy, your manufacturing automation assistant. I can help you automate production scheduling, quality control, and supply chain management. What manufacturing automation do you need?",
+        timestamp: "9:31 AM",
       },
       {
         type: "user",
-        message: "I need to automate production scheduling, quality control, and supply chain management for my manufacturing plant. Can you set this up?",
-        timestamp: "9:32 AM"
+        message:
+          "I need to automate production scheduling, quality control, and supply chain management for my manufacturing plant. Can you set this up?",
+        timestamp: "9:32 AM",
       },
       {
         type: "assistant",
         status: "processing",
-        message: "Manufacturing automation detected! 🏭 Setting up production workflow...",
-        tools: ["Production Scheduling", "Quality Control", "Inventory Management", "CRM"],
+        message:
+          "Manufacturing automation detected! 🏭 Setting up production workflow...",
+        tools: [
+          "Production Scheduling",
+          "Quality Control",
+          "Inventory Management",
+          "CRM",
+        ],
         metrics: { time: "2.0s", confidence: 96, model: "GPT-4", tokens: 195 },
         thinking: [
           "Analyzing manufacturing workflow requirements",
           "Setting up automated production scheduling",
           "Preparing quality control tools",
-          "Configuring supply chain automation"
+          "Configuring supply chain automation",
         ],
-        timestamp: "9:32 AM"
-      }
+        timestamp: "9:32 AM",
+      },
     ],
-    'Education': [
+    Education: [
       {
         type: "assistant",
         status: "complete",
-        message: "Hi! I'm Tredy, your education automation assistant. I can help you automate student management, course scheduling, and learning analytics. What education automation do you need?",
-        timestamp: "9:31 AM"
+        message:
+          "Hi! I'm Tredy, your education automation assistant. I can help you automate student management, course scheduling, and learning analytics. What education automation do you need?",
+        timestamp: "9:31 AM",
       },
       {
         type: "user",
-        message: "I need to automate student enrollment, course scheduling, and learning analytics for my educational institution. Can you help?",
-        timestamp: "9:32 AM"
+        message:
+          "I need to automate student enrollment, course scheduling, and learning analytics for my educational institution. Can you help?",
+        timestamp: "9:32 AM",
       },
       {
         type: "assistant",
         status: "processing",
-        message: "Education automation detected! 🎓 Setting up learning workflow...",
-        tools: ["Student Management", "Course Scheduling", "Learning Analytics", "CRM"],
+        message:
+          "Education automation detected! 🎓 Setting up learning workflow...",
+        tools: [
+          "Student Management",
+          "Course Scheduling",
+          "Learning Analytics",
+          "CRM",
+        ],
         metrics: { time: "1.7s", confidence: 94, model: "GPT-4", tokens: 181 },
         thinking: [
           "Analyzing education workflow requirements",
           "Setting up automated student management",
           "Preparing course scheduling tools",
-          "Configuring learning analytics"
+          "Configuring learning analytics",
         ],
-        timestamp: "9:32 AM"
-      }
-    ]
+        timestamp: "9:32 AM",
+      },
+    ],
   };
 
   // Get current industry chat messages
-  const chatMessages = industryChatMessages[selectedIndustry] || industryChatMessages['Real Estate'];
+  const chatMessages =
+    industryChatMessages[selectedIndustry] ||
+    industryChatMessages["Real Estate"];
 
   // Reset chat animation when industry changes
   useEffect(() => {
     setCurrentMessageIndex(0);
     setTypingMessage("");
     setExpandedDetails({});
-    setIsTyping(false);
-    // Clear any pending timeouts to prevent memory leaks
-    if (scrollTimeoutRef.current) {
-      clearTimeout(scrollTimeoutRef.current);
-    }
   }, [selectedIndustry]);
 
   // Smooth scroll function with debouncing
@@ -535,17 +1032,17 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
     }
-    
+
     if (isScrollingRef.current) return;
-    
+
     scrollTimeoutRef.current = setTimeout(() => {
       if (chatContainerRef.current && !isScrollingRef.current) {
         isScrollingRef.current = true;
         chatContainerRef.current.scrollTo({
           top: chatContainerRef.current.scrollHeight,
-          behavior: 'smooth'
+          behavior: "smooth",
         });
-        
+
         // Reset scrolling flag after animation completes
         setTimeout(() => {
           isScrollingRef.current = false;
@@ -561,22 +1058,22 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
 
   // Typing animation effect with smooth scrolling
   useEffect(() => {
-    let typingInterval = null;
-    let timeoutId = null;
-    
     if (currentMessageIndex < chatMessages.length) {
       const currentMsg = chatMessages[currentMessageIndex];
-      
-      if (currentMsg.type === "assistant" && typeof currentMsg.message === "string") {
+
+      if (
+        currentMsg.type === "assistant" &&
+        typeof currentMsg.message === "string"
+      ) {
         setIsTyping(true);
         let charIndex = 0;
         const message = currentMsg.message;
-        
-        typingInterval = setInterval(() => {
+
+        const typingInterval = setInterval(() => {
           if (charIndex <= message.length) {
             setTypingMessage(message.substring(0, charIndex));
             charIndex++;
-            
+
             // Smooth scroll during typing (less frequent)
             if (charIndex % 15 === 0) {
               smoothScrollToBottom(50);
@@ -584,11 +1081,11 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
           } else {
             clearInterval(typingInterval);
             setIsTyping(false);
-            
+
             // Final scroll after typing completes
             smoothScrollToBottom(300);
-            
-            timeoutId = setTimeout(() => {
+
+            setTimeout(() => {
               if (currentMessageIndex < chatMessages.length - 1) {
                 setCurrentMessageIndex(currentMessageIndex + 1);
                 setTypingMessage("");
@@ -596,51 +1093,39 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
             }, 2500);
           }
         }, 35); // Slightly faster typing for smoother feel
+
+        return () => clearInterval(typingInterval);
       } else {
         // For non-typing messages, show immediately and scroll
         smoothScrollToBottom(200);
-        
-        timeoutId = setTimeout(() => {
-          if (currentMessageIndex < chatMessages.length - 1) {
-            setCurrentMessageIndex(currentMessageIndex + 1);
-          }
-        }, currentMsg.type === "assistant" ? 2800 : 1200);
+
+        setTimeout(
+          () => {
+            if (currentMessageIndex < chatMessages.length - 1) {
+              setCurrentMessageIndex(currentMessageIndex + 1);
+            }
+          },
+          currentMsg.type === "assistant" ? 2800 : 1200
+        );
       }
     } else {
       // Reset animation with smooth scroll to top
-      timeoutId = setTimeout(() => {
+      setTimeout(() => {
         if (chatContainerRef.current) {
           chatContainerRef.current.scrollTo({
             top: 0,
-            behavior: 'smooth'
+            behavior: "smooth",
           });
         }
-        
-        timeoutId = setTimeout(() => {
+
+        setTimeout(() => {
           setCurrentMessageIndex(0);
           setTypingMessage("");
           setExpandedDetails({});
-          setIsTyping(false);
         }, 1200);
       }, 5500);
     }
-    
-    // Cleanup function to prevent memory leaks
-    return () => {
-      if (typingInterval) clearInterval(typingInterval);
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, [currentMessageIndex, smoothScrollToBottom, chatMessages.length]);
-
-  // Cleanup effect to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      // Clear all timeouts and intervals when component unmounts
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
-    };
-  }, []);
+  }, [currentMessageIndex, smoothScrollToBottom]);
 
   const renderStructuredMessage = (content) => {
     return (
@@ -656,10 +1141,17 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         {content.quickSummary && (
           <div className="grid grid-cols-2 gap-2">
             {content.quickSummary.map((item, i) => (
-              <div key={i} className="flex items-center gap-2 bg-white rounded-lg p-2 border border-purple-100">
+              <div
+                key={i}
+                className="flex items-center gap-2 bg-white rounded-lg p-2 border border-purple-100"
+              >
                 <span className="text-sm">{item.icon}</span>
-                <span className="text-xs font-medium text-gray-700">{item.label}</span>
-                <span className="text-xs text-green-600 font-medium">{item.status}</span>
+                <span className="text-xs font-medium text-gray-700">
+                  {item.label}
+                </span>
+                <span className="text-xs text-green-600 font-medium">
+                  {item.status}
+                </span>
               </div>
             ))}
           </div>
@@ -669,9 +1161,14 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         {content.quickStats && (
           <div className="grid grid-cols-2 gap-2">
             {content.quickStats.map((stat, i) => (
-              <div key={i} className="flex items-center justify-between bg-white rounded-lg p-2 border border-purple-100">
+              <div
+                key={i}
+                className="flex items-center justify-between bg-white rounded-lg p-2 border border-purple-100"
+              >
                 <span className="text-xs text-gray-600">{stat.label}</span>
-                <span className="text-xs font-medium text-purple-700">{stat.value}</span>
+                <span className="text-xs font-medium text-purple-700">
+                  {stat.value}
+                </span>
               </div>
             ))}
           </div>
@@ -681,9 +1178,14 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         {content.automation && (
           <div className="grid grid-cols-2 gap-2">
             {content.automation.map((feature, i) => (
-              <div key={i} className="flex items-center gap-2 bg-white rounded-lg p-2 border border-purple-100">
+              <div
+                key={i}
+                className="flex items-center gap-2 bg-white rounded-lg p-2 border border-purple-100"
+              >
                 <span className="text-sm">{feature.icon}</span>
-                <span className="text-xs font-medium text-gray-700">{feature.label}</span>
+                <span className="text-xs font-medium text-gray-700">
+                  {feature.label}
+                </span>
               </div>
             ))}
           </div>
@@ -693,12 +1195,19 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         {content.status && (
           <div className="grid grid-cols-2 gap-2">
             {content.status.map((item, i) => (
-              <div key={i} className="flex items-center justify-between bg-white rounded-lg p-2 border border-purple-100">
+              <div
+                key={i}
+                className="flex items-center justify-between bg-white rounded-lg p-2 border border-purple-100"
+              >
                 <div className="flex items-center gap-2">
                   <span className="text-sm">{item.icon}</span>
-                  <span className="text-xs font-medium text-gray-700">{item.label}</span>
+                  <span className="text-xs font-medium text-gray-700">
+                    {item.label}
+                  </span>
                 </div>
-                <span className="text-xs font-medium text-green-600">{item.status}</span>
+                <span className="text-xs font-medium text-green-600">
+                  {item.status}
+                </span>
               </div>
             ))}
           </div>
@@ -708,9 +1217,14 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         {content.performance && (
           <div className="space-y-1">
             {content.performance.map((item, i) => (
-              <div key={i} className="flex items-center justify-between bg-white rounded-lg p-2 border border-purple-100">
+              <div
+                key={i}
+                className="flex items-center justify-between bg-white rounded-lg p-2 border border-purple-100"
+              >
                 <span className="text-xs text-gray-600">{item.label}</span>
-                <span className="text-xs font-medium text-purple-700">{item.value}</span>
+                <span className="text-xs font-medium text-purple-700">
+                  {item.value}
+                </span>
               </div>
             ))}
           </div>
@@ -720,10 +1234,15 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         {content.monitoring && (
           <div className="grid grid-cols-2 gap-2">
             {content.monitoring.map((item, i) => (
-              <div key={i} className="flex items-center gap-2 bg-white rounded-lg p-2 border border-purple-100">
+              <div
+                key={i}
+                className="flex items-center gap-2 bg-white rounded-lg p-2 border border-purple-100"
+              >
                 <span className="text-sm">{item.icon}</span>
                 <div className="flex-1">
-                  <div className="text-xs font-medium text-gray-700">{item.label}</div>
+                  <div className="text-xs font-medium text-gray-700">
+                    {item.label}
+                  </div>
                   <div className="text-xs text-gray-500">{item.value}</div>
                 </div>
               </div>
@@ -735,10 +1254,15 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         {content.settings && (
           <div className="grid grid-cols-2 gap-2">
             {content.settings.map((item, i) => (
-              <div key={i} className="flex items-center gap-2 bg-white rounded-lg p-2 border border-purple-100">
+              <div
+                key={i}
+                className="flex items-center gap-2 bg-white rounded-lg p-2 border border-purple-100"
+              >
                 <span className="text-sm">{item.icon}</span>
                 <div className="flex-1">
-                  <div className="text-xs font-medium text-gray-700">{item.label}</div>
+                  <div className="text-xs font-medium text-gray-700">
+                    {item.label}
+                  </div>
                   <div className="text-xs text-gray-500">{item.value}</div>
                 </div>
               </div>
@@ -750,7 +1274,7 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
         {content.footer && (
           <div className="bg-green-50 rounded-lg p-2 border border-green-200">
             <div className="flex items-center gap-1">
-              <CheckCircle className="w-3 h-3 text-green-600" />
+              <CheckCircle2 className="w-3 h-3 text-green-600" />
               <p className="text-xs text-green-800 font-medium">
                 {content.footer}
               </p>
@@ -761,30 +1285,12 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
     );
   };
 
-  // Error boundary for the component
-  if (error) {
-    return (
-      <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border-2 border-red-200 h-[600px] flex items-center justify-center">
-        <div className="text-center p-8">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">Business Chat Error</h3>
-          <p className="text-sm text-gray-600 mb-4">{error}</p>
-          <button 
-            onClick={() => setError(null)}
-            className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border-2 border-purple-200 hover:border-purple-300 transition-all duration-300 h-[600px] flex flex-col lg:flex-row">
-
       {/* Left Sidebar Menu - Hidden on mobile */}
-      <div className={`bg-gradient-to-b from-purple-600 to-purple-700 transition-all duration-300 ${isMenuCollapsed ? 'w-16' : 'w-64'} flex-shrink-0 hidden lg:block`}>
+      <div
+        className={`bg-gradient-to-b from-purple-600 to-purple-700 transition-all duration-300 ${isMenuCollapsed ? "w-16" : "w-64"} flex-shrink-0 hidden lg:block`}
+      >
         <div className="p-4">
           <div className="flex items-center justify-between mb-6">
             {!isMenuCollapsed && (
@@ -800,18 +1306,22 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
               onClick={() => setIsMenuCollapsed(!isMenuCollapsed)}
               className="p-2 text-white hover:bg-white/20 rounded-lg transition-colors"
             >
-              {isMenuCollapsed ? <Menu className="w-5 h-5" /> : <X className="w-5 h-5" />}
+              {isMenuCollapsed ? (
+                <Menu className="w-5 h-5" />
+              ) : (
+                <X className="w-5 h-5" />
+              )}
             </button>
           </div>
-          
+
           <nav className="space-y-2">
             {menuItems.map((item, index) => (
               <button
                 key={index}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
-                  item.active 
-                    ? 'bg-white/20 text-white' 
-                    : 'text-purple-200 hover:bg-white/10 hover:text-white'
+                  item.active
+                    ? "bg-white/20 text-white"
+                    : "text-purple-200 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 <item.icon className="w-5 h-5 flex-shrink-0" />
@@ -825,29 +1335,39 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
       </div>
 
       {/* Center Dashboard */}
-      <div className={`flex-1 flex flex-col ${mobileView === 'dashboard' ? 'block' : 'hidden lg:flex'}`}>
+      <div
+        className={`flex-1 flex flex-col ${mobileView === "dashboard" ? "block" : "hidden lg:flex"}`}
+      >
         {/* Dashboard Header */}
         <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-4 border-b border-purple-200">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-white font-bold text-xl">{dashboardData.title}</h1>
-              <p className="text-purple-100 text-sm">{dashboardData.subtitle}</p>
+              <h1 className="text-white font-bold text-xl">
+                {dashboardData.title}
+              </h1>
+              <p className="text-purple-100 text-sm">
+                {dashboardData.subtitle}
+              </p>
             </div>
             <div className="flex items-center gap-2">
               {/* Mobile View Toggle */}
               <div className="lg:hidden flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 border border-white/30">
                 <button
-                  onClick={() => setMobileView('dashboard')}
+                  onClick={() => setMobileView("dashboard")}
                   className={`px-2 py-1 rounded text-xs font-semibold transition-colors ${
-                    mobileView === 'dashboard' ? 'bg-white text-purple-600' : 'text-white'
+                    mobileView === "dashboard"
+                      ? "bg-white text-purple-600"
+                      : "text-white"
                   }`}
                 >
                   Dashboard
                 </button>
                 <button
-                  onClick={() => setMobileView('chat')}
+                  onClick={() => setMobileView("chat")}
                   className={`px-2 py-1 rounded text-xs font-semibold transition-colors ${
-                    mobileView === 'chat' ? 'bg-white text-purple-600' : 'text-white'
+                    mobileView === "chat"
+                      ? "bg-white text-purple-600"
+                      : "text-white"
                   }`}
                 >
                   Chat
@@ -855,7 +1375,9 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
               </div>
               <div className="hidden lg:flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 border border-white/30">
                 <Activity className="w-4 h-4 text-white animate-pulse" />
-                <span className="text-xs text-white font-semibold">Live Demo</span>
+                <span className="text-xs text-white font-semibold">
+                  Live Demo
+                </span>
               </div>
             </div>
           </div>
@@ -868,23 +1390,37 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
             <div className="bg-white rounded-xl p-6 shadow-sm border border-purple-100 mb-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-2">{dashboardData.caseStudy.company}</h3>
-                  <p className="text-sm text-gray-600 mb-1">{dashboardData.caseStudy.location}</p>
-                  <p className="text-sm text-gray-700 font-medium">{dashboardData.caseStudy.challenge}</p>
+                  <h3 className="text-lg font-bold text-gray-800 mb-2">
+                    {dashboardData.caseStudy.company}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-1">
+                    {dashboardData.caseStudy.location}
+                  </p>
+                  <p className="text-sm text-gray-700 font-medium">
+                    {dashboardData.caseStudy.challenge}
+                  </p>
                 </div>
                 <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">
                   Success Story
                 </div>
               </div>
-              
+
               {/* Results Grid */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {dashboardData.caseStudy.results.map((result, index) => (
-                  <div key={index} className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
-                    <div className="text-xs text-gray-600 mb-1">{result.metric}</div>
-                    <div className="text-sm font-bold text-purple-700 mb-1">{result.improvement}</div>
+                  <div
+                    key={index}
+                    className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4"
+                  >
+                    <div className="text-xs text-gray-600 mb-1">
+                      {result.metric}
+                    </div>
+                    <div className="text-sm font-bold text-purple-700 mb-1">
+                      {result.improvement}
+                    </div>
                     <div className="text-xs text-gray-500">
-                      <span className="line-through">{result.before}</span> → <span className="font-medium">{result.after}</span>
+                      <span className="line-through">{result.before}</span> →{" "}
+                      <span className="font-medium">{result.after}</span>
                     </div>
                   </div>
                 ))}
@@ -896,14 +1432,21 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
           {dashboardData.visualizations && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
               {dashboardData.visualizations.map((viz, index) => (
-                <div key={index} className="bg-white rounded-xl p-4 shadow-sm border border-purple-100">
+                <div
+                  key={index}
+                  className="bg-white rounded-xl p-4 shadow-sm border border-purple-100"
+                >
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                    <h4 className="font-semibold text-gray-800 text-sm">{viz.title}</h4>
+                    <h4 className="font-semibold text-gray-800 text-sm">
+                      {viz.title}
+                    </h4>
                   </div>
                   <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center">
                     <div className="text-xs text-gray-600">{viz.data}</div>
-                    <div className="text-xs text-purple-600 font-medium mt-1">{viz.type}</div>
+                    <div className="text-xs text-purple-600 font-medium mt-1">
+                      {viz.type}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -919,13 +1462,20 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
               </h3>
               <div className="space-y-3">
                 {dashboardData.recentActivity.map((activity, index) => (
-                  <div key={index} className="flex items-start gap-3 p-2 rounded-lg hover:bg-purple-50 transition-colors">
+                  <div
+                    key={index}
+                    className="flex items-start gap-3 p-2 rounded-lg hover:bg-purple-50 transition-colors"
+                  >
                     <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                     <div className="flex-1">
-                      <p className="text-sm text-gray-700">{activity.message}</p>
+                      <p className="text-sm text-gray-700">
+                        {activity.message}
+                      </p>
                       <p className="text-xs text-gray-500">{activity.time}</p>
                     </div>
-                    <span className="text-xs text-green-600 font-medium">{activity.status}</span>
+                    <span className="text-xs text-green-600 font-medium">
+                      {activity.status}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -934,22 +1484,33 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
             {/* Active Automations */}
             <div className="bg-white rounded-xl p-4 shadow-sm border border-purple-100">
               <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <GitBranch className="w-4 h-4 text-purple-600" />
+                <Workflow className="w-4 h-4 text-purple-600" />
                 Automation Impact
               </h3>
               <div className="space-y-3">
                 {dashboardData.automations.map((automation, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 rounded-lg hover:bg-purple-50 transition-colors">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-2 rounded-lg hover:bg-purple-50 transition-colors"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                       <div>
-                        <div className="text-sm text-gray-700 font-medium">{automation.name}</div>
-                        <div className="text-xs text-gray-500">{automation.value}</div>
+                        <div className="text-sm text-gray-700 font-medium">
+                          {automation.name}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {automation.value}
+                        </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-xs text-green-600 font-medium">{automation.efficiency}</div>
-                      <div className="text-xs text-gray-500">{automation.status}</div>
+                      <div className="text-xs text-green-600 font-medium">
+                        {automation.efficiency}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {automation.status}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -960,7 +1521,9 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
       </div>
 
       {/* Right Side Chat */}
-      <div className={`w-full lg:w-80 flex-shrink-0 border-l border-purple-200 flex flex-col ${mobileView === 'chat' ? 'block' : 'hidden lg:flex'}`}>
+      <div
+        className={`w-full lg:w-80 flex-shrink-0 border-l border-purple-200 flex flex-col ${mobileView === "chat" ? "block" : "hidden lg:flex"}`}
+      >
         {/* Chat Header */}
         <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-4 border-b border-purple-200">
           <div className="flex items-center justify-between">
@@ -974,26 +1537,30 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
             </div>
           </div>
         </div>
-      
+
         {/* Chat Messages */}
-        <div 
+        <div
           ref={chatContainerRef}
           className="flex-1 overflow-y-auto p-3 space-y-3 bg-gradient-to-b from-purple-50/30 via-white to-purple-50/20 scroll-smooth"
-          style={{ 
-            scrollBehavior: 'smooth',
-            scrollPaddingBottom: '20px'
+          style={{
+            scrollBehavior: "smooth",
+            scrollPaddingBottom: "20px",
           }}
         >
           {chatMessages.slice(0, currentMessageIndex + 1).map((msg, idx) => (
-            <div 
-              key={idx} 
-              className={`${msg.type === 'user' ? 'flex justify-end' : 'flex justify-start'} animate-messageSlide`}
+            <div
+              key={idx}
+              className={`${msg.type === "user" ? "flex justify-end" : "flex justify-start"} animate-messageSlide`}
               style={{ animationDelay: `${idx * 0.2}s` }}
             >
-              <div className={`max-w-[85%] sm:max-w-[90%] ${msg.type === 'user' ? 'order-2' : ''}`}>
-                {msg.type === 'user' ? (
+              <div
+                className={`max-w-[85%] sm:max-w-[90%] ${msg.type === "user" ? "order-2" : ""}`}
+              >
+                {msg.type === "user" ? (
                   <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-5 rounded-2xl rounded-tr-sm shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] animate-slideInRight">
-                    <p className="text-sm leading-relaxed font-medium">{msg.message}</p>
+                    <p className="text-sm leading-relaxed font-medium">
+                      {msg.message}
+                    </p>
                     <p className="text-xs opacity-80 mt-2 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {msg.timestamp}
@@ -1003,7 +1570,7 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
                   <div className="space-y-2">
                     {/* Main Message */}
                     <div className="bg-white/95 backdrop-blur-sm rounded-2xl rounded-tl-sm shadow-xl border border-purple-100 p-6 hover:shadow-2xl transition-all duration-300 animate-slideInLeft">
-                      {typeof msg.message === 'string' ? (
+                      {typeof msg.message === "string" ? (
                         <p className="text-sm text-gray-800 whitespace-pre-line leading-relaxed font-medium">
                           {idx === currentMessageIndex && isTyping ? (
                             <>
@@ -1015,9 +1582,10 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
                           )}
                         </p>
                       ) : (
-                        msg.message.type === 'structured' && renderStructuredMessage(msg.message.content)
+                        msg.message.type === "structured" &&
+                        renderStructuredMessage(msg.message.content)
                       )}
-                      
+
                       <p className="text-xs text-gray-500 mt-4 flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {msg.timestamp}
@@ -1030,36 +1598,37 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
                         {/* Compact Tool Logos */}
                         <div className="flex items-center gap-1 flex-shrink-0">
                           {msg.tools.map((tool, ti) => (
-                            <div key={ti} className="relative group flex-shrink-0">
+                            <div
+                              key={ti}
+                              className="relative group flex-shrink-0"
+                            >
                               <div className="w-5 h-5 bg-white rounded-full border border-purple-200 flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-110">
                                 {toolLogos[tool] ? (
-                                  <img 
-                                    src={toolLogos[tool]} 
+                                  <img
+                                    src={toolLogos[tool]}
                                     alt={tool}
                                     className="w-3 h-3 rounded-full object-cover"
                                     title={tool}
                                     onError={(e) => {
-                                      e.target.style.display = 'none';
-                                      const fallback = e.target.nextElementSibling;
-                                      if (fallback) {
-                                        fallback.style.display = 'flex';
-                                      }
-                                    }}
-                                    onLoad={(e) => {
-                                      const fallback = e.target.nextElementSibling;
-                                      if (fallback) {
-                                        fallback.style.display = 'none';
-                                      }
+                                      e.target.style.display = "none";
+                                      e.target.nextSibling.style.display =
+                                        "flex";
                                     }}
                                   />
                                 ) : null}
-                                <div 
-                                  className={`w-3 h-3 rounded-full flex items-center justify-center text-xs font-bold ${toolLogos[tool] ? 'hidden' : 'flex'}`}
-                                  style={{ 
-                                    backgroundColor: tool === 'AI Analysis' || tool === 'AI Engine' ? '#10b981' : 
-                                                   tool === 'Analytics' ? '#3b82f6' : 
-                                                   tool === 'CRM' ? '#f59e0b' : '#8b5cf6',
-                                    color: 'white'
+                                <div
+                                  className={`w-3 h-3 rounded-full flex items-center justify-center text-xs font-bold ${toolLogos[tool] ? "hidden" : "flex"}`}
+                                  style={{
+                                    backgroundColor:
+                                      tool === "AI Analysis" ||
+                                      tool === "AI Engine"
+                                        ? "#10b981"
+                                        : tool === "Analytics"
+                                          ? "#3b82f6"
+                                          : tool === "CRM"
+                                            ? "#f59e0b"
+                                            : "#8b5cf6",
+                                    color: "white",
                                   }}
                                 >
                                   {tool.charAt(0)}
@@ -1077,8 +1646,10 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
 
                         {/* Time */}
                         <div className="flex items-center gap-1 flex-shrink-0">
-                          <Bolt className="w-3 h-3 text-purple-600" />
-                          <span className="font-medium">{msg.metrics.time}</span>
+                          <Zap className="w-3 h-3 text-purple-600" />
+                          <span className="font-medium">
+                            {msg.metrics.time}
+                          </span>
                         </div>
 
                         {/* Separator */}
@@ -1087,14 +1658,16 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
                         {/* Confidence */}
                         <div className="flex items-center gap-1 flex-shrink-0">
                           <div className="w-12 bg-purple-100 rounded-full h-1.5 relative overflow-hidden">
-                            <div 
+                            <div
                               className="bg-gradient-to-r from-purple-500 to-purple-600 h-1.5 rounded-full transition-all duration-1000 ease-out relative"
                               style={{ width: `${msg.metrics.confidence}%` }}
                             >
                               <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
                             </div>
                           </div>
-                          <span className="font-bold text-purple-700 text-xs">{msg.metrics.confidence}%</span>
+                          <span className="font-bold text-purple-700 text-xs">
+                            {msg.metrics.confidence}%
+                          </span>
                         </div>
 
                         {/* Separator */}
@@ -1103,23 +1676,33 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
                         {/* Model */}
                         <div className="flex items-center gap-1 flex-shrink-0">
                           <Cpu className="w-3 h-3 text-purple-600" />
-                          <span className="font-medium">{msg.metrics.model}</span>
+                          <span className="font-medium">
+                            {msg.metrics.model}
+                          </span>
                         </div>
 
                         {/* Expandable Details */}
                         {msg.thinking && (
                           <>
-                            <span className="text-gray-300 flex-shrink-0">•</span>
+                            <span className="text-gray-300 flex-shrink-0">
+                              •
+                            </span>
                             <button
-                              onClick={() => setExpandedDetails({ ...expandedDetails, [idx]: !expandedDetails[idx] })}
+                              onClick={() =>
+                                setExpandedDetails({
+                                  ...expandedDetails,
+                                  [idx]: !expandedDetails[idx],
+                                })
+                              }
                               className="flex items-center gap-1 text-purple-600 hover:text-purple-800 transition-colors duration-200 font-medium flex-shrink-0"
                             >
                               <Brain className="w-3 h-3" />
                               <span>Details</span>
-                              {expandedDetails[idx] ? 
-                                <ChevronDown className="w-3 h-3" /> : 
+                              {expandedDetails[idx] ? (
+                                <ChevronDown className="w-3 h-3" />
+                              ) : (
                                 <ChevronRight className="w-3 h-3" />
-                              }
+                              )}
                             </button>
                           </>
                         )}
@@ -1135,9 +1718,15 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
                         </div>
                         <div className="space-y-3">
                           {msg.thinking.map((thought, ti) => (
-                            <div key={ti} className="flex items-start gap-3 animate-slideInLeft" style={{ animationDelay: `${ti * 0.1}s` }}>
+                            <div
+                              key={ti}
+                              className="flex items-start gap-3 animate-slideInLeft"
+                              style={{ animationDelay: `${ti * 0.1}s` }}
+                            >
                               <div className="w-2 h-2 bg-purple-500 rounded-full mt-1 animate-pulse"></div>
-                              <span className="text-sm text-gray-700 leading-relaxed">{thought}</span>
+                              <span className="text-sm text-gray-700 leading-relaxed">
+                                {thought}
+                              </span>
                             </div>
                           ))}
                         </div>
@@ -1152,14 +1741,14 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
             </div>
           ))}
         </div>
-        
+
         {/* Chat Input */}
         <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100/50 border-t border-purple-200">
           <div className="flex items-center space-x-3">
             <div className="flex-1 relative">
-              <input 
-                type="text" 
-                placeholder="Type @tredy to start..." 
+              <input
+                type="text"
+                placeholder="Type @tredy to start..."
                 className="w-full px-3 py-2 border border-purple-200 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-200 bg-white/80 backdrop-blur-sm transition-all duration-300 text-xs font-medium placeholder-gray-500"
                 disabled
               />
@@ -1178,7 +1767,7 @@ export default function BusinessChat({ selectedIndustry = 'Real Estate' }) {
           </div>
         </div>
       </div>
-      
+
       {/* Custom Styles */}
       <style>{`
         @keyframes messageSlide {

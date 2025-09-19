@@ -15,7 +15,7 @@ export default function Main() {
 
   // Check for mobile or if screen width is small
   const isMobileView = isMobile || window.innerWidth < 768;
-  
+
   if (isMobileView) {
     return (
       <MobileSidebarWrapper>

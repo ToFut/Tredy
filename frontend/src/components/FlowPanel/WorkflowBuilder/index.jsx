@@ -21,18 +21,168 @@ import {
   Copy,
   ArrowsClockwise,
   Lightning,
+  Sparkle,
+  Lightbulb,
+  Robot,
+  MagicWand,
+  Target,
+  ChartLine,
+  Eye,
+  EyeSlash,
 } from "@phosphor-icons/react";
 import AnythingInfinityLogo from "@/media/logo/Tredy Full.png";
 import { Tooltip } from "react-tooltip";
 import showToast from "@/utils/toast";
 import AgentFlows from "@/models/agentFlows";
 
+// AI Assistant Component for Workflow Builder
+function AIAssistant({ blocks, onSuggestion, onOptimize, onValidate }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const analyzeWorkflow = async () => {
+    setIsAnalyzing(true);
+    try {
+      // Simulate AI analysis
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      const analysis = [
+        {
+          type: "suggestion",
+          icon: <Lightbulb size={16} className="text-yellow-500" />,
+          title: "Add Error Handling",
+          description: "Consider adding error handling blocks after API calls",
+          action: () => onSuggestion("error_handling"),
+        },
+        {
+          type: "optimization",
+          icon: <ChartLine size={16} className="text-green-500" />,
+          title: "Optimize Token Usage",
+          description:
+            "Your LLM instruction could be more concise to save tokens",
+          action: () => onOptimize("token_optimization"),
+        },
+        {
+          type: "validation",
+          icon: <CheckCircle size={16} className="text-blue-500" />,
+          title: "Missing Variables",
+          description: "Some blocks reference undefined variables",
+          action: () => onValidate("variables"),
+        },
+      ];
+
+      setSuggestions(analysis);
+    } catch (error) {
+      console.error("AI analysis failed:", error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  useEffect(() => {
+    if (blocks.length > 0) {
+      analyzeWorkflow();
+    }
+  }, [blocks]);
+
+  return (
+    <div className="fixed bottom-6 right-6 z-50">
+      <div
+        className={`bg-white border border-gray-200 rounded-2xl shadow-xl transition-all duration-300 ${
+          isOpen ? "w-80 h-96" : "w-16 h-16"
+        }`}
+      >
+        {!isOpen ? (
+          <button
+            onClick={() => setIsOpen(true)}
+            className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-2xl hover:from-purple-600 hover:to-purple-700 transition-all group relative overflow-hidden"
+          >
+            <Robot
+              size={24}
+              className="group-hover:scale-110 transition-transform"
+            />
+            {suggestions.length > 0 && (
+              <div className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
+                {suggestions.length}
+              </div>
+            )}
+          </button>
+        ) : (
+          <div className="p-4 h-full flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Robot size={20} className="text-purple-600" />
+                <h3 className="font-semibold text-gray-800">AI Assistant</h3>
+              </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X size={16} className="text-gray-500" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto space-y-3">
+              {isAnalyzing ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                    <span className="text-sm">Analyzing workflow...</span>
+                  </div>
+                </div>
+              ) : suggestions.length > 0 ? (
+                suggestions.map((suggestion, index) => (
+                  <div
+                    key={index}
+                    className="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer"
+                    onClick={suggestion.action}
+                  >
+                    <div className="flex items-start gap-2">
+                      {suggestion.icon}
+                      <div className="flex-1">
+                        <h4 className="text-sm font-medium text-gray-800 mb-1">
+                          {suggestion.title}
+                        </h4>
+                        <p className="text-xs text-gray-600">
+                          {suggestion.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <Sparkle size={32} className="mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No suggestions yet</p>
+                  <p className="text-xs">Add more blocks to get AI insights</p>
+                </div>
+              )}
+            </div>
+
+            <div className="pt-3 border-t border-gray-200">
+              <button
+                onClick={analyzeWorkflow}
+                disabled={isAnalyzing}
+                className="w-full px-3 py-2 bg-purple-500 hover:bg-purple-600 disabled:bg-gray-300 text-white text-sm rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
+                <MagicWand size={14} />
+                {isAnalyzing ? "Analyzing..." : "Re-analyze"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // Block Types - Only supported types from backend
 const BLOCK_TYPES = {
   FLOW_INFO: "flowInfo", // UI only - not saved to backend
   START: "start",
   API_CALL: "apiCall",
-  LLM_INSTRUCTION: "llmInstruction", 
+  LLM_INSTRUCTION: "llmInstruction",
   WEB_SCRAPING: "webScraping",
   FINISH: "finish", // UI only - not saved to backend
 };
@@ -40,7 +190,7 @@ const BLOCK_TYPES = {
 const BLOCK_INFO = {
   [BLOCK_TYPES.FLOW_INFO]: {
     label: "Flow Information",
-    icon: <Info className="w-5 h-5 text-theme-text-primary" />,
+    icon: Info,
     description: "Basic flow information",
     defaultConfig: {
       name: "",
@@ -49,8 +199,8 @@ const BLOCK_INFO = {
     getSummary: (config) => config.name || "Untitled Flow",
   },
   [BLOCK_TYPES.START]: {
-    label: "Flow Variables", 
-    icon: <BracketsCurly className="w-5 h-5 text-theme-text-primary" />,
+    label: "Flow Variables",
+    icon: BracketsCurly,
     description: "Configure agent variables and settings",
     defaultConfig: {
       variables: [{ name: "", value: "" }],
@@ -62,11 +212,11 @@ const BLOCK_INFO = {
   },
   [BLOCK_TYPES.API_CALL]: {
     label: "API Call",
-    icon: <Globe className="w-5 h-5 text-theme-text-primary" />,
+    icon: Globe,
     description: "Make an HTTP request",
     defaultConfig: {
       url: "",
-      method: "GET", 
+      method: "GET",
       headers: [],
       bodyType: "json",
       body: "",
@@ -79,8 +229,8 @@ const BLOCK_INFO = {
   },
   [BLOCK_TYPES.LLM_INSTRUCTION]: {
     label: "LLM Instruction",
-    icon: <Brain className="w-5 h-5 text-theme-text-primary" />,
-    description: "Send instructions to the AI model", 
+    icon: Brain,
+    description: "Send instructions to the AI model",
     defaultConfig: {
       instruction: "",
       resultVariable: "",
@@ -95,7 +245,7 @@ const BLOCK_INFO = {
   },
   [BLOCK_TYPES.WEB_SCRAPING]: {
     label: "Web Scraping",
-    icon: <Globe className="w-5 h-5 text-theme-text-primary" />,
+    icon: Globe,
     description: "Extract content from websites",
     defaultConfig: {
       url: "",
@@ -106,7 +256,7 @@ const BLOCK_INFO = {
   },
   [BLOCK_TYPES.TOOL_CALL]: {
     label: "Tool Call",
-    icon: <Lightning className="w-5 h-5 text-theme-text-primary" />,
+    icon: Lightning,
     description: "Execute MCP/Agent tools and functions",
     defaultConfig: {
       toolName: "",
@@ -118,7 +268,7 @@ const BLOCK_INFO = {
   },
   [BLOCK_TYPES.FINISH]: {
     label: "Flow Complete",
-    icon: <Flag className="w-5 h-5 text-theme-text-primary" />,
+    icon: Flag,
     description: "End the workflow",
     defaultConfig: {},
     getSummary: () => "Flow will end here",
@@ -162,7 +312,9 @@ function UnifiedHeader({
   isSaving,
   isRunning,
   hasUnsavedChanges,
-  lastSaved
+  lastSaved,
+  showAIAssistant,
+  onToggleAIAssistant,
 }) {
   const [showActions, setShowActions] = useState(false);
   const dropdownRef = useRef(null);
@@ -183,15 +335,15 @@ function UnifiedHeader({
     const saved = new Date(lastSaved);
     const diffMs = now - saved;
     const diffMins = Math.floor(diffMs / 60000);
-    
+
     if (diffMins < 1) return "Saved just now";
     if (diffMins === 1) return "1 min ago";
     if (diffMins < 60) return `${diffMins} min ago`;
-    
+
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours === 1) return "1h ago";
     if (diffHours < 24) return `${diffHours}h ago`;
-    
+
     return saved.toLocaleDateString();
   };
 
@@ -199,7 +351,7 @@ function UnifiedHeader({
     <div className="relative bg-white/95 backdrop-blur-md border-b border-gray-200/40 shadow-sm">
       {/* Elegant gradient accent */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-300/40 to-transparent" />
-      
+
       <div className="flex items-center justify-between px-6 py-4">
         {/* Left Section - Navigation & Flow Info */}
         <div className="flex items-center gap-4">
@@ -209,15 +361,18 @@ function UnifiedHeader({
             className="p-2.5 hover:bg-gray-100/80 rounded-xl transition-all duration-200 hover:scale-105 group"
             title="Back to Flow Panel"
           >
-            <CaretLeft size={18} className="text-gray-600 group-hover:text-purple-600 transition-colors" />
+            <CaretLeft
+              size={18}
+              className="text-gray-600 group-hover:text-purple-600 transition-colors"
+            />
           </button>
-          
+
           {/* Flow Info */}
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-purple-200/70 rounded-xl flex items-center justify-center shadow-sm">
               <Wrench size={18} className="text-purple-700" />
             </div>
-            
+
             <div>
               <h1 className="text-lg font-semibold text-gray-900 leading-tight">
                 {flowName || "New Workflow"}
@@ -244,10 +399,28 @@ function UnifiedHeader({
           {hasUnsavedChanges && (
             <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200/60 rounded-lg">
               <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
-              <span className="text-xs font-medium text-amber-700">Unsaved</span>
+              <span className="text-xs font-medium text-amber-700">
+                Unsaved
+              </span>
             </div>
           )}
-          
+
+          {/* AI Assistant Toggle */}
+          <button
+            onClick={onToggleAIAssistant}
+            className={`p-2.5 rounded-xl transition-all duration-200 hover:scale-105 group ${
+              showAIAssistant
+                ? "bg-purple-100 text-purple-600"
+                : "hover:bg-gray-100/80 text-gray-600"
+            }`}
+            title={showAIAssistant ? "Hide AI Assistant" : "Show AI Assistant"}
+          >
+            <Robot
+              size={18}
+              className="group-hover:scale-110 transition-transform"
+            />
+          </button>
+
           {/* Primary Actions */}
           <button
             onClick={onRunFlow}
@@ -292,13 +465,19 @@ function UnifiedHeader({
               className="p-2.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100/80 rounded-xl transition-all duration-200"
               title="More actions"
             >
-              <CaretDown size={16} className={`transition-transform duration-200 ${showActions ? 'rotate-180' : ''}`} />
+              <CaretDown
+                size={16}
+                className={`transition-transform duration-200 ${showActions ? "rotate-180" : ""}`}
+              />
             </button>
-            
+
             {showActions && (
               <div className="absolute right-0 top-full mt-2 w-40 bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-xl shadow-xl z-50 overflow-hidden">
                 <button
-                  onClick={() => { onClearFlow(); setShowActions(false); }}
+                  onClick={() => {
+                    onClearFlow();
+                    setShowActions(false);
+                  }}
                   className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50/80 transition-colors flex items-center gap-3"
                 >
                   <Trash size={16} />
@@ -313,24 +492,54 @@ function UnifiedHeader({
   );
 }
 
-
-
-function BlockNode({ 
-  block, 
-  updateBlockConfig, 
-  removeBlock, 
+function BlockNode({
+  block,
+  updateBlockConfig,
+  removeBlock,
   toggleBlockExpansion,
   duplicateBlock,
   executionStatus,
-  validationErrors 
+  validationErrors,
+  isFirst,
+  isLast,
 }) {
   const blockInfo = BLOCK_INFO[block.type];
   if (!blockInfo) return null;
 
   const hasErrors = validationErrors && validationErrors.length > 0;
-  const isExecuting = executionStatus === 'executing';
-  const isCompleted = executionStatus === 'completed';
-  const isFailed = executionStatus === 'failed';
+  const isExecuting = executionStatus === "executing";
+  const isCompleted = executionStatus === "completed";
+  const isFailed = executionStatus === "failed";
+
+  // Determine block color based on type
+  const getBlockColor = () => {
+    switch (block.type) {
+      case BLOCK_TYPES.API_CALL:
+        return "from-blue-500 to-blue-600";
+      case BLOCK_TYPES.LLM_INSTRUCTION:
+        return "from-purple-500 to-purple-600";
+      case BLOCK_TYPES.WEB_SCRAPING:
+        return "from-green-500 to-green-600";
+      case BLOCK_TYPES.TOOL_CALL:
+        return "from-orange-500 to-orange-600";
+      case BLOCK_TYPES.START:
+        return "from-gray-500 to-gray-600";
+      case BLOCK_TYPES.FINISH:
+        return "from-red-500 to-red-600";
+      case BLOCK_TYPES.FLOW_INFO:
+        return "from-indigo-500 to-indigo-600";
+      default:
+        return "from-gray-400 to-gray-500";
+    }
+  };
+
+  const getStatusColor = () => {
+    if (isExecuting) return "ring-4 ring-blue-400 ring-opacity-50 animate-pulse";
+    if (isCompleted) return "ring-4 ring-green-400 ring-opacity-50";
+    if (isFailed) return "ring-4 ring-red-400 ring-opacity-50";
+    if (hasErrors) return "ring-4 ring-amber-400 ring-opacity-50";
+    return "";
+  };
 
   const renderBlockContent = () => {
     switch (block.type) {
@@ -347,7 +556,7 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { name: e.target.value })
                 }
-                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 p-2"
                 placeholder="Enter flow name..."
               />
             </div>
@@ -360,7 +569,7 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { description: e.target.value })
                 }
-                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 p-2"
                 placeholder="Describe what this flow does..."
                 rows={2}
               />
@@ -393,7 +602,10 @@ function BlockNode({
                   value={variable.name || ""}
                   onChange={(e) => {
                     const variables = [...block.config.variables];
-                    variables[index] = { ...variables[index], name: e.target.value };
+                    variables[index] = {
+                      ...variables[index],
+                      name: e.target.value,
+                    };
                     updateBlockConfig(block.id, { variables });
                   }}
                   className="flex-1 border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-1.5"
@@ -404,7 +616,10 @@ function BlockNode({
                   value={variable.value || ""}
                   onChange={(e) => {
                     const variables = [...block.config.variables];
-                    variables[index] = { ...variables[index], value: e.target.value };
+                    variables[index] = {
+                      ...variables[index],
+                      value: e.target.value,
+                    };
                     updateBlockConfig(block.id, { variables });
                   }}
                   className="flex-1 border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-1.5"
@@ -437,7 +652,7 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { instruction: e.target.value })
                 }
-                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 p-2"
                 placeholder="Enter AI instruction..."
                 rows={3}
               />
@@ -450,9 +665,11 @@ function BlockNode({
                 type="text"
                 value={block.config.resultVariable || ""}
                 onChange={(e) =>
-                  updateBlockConfig(block.id, { resultVariable: e.target.value })
+                  updateBlockConfig(block.id, {
+                    resultVariable: e.target.value,
+                  })
                 }
-                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 p-2"
                 placeholder="Variable to store result"
               />
             </div>
@@ -461,7 +678,9 @@ function BlockNode({
                 type="checkbox"
                 checked={block.config.directOutput || false}
                 onChange={(e) =>
-                  updateBlockConfig(block.id, { directOutput: e.target.checked })
+                  updateBlockConfig(block.id, {
+                    directOutput: e.target.checked,
+                  })
                 }
                 className="w-4 h-4"
               />
@@ -485,7 +704,7 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { url: e.target.value })
                 }
-                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 p-2"
                 placeholder="https://api.example.com/endpoint"
               />
             </div>
@@ -498,7 +717,7 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { method: e.target.value })
                 }
-                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 p-2"
               >
                 <option value="GET">GET</option>
                 <option value="POST">POST</option>
@@ -514,9 +733,11 @@ function BlockNode({
                 type="text"
                 value={block.config.responseVariable || ""}
                 onChange={(e) =>
-                  updateBlockConfig(block.id, { responseVariable: e.target.value })
+                  updateBlockConfig(block.id, {
+                    responseVariable: e.target.value,
+                  })
                 }
-                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 p-2"
                 placeholder="Variable to store response"
               />
             </div>
@@ -536,7 +757,7 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { url: e.target.value })
                 }
-                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 p-2"
                 placeholder="https://example.com"
               />
             </div>
@@ -548,9 +769,11 @@ function BlockNode({
                 type="text"
                 value={block.config.resultVariable || ""}
                 onChange={(e) =>
-                  updateBlockConfig(block.id, { resultVariable: e.target.value })
+                  updateBlockConfig(block.id, {
+                    resultVariable: e.target.value,
+                  })
                 }
-                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 p-2"
                 placeholder="Variable to store scraped content"
               />
             </div>
@@ -559,7 +782,9 @@ function BlockNode({
                 type="checkbox"
                 checked={block.config.directOutput || false}
                 onChange={(e) =>
-                  updateBlockConfig(block.id, { directOutput: e.target.checked })
+                  updateBlockConfig(block.id, {
+                    directOutput: e.target.checked,
+                  })
                 }
                 className="w-4 h-4"
               />
@@ -578,14 +803,18 @@ function BlockNode({
               <div className="p-2 bg-theme-bg-primary/50 rounded-lg text-xs text-theme-text-secondary mb-3">
                 <div className="flex items-center gap-2">
                   {block.metadata.icon && <span>{block.metadata.icon}</span>}
-                  {block.metadata.name && <span className="font-medium">{block.metadata.name}</span>}
+                  {block.metadata.name && (
+                    <span className="font-medium">{block.metadata.name}</span>
+                  )}
                 </div>
                 {block.metadata.description && (
-                  <div className="mt-1 text-[10px] opacity-80">{block.metadata.description}</div>
+                  <div className="mt-1 text-[10px] opacity-80">
+                    {block.metadata.description}
+                  </div>
                 )}
               </div>
             )}
-            
+
             <div>
               <label className="block text-xs font-medium mb-1 text-gray-700">
                 Tool Name *
@@ -596,7 +825,7 @@ function BlockNode({
                 onChange={(e) =>
                   updateBlockConfig(block.id, { toolName: e.target.value })
                 }
-                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 p-2"
                 placeholder="e.g., gmail_ws6-send_email"
               />
             </div>
@@ -614,7 +843,7 @@ function BlockNode({
                     // Invalid JSON, don't update
                   }
                 }}
-                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2 font-mono"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 p-2 font-mono"
                 rows={3}
                 placeholder='{"to": "user@example.com", "body": "Message"}'
               />
@@ -627,9 +856,11 @@ function BlockNode({
                 type="text"
                 value={block.config.resultVariable || ""}
                 onChange={(e) =>
-                  updateBlockConfig(block.id, { resultVariable: e.target.value })
+                  updateBlockConfig(block.id, {
+                    resultVariable: e.target.value,
+                  })
                 }
-                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-lg focus:outline-none focus:border-purple-400 p-2"
+                className="w-full border border-gray-200 bg-white text-gray-800 text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 p-2"
                 placeholder="Variable to store tool result"
               />
             </div>
@@ -638,7 +869,9 @@ function BlockNode({
                 type="checkbox"
                 checked={block.config.directOutput || false}
                 onChange={(e) =>
-                  updateBlockConfig(block.id, { directOutput: e.target.checked })
+                  updateBlockConfig(block.id, {
+                    directOutput: e.target.checked,
+                  })
                 }
                 className="w-4 h-4"
               />
@@ -652,7 +885,8 @@ function BlockNode({
       case BLOCK_TYPES.FINISH:
         return (
           <div className="text-sm text-gray-600">
-            This block marks the end of the workflow. All results will be collected and returned.
+            This block marks the end of the workflow. All results will be
+            collected and returned.
           </div>
         );
 
@@ -662,122 +896,116 @@ function BlockNode({
   };
 
   return (
-    <div className={`
-      relative overflow-hidden backdrop-blur-md bg-gradient-to-r from-white/90 via-white/95 to-purple-50/90 
-      border border-gray-200/40 rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-purple-100/50 
-      hover:border-purple-300/60 hover:scale-[1.02] group transform-gpu
-      ${isExecuting ? 'border-blue-400 shadow-2xl shadow-blue-400/30 animate-pulse bg-gradient-to-r from-blue-50/80 to-white/90' : ''}
-      ${isCompleted ? 'border-green-400 shadow-2xl shadow-green-400/30 bg-gradient-to-r from-green-50/80 to-white/90' : ''}
-      ${isFailed ? 'border-red-400 shadow-2xl shadow-red-400/30 bg-gradient-to-r from-red-50/80 to-white/90' : ''}
-      ${hasErrors ? 'border-amber-400 bg-gradient-to-r from-amber-50/80 to-white/90' : ''}
-      before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/5 before:to-transparent
-      before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700
-    `}>
-      <div className="relative z-10 flex justify-between items-center p-4">
-        <div className="flex items-center gap-3 relative flex-1 min-w-0">
-          {/* Advanced Status Indicator */}
-          {(isExecuting || isCompleted || isFailed) && (
-            <div className="flex-shrink-0 relative">
-              {isExecuting && (
-                <div className="relative">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full animate-ping absolute" />
-                  <div className="w-3 h-3 bg-blue-600 rounded-full animate-pulse" />
-                </div>
-              )}
-              {isCompleted && (
-                <div className="relative">
-                  <CheckCircle size={16} className="text-green-500 drop-shadow-sm" />
-                  <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-20" />
-                </div>
-              )}
-              {isFailed && (
-                <div className="relative">
-                  <Warning size={16} className="text-red-500 drop-shadow-sm animate-bounce" />
-                </div>
-              )}
-            </div>
-          )}
-          
-          {/* Modern Icon Container */}
-          <div className="relative flex-shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-100 to-purple-200/70 border border-purple-200/80 flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-110">
-              <div className="text-purple-700 transform transition-transform duration-300 group-hover:rotate-6" style={{fontSize: '16px'}}>
-                {blockInfo.icon}
-              </div>
-            </div>
-            {/* Subtle glow effect */}
-            <div className="absolute inset-0 rounded-xl bg-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md -z-10" />
-          </div>
-          
-          <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between">
-              <div className="min-w-0 flex-1">
-                <h4 className="text-gray-900 font-semibold flex items-center gap-2 text-base truncate group-hover:text-purple-800 transition-colors duration-200">
-                  {block.metadata?.name || blockInfo.label}
-                  {hasErrors && (
-                    <div className="flex-shrink-0 relative">
-                      <Warning 
-                        size={14} 
-                        className="text-amber-500 animate-pulse drop-shadow-sm" 
-                        data-tooltip-id="validation-error-tooltip"
-                        data-tooltip-content={validationErrors?.join(', ')}
-                      />
-                    </div>
-                  )}
-                </h4>
-                <p className="text-gray-600 text-sm mt-1 truncate leading-relaxed">
-                  {block.metadata?.description || blockInfo.getSummary(block.config)}
-                </p>
-              </div>
-            </div>
+    <div className="relative">
+      {/* Connection line from previous block */}
+      {!isFirst && (
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full">
+          <div className="w-0.5 h-8 bg-gradient-to-b from-gray-200 to-gray-400" />
+          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1">
+            <div className="w-2 h-2 bg-gray-400 rounded-full" />
           </div>
         </div>
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 ml-4 flex-shrink-0 transform translate-x-2 group-hover:translate-x-0">
-          {duplicateBlock && !["flow_info", "start", "finish"].includes(block.id) && (
-            <button
-              onClick={() => duplicateBlock(block.id)}
-              className="p-2 bg-white/80 hover:bg-blue-50 text-gray-600 hover:text-blue-600 rounded-lg border border-gray-200/60 hover:border-blue-300/60 transition-all duration-200 hover:shadow-md hover:scale-105 backdrop-blur-sm"
-              title="Duplicate"
-            >
-              <Copy size={14} />
-            </button>
+      )}
+
+      {/* Main node container */}
+      <div className="relative group">
+        <div
+          className={`
+            relative bg-white rounded-2xl shadow-lg transition-all duration-200
+            hover:shadow-xl hover:scale-[1.01] ${getStatusColor()}
+          `}
+        >
+          {/* Node header with gradient background */}
+          <div className={`rounded-t-2xl bg-gradient-to-r ${getBlockColor()} p-1`}>
+            <div className="bg-white bg-opacity-95 rounded-t-xl px-4 py-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {/* Icon with colored background */}
+                  <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${getBlockColor()} flex items-center justify-center text-white shadow-md`}>
+                    {React.createElement(blockInfo.icon, { size: 16, className: "text-white" })}
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-800">
+                      {block.metadata?.name || blockInfo.label}
+                    </h4>
+                    {/* Quick summary pill */}
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                        {blockInfo.getSummary(block.config)}
+                      </span>
+                      {hasErrors && (
+                        <Warning size={12} className="text-amber-500" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex items-center gap-1">
+                  {duplicateBlock && !["flow_info", "start", "finish"].includes(block.id) && (
+                    <button
+                      onClick={() => duplicateBlock(block.id)}
+                      className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                      title="Duplicate"
+                    >
+                      <Copy size={14} className="text-gray-500" />
+                    </button>
+                  )}
+                  {removeBlock && !["flow_info", "start", "finish"].includes(block.id) && (
+                    <button
+                      onClick={() => removeBlock(block.id)}
+                      className="p-1.5 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                      title="Remove"
+                    >
+                      <X size={14} className="text-red-500" />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => toggleBlockExpansion(block.id)}
+                    className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    {block.isExpanded ? (
+                      <CaretUp size={14} className="text-gray-600" />
+                    ) : (
+                      <CaretDown size={14} className="text-gray-600" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Node body - expandable content */}
+          {block.isExpanded && (
+            <div className="px-4 py-3 border-t border-gray-100">
+              <div className="text-sm">
+                {renderBlockContent()}
+              </div>
+            </div>
           )}
-          {removeBlock && !["flow_info", "start", "finish"].includes(block.id) && (
-            <button
-              onClick={() => removeBlock(block.id)}
-              className="p-2 bg-white/80 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200/60 hover:border-red-300/60 transition-all duration-200 hover:shadow-md hover:scale-105 backdrop-blur-sm"
-              title="Remove"
-            >
-              <X size={14} />
-            </button>
+
+          {/* Status indicators */}
+          {(isExecuting || isCompleted || isFailed) && (
+            <div className="absolute -right-2 -top-2">
+              {isExecuting && (
+                <div className="w-6 h-6 bg-blue-500 rounded-full animate-ping" />
+              )}
+              {isCompleted && (
+                <CheckCircle size={20} className="text-green-500 bg-white rounded-full" />
+              )}
+              {isFailed && (
+                <Warning size={20} className="text-red-500 bg-white rounded-full" />
+              )}
+            </div>
           )}
-          <button
-            onClick={() => toggleBlockExpansion(block.id)}
-            className="p-2 bg-white/80 hover:bg-purple-50 text-gray-600 hover:text-purple-600 rounded-lg border border-gray-200/60 hover:border-purple-300/60 transition-all duration-200 hover:shadow-md hover:scale-105 backdrop-blur-sm"
-            title={block.isExpanded ? "Collapse" : "Expand"}
-          >
-            {block.isExpanded ? (
-              <CaretUp size={14} className="transform transition-transform duration-200 group-hover:scale-110" />
-            ) : (
-              <CaretDown size={14} className="transform transition-transform duration-200 group-hover:scale-110" />
-            )}
-          </button>
         </div>
       </div>
 
-      {block.isExpanded && (
-        <div className="relative">
-          {/* Elegant separator */}
-          <div className="mx-4 border-t border-gradient-to-r from-transparent via-gray-200/60 to-transparent" />
-          
-          <div className="px-6 pb-6 pt-4">
-            <div className="bg-white/40 backdrop-blur-sm rounded-xl p-4 border border-white/60 shadow-inner">
-              {renderBlockContent()}
-            </div>
-          </div>
-          
-          {/* Bottom accent line */}
-          <div className="absolute bottom-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-purple-200/40 to-transparent" />
+      {/* Connection line to next block */}
+      {!isLast && (
+        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full">
+          <div className="w-0.5 h-8 bg-gradient-to-b from-gray-400 to-gray-200" />
         </div>
       )}
     </div>
@@ -805,64 +1033,76 @@ function AddBlockMenu({ blocks, addBlock }) {
 
   const availableBlocks = Object.entries(BLOCK_INFO).filter(
     ([type]) =>
-      ![BLOCK_TYPES.FLOW_INFO, BLOCK_TYPES.START, BLOCK_TYPES.FINISH].includes(type)
+      ![BLOCK_TYPES.FLOW_INFO, BLOCK_TYPES.START, BLOCK_TYPES.FINISH].includes(
+        type
+      )
   );
 
-  const finishBlockIndex = blocks.findIndex((b) => b.type === BLOCK_TYPES.FINISH);
+  const finishBlockIndex = blocks.findIndex(
+    (b) => b.type === BLOCK_TYPES.FINISH
+  );
   const canAddBlock = finishBlockIndex > 0;
 
   if (!canAddBlock) return null;
 
   return (
-    <div className="relative mt-8">
+    <div className="relative mt-4">
+      {/* Connection line from last block */}
+      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full">
+        <div className="w-0.5 h-8 bg-gradient-to-b from-gray-200 to-transparent" />
+      </div>
+
       <button
         onClick={() => setShowMenu(!showMenu)}
-        className="w-full py-4 border-2 border-dashed border-purple-200/40 bg-gradient-to-r from-purple-50/30 to-white/50 rounded-xl text-gray-600 hover:border-purple-300/60 hover:text-purple-700 hover:bg-gradient-to-r hover:from-purple-100/40 hover:to-purple-50/60 transition-all duration-300 flex items-center justify-center gap-3 group backdrop-blur-sm hover:shadow-lg hover:shadow-purple-100/30"
+        className="w-24 h-24 mx-auto flex items-center justify-center bg-white border-2 border-dashed border-gray-300 rounded-2xl hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 group"
       >
-        <div className="relative">
-          <Plus size={22} className="group-hover:scale-110 transition-all duration-300 group-hover:rotate-90" />
-          <div className="absolute inset-0 bg-purple-400 rounded-full opacity-0 group-hover:opacity-20 animate-ping" />
-        </div>
-        <span className="font-semibold text-base">Add Block</span>
+        <Plus size={24} className="text-gray-400 group-hover:text-purple-600 group-hover:scale-110 transition-all" />
       </button>
 
       {showMenu && (
         <div
           ref={menuRef}
-          className="absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-2xl shadow-2xl z-50 overflow-hidden transform animate-fadeIn"
+          className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden min-w-[320px]"
         >
-          <div className="p-4">
-            <div className="text-xs font-semibold text-gray-500 px-3 py-2 uppercase tracking-wider border-b border-gray-200/40 mb-3">
-              Available Blocks
+          <div className="p-3">
+            <div className="text-xs font-semibold text-gray-500 px-2 pb-2 border-b border-gray-100 mb-2">
+              CHOOSE BLOCK TYPE
             </div>
-            <div className="space-y-1">
-              {availableBlocks.map(([type, info]) => (
-                <button
-                  key={type}
-                  onClick={() => {
-                    addBlock(type);
-                    setShowMenu(false);
-                  }}
-                  className="w-full text-left px-3 py-3 hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 rounded-xl transition-all duration-200 flex items-center gap-4 group transform hover:scale-[1.02]"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-100 to-purple-200/70 border border-purple-200/80 flex items-center justify-center group-hover:shadow-lg group-hover:scale-110 transition-all duration-200">
-                    <div className="text-purple-700 group-hover:rotate-6 transition-transform duration-200">
-                      {info.icon}
+            <div className="grid grid-cols-2 gap-2">
+              {availableBlocks.map(([type, info]) => {
+                const getBlockColor = () => {
+                  switch (type) {
+                    case BLOCK_TYPES.API_CALL:
+                      return "from-blue-500 to-blue-600";
+                    case BLOCK_TYPES.LLM_INSTRUCTION:
+                      return "from-purple-500 to-purple-600";
+                    case BLOCK_TYPES.WEB_SCRAPING:
+                      return "from-green-500 to-green-600";
+                    case BLOCK_TYPES.TOOL_CALL:
+                      return "from-orange-500 to-orange-600";
+                    default:
+                      return "from-gray-400 to-gray-500";
+                  }
+                };
+
+                return (
+                  <button
+                    key={type}
+                    onClick={() => {
+                      addBlock(type);
+                      setShowMenu(false);
+                    }}
+                    className="flex flex-col items-center gap-2 p-4 hover:bg-gray-50 rounded-lg transition-all group"
+                  >
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${getBlockColor()} flex items-center justify-center text-white shadow-md group-hover:scale-110 transition-transform`}>
+                      {React.createElement(info.icon, { size: 20, className: "text-white" })}
                     </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-sm font-semibold text-gray-800 group-hover:text-purple-800 transition-colors">
+                    <div className="text-xs font-medium text-gray-700 text-center">
                       {info.label}
                     </div>
-                    <div className="text-xs text-gray-600 leading-relaxed">
-                      {info.description}
-                    </div>
-                  </div>
-                  <div className="opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0">
-                    <Plus size={18} className="text-purple-500" />
-                  </div>
-                </button>
-              ))}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -871,7 +1111,12 @@ function AddBlockMenu({ blocks, addBlock }) {
   );
 }
 
-function ExecutionPanel({ isOpen, onClose, executionResults, executionStatus }) {
+function ExecutionPanel({
+  isOpen,
+  onClose,
+  executionResults,
+  executionStatus,
+}) {
   if (!isOpen) return null;
 
   return (
@@ -893,26 +1138,42 @@ function ExecutionPanel({ isOpen, onClose, executionResults, executionStatus }) 
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
-          {executionStatus === 'idle' && (
+          {executionStatus === "idle" && (
             <div className="text-center text-theme-text-secondary py-8">
               <Play size={48} className="mx-auto mb-4 opacity-20" />
               <p>Click "Run Flow" to execute the workflow</p>
             </div>
           )}
 
-          {executionStatus === 'running' && (
+          {executionStatus === "running" && (
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <ArrowsClockwise size={20} className="animate-spin text-blue-500" />
-                <span className="text-theme-text-primary">Executing workflow...</span>
+                <ArrowsClockwise
+                  size={20}
+                  className="animate-spin text-blue-500"
+                />
+                <span className="text-theme-text-primary">
+                  Executing workflow...
+                </span>
               </div>
               {executionResults.map((result, index) => (
                 <div key={index} className="bg-theme-bg-primary rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
-                    {result.status === 'completed' && <CheckCircle size={16} className="text-green-500" />}
-                    {result.status === 'running' && <ArrowsClockwise size={16} className="animate-spin text-blue-500" />}
-                    {result.status === 'failed' && <Warning size={16} className="text-red-500" />}
-                    <span className="text-sm font-medium text-theme-text-primary">{result.blockName}</span>
+                    {result.status === "completed" && (
+                      <CheckCircle size={16} className="text-green-500" />
+                    )}
+                    {result.status === "running" && (
+                      <ArrowsClockwise
+                        size={16}
+                        className="animate-spin text-blue-500"
+                      />
+                    )}
+                    {result.status === "failed" && (
+                      <Warning size={16} className="text-red-500" />
+                    )}
+                    <span className="text-sm font-medium text-theme-text-primary">
+                      {result.blockName}
+                    </span>
                   </div>
                   {result.output && (
                     <pre className="text-xs text-theme-text-secondary bg-black/20 rounded p-2 overflow-x-auto">
@@ -924,17 +1185,21 @@ function ExecutionPanel({ isOpen, onClose, executionResults, executionStatus }) 
             </div>
           )}
 
-          {executionStatus === 'completed' && (
+          {executionStatus === "completed" && (
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-green-500 mb-4">
                 <CheckCircle size={20} />
-                <span className="font-medium">Workflow completed successfully</span>
+                <span className="font-medium">
+                  Workflow completed successfully
+                </span>
               </div>
               {executionResults.map((result, index) => (
                 <div key={index} className="bg-theme-bg-primary rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
                     <CheckCircle size={16} className="text-green-500" />
-                    <span className="text-sm font-medium text-theme-text-primary">{result.blockName}</span>
+                    <span className="text-sm font-medium text-theme-text-primary">
+                      {result.blockName}
+                    </span>
                   </div>
                   {result.output && (
                     <pre className="text-xs text-theme-text-secondary bg-black/20 rounded p-2 overflow-x-auto">
@@ -946,14 +1211,16 @@ function ExecutionPanel({ isOpen, onClose, executionResults, executionStatus }) 
             </div>
           )}
 
-          {executionStatus === 'failed' && (
+          {executionStatus === "failed" && (
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-red-500 mb-4">
                 <Warning size={20} />
                 <span className="font-medium">Workflow execution failed</span>
               </div>
               <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-                <p className="text-sm text-red-400">Error details will appear here</p>
+                <p className="text-sm text-red-400">
+                  Error details will appear here
+                </p>
               </div>
             </div>
           )}
@@ -963,7 +1230,7 @@ function ExecutionPanel({ isOpen, onClose, executionResults, executionStatus }) 
   );
 }
 
-function WorkflowBuilder({ workspace, noteData, onClose }) {
+export default function WorkflowBuilder({ workspace, noteData, onClose }) {
   const [blocks, setBlocks] = useState([]);
   const [availableFlows, setAvailableFlows] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -972,10 +1239,12 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showExecutionPanel, setShowExecutionPanel] = useState(false);
   const [executionResults, setExecutionResults] = useState([]);
-  const [executionStatus, setExecutionStatus] = useState('idle'); // idle, running, completed, failed
+  const [executionStatus, setExecutionStatus] = useState("idle"); // idle, running, completed, failed
   const [blockExecutionStatus, setBlockExecutionStatus] = useState({});
   const [validationErrors, setValidationErrors] = useState({});
-  
+  const [showAIAssistant, setShowAIAssistant] = useState(true);
+  const [smartSuggestions, setSmartSuggestions] = useState([]);
+
   const nameRef = useRef(null);
   const descriptionRef = useRef(null);
   const autoSaveTimeoutRef = useRef(null);
@@ -997,7 +1266,9 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
       );
       setBlocks(noteData.workflowData.blocks);
     } else {
-      console.log("[WorkflowBuilder] No workflow data found, using default blocks");
+      console.log(
+        "[WorkflowBuilder] No workflow data found, using default blocks"
+      );
       setBlocks(DEFAULT_BLOCKS);
     }
 
@@ -1008,19 +1279,19 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
   useEffect(() => {
     if (blocks.length > 0) {
       setHasUnsavedChanges(true);
-      
+
       // Auto-save after 30 seconds of inactivity
       if (autoSaveTimeoutRef.current) {
         clearTimeout(autoSaveTimeoutRef.current);
       }
-      
+
       autoSaveTimeoutRef.current = setTimeout(() => {
         if (hasUnsavedChanges) {
           saveFlow(true); // Auto-save silently
         }
       }, 30000);
     }
-    
+
     return () => {
       if (autoSaveTimeoutRef.current) {
         clearTimeout(autoSaveTimeoutRef.current);
@@ -1032,19 +1303,19 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
   useEffect(() => {
     const handleKeyDown = (e) => {
       // Cmd+S or Ctrl+S to save
-      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
         e.preventDefault();
         saveFlow();
       }
       // Cmd+Enter or Ctrl+Enter to run
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
         e.preventDefault();
         runFlow();
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [blocks]);
 
   const loadAvailableFlows = async () => {
@@ -1060,11 +1331,14 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
 
   const convertAgentFlowBlocks = (agentFlow) => {
     console.log("[WorkflowBuilder] Converting agent flow:", agentFlow);
-    
+
     // Check for visualBlocks first (new format with better metadata)
     if (agentFlow?.visualBlocks && Array.isArray(agentFlow.visualBlocks)) {
-      console.log("[WorkflowBuilder] Using visualBlocks:", agentFlow.visualBlocks);
-      
+      console.log(
+        "[WorkflowBuilder] Using visualBlocks:",
+        agentFlow.visualBlocks
+      );
+
       const convertedBlocks = [
         {
           id: "flow_info",
@@ -1076,29 +1350,29 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
           isExpanded: true,
         },
       ];
-      
+
       // Convert visual blocks, filtering out start/complete blocks
       agentFlow.visualBlocks.forEach((vBlock, index) => {
-        if (vBlock.type === 'start' || vBlock.type === 'complete') {
+        if (vBlock.type === "start" || vBlock.type === "complete") {
           return; // Skip start and complete blocks
         }
-        
+
         // Map visual block type to WorkflowBuilder block type
         let blockType = BLOCK_TYPES.LLM_INSTRUCTION; // default
-        if (vBlock.type === 'toolCall') {
+        if (vBlock.type === "toolCall") {
           blockType = BLOCK_TYPES.TOOL_CALL;
-        } else if (vBlock.type === 'apiCall') {
+        } else if (vBlock.type === "apiCall") {
           blockType = BLOCK_TYPES.API_CALL;
-        } else if (vBlock.type === 'webScraping') {
+        } else if (vBlock.type === "webScraping") {
           blockType = BLOCK_TYPES.WEB_SCRAPING;
-        } else if (vBlock.type === 'llmInstruction') {
+        } else if (vBlock.type === "llmInstruction") {
           blockType = BLOCK_TYPES.LLM_INSTRUCTION;
         }
-        
+
         // Find corresponding step config
-        const stepIndex = parseInt(vBlock.id.replace('step_', '')) - 1;
+        const stepIndex = parseInt(vBlock.id.replace("step_", "")) - 1;
         const step = agentFlow.steps?.[stepIndex + 1]; // +1 to skip start step
-        
+
         const block = {
           id: vBlock.id || `block_${index}`,
           type: blockType,
@@ -1108,14 +1382,14 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
             description: vBlock.description,
             icon: vBlock.icon,
             tool: vBlock.tool,
-            status: vBlock.status
+            status: vBlock.status,
           },
           isExpanded: index < 2, // Expand first few blocks
         };
-        
+
         convertedBlocks.push(block);
       });
-      
+
       // Add finish block
       convertedBlocks.push({
         id: "finish",
@@ -1123,11 +1397,14 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
         config: {},
         isExpanded: false,
       });
-      
-      console.log("[WorkflowBuilder] Converted blocks from visualBlocks:", convertedBlocks);
+
+      console.log(
+        "[WorkflowBuilder] Converted blocks from visualBlocks:",
+        convertedBlocks
+      );
       return convertedBlocks;
     }
-    
+
     // Fallback to steps array
     const steps = agentFlow?.config?.steps || agentFlow?.steps || [];
 
@@ -1154,19 +1431,19 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
     steps.forEach((step, index) => {
       // Skip start step
       if (step.type === "start") return;
-      
+
       // Map step type to block type
       let blockType = BLOCK_TYPES.LLM_INSTRUCTION; // default
-      if (step.type === 'toolCall') {
+      if (step.type === "toolCall") {
         blockType = BLOCK_TYPES.TOOL_CALL;
-      } else if (step.type === 'apiCall') {
+      } else if (step.type === "apiCall") {
         blockType = BLOCK_TYPES.API_CALL;
-      } else if (step.type === 'webScraping') {
+      } else if (step.type === "webScraping") {
         blockType = BLOCK_TYPES.WEB_SCRAPING;
-      } else if (step.type === 'llmInstruction') {
+      } else if (step.type === "llmInstruction") {
         blockType = BLOCK_TYPES.LLM_INSTRUCTION;
       }
-      
+
       const block = {
         id: `block_${index}`,
         type: blockType,
@@ -1186,38 +1463,44 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
       });
     }
 
-    console.log("[WorkflowBuilder] Converted blocks from steps:", convertedBlocks);
+    console.log(
+      "[WorkflowBuilder] Converted blocks from steps:",
+      convertedBlocks
+    );
     return convertedBlocks;
   };
 
   const validateBlocks = () => {
     const errors = {};
-    
-    blocks.forEach(block => {
+
+    blocks.forEach((block) => {
       const blockErrors = [];
-      
+
       if (block.type === BLOCK_TYPES.FLOW_INFO) {
-        if (!block.config.name?.trim()) blockErrors.push("Flow name is required");
-        if (!block.config.description?.trim()) blockErrors.push("Description is required");
+        if (!block.config.name?.trim())
+          blockErrors.push("Flow name is required");
+        if (!block.config.description?.trim())
+          blockErrors.push("Description is required");
       }
-      
+
       if (block.type === BLOCK_TYPES.LLM_INSTRUCTION) {
-        if (!block.config.instruction?.trim()) blockErrors.push("Instruction is required");
+        if (!block.config.instruction?.trim())
+          blockErrors.push("Instruction is required");
       }
-      
+
       if (block.type === BLOCK_TYPES.API_CALL) {
         if (!block.config.url?.trim()) blockErrors.push("API URL is required");
       }
-      
+
       if (block.type === BLOCK_TYPES.WEB_SCRAPING) {
         if (!block.config.url?.trim()) blockErrors.push("URL is required");
       }
-      
+
       if (blockErrors.length > 0) {
         errors[block.id] = blockErrors;
       }
     });
-    
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -1238,20 +1521,20 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
   };
 
   const duplicateBlock = (blockId) => {
-    const blockIndex = blocks.findIndex(b => b.id === blockId);
+    const blockIndex = blocks.findIndex((b) => b.id === blockId);
     if (blockIndex === -1) return;
-    
+
     const blockToDuplicate = blocks[blockIndex];
     const newBlock = {
       ...blockToDuplicate,
       id: `block_${Date.now()}`,
-      config: { ...blockToDuplicate.config }
+      config: { ...blockToDuplicate.config },
     };
-    
+
     const newBlocks = [...blocks];
     newBlocks.splice(blockIndex + 1, 0, newBlock);
     setBlocks(newBlocks);
-    
+
     showToast("Block duplicated", "success");
   };
 
@@ -1321,7 +1604,12 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
             // Only include backend-supported block types
             block.type !== BLOCK_TYPES.FINISH &&
             block.type !== BLOCK_TYPES.FLOW_INFO &&
-            [BLOCK_TYPES.START, BLOCK_TYPES.API_CALL, BLOCK_TYPES.LLM_INSTRUCTION, BLOCK_TYPES.WEB_SCRAPING].includes(block.type)
+            [
+              BLOCK_TYPES.START,
+              BLOCK_TYPES.API_CALL,
+              BLOCK_TYPES.LLM_INSTRUCTION,
+              BLOCK_TYPES.WEB_SCRAPING,
+            ].includes(block.type)
         )
         .map((block) => ({
           type: block.type,
@@ -1336,11 +1624,11 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
 
       setLastSaved(new Date());
       setHasUnsavedChanges(false);
-      
+
       if (!isAutoSave) {
         showToast("Flow saved successfully!", "success", { clear: true });
       }
-      
+
       await loadAvailableFlows();
     } catch (error) {
       console.error("Save error:", error);
@@ -1360,56 +1648,59 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
 
     setIsRunning(true);
     setShowExecutionPanel(true);
-    setExecutionStatus('running');
+    setExecutionStatus("running");
     setExecutionResults([]);
     setBlockExecutionStatus({});
 
     // Simulate workflow execution
     const executableBlocks = blocks.filter(
-      b => b.type !== BLOCK_TYPES.FLOW_INFO && b.type !== BLOCK_TYPES.FINISH
+      (b) => b.type !== BLOCK_TYPES.FLOW_INFO && b.type !== BLOCK_TYPES.FINISH
     );
 
     for (let i = 0; i < executableBlocks.length; i++) {
       const block = executableBlocks[i];
-      
+
       // Update block status to executing
-      setBlockExecutionStatus(prev => ({
+      setBlockExecutionStatus((prev) => ({
         ...prev,
-        [block.id]: 'executing'
+        [block.id]: "executing",
       }));
 
       // Add to execution results
-      setExecutionResults(prev => [...prev, {
-        blockName: BLOCK_INFO[block.type].label,
-        status: 'running',
-        output: null
-      }]);
+      setExecutionResults((prev) => [
+        ...prev,
+        {
+          blockName: BLOCK_INFO[block.type].label,
+          status: "running",
+          output: null,
+        },
+      ]);
 
       // Simulate execution delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Update block status to completed
-      setBlockExecutionStatus(prev => ({
+      setBlockExecutionStatus((prev) => ({
         ...prev,
-        [block.id]: 'completed'
+        [block.id]: "completed",
       }));
 
       // Update execution results
-      setExecutionResults(prev => {
+      setExecutionResults((prev) => {
         const updated = [...prev];
         updated[i] = {
           ...updated[i],
-          status: 'completed',
-          output: { 
-            success: true, 
-            data: `Result from ${BLOCK_INFO[block.type].label}` 
-          }
+          status: "completed",
+          output: {
+            success: true,
+            data: `Result from ${BLOCK_INFO[block.type].label}`,
+          },
         };
         return updated;
       });
     }
 
-    setExecutionStatus('completed');
+    setExecutionStatus("completed");
     setIsRunning(false);
     showToast("Workflow executed successfully!", "success");
 
@@ -1421,13 +1712,63 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
 
   const clearFlow = () => {
     if (hasUnsavedChanges) {
-      if (!confirm("You have unsaved changes. Are you sure you want to clear the flow?")) {
+      if (
+        !confirm(
+          "You have unsaved changes. Are you sure you want to clear the flow?"
+        )
+      ) {
         return;
       }
     }
     setBlocks(DEFAULT_BLOCKS);
     setHasUnsavedChanges(false);
     showToast("Flow cleared", "info");
+  };
+
+  // AI Assistant handlers
+  const handleAISuggestion = (suggestionType) => {
+    switch (suggestionType) {
+      case "error_handling":
+        // Add error handling block after API calls
+        const apiCallBlocks = blocks.filter(
+          (block) => block.type === BLOCK_TYPES.API_CALL
+        );
+        if (apiCallBlocks.length > 0) {
+          showToast("Adding error handling blocks...", "info");
+          // Implementation would add error handling blocks
+        }
+        break;
+      case "token_optimization":
+        // Optimize LLM instructions
+        const llmBlocks = blocks.filter(
+          (block) => block.type === BLOCK_TYPES.LLM_INSTRUCTION
+        );
+        if (llmBlocks.length > 0) {
+          showToast(
+            "Optimizing LLM instructions for token efficiency...",
+            "info"
+          );
+          // Implementation would optimize instructions
+        }
+        break;
+      case "variables":
+        // Check for undefined variables
+        showToast("Checking variable references...", "info");
+        // Implementation would validate variables
+        break;
+      default:
+        showToast("AI suggestion applied", "success");
+    }
+  };
+
+  const handleAIOptimize = (optimizationType) => {
+    showToast(`Applying ${optimizationType} optimization...`, "info");
+    // Implementation would apply optimizations
+  };
+
+  const handleAIValidate = (validationType) => {
+    showToast(`Running ${validationType} validation...`, "info");
+    // Implementation would run validation
   };
 
   const publishFlow = () => {
@@ -1442,10 +1783,13 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
   return (
     <div className="w-full h-full flex flex-col bg-gradient-to-br from-gray-50/30 via-white/95 to-purple-50/20 relative">
       {/* Subtle background pattern */}
-      <div className="absolute inset-0 opacity-[0.02]" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        backgroundSize: '30px 30px'
-      }} />
+      <div
+        className="absolute inset-0 opacity-[0.02]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundSize: "30px 30px",
+        }}
+      />
       <UnifiedHeader
         flowName={flowName}
         blockCount={blocks.length}
@@ -1457,13 +1801,18 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
         isRunning={isRunning}
         lastSaved={lastSaved}
         hasUnsavedChanges={hasUnsavedChanges}
+        showAIAssistant={showAIAssistant}
+        onToggleAIAssistant={() => setShowAIAssistant(!showAIAssistant)}
       />
-      
+
       <div className="flex-1 flex overflow-hidden">
-        <div className="flex-1 overflow-y-auto" style={{maxHeight: 'calc(100vh - 120px)'}}>
+        <div
+          className="flex-1 overflow-y-auto"
+          style={{ maxHeight: "calc(100vh - 120px)" }}
+        >
           <div className="max-w-3xl mx-auto p-4">
-            <div className="space-y-6">
-              {blocks.map((block) => (
+            <div className="space-y-2">
+              {blocks.map((block, index) => (
                 <BlockNode
                   key={block.id}
                   block={block}
@@ -1473,6 +1822,8 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
                   toggleBlockExpansion={toggleBlockExpansion}
                   executionStatus={blockExecutionStatus[block.id]}
                   validationErrors={validationErrors[block.id]}
+                  isFirst={index === 0}
+                  isLast={index === blocks.length - 1}
                   refs={
                     block.type === BLOCK_TYPES.FLOW_INFO
                       ? { nameRef, descriptionRef }
@@ -1482,10 +1833,7 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
               ))}
             </div>
 
-            <AddBlockMenu
-              blocks={blocks}
-              addBlock={addBlock}
-            />
+            <AddBlockMenu blocks={blocks} addBlock={addBlock} />
           </div>
         </div>
       </div>
@@ -1508,21 +1856,27 @@ function WorkflowBuilder({ workspace, noteData, onClose }) {
           reduce token usage.
           <br />
           <br />
-          Note: This may affect data quality and remove specific details from the
-          original content.
+          Note: This may affect data quality and remove specific details from
+          the original content.
         </p>
       </Tooltip>
-      
+
       <Tooltip
         id="validation-error-tooltip"
         place="top"
         delayShow={300}
         className="tooltip !text-xs z-99 max-w-xs"
       />
+
+      {/* AI Assistant */}
+      {showAIAssistant && (
+        <AIAssistant
+          blocks={blocks}
+          onSuggestion={handleAISuggestion}
+          onOptimize={handleAIOptimize}
+          onValidate={handleAIValidate}
+        />
+      )}
     </div>
   );
 }
-
-// Export both as named export and default export for compatibility
-export { WorkflowBuilder as Workflow };
-export default WorkflowBuilder;

@@ -56,9 +56,7 @@ async function grepAgents({
       textResponse: `${pluralize(
         "Agent",
         agentHandles.length
-      )} ${agentHandles.join(
-        ", "
-      )} invoked`,
+      )} ${agentHandles.join(", ")} invoked`,
       sources: [],
       close: true,
       error: null,

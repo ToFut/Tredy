@@ -11,11 +11,14 @@ const WorkspaceAgentInvocation = {
 
   close: async function (uuid, retryCount = 0) {
     if (!uuid) return;
-    
+
     // Make this operation non-blocking by not awaiting it
     // This prevents the websocket close from hanging on database timeouts
-    this.closeAsync(uuid, retryCount).catch(error => {
-      console.error(`[WorkspaceAgentInvocation] Background close failed for ${uuid}:`, error.message);
+    this.closeAsync(uuid, retryCount).catch((error) => {
+      console.error(
+        `[WorkspaceAgentInvocation] Background close failed for ${uuid}:`,
+        error.message
+      );
     });
   },
 
@@ -23,7 +26,7 @@ const WorkspaceAgentInvocation = {
     if (!uuid) return;
     const maxRetries = 3;
     const retryDelay = 1000; // 1 second
-    
+
     try {
       await prisma.workspace_agent_invocations.update({
         where: { uuid: String(uuid) },
@@ -31,20 +34,33 @@ const WorkspaceAgentInvocation = {
       });
     } catch (error) {
       // Log the error for debugging
-      if (error.message?.includes("Timed out") || error.message?.includes("ConnectionError")) {
-        console.error(`[WorkspaceAgentInvocation] Database timeout error closing invocation ${uuid}:`, error.message);
-        
+      if (
+        error.message?.includes("Timed out") ||
+        error.message?.includes("ConnectionError")
+      ) {
+        console.error(
+          `[WorkspaceAgentInvocation] Database timeout error closing invocation ${uuid}:`,
+          error.message
+        );
+
         // Retry logic for timeout errors
         if (retryCount < maxRetries) {
-          console.log(`[WorkspaceAgentInvocation] Retrying close operation (attempt ${retryCount + 1}/${maxRetries})...`);
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          console.log(
+            `[WorkspaceAgentInvocation] Retrying close operation (attempt ${retryCount + 1}/${maxRetries})...`
+          );
+          await new Promise((resolve) => setTimeout(resolve, retryDelay));
           return await this.closeAsync(uuid, retryCount + 1);
         } else {
-          console.error(`[WorkspaceAgentInvocation] Failed to close invocation ${uuid} after ${maxRetries} retries`);
+          console.error(
+            `[WorkspaceAgentInvocation] Failed to close invocation ${uuid} after ${maxRetries} retries`
+          );
         }
       } else {
         // Log other errors but don't retry
-        console.error(`[WorkspaceAgentInvocation] Error closing invocation ${uuid}:`, error.message);
+        console.error(
+          `[WorkspaceAgentInvocation] Error closing invocation ${uuid}:`,
+          error.message
+        );
       }
     }
   },
@@ -127,7 +143,7 @@ const WorkspaceAgentInvocation = {
     try {
       const invocation = await prisma.workspace_agent_invocations.update({
         where: { uuid: String(uuid) },
-        data: { 
+        data: {
           prompt: String(prompt),
           lastUpdatedAt: new Date(),
         },

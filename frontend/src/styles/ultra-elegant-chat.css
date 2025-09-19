@@ -18,18 +18,20 @@
 }
 
 .chat-message-ultra-elegant::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(139, 92, 246, 0.3) 20%, 
-    rgba(139, 92, 246, 0.6) 50%, 
-    rgba(139, 92, 246, 0.3) 80%, 
-    transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(139, 92, 246, 0.3) 20%,
+    rgba(139, 92, 246, 0.6) 50%,
+    rgba(139, 92, 246, 0.3) 80%,
+    transparent
+  );
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -37,7 +39,7 @@
 .chat-message-ultra-elegant:hover {
   background: rgba(255, 255, 255, 0.04);
   border-color: rgba(139, 92, 246, 0.2);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.12),
     0 0 0 1px rgba(139, 92, 246, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -50,7 +52,13 @@
 
 /* 2. SOPHISTICATED TYPOGRAPHY */
 .prose-ultra-elegant {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   font-size: 15px;
   line-height: 1.7;
   color: var(--theme-text-primary);
@@ -82,12 +90,14 @@
   font-weight: 700;
   line-height: 1.2;
   margin: 1.5rem 0 1rem 0;
-  background: linear-gradient(135deg, 
-    #a78bfa 0%, 
-    #c084fc 25%, 
-    #e879f9 50%, 
-    #f0abfc 75%, 
-    #fbbf24 100%);
+  background: linear-gradient(
+    135deg,
+    #a78bfa 0%,
+    #c084fc 25%,
+    #e879f9 50%,
+    #f0abfc 75%,
+    #fbbf24 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -96,7 +106,7 @@
 }
 
 .prose-ultra-elegant h1::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -4px;
   left: 0;
@@ -114,16 +124,18 @@
   color: var(--theme-text-primary);
   padding-left: 12px;
   border-left: 3px solid transparent;
-  background: linear-gradient(180deg, 
-    rgba(139, 92, 246, 0.3) 0%, 
-    rgba(167, 139, 250, 0.1) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(139, 92, 246, 0.3) 0%,
+    rgba(167, 139, 250, 0.1) 100%
+  );
   background-clip: padding-box;
   border-left-color: rgba(139, 92, 246, 0.4);
   position: relative;
 }
 
 .prose-ultra-elegant h2::before {
-  content: '';
+  content: "";
   position: absolute;
   left: -3px;
   top: 0;
@@ -143,7 +155,7 @@
 }
 
 .prose-ultra-elegant h3::before {
-  content: '◆';
+  content: "◆";
   color: rgba(139, 92, 246, 0.6);
   margin-right: 8px;
   font-size: 12px;
@@ -168,17 +180,19 @@
 }
 
 .prose-ultra-elegant ul::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 0;
   bottom: 0;
   width: 1px;
-  background: linear-gradient(180deg, 
-    transparent, 
-    rgba(139, 92, 246, 0.2) 20%, 
-    rgba(139, 92, 246, 0.2) 80%, 
-    transparent);
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(139, 92, 246, 0.2) 20%,
+    rgba(139, 92, 246, 0.2) 80%,
+    transparent
+  );
 }
 
 .prose-ultra-elegant li {
@@ -194,7 +208,7 @@
 }
 
 .prose-ultra-elegant ul li::before {
-  content: '';
+  content: "";
   position: absolute;
   left: -16px;
   top: 50%;
@@ -213,9 +227,11 @@
 
 /* 5. PREMIUM CODE BLOCKS */
 .prose-ultra-elegant pre {
-  background: linear-gradient(135deg, 
-    rgba(15, 23, 42, 0.95) 0%, 
-    rgba(30, 41, 59, 0.95) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.95) 0%,
+    rgba(30, 41, 59, 0.95) 100%
+  );
   backdrop-filter: blur(20px);
   border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 16px;
@@ -225,22 +241,24 @@
   font-size: 14px;
   line-height: 1.6;
   position: relative;
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .prose-ultra-elegant pre::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(139, 92, 246, 0.5) 50%, 
-    transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(139, 92, 246, 0.5) 50%,
+    transparent
+  );
 }
 
 .prose-ultra-elegant code {
@@ -251,7 +269,7 @@
   font-size: 0.9em;
   font-weight: 500;
   border: 1px solid rgba(139, 92, 246, 0.2);
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
 }
 
 .prose-ultra-elegant pre code {
@@ -260,7 +278,7 @@
   padding: 0;
   border-radius: 0;
   border: none;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
 }
 
 /* 6. SOPHISTICATED TABLES */
@@ -278,9 +296,11 @@
 }
 
 .prose-ultra-elegant th {
-  background: linear-gradient(135deg, 
-    rgba(139, 92, 246, 0.2) 0%, 
-    rgba(167, 139, 250, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.2) 0%,
+    rgba(167, 139, 250, 0.1) 100%
+  );
   color: var(--theme-text-primary);
   font-weight: 600;
   padding: 16px 20px;
@@ -291,16 +311,18 @@
 }
 
 .prose-ultra-elegant th::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(139, 92, 246, 0.4) 50%, 
-    transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(139, 92, 246, 0.4) 50%,
+    transparent
+  );
 }
 
 .prose-ultra-elegant td {
@@ -322,9 +344,11 @@
 /* 7. ELEGANT BLOCKQUOTES */
 .prose-ultra-elegant blockquote {
   border-left: 4px solid transparent;
-  background: linear-gradient(135deg, 
-    rgba(139, 92, 246, 0.08) 0%, 
-    rgba(167, 139, 250, 0.04) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.08) 0%,
+    rgba(167, 139, 250, 0.04) 100%
+  );
   padding: 20px 24px;
   margin: 1.5rem 0;
   border-radius: 0 16px 16px 0;
@@ -347,16 +371,18 @@
 }
 
 .prose-ultra-elegant blockquote::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(139, 92, 246, 0.2) 50%, 
-    transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(139, 92, 246, 0.2) 50%,
+    transparent
+  );
 }
 
 /* 8. REFINED LINKS */
@@ -370,7 +396,7 @@
 }
 
 .prose-ultra-elegant a::before {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -1px;
   left: 0;
@@ -393,19 +419,21 @@
 .prose-ultra-elegant hr {
   border: none;
   height: 2px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(139, 92, 246, 0.2) 20%, 
-    rgba(139, 92, 246, 0.4) 50%, 
-    rgba(139, 92, 246, 0.2) 80%, 
-    transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(139, 92, 246, 0.2) 20%,
+    rgba(139, 92, 246, 0.4) 50%,
+    rgba(139, 92, 246, 0.2) 80%,
+    transparent
+  );
   margin: 2rem 0;
   border-radius: 1px;
   position: relative;
 }
 
 .prose-ultra-elegant hr::after {
-  content: '◆';
+  content: "◆";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -420,7 +448,8 @@
 .message-ultra-elegant-enter {
   opacity: 0;
   transform: translateY(20px) scale(0.95);
-  animation: ultraElegantSlideIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: ultraElegantSlideIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+    forwards;
 }
 
 @keyframes ultraElegantSlideIn {
@@ -439,40 +468,50 @@
 }
 
 /* 11. SOPHISTICATED SPACING UTILITIES */
-.space-ultra-elegant-xs { margin: 0.25rem 0; }
-.space-ultra-elegant-sm { margin: 0.5rem 0; }
-.space-ultra-elegant-md { margin: 0.75rem 0; }
-.space-ultra-elegant-lg { margin: 1rem 0; }
-.space-ultra-elegant-xl { margin: 1.5rem 0; }
+.space-ultra-elegant-xs {
+  margin: 0.25rem 0;
+}
+.space-ultra-elegant-sm {
+  margin: 0.5rem 0;
+}
+.space-ultra-elegant-md {
+  margin: 0.75rem 0;
+}
+.space-ultra-elegant-lg {
+  margin: 1rem 0;
+}
+.space-ultra-elegant-xl {
+  margin: 1.5rem 0;
+}
 
 /* 12. PREMIUM TYPOGRAPHY SCALE */
-.text-ultra-elegant-xs { 
-  font-size: 12px; 
-  line-height: 1.5; 
+.text-ultra-elegant-xs {
+  font-size: 12px;
+  line-height: 1.5;
   font-weight: 400;
   letter-spacing: 0.01em;
 }
-.text-ultra-elegant-sm { 
-  font-size: 13px; 
-  line-height: 1.6; 
+.text-ultra-elegant-sm {
+  font-size: 13px;
+  line-height: 1.6;
   font-weight: 400;
   letter-spacing: 0.005em;
 }
-.text-ultra-elegant-base { 
-  font-size: 15px; 
-  line-height: 1.7; 
+.text-ultra-elegant-base {
+  font-size: 15px;
+  line-height: 1.7;
   font-weight: 400;
   letter-spacing: -0.01em;
 }
-.text-ultra-elegant-lg { 
-  font-size: 17px; 
-  line-height: 1.6; 
+.text-ultra-elegant-lg {
+  font-size: 17px;
+  line-height: 1.6;
   font-weight: 400;
   letter-spacing: -0.015em;
 }
-.text-ultra-elegant-xl { 
-  font-size: 20px; 
-  line-height: 1.5; 
+.text-ultra-elegant-xl {
+  font-size: 20px;
+  line-height: 1.5;
   font-weight: 500;
   letter-spacing: -0.02em;
 }
@@ -483,7 +522,7 @@
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
@@ -491,7 +530,7 @@
 .glass-morphism-elegant:hover {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(139, 92, 246, 0.2);
-  box-shadow: 
+  box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
@@ -503,22 +542,22 @@
     margin: 3px 0;
     border-radius: 16px;
   }
-  
+
   .prose-ultra-elegant {
     font-size: 14px;
     line-height: 1.6;
   }
-  
+
   .prose-ultra-elegant h1 {
     font-size: 20px;
     margin: 1.25rem 0 0.75rem 0;
   }
-  
+
   .prose-ultra-elegant h2 {
     font-size: 16px;
     margin: 1rem 0 0.5rem 0;
   }
-  
+
   .prose-ultra-elegant h3 {
     font-size: 15px;
     margin: 0.75rem 0 0.25rem 0;
@@ -531,7 +570,7 @@
     margin: 2px 0;
     border-radius: 12px;
   }
-  
+
   .prose-ultra-elegant {
     font-size: 13px;
     line-height: 1.5;
@@ -540,12 +579,14 @@
 
 /* 15. DARK THEME ULTRA ELEGANT */
 [data-theme="dark"] .prose-ultra-elegant h1 {
-  background: linear-gradient(135deg, 
-    #a78bfa 0%, 
-    #c084fc 25%, 
-    #e879f9 50%, 
-    #f0abfc 75%, 
-    #fbbf24 100%);
+  background: linear-gradient(
+    135deg,
+    #a78bfa 0%,
+    #c084fc 25%,
+    #e879f9 50%,
+    #f0abfc 75%,
+    #fbbf24 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -558,9 +599,11 @@
 }
 
 [data-theme="dark"] .prose-ultra-elegant blockquote {
-  background: linear-gradient(135deg, 
-    rgba(167, 139, 250, 0.1) 0%, 
-    rgba(192, 132, 252, 0.05) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(167, 139, 250, 0.1) 0%,
+    rgba(192, 132, 252, 0.05) 100%
+  );
   border-left-color: rgba(167, 139, 250, 0.5);
 }
 
@@ -571,12 +614,14 @@
 }
 
 [data-theme="light"] .prose-ultra-elegant h1 {
-  background: linear-gradient(135deg, 
-    #7c3aed 0%, 
-    #9333ea 25%, 
-    #a855f7 50%, 
-    #c084fc 75%, 
-    #d8b4fe 100%);
+  background: linear-gradient(
+    135deg,
+    #7c3aed 0%,
+    #9333ea 25%,
+    #a855f7 50%,
+    #c084fc 75%,
+    #d8b4fe 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -589,16 +634,18 @@
 }
 
 [data-theme="light"] .prose-ultra-elegant blockquote {
-  background: linear-gradient(135deg, 
-    rgba(124, 58, 237, 0.05) 0%, 
-    rgba(147, 51, 234, 0.02) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.05) 0%,
+    rgba(147, 51, 234, 0.02) 100%
+  );
   border-left-color: rgba(124, 58, 237, 0.3);
 }
 
 /* 17. PREMIUM FOCUS STATES */
 .prose-ultra-elegant:focus-within {
   outline: none;
-  box-shadow: 
+  box-shadow:
     0 0 0 2px rgba(139, 92, 246, 0.3),
     0 8px 32px rgba(0, 0, 0, 0.12);
 }
@@ -661,10 +708,12 @@
 
 /* 22. PREMIUM LOADING STATES */
 .ultra-elegant-loading {
-  background: linear-gradient(90deg, 
-    rgba(139, 92, 246, 0.1) 0%, 
-    rgba(167, 139, 250, 0.2) 50%, 
-    rgba(139, 92, 246, 0.1) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(139, 92, 246, 0.1) 0%,
+    rgba(167, 139, 250, 0.2) 50%,
+    rgba(139, 92, 246, 0.1) 100%
+  );
   background-size: 200% 100%;
   animation: ultraElegantShimmer 2s ease-in-out infinite;
 }
@@ -726,7 +775,7 @@
     border-width: 2px;
     border-color: var(--theme-text-primary);
   }
-  
+
   .prose-ultra-elegant h1,
   .prose-ultra-elegant h2,
   .prose-ultra-elegant h3 {

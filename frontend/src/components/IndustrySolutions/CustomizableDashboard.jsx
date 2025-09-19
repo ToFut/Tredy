@@ -5,6 +5,7 @@ import {
   Calendar,
   Envelope,
   Briefcase,
+  Activity,
   Clock,
   Target,
   Lightning,
@@ -14,119 +15,120 @@ import {
   Plus,
   Minus,
   ArrowsOut,
-  ArrowsIn
+  ArrowsIn,
 } from "@phosphor-icons/react";
 
 // Widget Types
 const WIDGET_TYPES = {
-  'workflow-metrics': {
-    title: 'Workflow Metrics',
-    color: 'from-blue-500 to-blue-600',
-    description: 'Track your daily workflow efficiency'
+  "workflow-metrics": {
+    title: "Workflow Metrics",
+    icon: Activity,
+    color: "from-blue-500 to-blue-600",
+    description: "Track your daily workflow efficiency",
   },
-  'connector-health': {
-    title: 'Connector Health',
+  "connector-health": {
+    title: "Connector Health",
     icon: Lightning,
-    color: 'from-green-500 to-green-600',
-    description: 'Monitor all connected services'
+    color: "from-green-500 to-green-600",
+    description: "Monitor all connected services",
   },
-  'business-insights': {
-    title: 'Business Insights',
+  "business-insights": {
+    title: "Business Insights",
     icon: ChartLine,
-    color: 'from-purple-500 to-purple-600',
-    description: 'Key performance indicators'
+    color: "from-purple-500 to-purple-600",
+    description: "Key performance indicators",
   },
-  'communication-summary': {
-    title: 'Communication Summary',
+  "communication-summary": {
+    title: "Communication Summary",
     icon: Envelope,
-    color: 'from-orange-500 to-orange-600',
-    description: 'Email and messaging overview'
+    color: "from-orange-500 to-orange-600",
+    description: "Email and messaging overview",
   },
-  'calendar-overview': {
-    title: 'Calendar Overview',
+  "calendar-overview": {
+    title: "Calendar Overview",
     icon: Calendar,
-    color: 'from-indigo-500 to-indigo-600',
-    description: 'Schedule and meeting insights'
+    color: "from-indigo-500 to-indigo-600",
+    description: "Schedule and meeting insights",
   },
-  'team-activity': {
-    title: 'Team Activity',
+  "team-activity": {
+    title: "Team Activity",
     icon: Users,
-    color: 'from-pink-500 to-pink-600',
-    description: 'Team collaboration metrics'
-  }
+    color: "from-pink-500 to-pink-600",
+    description: "Team collaboration metrics",
+  },
 };
 
 // Sample Data Generator
 const generateWidgetData = (type) => {
   const data = {
-    'workflow-metrics': {
+    "workflow-metrics": {
       efficiency: 87,
       tasksCompleted: 23,
-      avgTaskTime: '2.3h',
-      trend: '+12%'
+      avgTaskTime: "2.3h",
+      trend: "+12%",
     },
-    'connector-health': {
+    "connector-health": {
       totalConnectors: 8,
       activeConnectors: 7,
-      lastSync: '2 min ago',
-      status: 'healthy'
+      lastSync: "2 min ago",
+      status: "healthy",
     },
-    'business-insights': {
-      revenue: '$12,450',
-      growth: '+18%',
+    "business-insights": {
+      revenue: "$12,450",
+      growth: "+18%",
       customers: 156,
-      satisfaction: '94%'
+      satisfaction: "94%",
     },
-    'communication-summary': {
+    "communication-summary": {
       emailsSent: 45,
       emailsReceived: 78,
-      responseTime: '1.2h',
-      unreadCount: 12
+      responseTime: "1.2h",
+      unreadCount: 12,
     },
-    'calendar-overview': {
+    "calendar-overview": {
       meetingsToday: 4,
-      freeTime: '2.5h',
-      nextMeeting: 'Sales Call',
-      productivity: 'High'
+      freeTime: "2.5h",
+      nextMeeting: "Sales Call",
+      productivity: "High",
     },
-    'team-activity': {
+    "team-activity": {
       activeMembers: 8,
       projects: 12,
-      collaboration: 'High',
-      lastActivity: '5 min ago'
-    }
+      collaboration: "High",
+      lastActivity: "5 min ago",
+    },
   };
   return data[type] || {};
 };
 
 // Individual Widget Component
-function DashboardWidget({ 
-  type, 
-  size = 'medium', 
+function DashboardWidget({
+  type,
+  size = "medium",
   isDraggable = false,
   onRemove,
-  onResize 
+  onResize,
 }) {
   const config = WIDGET_TYPES[type];
   const data = generateWidgetData(type);
-  
+
   if (!config) return null;
 
   const sizeClasses = {
-    small: 'col-span-1 row-span-1',
-    medium: 'col-span-2 row-span-1',
-    large: 'col-span-2 row-span-2'
+    small: "col-span-1 row-span-1",
+    medium: "col-span-2 row-span-1",
+    large: "col-span-2 row-span-2",
   };
 
   const Icon = config.icon;
 
   return (
-    <div 
+    <div
       className={`
         ${sizeClasses[size]} 
         p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 
         hover:shadow-lg transition-all duration-200 group
-        ${isDraggable ? 'cursor-move' : ''}
+        ${isDraggable ? "cursor-move" : ""}
       `}
     >
       {/* Widget Header */}
@@ -144,19 +146,19 @@ function DashboardWidget({
             </p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           {onResize && (
             <>
               <button
-                onClick={() => onResize(type, 'small')}
+                onClick={() => onResize(type, "small")}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                 title="Small"
               >
                 <ArrowsIn className="w-3 h-3 text-gray-500" />
               </button>
               <button
-                onClick={() => onResize(type, 'large')}
+                onClick={() => onResize(type, "large")}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                 title="Large"
               >
@@ -181,13 +183,15 @@ function DashboardWidget({
         {Object.entries(data).map(([key, value], index) => (
           <div key={index} className="flex justify-between items-center">
             <span className="text-xs text-gray-600 dark:text-gray-400 capitalize">
-              {key.replace(/([A-Z])/g, ' $1').trim()}:
+              {key.replace(/([A-Z])/g, " $1").trim()}:
             </span>
-            <span className={`text-sm font-medium ${
-              key === 'trend' || key === 'growth' 
-                ? 'text-green-600 dark:text-green-400' 
-                : 'text-gray-900 dark:text-white'
-            }`}>
+            <span
+              className={`text-sm font-medium ${
+                key === "trend" || key === "growth"
+                  ? "text-green-600 dark:text-green-400"
+                  : "text-gray-900 dark:text-white"
+              }`}
+            >
               {value}
             </span>
           </div>
@@ -211,7 +215,7 @@ function DashboardWidget({
 
 // Connector Status Bar Component
 function ConnectorStatusBar({ connectors }) {
-  const activeConnectors = connectors.filter(c => c.status === 'connected');
+  const activeConnectors = connectors.filter((c) => c.status === "connected");
   const totalConnectors = connectors.length;
 
   return (
@@ -237,7 +241,7 @@ function ConnectorStatusBar({ connectors }) {
           </span>
         </div>
       </div>
-      
+
       {/* Connector Circles */}
       <div className="flex items-center gap-2">
         {activeConnectors.slice(0, 8).map((connector, index) => (
@@ -248,13 +252,15 @@ function ConnectorStatusBar({ connectors }) {
           >
             <div className="w-8 h-8 rounded-full bg-white dark:bg-gray-800 border-2 border-green-500 flex items-center justify-center shadow-sm">
               <span className="text-xs">
-                {connector.name ? connector.name.charAt(0).toUpperCase() : connector.provider.charAt(0).toUpperCase()}
+                {connector.name
+                  ? connector.name.charAt(0).toUpperCase()
+                  : connector.provider.charAt(0).toUpperCase()}
               </span>
             </div>
             <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-white dark:border-gray-800" />
           </div>
         ))}
-        
+
         {activeConnectors.length > 8 && (
           <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
             <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">
@@ -262,7 +268,7 @@ function ConnectorStatusBar({ connectors }) {
             </span>
           </div>
         )}
-        
+
         {activeConnectors.length === 0 && (
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
@@ -277,11 +283,11 @@ function ConnectorStatusBar({ connectors }) {
 }
 
 // Main Dashboard Component
-export default function CustomizableDashboard({ 
-  layout = 'workflow-mirror',
+export default function CustomizableDashboard({
+  layout = "workflow-mirror",
   connectors = [],
   onCustomize,
-  className = ""
+  className = "",
 }) {
   const [widgets, setWidgets] = useState([]);
   const [isCustomizing, setIsCustomizing] = useState(false);
@@ -293,69 +299,71 @@ export default function CustomizableDashboard({
 
   const initializeDashboard = (layoutType) => {
     let defaultWidgets = [];
-    
+
     switch (layoutType) {
-      case 'workflow-mirror':
+      case "workflow-mirror":
         defaultWidgets = [
-          { type: 'workflow-metrics', size: 'large' },
-          { type: 'connector-health', size: 'medium' },
-          { type: 'communication-summary', size: 'medium' },
-          { type: 'calendar-overview', size: 'medium' },
-          { type: 'team-activity', size: 'medium' }
+          { type: "workflow-metrics", size: "large" },
+          { type: "connector-health", size: "medium" },
+          { type: "communication-summary", size: "medium" },
+          { type: "calendar-overview", size: "medium" },
+          { type: "team-activity", size: "medium" },
         ];
         break;
-      case 'insights-focused':
+      case "insights-focused":
         defaultWidgets = [
-          { type: 'business-insights', size: 'large' },
-          { type: 'workflow-metrics', size: 'medium' },
-          { type: 'connector-health', size: 'medium' },
-          { type: 'communication-summary', size: 'medium' }
+          { type: "business-insights", size: "large" },
+          { type: "workflow-metrics", size: "medium" },
+          { type: "connector-health", size: "medium" },
+          { type: "communication-summary", size: "medium" },
         ];
         break;
-      case 'connector-status':
+      case "connector-status":
         defaultWidgets = [
-          { type: 'connector-health', size: 'large' },
-          { type: 'workflow-metrics', size: 'medium' },
-          { type: 'business-insights', size: 'medium' },
-          { type: 'communication-summary', size: 'medium' }
+          { type: "connector-health", size: "large" },
+          { type: "workflow-metrics", size: "medium" },
+          { type: "business-insights", size: "medium" },
+          { type: "communication-summary", size: "medium" },
         ];
         break;
-      case 'ai-assistant':
+      case "ai-assistant":
         defaultWidgets = [
-          { type: 'business-insights', size: 'large' },
-          { type: 'workflow-metrics', size: 'medium' },
-          { type: 'team-activity', size: 'medium' },
-          { type: 'connector-health', size: 'medium' }
+          { type: "business-insights", size: "large" },
+          { type: "workflow-metrics", size: "medium" },
+          { type: "team-activity", size: "medium" },
+          { type: "connector-health", size: "medium" },
         ];
         break;
       default:
         defaultWidgets = [
-          { type: 'workflow-metrics', size: 'medium' },
-          { type: 'connector-health', size: 'medium' }
+          { type: "workflow-metrics", size: "medium" },
+          { type: "connector-health", size: "medium" },
         ];
     }
-    
+
     setWidgets(defaultWidgets);
-    setAvailableWidgets(Object.keys(WIDGET_TYPES).filter(
-      type => !defaultWidgets.some(w => w.type === type)
-    ));
+    setAvailableWidgets(
+      Object.keys(WIDGET_TYPES).filter(
+        (type) => !defaultWidgets.some((w) => w.type === type)
+      )
+    );
   };
 
   const addWidget = (type) => {
-    const newWidget = { type, size: 'medium' };
+    const newWidget = { type, size: "medium" };
     setWidgets([...widgets, newWidget]);
-    setAvailableWidgets(availableWidgets.filter(t => t !== type));
+    setAvailableWidgets(availableWidgets.filter((t) => t !== type));
   };
 
   const removeWidget = (type) => {
-    setWidgets(widgets.filter(w => w.type !== type));
+    setWidgets(widgets.filter((w) => w.type !== type));
     setAvailableWidgets([...availableWidgets, type]);
   };
 
   const resizeWidget = (type, newSize) => {
-    setWidgets(widgets.map(w => 
-      w.type === type ? { ...w, size: newSize } : w
-    ));
+    setWidgets(
+      widgets.map((w) => (w.type === type ? { ...w, size: newSize } : w))
+    );
   };
 
   const toggleCustomization = () => {
@@ -378,18 +386,21 @@ export default function CustomizableDashboard({
               Tailored to you • From all your platforms • Fit to your eyes
             </p>
             <p className="text-xs text-purple-600 dark:text-purple-400 font-medium mt-1">
-              {layout.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())} Layout
+              {layout
+                .replace("-", " ")
+                .replace(/\b\w/g, (l) => l.toUpperCase())}{" "}
+              Layout
             </p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <button
             onClick={toggleCustomization}
             className={`px-3 py-2 rounded-lg transition-colors ${
-              isCustomizing 
-                ? 'bg-purple-500 text-white' 
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              isCustomizing
+                ? "bg-purple-500 text-white"
+                : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
             }`}
           >
             <Gear className="w-4 h-4" />
@@ -415,7 +426,7 @@ export default function CustomizableDashboard({
             Available Widgets
           </h3>
           <div className="grid grid-cols-2 gap-2">
-            {availableWidgets.map(type => {
+            {availableWidgets.map((type) => {
               const config = WIDGET_TYPES[type];
               const Icon = config.icon;
               return (
@@ -424,7 +435,9 @@ export default function CustomizableDashboard({
                   onClick={() => addWidget(type)}
                   className="flex items-center gap-2 p-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  <div className={`p-1 bg-gradient-to-br ${config.color} rounded`}>
+                  <div
+                    className={`p-1 bg-gradient-to-br ${config.color} rounded`}
+                  >
                     <Icon className="w-3 h-3 text-white" />
                   </div>
                   <span className="text-sm text-gray-700 dark:text-gray-300">

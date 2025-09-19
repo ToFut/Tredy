@@ -1,23 +1,23 @@
 /* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
 
 /* Import modern chat styles */
-@import './styles/modern-chat.css';
+@import "./styles/modern-chat.css";
 
 /* Import elegant chat styles */
-@import './styles/elegant-chat.css';
+@import "./styles/elegant-chat.css";
 
 /* Import ultra-elegant chat styles */
-@import './styles/ultra-elegant-chat.css';
+@import "./styles/ultra-elegant-chat.css";
 
 /* Import premium animations */
-@import './styles/premium-animations.css';
+@import "./styles/premium-animations.css";
 
 /* Import sophisticated themes */
-@import './styles/sophisticated-themes.css';
+@import "./styles/sophisticated-themes.css";
 
 /* Import landing page enhancements */
-@import './styles/landing-page-enhancements.css';
+@import "./styles/landing-page-enhancements.css";
 
 @tailwind base;
 @tailwind components;
@@ -50,69 +50,73 @@
   --tredy-primary-700: #7c3aed;
   --tredy-primary-800: #6b21a8;
   --tredy-primary-900: #581c87;
-  
+
   /* Semantic Colors */
   --tredy-success: #10b981;
   --tredy-warning: #f59e0b;
   --tredy-error: #ef4444;
   --tredy-info: #3b82f6;
-  
+
   /* Surface System */
   --tredy-surface-primary: #ffffff;
   --tredy-surface-secondary: #f8fafc;
   --tredy-surface-tertiary: #f1f5f9;
   --tredy-surface-elevated: rgba(255, 255, 255, 0.95);
   --tredy-surface-glass: rgba(255, 255, 255, 0.8);
-  
+
   /* Text Colors */
   --tredy-text-primary: #1e293b;
   --tredy-text-secondary: #64748b;
   --tredy-text-tertiary: #94a3b8;
   --tredy-text-inverse: #ffffff;
-  
+
   /* Border System */
   --tredy-border-light: rgba(148, 163, 184, 0.15);
   --tredy-border-medium: rgba(148, 163, 184, 0.25);
   --tredy-border-strong: rgba(148, 163, 184, 0.4);
-  
+
   /* Spacing Scale */
-  --tredy-space-1: 0.25rem;  /* 4px */
-  --tredy-space-2: 0.5rem;   /* 8px */
-  --tredy-space-3: 0.75rem;  /* 12px */
-  --tredy-space-4: 1rem;     /* 16px */
-  --tredy-space-5: 1.25rem;  /* 20px */
-  --tredy-space-6: 1.5rem;   /* 24px */
-  --tredy-space-8: 2rem;     /* 32px */
-  --tredy-space-10: 2.5rem;  /* 40px */
-  --tredy-space-12: 3rem;    /* 48px */
-  --tredy-space-16: 4rem;    /* 64px */
-  
+  --tredy-space-1: 0.25rem; /* 4px */
+  --tredy-space-2: 0.5rem; /* 8px */
+  --tredy-space-3: 0.75rem; /* 12px */
+  --tredy-space-4: 1rem; /* 16px */
+  --tredy-space-5: 1.25rem; /* 20px */
+  --tredy-space-6: 1.5rem; /* 24px */
+  --tredy-space-8: 2rem; /* 32px */
+  --tredy-space-10: 2.5rem; /* 40px */
+  --tredy-space-12: 3rem; /* 48px */
+  --tredy-space-16: 4rem; /* 64px */
+
   /* Border Radius Scale */
-  --tredy-radius-sm: 0.375rem;  /* 6px */
-  --tredy-radius-md: 0.5rem;   /* 8px */
-  --tredy-radius-lg: 0.75rem;  /* 12px */
-  --tredy-radius-xl: 1rem;     /* 16px */
-  --tredy-radius-2xl: 1.5rem;  /* 24px */
+  --tredy-radius-sm: 0.375rem; /* 6px */
+  --tredy-radius-md: 0.5rem; /* 8px */
+  --tredy-radius-lg: 0.75rem; /* 12px */
+  --tredy-radius-xl: 1rem; /* 16px */
+  --tredy-radius-2xl: 1.5rem; /* 24px */
   --tredy-radius-full: 9999px;
-  
+
   /* Shadow System */
   --tredy-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --tredy-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-  --tredy-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  --tredy-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-  --tredy-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --tredy-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --tredy-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --tredy-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --tredy-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
   --tredy-shadow-glow: 0 0 20px rgba(168, 85, 247, 0.3);
-  
+
   /* Typography System */
-  --tredy-font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  --tredy-font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
-  
+  --tredy-font-family: "Inter", system-ui, -apple-system, sans-serif;
+  --tredy-font-family-mono: "JetBrains Mono", "Fira Code", monospace;
+
   /* Animation System */
   --tredy-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --tredy-transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
   --tredy-transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
   --tredy-transition-bounce: 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  
+
   /* Layout System */
   --tredy-header-height: 60px;
   --tredy-sidebar-width: 320px;
@@ -121,7 +125,11 @@
 }
 
 .chat-message-text {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   font-size: 16px;
   line-height: 1.7;
   letter-spacing: -0.01em;
@@ -168,13 +176,18 @@
 }
 
 .button-glow::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
   transition: left 0.5s;
 }
 
@@ -251,13 +264,21 @@
 }
 
 .tredy-btn-primary {
-  background: linear-gradient(135deg, var(--tredy-primary-500), var(--tredy-primary-600));
+  background: linear-gradient(
+    135deg,
+    var(--tredy-primary-500),
+    var(--tredy-primary-600)
+  );
   color: var(--tredy-text-inverse);
   box-shadow: var(--tredy-shadow-sm);
 }
 
 .tredy-btn-primary:hover {
-  background: linear-gradient(135deg, var(--tredy-primary-600), var(--tredy-primary-700));
+  background: linear-gradient(
+    135deg,
+    var(--tredy-primary-600),
+    var(--tredy-primary-700)
+  );
   box-shadow: var(--tredy-shadow-md);
   transform: translateY(-1px);
 }
@@ -400,7 +421,8 @@
 }
 
 @keyframes glowPulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
   }
   50% {
@@ -409,7 +431,8 @@
 }
 
 @keyframes gentleFloat {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -465,19 +488,25 @@
 
 /* Apple-class breathing animation */
 @keyframes breathe {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 0 20px rgba(59, 130, 246, 0.15);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.12),
+      0 0 20px rgba(59, 130, 246, 0.15);
   }
   50% {
     transform: scale(1.05);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.16), 0 0 30px rgba(59, 130, 246, 0.25);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.16),
+      0 0 30px rgba(59, 130, 246, 0.25);
   }
 }
 
 /* Smooth floating animation */
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px) rotate(0deg);
     opacity: 0.4;
   }
@@ -530,7 +559,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -568,11 +598,21 @@
   animation: gentleFloat 4s ease-in-out infinite;
 }
 
-.animate-stagger-1 { animation-delay: 0.1s; }
-.animate-stagger-2 { animation-delay: 0.2s; }
-.animate-stagger-3 { animation-delay: 0.3s; }
-.animate-stagger-4 { animation-delay: 0.4s; }
-.animate-stagger-5 { animation-delay: 0.5s; }
+.animate-stagger-1 {
+  animation-delay: 0.1s;
+}
+.animate-stagger-2 {
+  animation-delay: 0.2s;
+}
+.animate-stagger-3 {
+  animation-delay: 0.3s;
+}
+.animate-stagger-4 {
+  animation-delay: 0.4s;
+}
+.animate-stagger-5 {
+  animation-delay: 0.5s;
+}
 
 .animate-slideInLeft {
   animation: slideInLeft 0.3s ease-out;
@@ -697,7 +737,7 @@
   --theme-button-primary-hover: #7c3aed;
 
   --theme-button-cta: #a78bfa;
-  
+
   /* Modern Additions */
   --theme-accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --theme-border-radius: 12px;
@@ -768,7 +808,7 @@
   --app-safe-area-bottom: env(safe-area-inset-bottom);
   --app-safe-area-left: env(safe-area-inset-left);
   --app-safe-area-right: env(safe-area-inset-right);
-  
+
   --app-header-height: 64px;
   --app-input-height: 56px;
   --app-border-radius: 16px;
@@ -776,21 +816,25 @@
   --app-shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.1);
   --app-shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.15);
   --app-backdrop-blur: blur(20px);
-  
+
   --app-touch-target: 44px;
   --app-spacing-xs: 4px;
   --app-spacing-sm: 8px;
   --app-spacing-md: 16px;
   --app-spacing-lg: 24px;
   --app-spacing-xl: 32px;
-  
+
   /* Tready Intelligence System Colors */
   --tready-gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --tready-gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --tready-gradient-secondary: linear-gradient(
+    135deg,
+    #f093fb 0%,
+    #f5576c 100%
+  );
   --tready-gradient-success: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
   --tready-gradient-warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
   --tready-gradient-dark: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
-  
+
   /* Visual Intelligence Colors */
   --vi-purple: #8b5cf6;
   --vi-blue: #3b82f6;
@@ -798,7 +842,7 @@
   --vi-pink: #ec4899;
   --vi-amber: #f59e0b;
   --vi-emerald: #10b981;
-  
+
   /* Dark Theme Variables */
   --dark-bg-primary: #0a0a0a;
   --dark-bg-secondary: #1a1a1a;
@@ -806,13 +850,13 @@
   --dark-border: rgba(255, 255, 255, 0.1);
   --dark-text-primary: #ffffff;
   --dark-text-secondary: #a3a3a3;
-  
+
   /* Glass Morphism */
   --glass-bg: rgba(255, 255, 255, 0.05);
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
   --glass-blur: blur(12px);
-  
+
   /* Glow Effects */
   --glow-purple: 0 0 30px rgba(139, 92, 246, 0.5);
   --glow-blue: 0 0 30px rgba(59, 130, 246, 0.5);
@@ -865,7 +909,7 @@
   --theme-button-primary-hover: #7c3aed;
 
   --theme-button-cta: #a78bfa;
-  
+
   /* Modern Light Theme Additions */
   --theme-accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --theme-border-radius: 12px;
@@ -936,7 +980,11 @@
   --theme-loader: #8b5cf6;
   --theme-bg-primary: #fafafa;
   --theme-bg-secondary: #f5f5f7;
-  --theme-bg-sidebar: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(245,245,247,0.95) 100%);
+  --theme-bg-sidebar: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(245, 245, 247, 0.95) 100%
+  );
   --theme-bg-container: #ffffff;
   --theme-bg-chat: #ffffff;
   --theme-bg-chat-input: rgba(139, 92, 246, 0.05);
@@ -1972,7 +2020,8 @@ html {
 
 /* Intelligence System Animations */
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     filter: brightness(1);
   }
@@ -1992,7 +2041,8 @@ html {
 }
 
 @keyframes particle-float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) translateX(0);
     opacity: 0;
   }
@@ -2032,13 +2082,18 @@ html {
 }
 
 .thinking-indicator::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(139, 92, 246, 0.3),
+    transparent
+  );
   animation: thinking-wave 1.5s ease-in-out infinite;
 }
 

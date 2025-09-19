@@ -3,6 +3,7 @@
 ## Current State Analysis
 
 ### Existing Loading/Display States
+
 1. **DebugMessage.jsx** - Shows agent debug info with different states (attempt, execution, success, error)
 2. **ProcessingIndicator** - Multiple stage indicators with different modes (research, create, analyze, smart)
 3. **AgentThinking.jsx** - Step-by-step thinking animation with progress
@@ -12,6 +13,7 @@
 7. **Three dots loading** - Simple loading animation
 
 ### Problems to Solve
+
 - Multiple inconsistent loading UIs
 - Debug messages are too verbose
 - Metrics are spread across different components
@@ -41,36 +43,28 @@ UnifiedMessage/
 
 ```jsx
 // UnifiedMessage/index.jsx
-export default function UnifiedMessage({ 
-  message, 
-  isLoading, 
-  metrics, 
-  tools, 
+export default function UnifiedMessage({
+  message,
+  isLoading,
+  metrics,
+  tools,
   thinking,
   error,
-  workspace 
+  workspace,
 }) {
   return (
     <div className="unified-message">
       {/* Profile Image */}
       <WorkspaceProfileImage workspace={workspace} />
-      
+
       {/* Message Container */}
       <div className="message-container">
         {/* Main Content */}
-        <MessageContent 
-          content={message}
-          isLoading={isLoading}
-          error={error}
-        />
-        
+        <MessageContent content={message} isLoading={isLoading} error={error} />
+
         {/* Compact Metrics Bar (only if has metrics) */}
         {(tools || metrics) && !isLoading && (
-          <MetricsBar 
-            tools={tools}
-            metrics={metrics}
-            thinking={thinking}
-          />
+          <MetricsBar tools={tools} metrics={metrics} thinking={thinking} />
         )}
       </div>
     </div>
@@ -84,25 +78,25 @@ export default function UnifiedMessage({
 // MetricsBar.jsx
 function MetricsBar({ tools, metrics, thinking }) {
   const [expandedThinking, setExpandedThinking] = useState(false);
-  
+
   return (
     <>
       <div className="flex items-center gap-3 text-xs text-gray-600 mt-2">
         {/* Tool Logos */}
         <ToolLogos tools={tools} />
-        
+
         {/* Separator */}
         <span className="text-gray-300">•</span>
-        
+
         {/* Execution Time */}
         <MetricItem icon={Zap} value={metrics.time} />
-        
+
         {/* Confidence Bar */}
         <ConfidenceBar value={metrics.confidence} />
-        
+
         {/* Model */}
         <MetricItem icon={Cpu} value={metrics.model} />
-        
+
         {/* Expandable Thinking */}
         {thinking && (
           <>
@@ -110,12 +104,12 @@ function MetricsBar({ tools, metrics, thinking }) {
             <button onClick={() => setExpandedThinking(!expandedThinking)}>
               <Brain className="w-3 h-3" />
               Details
-              <ChevronRight className={expandedThinking ? 'rotate-90' : ''} />
+              <ChevronRight className={expandedThinking ? "rotate-90" : ""} />
             </button>
           </>
         )}
       </div>
-      
+
       {/* Expanded Thinking Log */}
       {expandedThinking && <ThinkingLog steps={thinking} />}
     </>
@@ -135,12 +129,12 @@ function LoadingState({ stage, progress, tools }) {
         <Loader2 className="animate-spin" />
         <span>{stage || "Processing..."}</span>
       </div>
-      
+
       {/* Tool indicators (if actively using tools) */}
       {tools && tools.length > 0 && (
         <div className="flex items-center gap-2 mt-2">
-          {tools.map(tool => (
-            <ToolIndicator 
+          {tools.map((tool) => (
+            <ToolIndicator
               key={tool.id}
               tool={tool}
               status={tool.status} // 'pending', 'active', 'complete'
@@ -148,11 +142,11 @@ function LoadingState({ stage, progress, tools }) {
           ))}
         </div>
       )}
-      
+
       {/* Progress bar (if available) */}
       {progress && (
         <div className="w-full bg-gray-200 rounded-full h-1 mt-2">
-          <div 
+          <div
             className="bg-purple-600 h-1 rounded-full transition-all"
             style={{ width: `${progress}%` }}
           />
@@ -169,24 +163,24 @@ function LoadingState({ stage, progress, tools }) {
 // utils/toolLogos.js
 export const TOOL_LOGOS = {
   // MCP Tools
-  'gmail': '/icons/gmail.svg',
-  'google-calendar': '/icons/google-calendar.svg',
-  'google-drive': '/icons/google-drive.svg',
-  'linkedin': '/icons/linkedin.svg',
-  
+  gmail: "/icons/gmail.svg",
+  "google-calendar": "/icons/google-calendar.svg",
+  "google-drive": "/icons/google-drive.svg",
+  linkedin: "/icons/linkedin.svg",
+
   // Internal Tools
-  'web-search': SearchIcon,
-  'document-summarizer': DocumentIcon,
-  'rag-memory': BrainIcon,
-  'create-workflow': WorkflowIcon,
-  
+  "web-search": SearchIcon,
+  "document-summarizer": DocumentIcon,
+  "rag-memory": BrainIcon,
+  "create-workflow": WorkflowIcon,
+
   // Fallback
-  'default': ToolIcon
+  default: ToolIcon,
 };
 
 export function getToolLogo(toolName) {
   // Normalize tool name
-  const normalized = toolName.toLowerCase().replace(/_/g, '-');
+  const normalized = toolName.toLowerCase().replace(/_/g, "-");
   return TOOL_LOGOS[normalized] || TOOL_LOGOS.default;
 }
 ```
@@ -194,24 +188,28 @@ export function getToolLogo(toolName) {
 ## Implementation Strategy
 
 ### Phase 1: Create Base Components (Week 1)
+
 1. Create UnifiedMessage component structure
 2. Build MetricsBar with tool logos
 3. Implement LoadingState component
 4. Create tool logo mapping system
 
 ### Phase 2: Integration (Week 2)
+
 1. Replace PromptReply rendering with UnifiedMessage
 2. Convert debug messages to use MetricsBar
 3. Integrate with WebSocket for real-time updates
 4. Handle backward compatibility
 
 ### Phase 3: Migration (Week 3)
+
 1. Update AgentThinking to use LoadingState
 2. Merge ProcessingIndicator into LoadingState
 3. Consolidate ThinkingMetrics into MetricsBar
 4. Remove redundant components
 
 ### Phase 4: Polish (Week 4)
+
 1. Add animations and transitions
 2. Optimize performance
 3. Add error states
@@ -221,25 +219,25 @@ export function getToolLogo(toolName) {
 
 ```javascript
 // Handle real-time updates
-socket.on('agent_status', (data) => {
+socket.on("agent_status", (data) => {
   updateMessage({
     id: data.messageId,
     tools: data.tools,
     metrics: {
       time: data.executionTime,
       confidence: data.confidence,
-      model: data.model
+      model: data.model,
     },
-    thinking: data.thinking
+    thinking: data.thinking,
   });
 });
 
-socket.on('tool_update', (data) => {
+socket.on("tool_update", (data) => {
   updateToolStatus({
     messageId: data.messageId,
     toolId: data.toolId,
     status: data.status, // 'pending', 'active', 'complete', 'error'
-    result: data.result
+    result: data.result,
   });
 });
 ```
@@ -247,29 +245,30 @@ socket.on('tool_update', (data) => {
 ## Backward Compatibility
 
 ### Message Format Adapter
+
 ```javascript
 // utils/messageAdapter.js
 export function adaptLegacyMessage(message) {
   // Convert old format to new unified format
-  if (message.type === 'debug') {
+  if (message.type === "debug") {
     return {
       content: parseDebugContent(message.content),
       tools: extractToolsFromDebug(message),
-      metrics: extractMetricsFromDebug(message)
+      metrics: extractMetricsFromDebug(message),
     };
   }
-  
+
   if (message.agentStatus) {
     return {
       content: message.text,
       tools: message.agentStatus.tools,
       metrics: {
         time: message.agentStatus.duration,
-        model: message.agentStatus.model
-      }
+        model: message.agentStatus.model,
+      },
     };
   }
-  
+
   // Default passthrough
   return message;
 }
@@ -285,15 +284,15 @@ export const MESSAGE_CONFIG = {
   enableToolLogos: true,
   enableCompactMetrics: true,
   enableThinkingLog: true,
-  
+
   // Display options
   showDebugMessages: false, // Hide debug by default
   autoExpandThinking: false,
   maxToolsDisplay: 5,
-  
+
   // Animation settings
-  loadingAnimationSpeed: 'normal', // 'slow', 'normal', 'fast'
-  enableTransitions: true
+  loadingAnimationSpeed: "normal", // 'slow', 'normal', 'fast'
+  enableTransitions: true,
 };
 ```
 

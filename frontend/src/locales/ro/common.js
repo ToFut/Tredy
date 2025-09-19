@@ -904,8 +904,7 @@ const TRANSLATIONS = {
     },
     branding: {
       title: "Branding & White-labeling",
-      description:
-        "Personalizează-ți instanța Tredy cu branding personalizat.",
+      description: "Personalizează-ți instanța Tredy cu branding personalizat.",
     },
     chat: {
       title: "Chat",

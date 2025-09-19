@@ -1,12 +1,9 @@
-const { systemEvents } = require('./systemInterfaces');
-const { v4: uuidv4 } = require('uuid');
+const { systemEvents } = require("./systemInterfaces");
+const { v4: uuidv4 } = require("uuid");
 
 // System settings types and constants
 const SYSTEM_SETTINGS = {
-  PROTECTED_FIELDS: [
-    "multi_user_mode",
-    "hub_api_key"
-  ],
+  PROTECTED_FIELDS: ["multi_user_mode", "hub_api_key"],
   PUBLIC_FIELDS: [
     "footer_data",
     "support_email",
@@ -22,8 +19,8 @@ const SYSTEM_SETTINGS = {
     "custom_app_name",
     "feature_flags",
     "meta_page_title",
-    "meta_page_favicon"
-  ]
+    "meta_page_favicon",
+  ],
 };
 
 // Validation functions
@@ -31,7 +28,9 @@ function validateSetting(key, value) {
   const validators = {
     footer_data: (val) => {
       try {
-        return JSON.parse(val).filter(setting => isValidUrl(setting.url)).slice(0, 3);
+        return JSON.parse(val)
+          .filter((setting) => isValidUrl(setting.url))
+          .slice(0, 3);
       } catch (e) {
         return [];
       }
@@ -47,11 +46,11 @@ function validateSetting(key, value) {
 
 // Event emitters for system settings
 function emitSettingUpdate(key, value) {
-  systemEvents.emit('setting:update', { key, value });
+  systemEvents.emit("setting:update", { key, value });
 }
 
 function onSettingUpdate(callback) {
-  systemEvents.on('setting:update', callback);
+  systemEvents.on("setting:update", callback);
 }
 
 module.exports = {

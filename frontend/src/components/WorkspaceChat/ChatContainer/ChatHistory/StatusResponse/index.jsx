@@ -7,9 +7,11 @@ import AgenticThinking from "@/components/AgenticThinking";
  */
 function extractToolResult(content) {
   if (!content) return null;
-  
+
   // Look for [TOOL_RESULT] blocks in the content
-  const toolResultMatch = content.match(/\[TOOL_RESULT\]([\s\S]*?)\[\/TOOL_RESULT\]/);
+  const toolResultMatch = content.match(
+    /\[TOOL_RESULT\]([\s\S]*?)\[\/TOOL_RESULT\]/
+  );
   if (toolResultMatch) {
     try {
       return JSON.parse(toolResultMatch[1]);
@@ -25,56 +27,56 @@ function extractToolResult(content) {
  */
 function parseDebugToToolInfo(content) {
   if (!content) return null;
-  
+
   // First try to extract structured TOOL_RESULT
   const toolResult = extractToolResult(content);
   if (toolResult) {
     return {
-      type: toolResult.status === 'success' ? 'complete' : 'failed',
+      type: toolResult.status === "success" ? "complete" : "failed",
       tool: toolResult.displayName || toolResult.tool,
       message: toolResult.summary,
-      structured: toolResult
+      structured: toolResult,
     };
   }
-  
+
   // Tool call attempt
-  if (content.includes('[debug]:') && content.includes('attempting to call')) {
+  if (content.includes("[debug]:") && content.includes("attempting to call")) {
     const toolMatch = content.match(/`([^`]+)`/);
-    const tool = toolMatch ? toolMatch[1] : '';
+    const tool = toolMatch ? toolMatch[1] : "";
     return {
-      type: 'preparing',
+      type: "preparing",
       tool: formatToolName(tool),
-      message: `Preparing ${formatToolName(tool)}...`
+      message: `Preparing ${formatToolName(tool)}...`,
     };
   }
-  
+
   // MCP server execution
-  if (content.includes('Executing MCP server:')) {
+  if (content.includes("Executing MCP server:")) {
     const serverMatch = content.match(/Executing MCP server: ([^\s]+)/);
-    const server = serverMatch ? serverMatch[1] : '';
+    const server = serverMatch ? serverMatch[1] : "";
     return {
-      type: 'executing',
+      type: "executing",
       tool: formatToolName(server),
-      message: `Using ${formatToolName(server)}...`
+      message: `Using ${formatToolName(server)}...`,
     };
   }
-  
+
   // Completion - handle both formats
-  if (content.includes('completed successfully')) {
+  if (content.includes("completed successfully")) {
     // Try format: "MCP server: gmail_ws3:send_email completed successfully"
     let serverMatch = content.match(/MCP server: ([^:]+):/);
     if (!serverMatch) {
       // Try format: "gmail_ws3 completed successfully"
       serverMatch = content.match(/([^\s]+) completed successfully/);
     }
-    const server = serverMatch ? serverMatch[1] : '';
+    const server = serverMatch ? serverMatch[1] : "";
     return {
-      type: 'complete',
+      type: "complete",
       tool: formatToolName(server),
-      message: `${formatToolName(server)} completed`
+      message: `${formatToolName(server)} completed`,
     };
   }
-  
+
   return null;
 }
 
@@ -82,56 +84,70 @@ function parseDebugToToolInfo(content) {
  * Format tool name for display
  */
 function formatToolName(name) {
-  if (!name) return 'Tool';
-  return name
-    .replace(/[_-]/g, ' ')
-    .replace(/mcp/gi, '')
-    .replace(/ws\d+/g, '')
-    .replace(/gmail/gi, 'Gmail')
-    .replace(/linkedin/gi, 'LinkedIn')
-    .replace(/calendar/gi, 'Calendar')
-    .trim()
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ') || 'Tool';
+  if (!name) return "Tool";
+  return (
+    name
+      .replace(/[_-]/g, " ")
+      .replace(/mcp/gi, "")
+      .replace(/ws\d+/g, "")
+      .replace(/gmail/gi, "Gmail")
+      .replace(/linkedin/gi, "LinkedIn")
+      .replace(/calendar/gi, "Calendar")
+      .trim()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ") || "Tool"
+  );
 }
 
 /**
  * Clean up message content for display
  */
 function getCleanMessage(content) {
-  if (!content) return '';
-  
+  if (!content) return "";
+
   // Remove debug prefixes
   let cleaned = content
-    .replace(/^\[debug\]:\s*/i, '')
-    .replace(/^\[.*?\]:\s*/i, '')
+    .replace(/^\[debug\]:\s*/i, "")
+    .replace(/^\[.*?\]:\s*/i, "")
     .trim();
-  
+
   // If it's a simple status message, return as is
-  if (cleaned.length < 100 && !cleaned.includes('\n')) {
+  if (cleaned.length < 100 && !cleaned.includes("\n")) {
     return cleaned;
   }
-  
+
   // For longer messages, try to extract the essential part
-  const lines = cleaned.split('\n').filter(line => line.trim());
+  const lines = cleaned.split("\n").filter((line) => line.trim());
   if (lines.length > 0) {
     return lines[0].trim();
   }
-  
+
   return cleaned;
 }
 
-import { CheckCircle, Loader2, Mail, Calendar, Globe, CheckCircle2, Zap } from "lucide-react";
+import {
+  CheckCircle,
+  Loader2,
+  Mail,
+  Calendar,
+  Globe,
+  CheckCircle2,
+  Zap,
+} from "lucide-react";
 import AgentAnimation from "@/media/animations/agent-animation.webm";
 import AgentStatic from "@/media/animations/agent-static.png";
 
 // Tool logos mapping (same as landing page)
 const toolLogos = {
-  "Gmail": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg",
-  "Google Calendar": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg",
-  "LinkedIn": "https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png",
-  "Google Drive": "https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg"
+  Gmail:
+    "https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg",
+  "Google Calendar":
+    "https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg",
+  LinkedIn:
+    "https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png",
+  "Google Drive":
+    "https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg",
 };
 
 /**
@@ -139,33 +155,43 @@ const toolLogos = {
  */
 function EnhancedToolDisplay({ tools, latestTool, content }) {
   const getToolLogo = (toolName) => {
-    const name = toolName.charAt(0).toUpperCase() + toolName.slice(1).toLowerCase();
+    const name =
+      toolName.charAt(0).toUpperCase() + toolName.slice(1).toLowerCase();
     return toolLogos[name] || toolLogos["Gmail"]; // fallback to Gmail logo
   };
 
   const getStatusIcon = (type) => {
     switch (type) {
-      case 'complete': return CheckCircle2;
-      case 'executing': return Loader2;
-      case 'preparing': return Loader2;
-      default: return Loader2;
+      case "complete":
+        return CheckCircle2;
+      case "executing":
+        return Loader2;
+      case "preparing":
+        return Loader2;
+      default:
+        return Loader2;
     }
   };
 
   const getStatusColor = (type) => {
     switch (type) {
-      case 'complete': return 'text-green-600';
-      case 'executing': return 'text-blue-600 animate-spin';
-      case 'preparing': return 'text-purple-600';
-      default: return 'text-gray-500';
+      case "complete":
+        return "text-green-600";
+      case "executing":
+        return "text-blue-600 animate-spin";
+      case "preparing":
+        return "text-purple-600";
+      default:
+        return "text-gray-500";
     }
   };
 
   // If we have structured data from TOOL_RESULT, use it
   if (latestTool?.structured) {
-    const { icon, displayName, summary, highlights, metrics, status } = latestTool.structured;
-    const isSuccess = status === 'success';
-    
+    const { icon, displayName, summary, highlights, metrics, status } =
+      latestTool.structured;
+    const isSuccess = status === "success";
+
     return (
       <div className="bg-white rounded-2xl rounded-tl-sm shadow-sm border border-gray-100 p-4 mb-2">
         <div className="space-y-3">
@@ -173,26 +199,34 @@ function EnhancedToolDisplay({ tools, latestTool, content }) {
           <div className="flex items-center gap-2">
             <span className="text-2xl">{icon}</span>
             <h4 className="font-semibold text-gray-900">
-              {isSuccess ? '✅' : '❌'} {summary}
+              {isSuccess ? "✅" : "❌"} {summary}
             </h4>
           </div>
-          
+
           {/* Highlights section */}
           {highlights && highlights.length > 0 && (
             <div className="space-y-2">
               {highlights.map((highlight, idx) => (
                 <div key={idx}>
                   <div className="flex items-center justify-between">
-                    <span className={`text-sm font-medium ${
-                      highlight.importance === 'primary' ? 'text-gray-700' : 'text-gray-600'
-                    }`}>
+                    <span
+                      className={`text-sm font-medium ${
+                        highlight.importance === "primary"
+                          ? "text-gray-700"
+                          : "text-gray-600"
+                      }`}
+                    >
                       {highlight.label}
                     </span>
                   </div>
-                  <div className={`text-sm mt-1 ${
-                    highlight.importance === 'primary' ? 'text-gray-900 font-medium' : 'text-gray-700'
-                  }`}>
-                    {highlight.label.includes('ID') ? (
+                  <div
+                    className={`text-sm mt-1 ${
+                      highlight.importance === "primary"
+                        ? "text-gray-900 font-medium"
+                        : "text-gray-700"
+                    }`}
+                  >
+                    {highlight.label.includes("ID") ? (
                       <span className="font-mono text-xs bg-gray-50 px-2 py-1 rounded">
                         {highlight.value}
                       </span>
@@ -204,7 +238,7 @@ function EnhancedToolDisplay({ tools, latestTool, content }) {
               ))}
             </div>
           )}
-          
+
           {/* Metrics footer */}
           {metrics && (
             <div className="flex items-center gap-3 text-xs text-gray-600 pt-2 border-t border-gray-100">
@@ -221,7 +255,7 @@ function EnhancedToolDisplay({ tools, latestTool, content }) {
                 <>
                   <div className="flex items-center gap-1">
                     <div className="w-12 bg-gray-200 rounded-full h-1.5">
-                      <div 
+                      <div
                         className="bg-green-500 h-1.5 rounded-full"
                         style={{ width: `${metrics.confidence}%` }}
                       ></div>
@@ -240,16 +274,16 @@ function EnhancedToolDisplay({ tools, latestTool, content }) {
       </div>
     );
   }
-  
+
   // Fallback: If we have a complete action with meaningful content, show basic result
-  if (latestTool?.type === 'complete' && content) {
+  if (latestTool?.type === "complete" && content) {
     return (
       <div className="bg-white rounded-2xl rounded-tl-sm shadow-sm border border-gray-100 p-4 mb-2">
         <div className="space-y-3">
-          <h4 className="font-semibold text-gray-900">✅ {latestTool.message || 'Action Completed'}</h4>
-          <p className="text-sm text-gray-600">
-            {getCleanMessage(content)}
-          </p>
+          <h4 className="font-semibold text-gray-900">
+            ✅ {latestTool.message || "Action Completed"}
+          </h4>
+          <p className="text-sm text-gray-600">{getCleanMessage(content)}</p>
         </div>
       </div>
     );
@@ -261,13 +295,13 @@ function EnhancedToolDisplay({ tools, latestTool, content }) {
       <div className="flex items-center gap-3">
         {latestTool && (
           <>
-            <img 
-              src={getToolLogo(latestTool.tool)} 
+            <img
+              src={getToolLogo(latestTool.tool)}
               alt={latestTool.tool}
               className="w-5 h-5 rounded"
             />
             {React.createElement(getStatusIcon(latestTool.type), {
-              className: `w-4 h-4 ${getStatusColor(latestTool.type)}`
+              className: `w-4 h-4 ${getStatusColor(latestTool.type)}`,
             })}
             <span className="text-sm font-medium text-gray-900">
               {latestTool.message}
@@ -275,7 +309,7 @@ function EnhancedToolDisplay({ tools, latestTool, content }) {
           </>
         )}
       </div>
-      
+
       {/* Compact metrics line like in landing page */}
       <div className="flex items-center gap-3 text-xs text-gray-600 mt-2 pt-2 border-t border-gray-100">
         <div className="flex items-center gap-1">
@@ -307,70 +341,79 @@ export default function StatusResponse({
   }
 
   // Parse debug messages into tool information
-  const toolInfo = messages.map(msg => parseDebugToToolInfo(msg.content)).filter(Boolean);
+  const toolInfo = messages
+    .map((msg) => parseDebugToToolInfo(msg.content))
+    .filter(Boolean);
   const latestTool = toolInfo[toolInfo.length - 1];
 
   // If we have tool information, show enhanced tool display
   if (toolInfo.length > 0 && !isThinking) {
-    const relevantContent = currentThought?.content || messages.map(m => m.content).join(' ');
+    const relevantContent =
+      currentThought?.content || messages.map((m) => m.content).join(" ");
     return (
       <div className="flex justify-start w-full">
         <div className="max-w-[85%] space-y-2">
-          <EnhancedToolDisplay 
-            tools={toolInfo} 
-            latestTool={latestTool} 
+          <EnhancedToolDisplay
+            tools={toolInfo}
+            latestTool={latestTool}
             content={relevantContent}
           />
-          
+
           {/* Metrics line - only for completed tasks with structured data */}
-          {latestTool?.type === 'complete' && latestTool?.structured?.metrics && (
-            <div className="flex items-center gap-3 text-xs text-gray-600 px-1">
-              {/* Tool Logo */}
-              <div className="flex items-center gap-1">
-                <span className="text-lg" title={latestTool.structured.displayName}>
-                  {latestTool.structured.icon || '🔧'}
-                </span>
-              </div>
+          {latestTool?.type === "complete" &&
+            latestTool?.structured?.metrics && (
+              <div className="flex items-center gap-3 text-xs text-gray-600 px-1">
+                {/* Tool Logo */}
+                <div className="flex items-center gap-1">
+                  <span
+                    className="text-lg"
+                    title={latestTool.structured.displayName}
+                  >
+                    {latestTool.structured.icon || "🔧"}
+                  </span>
+                </div>
 
-              {/* Only show metrics that exist */}
-              {latestTool.structured.metrics.duration && (
-                <>
-                  <span className="text-gray-300">•</span>
-                  <div className="flex items-center gap-1">
-                    <Zap className="w-3 h-3 text-yellow-600" />
-                    <span>{latestTool.structured.metrics.duration}ms</span>
-                  </div>
-                </>
-              )}
-
-              {latestTool.structured.metrics.confidence && (
-                <>
-                  <span className="text-gray-300">•</span>
-                  <div className="flex items-center gap-1">
-                    <div className="w-12 bg-gray-200 rounded-full h-1.5">
-                      <div 
-                        className="bg-green-500 h-1.5 rounded-full"
-                        style={{ width: `${latestTool.structured.metrics.confidence}%` }}
-                      ></div>
+                {/* Only show metrics that exist */}
+                {latestTool.structured.metrics.duration && (
+                  <>
+                    <span className="text-gray-300">•</span>
+                    <div className="flex items-center gap-1">
+                      <Zap className="w-3 h-3 text-yellow-600" />
+                      <span>{latestTool.structured.metrics.duration}ms</span>
                     </div>
-                    <span>{latestTool.structured.metrics.confidence}%</span>
-                  </div>
-                </>
-              )}
+                  </>
+                )}
 
-              {latestTool.structured.displayName && (
-                <>
-                  <span className="text-gray-300">•</span>
-                  <div className="flex items-center gap-1">
-                    <span>{latestTool.structured.displayName}</span>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-          
+                {latestTool.structured.metrics.confidence && (
+                  <>
+                    <span className="text-gray-300">•</span>
+                    <div className="flex items-center gap-1">
+                      <div className="w-12 bg-gray-200 rounded-full h-1.5">
+                        <div
+                          className="bg-green-500 h-1.5 rounded-full"
+                          style={{
+                            width: `${latestTool.structured.metrics.confidence}%`,
+                          }}
+                        ></div>
+                      </div>
+                      <span>{latestTool.structured.metrics.confidence}%</span>
+                    </div>
+                  </>
+                )}
+
+                {latestTool.structured.displayName && (
+                  <>
+                    <span className="text-gray-300">•</span>
+                    <div className="flex items-center gap-1">
+                      <span>{latestTool.structured.displayName}</span>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
           {/* Fallback metrics for non-structured responses (backward compatibility) */}
-          {latestTool?.type === 'complete' && !latestTool?.structured && (
+          {latestTool?.type === "complete" && !latestTool?.structured && (
             <div className="flex items-center gap-3 text-xs text-gray-600 px-1">
               <div className="flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3 text-green-600" />
@@ -387,12 +430,13 @@ export default function StatusResponse({
   if (isThinking) {
     // Check if we have tool information during thinking
     if (toolInfo.length > 0) {
-      const relevantContent = currentThought?.content || messages.map(m => m.content).join(' ');
+      const relevantContent =
+        currentThought?.content || messages.map((m) => m.content).join(" ");
       return (
         <div className="flex justify-start w-full">
           <div className="max-w-[85%] space-y-2">
-            <EnhancedToolDisplay 
-              tools={toolInfo} 
+            <EnhancedToolDisplay
+              tools={toolInfo}
               latestTool={latestTool}
               content={relevantContent}
             />
@@ -400,7 +444,7 @@ export default function StatusResponse({
         </div>
       );
     }
-    
+
     // Fall back to clean thinking display with no generic steps
     return (
       <div className="flex justify-start w-full">
@@ -412,7 +456,7 @@ export default function StatusResponse({
                 Processing request...
               </span>
             </div>
-            
+
             {/* Minimal processing indicator */}
             <div className="flex items-center gap-3 text-xs text-gray-600 mt-2 pt-2 border-t border-gray-100">
               <div className="flex items-center gap-1">
@@ -468,7 +512,8 @@ export default function StatusResponse({
                 <div className="text-theme-text-secondary font-mono leading-6">
                   {!isExpanded ? (
                     <span className="block w-full truncate mt-[2px]">
-                      {getCleanMessage(currentThought?.content) || "Working on your request..."}
+                      {getCleanMessage(currentThought?.content) ||
+                        "Working on your request..."}
                     </span>
                   ) : (
                     <>
@@ -480,7 +525,9 @@ export default function StatusResponse({
                           {getCleanMessage(thought.content)}
                         </div>
                       ))}
-                      <div>{getCleanMessage(currentThought?.content) || ""}</div>
+                      <div>
+                        {getCleanMessage(currentThought?.content) || ""}
+                      </div>
                     </>
                   )}
                 </div>

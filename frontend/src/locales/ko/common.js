@@ -51,8 +51,7 @@ const TRANSLATIONS = {
     },
     workspace: {
       title: "첫 번째 워크스페이스 만들기",
-      description:
-        "첫 번째 워크스페이스를 생성하고 Tredy을 시작해보세요.",
+      description: "첫 번째 워크스페이스를 생성하고 Tredy을 시작해보세요.",
     },
   },
   common: {

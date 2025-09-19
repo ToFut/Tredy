@@ -50,110 +50,112 @@ export default function ThreadItem({
         {hasNext && (
           <div
             style={{ width: THREAD_CALLOUT_DETAIL_WIDTH / 2 }}
-          className={`${
-            idx <= activeIdx && !isActive
-              ? "border-l-2 border-blue-400 z-[2]"
-              : "border-l border-gray-300 z-[1]"
-          } h-[100%] absolute top-0 left-3 transition-colors duration-200`}
-        ></div>
-      )}
-
-      {/* Curved line inline placeholder for spacing - not visible */}
-      <div
-        style={{ width: THREAD_CALLOUT_DETAIL_WIDTH + 8 }}
-        className="h-full"
-      />
-      <div
-        className={`flex w-full items-center justify-between pr-2 group relative ${
-          isActive 
-            ? "bg-blue-50 border border-blue-200 shadow-sm" 
-            : "hover:bg-gray-50 border border-transparent hover:border-gray-200"
-        } rounded-lg transition-all duration-200`}
-      >
-        {thread.deleted ? (
-          <div className="w-full flex justify-between">
-            <div className="w-full pl-2 py-1">
-              <p
-                className={`text-left text-sm text-slate-400/50 light:text-slate-500 italic`}
-              >
-                deleted thread
-              </p>
-            </div>
-            {ctrlPressed && (
-              <button
-                type="button"
-                className="border-none"
-                onClick={() => toggleMarkForDeletion(thread.id)}
-              >
-                <ArrowCounterClockwise
-                  className="text-zinc-300 hover:text-white light:text-theme-text-secondary hover:light:text-theme-text-primary"
-                  size={18}
-                />
-              </button>
-            )}
-          </div>
-        ) : (
-          <a
-            href={
-              window.location.pathname === linkTo || ctrlPressed ? "#" : linkTo
-            }
-            className="w-full pl-2 py-1 overflow-hidden"
-            aria-current={isActive ? "page" : ""}
-          >
-            <p
-              className={`text-left text-sm truncate max-w-[150px] ${
-                isActive ? "font-medium text-blue-700" : "text-gray-700"
-              } transition-colors duration-200`}
-            >
-              {thread.name}
-            </p>
-          </a>
+            className={`${
+              idx <= activeIdx && !isActive
+                ? "border-l-2 border-blue-400 z-[2]"
+                : "border-l border-gray-300 z-[1]"
+            } h-[100%] absolute top-0 left-3 transition-colors duration-200`}
+          ></div>
         )}
-        {!!thread.slug && !thread.deleted && (
-          <div ref={optionsContainer} className="flex items-center">
-            {" "}
-            {/* Added flex and items-center */}
-            {ctrlPressed ? (
-              <button
-                type="button"
-                className="border-none"
-                onClick={() => toggleMarkForDeletion(thread.id)}
-              >
-                <X
-                  className="text-zinc-300 light:text-theme-text-secondary hover:text-white hover:light:text-theme-text-primary"
-                  weight="bold"
-                  size={18}
-                />
-              </button>
-            ) : (
-              <div className="flex items-center w-fit group-hover:visible md:invisible gap-x-1">
+
+        {/* Curved line inline placeholder for spacing - not visible */}
+        <div
+          style={{ width: THREAD_CALLOUT_DETAIL_WIDTH + 8 }}
+          className="h-full"
+        />
+        <div
+          className={`flex w-full items-center justify-between pr-2 group relative ${
+            isActive
+              ? "bg-blue-50 border border-blue-200 shadow-sm"
+              : "hover:bg-gray-50 border border-transparent hover:border-gray-200"
+          } rounded-lg transition-all duration-200`}
+        >
+          {thread.deleted ? (
+            <div className="w-full flex justify-between">
+              <div className="w-full pl-2 py-1">
+                <p
+                  className={`text-left text-sm text-slate-400/50 light:text-slate-500 italic`}
+                >
+                  deleted thread
+                </p>
+              </div>
+              {ctrlPressed && (
                 <button
                   type="button"
                   className="border-none"
-                  onClick={() => setShowOptions(!showOptions)}
-                  aria-label="Thread options"
+                  onClick={() => toggleMarkForDeletion(thread.id)}
                 >
-                  <DotsThree
-                    className="text-slate-300 light:text-theme-text-secondary hover:text-white hover:light:text-theme-text-primary"
-                    size={25}
+                  <ArrowCounterClockwise
+                    className="text-zinc-300 hover:text-white light:text-theme-text-secondary hover:light:text-theme-text-primary"
+                    size={18}
                   />
                 </button>
-              </div>
-            )}
-            {showOptions && (
-              <OptionsMenu
-                containerRef={optionsContainer}
-                workspace={workspace}
-                thread={thread}
-                onRemove={onRemove}
-                close={() => setShowOptions(false)}
-                currentThreadSlug={threadSlug}
-              />
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          ) : (
+            <a
+              href={
+                window.location.pathname === linkTo || ctrlPressed
+                  ? "#"
+                  : linkTo
+              }
+              className="w-full pl-2 py-1 overflow-hidden"
+              aria-current={isActive ? "page" : ""}
+            >
+              <p
+                className={`text-left text-sm truncate max-w-[150px] ${
+                  isActive ? "font-medium text-blue-700" : "text-gray-700"
+                } transition-colors duration-200`}
+              >
+                {thread.name}
+              </p>
+            </a>
+          )}
+          {!!thread.slug && !thread.deleted && (
+            <div ref={optionsContainer} className="flex items-center">
+              {" "}
+              {/* Added flex and items-center */}
+              {ctrlPressed ? (
+                <button
+                  type="button"
+                  className="border-none"
+                  onClick={() => toggleMarkForDeletion(thread.id)}
+                >
+                  <X
+                    className="text-zinc-300 light:text-theme-text-secondary hover:text-white hover:light:text-theme-text-primary"
+                    weight="bold"
+                    size={18}
+                  />
+                </button>
+              ) : (
+                <div className="flex items-center w-fit group-hover:visible md:invisible gap-x-1">
+                  <button
+                    type="button"
+                    className="border-none"
+                    onClick={() => setShowOptions(!showOptions)}
+                    aria-label="Thread options"
+                  >
+                    <DotsThree
+                      className="text-slate-300 light:text-theme-text-secondary hover:text-white hover:light:text-theme-text-primary"
+                      size={25}
+                    />
+                  </button>
+                </div>
+              )}
+              {showOptions && (
+                <OptionsMenu
+                  containerRef={optionsContainer}
+                  workspace={workspace}
+                  thread={thread}
+                  onRemove={onRemove}
+                  close={() => setShowOptions(false)}
+                  currentThreadSlug={threadSlug}
+                />
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
     </ThreadSummary>
   );
 }

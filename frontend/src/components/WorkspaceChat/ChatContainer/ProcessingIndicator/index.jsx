@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { 
-  CircleNotch, 
-  CheckCircle, 
+import React, { useEffect, useState } from "react";
+import {
+  CircleNotch,
+  CheckCircle,
   Circle,
   Brain,
   MagnifyingGlass,
   PencilSimple,
-  Sparkle
-} from '@phosphor-icons/react';
+  Sparkle,
+} from "@phosphor-icons/react";
 
-export default function ProcessingIndicator({ 
-  stages = [], 
+export default function ProcessingIndicator({
+  stages = [],
   currentStage = 0,
-  mode = 'default',
-  visible = true 
+  mode = "default",
+  visible = true,
 }) {
   const [animatedStage, setAnimatedStage] = useState(currentStage);
 
@@ -28,68 +28,76 @@ export default function ProcessingIndicator({
   if (!visible || stages.length === 0) return null;
 
   const defaultStages = [
-    'Understanding request',
-    'Processing information',
-    'Generating response',
-    'Formatting output'
+    "Understanding request",
+    "Processing information",
+    "Generating response",
+    "Formatting output",
   ];
 
   const modeStages = {
     research: [
-      'Analyzing query',
-      'Searching sources',
-      'Gathering information',
-      'Synthesizing findings',
-      'Structuring report'
+      "Analyzing query",
+      "Searching sources",
+      "Gathering information",
+      "Synthesizing findings",
+      "Structuring report",
     ],
     create: [
-      'Understanding requirements',
-      'Planning structure',
-      'Generating content',
-      'Refining output',
-      'Finalizing'
+      "Understanding requirements",
+      "Planning structure",
+      "Generating content",
+      "Refining output",
+      "Finalizing",
     ],
     analyze: [
-      'Processing data',
-      'Running analysis',
-      'Identifying patterns',
-      'Creating visualizations',
-      'Preparing insights'
+      "Processing data",
+      "Running analysis",
+      "Identifying patterns",
+      "Creating visualizations",
+      "Preparing insights",
     ],
     smart: [
-      'Analyzing request',
-      'Selecting approach',
-      'Executing tasks',
-      'Optimizing results',
-      'Preparing output'
-    ]
+      "Analyzing request",
+      "Selecting approach",
+      "Executing tasks",
+      "Optimizing results",
+      "Preparing output",
+    ],
   };
 
-  const activeStages = stages.length > 0 ? stages : (modeStages[mode] || defaultStages);
+  const activeStages =
+    stages.length > 0 ? stages : modeStages[mode] || defaultStages;
 
   const getStageIcon = (index, isActive, isCompleted) => {
     if (isCompleted) {
       return <CheckCircle className="w-4 h-4" weight="fill" />;
     }
     if (isActive) {
-      return <CircleNotch className="w-4 h-4 progress-icon spinner" weight="bold" />;
+      return (
+        <CircleNotch className="w-4 h-4 progress-icon spinner" weight="bold" />
+      );
     }
     return <Circle className="w-4 h-4" weight="regular" />;
   };
 
   const getStageClass = (index) => {
-    if (index < animatedStage) return 'completed';
-    if (index === animatedStage) return 'active';
-    return 'pending';
+    if (index < animatedStage) return "completed";
+    if (index === animatedStage) return "active";
+    return "pending";
   };
 
   const getModeIcon = () => {
     switch (mode) {
-      case 'research': return <MagnifyingGlass className="w-5 h-5" />;
-      case 'create': return <PencilSimple className="w-5 h-5" />;
-      case 'analyze': return <Brain className="w-5 h-5" />;
-      case 'smart': return <Sparkle className="w-5 h-5" />;
-      default: return <Brain className="w-5 h-5" />;
+      case "research":
+        return <MagnifyingGlass className="w-5 h-5" />;
+      case "create":
+        return <PencilSimple className="w-5 h-5" />;
+      case "analyze":
+        return <Brain className="w-5 h-5" />;
+      case "smart":
+        return <Sparkle className="w-5 h-5" />;
+      default:
+        return <Brain className="w-5 h-5" />;
     }
   };
 
@@ -103,7 +111,7 @@ export default function ProcessingIndicator({
         <div className="absolute inset-0 opacity-20">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 animate-pulse" />
         </div>
-        
+
         {/* Main content */}
         <div className="relative">
           <div className="flex items-center justify-between mb-3">
@@ -112,7 +120,9 @@ export default function ProcessingIndicator({
                 {getModeIcon()}
               </div>
               <div>
-                <p className="text-xs text-gray-600 font-medium">AI Processing</p>
+                <p className="text-xs text-gray-600 font-medium">
+                  AI Processing
+                </p>
                 <p className="text-sm font-semibold text-gray-900">
                   {activeStages[animatedStage]}
                 </p>
@@ -131,14 +141,16 @@ export default function ProcessingIndicator({
             {activeStages.map((stage, index) => {
               const isActive = index === animatedStage;
               const isCompleted = index < animatedStage;
-              
+
               return (
                 <div
                   key={index}
                   className={`flex-1 h-1 rounded-full transition-all duration-300 ${
-                    isCompleted ? 'bg-gradient-to-r from-blue-500 to-purple-500' :
-                    isActive ? 'bg-gradient-to-r from-blue-300 to-purple-300 animate-pulse' :
-                    'bg-gray-200'
+                    isCompleted
+                      ? "bg-gradient-to-r from-blue-500 to-purple-500"
+                      : isActive
+                        ? "bg-gradient-to-r from-blue-300 to-purple-300 animate-pulse"
+                        : "bg-gray-200"
                   }`}
                 />
               );
@@ -150,22 +162,28 @@ export default function ProcessingIndicator({
             {activeStages.map((stage, index) => {
               const isActive = index === animatedStage;
               const isCompleted = index < animatedStage;
-              
+
               return (
                 <div
                   key={index}
                   className={`text-center transition-all duration-300 ${
-                    isCompleted ? 'opacity-50' :
-                    isActive ? 'opacity-100 scale-105' :
-                    'opacity-30'
+                    isCompleted
+                      ? "opacity-50"
+                      : isActive
+                        ? "opacity-100 scale-105"
+                        : "opacity-30"
                   }`}
                 >
-                  <div className={`w-6 h-6 mx-auto mb-1 rounded-full flex items-center justify-center ${
-                    isCompleted ? 'bg-green-100 text-green-600' :
-                    isActive ? 'bg-blue-100 text-blue-600' :
-                    'bg-gray-100 text-gray-400'
-                  }`}>
-                    {isCompleted ? '✓' : index + 1}
+                  <div
+                    className={`w-6 h-6 mx-auto mb-1 rounded-full flex items-center justify-center ${
+                      isCompleted
+                        ? "bg-green-100 text-green-600"
+                        : isActive
+                          ? "bg-blue-100 text-blue-600"
+                          : "bg-gray-100 text-gray-400"
+                    }`}
+                  >
+                    {isCompleted ? "✓" : index + 1}
                   </div>
                   <span className="hidden lg:block truncate px-1">{stage}</span>
                 </div>
@@ -182,7 +200,7 @@ export default function ProcessingIndicator({
             const stageClass = getStageClass(index);
             const isActive = index === animatedStage;
             const isCompleted = index < animatedStage;
-            
+
             return (
               <div key={index} className={`progress-stage ${stageClass}`}>
                 <div className="progress-icon">
@@ -197,7 +215,7 @@ export default function ProcessingIndicator({
         {/* Progress Bar */}
         <div className="mt-3 px-4">
           <div className="w-full bg-theme-bg-secondary/50 rounded-full h-1.5">
-            <div 
+            <div
               className="bg-gradient-to-r from-theme-button-cta to-blue-400 h-1.5 rounded-full transition-all duration-500 relative"
               style={{ width: `${progressPercentage}%` }}
             >
@@ -218,9 +236,18 @@ export default function ProcessingIndicator({
               Almost there...
             </span>
             <div className="flex gap-1">
-              <div className="w-1 h-1 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-              <div className="w-1 h-1 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-              <div className="w-1 h-1 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              <div
+                className="w-1 h-1 bg-purple-500 rounded-full animate-bounce"
+                style={{ animationDelay: "0ms" }}
+              />
+              <div
+                className="w-1 h-1 bg-purple-500 rounded-full animate-bounce"
+                style={{ animationDelay: "150ms" }}
+              />
+              <div
+                className="w-1 h-1 bg-purple-500 rounded-full animate-bounce"
+                style={{ animationDelay: "300ms" }}
+              />
             </div>
           </div>
         </div>

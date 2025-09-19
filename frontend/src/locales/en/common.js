@@ -53,8 +53,7 @@ const TRANSLATIONS = {
     },
     workspace: {
       title: "Create your first workspace",
-      description:
-        "Create your first workspace and get started with Tredy.",
+      description: "Create your first workspace and get started with Tredy.",
     },
   },
   common: {
@@ -89,11 +88,15 @@ const TRANSLATIONS = {
     createFlow: "Create Flow",
     createFlowDesc: "Build custom workflow",
     welcomeMessage: "Hi! I'm Tredy,",
-    welcomeMessageDesc: "your AI workflow assistant. Click any flow above to get started, or type",
-    welcomeMessageDesc2: "followed by your request. I can help you send emails, schedule meetings, post on social media, and analyze your data!",
+    welcomeMessageDesc:
+      "your AI workflow assistant. Click any flow above to get started, or type",
+    welcomeMessageDesc2:
+      "followed by your request. I can help you send emails, schedule meetings, post on social media, and analyze your data!",
     noWorkspaceTitle: "Welcome to Tredy",
-    noWorkspaceDesc: "Tredy is your intelligent workflow assistant that automates emails, calendar management, social media, and data analysis.",
-    createFirstWorkspace: "Create your first workspace to unlock powerful AI workflows!",
+    noWorkspaceDesc:
+      "Tredy is your intelligent workflow assistant that automates emails, calendar management, social media, and data analysis.",
+    createFirstWorkspace:
+      "Create your first workspace to unlock powerful AI workflows!",
     createWorkspaceBtn: "Create Your First Workspace",
     emailWorkflows: "Email Workflows",
     emailWorkflowsDesc: "Compose, send, and manage emails",
@@ -101,7 +104,7 @@ const TRANSLATIONS = {
     smartSchedulingDesc: "AI-powered meeting coordination",
     flowAutomation: "Flow Automation",
     flowAutomationDesc: "Build custom AI workflows",
-    steps: "steps"
+    steps: "steps",
   },
 
   // Setting Sidebar menu items.
@@ -323,7 +326,8 @@ const TRANSLATIONS = {
   // Chat Settings
   chat: {
     "begin-conversation": "Begin a conversation to get started.",
-    "begin-conversation-anon": "Begin an anonymous conversation to get started.",
+    "begin-conversation-anon":
+      "Begin an anonymous conversation to get started.",
     llm: {
       title: "Workspace LLM Provider",
       description:
@@ -507,8 +511,7 @@ const TRANSLATIONS = {
     },
     branding: {
       title: "Branding & Whitelabeling",
-      description:
-        "White-label your Tredy instance with custom branding.",
+      description: "White-label your Tredy instance with custom branding.",
     },
     chat: {
       title: "Chat",
@@ -1159,17 +1162,18 @@ const TRANSLATIONS = {
     hero: {
       title: "The Future of",
       subtitle: "AI Workflows",
-      description: "Transform your business with intelligent automation that connects every tool, understands context, and scales infinitely."
+      description:
+        "Transform your business with intelligent automation that connects every tool, understands context, and scales infinitely.",
     },
     cta: {
       startTrial: "Start Free Trial",
-      getStartedFree: "Get Started Free"
-    }
+      getStartedFree: "Get Started Free",
+    },
   },
   common: {
     getStarted: "Get Started",
-    next: "Next"
-  }
+    next: "Next",
+  },
 };
 
 export default TRANSLATIONS;

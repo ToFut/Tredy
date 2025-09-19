@@ -30,11 +30,11 @@ class UnifiedWorkflowPlugin {
       ),
       []
     );
-    
+
     if (enabledSkills.includes("auto-workflow")) return "auto";
     if (enabledSkills.includes("flow-orchestrator")) return "orchestrator";
     if (enabledSkills.includes("task-planner")) return "planner";
-    
+
     return null;
   }
 
@@ -48,7 +48,7 @@ class UnifiedWorkflowPlugin {
         tasks: [],
         workflows: [],
         context: {},
-        state: "idle"
+        state: "idle",
       });
     }
     return this.sessions.get(conversationId);
@@ -61,7 +61,7 @@ class UnifiedWorkflowPlugin {
     const capabilities = {
       plugins: [],
       mcpServers: [],
-      flowBlocks: ["llmInstruction", "api_call", "web_scraping"]
+      flowBlocks: ["llmInstruction", "api_call", "web_scraping"],
     };
 
     // Get available plugins
@@ -70,7 +70,7 @@ class UnifiedWorkflowPlugin {
         if (name !== "unified-workflow") {
           capabilities.plugins.push({
             name,
-            description: plugin.description || `Plugin: ${name}`
+            description: plugin.description || `Plugin: ${name}`,
           });
         }
       });
@@ -79,9 +79,9 @@ class UnifiedWorkflowPlugin {
     // Get MCP servers if available
     if (this.aibitat.mcpManager) {
       const servers = await this.aibitat.mcpManager.getActiveServers();
-      capabilities.mcpServers = servers.map(s => ({
+      capabilities.mcpServers = servers.map((s) => ({
         name: s.name,
-        description: s.description || `MCP Server: ${s.name}`
+        description: s.description || `MCP Server: ${s.name}`,
       }));
     }
 
@@ -93,14 +93,14 @@ class UnifiedWorkflowPlugin {
    */
   async analyzeRequest(request) {
     const capabilities = await this.discoverCapabilities();
-    
+
     // Use LLM to analyze the request
     const prompt = `Analyze this request and create an execution plan.
 Request: "${request}"
 
 Available capabilities:
-${capabilities.plugins.map(p => `- ${p.name}: ${p.description}`).join("\n")}
-${capabilities.mcpServers.map(s => `- ${s.name}: ${s.description}`).join("\n")}
+${capabilities.plugins.map((p) => `- ${p.name}: ${p.description}`).join("\n")}
+${capabilities.mcpServers.map((s) => `- ${s.name}: ${s.description}`).join("\n")}
 
 Return a JSON object with:
 {
@@ -114,11 +114,14 @@ Return a JSON object with:
     try {
       const response = await this.aibitat.provider.complete({
         messages: [
-          { role: "system", content: "You are a workflow analyzer. Return only valid JSON." },
-          { role: "user", content: prompt }
-        ]
+          {
+            role: "system",
+            content: "You are a workflow analyzer. Return only valid JSON.",
+          },
+          { role: "user", content: prompt },
+        ],
       });
-      
+
       return JSON.parse(response.result);
     } catch (error) {
       // Fallback to simple analysis
@@ -127,7 +130,7 @@ Return a JSON object with:
         steps: [request],
         tools_needed: [],
         requires_approval: false,
-        can_schedule: request.includes("daily") || request.includes("every")
+        can_schedule: request.includes("daily") || request.includes("every"),
       };
     }
   }
@@ -138,34 +141,35 @@ Return a JSON object with:
   async createTaskList({ request }) {
     const session = this.getSession(this.aibitat.conversationId);
     const analysis = await this.analyzeRequest(request);
-    
+
     // Create task list
     const tasks = analysis.steps.map((step, index) => ({
       id: `task_${index + 1}`,
       content: step,
       status: "pending",
-      order: index
+      order: index,
     }));
-    
+
     session.tasks = tasks;
     session.state = "planning";
-    
+
     // Format task list for display
-    const taskListDisplay = tasks.map(t => `☐ ${t.content}`).join("\n");
-    
+    const taskListDisplay = tasks.map((t) => `☐ ${t.content}`).join("\n");
+
     this.aibitat.introspect(`Created task list with ${tasks.length} tasks`);
-    
+
     // Start executing tasks
     const results = await this.executeTasks(session);
-    
+
     return {
       mode: "task-planner",
-      tasks: tasks.map(t => ({
+      tasks: tasks.map((t) => ({
         ...t,
-        status: t.status === "completed" ? "✅" : t.status === "failed" ? "❌" : "☐"
+        status:
+          t.status === "completed" ? "✅" : t.status === "failed" ? "❌" : "☐",
       })),
       summary: `Completed ${results.completed} of ${results.total} tasks`,
-      results: results.details
+      results: results.details,
     };
   }
 
@@ -175,35 +179,36 @@ Return a JSON object with:
   async createWorkflow({ request }) {
     const session = this.getSession(this.aibitat.conversationId);
     const analysis = await this.analyzeRequest(request);
-    
+
     this.aibitat.introspect(`Creating workflow for: ${request}`);
-    
+
     // Build workflow using DynamicFlowBuilder
     const workflow = await this.flowBuilder.buildFlowFromPrompt(request, {
       name: this.generateWorkflowName(request),
-      userId: this.workspace.id
+      userId: this.workspace.id,
     });
-    
+
     session.workflows.push(workflow);
     session.state = "executing";
-    
+
     // Execute the workflow
     const execution = await this.executeWorkflow(workflow, session);
-    
+
     // Prepare save prompt
-    const savePrompt = execution.success ? 
-      "Would you like to save this workflow for future use?" : null;
-    
+    const savePrompt = execution.success
+      ? "Would you like to save this workflow for future use?"
+      : null;
+
     return {
       mode: "flow-orchestrator",
       workflow: {
         name: workflow.name,
         steps: workflow.config.steps.length,
-        schedule: workflow.schedule
+        schedule: workflow.schedule,
       },
       execution,
       savePrompt,
-      workflowId: workflow.uuid
+      workflowId: workflow.uuid,
     };
   }
 
@@ -213,41 +218,46 @@ Return a JSON object with:
   async autoExecute({ request }) {
     const session = this.getSession(this.aibitat.conversationId);
     const analysis = await this.analyzeRequest(request);
-    
+
     this.aibitat.introspect(`Auto-executing: ${request}`);
-    
+
     // For simple requests, execute directly
-    if (analysis.complexity === "simple" && analysis.tools_needed.length === 1) {
+    if (
+      analysis.complexity === "simple" &&
+      analysis.tools_needed.length === 1
+    ) {
       const tool = analysis.tools_needed[0];
       const result = await this.executeTool(tool, { request });
-      
+
       return {
         mode: "auto-workflow",
         action: tool,
         result,
-        completed: true
+        completed: true,
       };
     }
-    
+
     // For complex requests, create and execute workflow automatically
     const workflow = await this.flowBuilder.buildFlowFromPrompt(request, {
       name: `Auto: ${request.substring(0, 50)}`,
-      userId: this.workspace.id
+      userId: this.workspace.id,
     });
-    
+
     const execution = await this.executeWorkflow(workflow, session);
-    
+
     // Auto-save if successful and schedulable
     if (execution.success && analysis.can_schedule) {
       await AgentFlows.saveFlow(workflow.name, workflow.config, workflow.uuid);
-      this.aibitat.introspect(`Workflow saved for future use: ${workflow.name}`);
+      this.aibitat.introspect(
+        `Workflow saved for future use: ${workflow.name}`
+      );
     }
-    
+
     return {
       mode: "auto-workflow",
       completed: execution.success,
       result: execution.result,
-      automated_actions: execution.steps_completed
+      automated_actions: execution.steps_completed,
     };
   }
 
@@ -258,40 +268,39 @@ Return a JSON object with:
     let completed = 0;
     const total = session.tasks.length;
     const details = [];
-    
+
     for (const task of session.tasks) {
       task.status = "in_progress";
       this.aibitat.introspect(`Working on: ${task.content}`);
-      
+
       try {
         // Execute task using available tools
         const result = await this.executeStep(task.content, session.context);
-        
+
         task.status = "completed";
         task.result = result;
         completed++;
-        
+
         details.push({
           task: task.content,
           status: "success",
-          result
+          result,
         });
-        
+
         // Update context for next task
         session.context[`task_${task.id}_result`] = result;
-        
       } catch (error) {
         task.status = "failed";
         task.error = error.message;
-        
+
         details.push({
           task: task.content,
           status: "failed",
-          error: error.message
+          error: error.message,
         });
       }
     }
-    
+
     return { completed, total, details };
   }
 
@@ -306,19 +315,18 @@ Return a JSON object with:
         session.context,
         this.aibitat
       );
-      
+
       return {
         success: result.success,
         result: result.results,
-        steps_completed: workflow.config.steps.length
+        steps_completed: workflow.config.steps.length,
       };
-      
     } catch (error) {
       this.aibitat.introspect(`Workflow execution failed: ${error.message}`);
       return {
         success: false,
         error: error.message,
-        steps_completed: 0
+        steps_completed: 0,
       };
     }
   }
@@ -329,11 +337,11 @@ Return a JSON object with:
   async executeStep(stepDescription, context) {
     // Try to match with available tools
     const capabilities = await this.discoverCapabilities();
-    
+
     // Use LLM to determine best tool and parameters
     const prompt = `Execute this step: "${stepDescription}"
 Context: ${JSON.stringify(context)}
-Available tools: ${capabilities.plugins.map(p => p.name).join(", ")}
+Available tools: ${capabilities.plugins.map((p) => p.name).join(", ")}
 
 Return the tool to use and parameters, or indicate if this should be handled by the LLM directly.`;
 
@@ -341,10 +349,10 @@ Return the tool to use and parameters, or indicate if this should be handled by 
       const response = await this.aibitat.provider.complete({
         messages: [
           { role: "system", content: "You are a workflow executor." },
-          { role: "user", content: prompt }
-        ]
+          { role: "user", content: prompt },
+        ],
       });
-      
+
       return response.result;
     } catch (error) {
       // Fallback to LLM instruction
@@ -360,7 +368,7 @@ Return the tool to use and parameters, or indicate if this should be handled by 
     if (this.aibitat.functions && this.aibitat.functions[toolName]) {
       return await this.aibitat.functions[toolName].handler(params);
     }
-    
+
     // Fallback to LLM
     return `Executed ${toolName} with params: ${JSON.stringify(params)}`;
   }
@@ -370,27 +378,27 @@ Return the tool to use and parameters, or indicate if this should be handled by 
    */
   async saveWorkflow({ workflowId, name }) {
     const session = this.getSession(this.aibitat.conversationId);
-    const workflow = session.workflows.find(w => w.uuid === workflowId);
-    
+    const workflow = session.workflows.find((w) => w.uuid === workflowId);
+
     if (!workflow) {
       return { success: false, error: "Workflow not found" };
     }
-    
+
     const result = await AgentFlows.saveFlow(
       name || workflow.name,
       workflow.config,
       workflow.uuid
     );
-    
+
     if (result.success) {
       this.aibitat.introspect(`Workflow saved: ${name || workflow.name}`);
       return {
         success: true,
         message: `Workflow "${name || workflow.name}" saved successfully!`,
-        uuid: result.uuid
+        uuid: result.uuid,
       };
     }
-    
+
     return result;
   }
 
@@ -399,7 +407,9 @@ Return the tool to use and parameters, or indicate if this should be handled by 
    */
   generateWorkflowName(request) {
     const words = request.split(" ").slice(0, 5);
-    return words.join(" ") + (words.length < request.split(" ").length ? "..." : "");
+    return (
+      words.join(" ") + (words.length < request.split(" ").length ? "..." : "")
+    );
   }
 }
 
@@ -411,63 +421,69 @@ const unifiedWorkflow = {
   startupConfig: {
     params: {},
   },
-  description: "Unified workflow system for task planning, orchestration, and automation",
+  description:
+    "Unified workflow system for task planning, orchestration, and automation",
   plugin: function () {
     return {
       name: "unified-workflow",
-      description: "Handles task planning, workflow orchestration, and automatic workflow execution",
+      description:
+        "Handles task planning, workflow orchestration, and automatic workflow execution",
       async setup(aibitat) {
         const plugin = new UnifiedWorkflowPlugin(aibitat);
-        
+
         // Detect mode based on enabled skills
         plugin.mode = await plugin.detectMode();
-        
+
         // Skip if no mode is enabled
         if (!plugin.mode) {
           return;
         }
-        
-        aibitat.introspect(`Unified Workflow plugin initialized in ${plugin.mode} mode`);
-        
+
+        aibitat.introspect(
+          `Unified Workflow plugin initialized in ${plugin.mode} mode`
+        );
+
         // Register functions based on mode
         switch (plugin.mode) {
           case "planner":
             // Task Planning mode
             aibitat.function({
               name: "create_task_list",
-              description: "Break down a complex request into trackable tasks and execute them",
+              description:
+                "Break down a complex request into trackable tasks and execute them",
               parameters: {
                 type: "object",
                 properties: {
                   request: {
                     type: "string",
-                    description: "The request to break down into tasks"
-                  }
+                    description: "The request to break down into tasks",
+                  },
                 },
-                required: ["request"]
+                required: ["request"],
               },
-              handler: plugin.createTaskList.bind(plugin)
+              handler: plugin.createTaskList.bind(plugin),
             });
             break;
-            
+
           case "orchestrator":
             // Workflow Orchestrator mode
             aibitat.function({
               name: "create_workflow",
-              description: "Create and execute a workflow from a natural language request",
+              description:
+                "Create and execute a workflow from a natural language request",
               parameters: {
                 type: "object",
                 properties: {
                   request: {
                     type: "string",
-                    description: "The workflow request"
-                  }
+                    description: "The workflow request",
+                  },
                 },
-                required: ["request"]
+                required: ["request"],
               },
-              handler: plugin.createWorkflow.bind(plugin)
+              handler: plugin.createWorkflow.bind(plugin),
             });
-            
+
             aibitat.function({
               name: "save_workflow",
               description: "Save a completed workflow for future use",
@@ -476,63 +492,74 @@ const unifiedWorkflow = {
                 properties: {
                   workflowId: {
                     type: "string",
-                    description: "The workflow ID to save"
+                    description: "The workflow ID to save",
                   },
                   name: {
                     type: "string",
-                    description: "Optional custom name for the workflow"
-                  }
+                    description: "Optional custom name for the workflow",
+                  },
                 },
-                required: ["workflowId"]
+                required: ["workflowId"],
               },
-              handler: plugin.saveWorkflow.bind(plugin)
+              handler: plugin.saveWorkflow.bind(plugin),
             });
             break;
-            
+
           case "auto":
             // Auto Workflow mode
             aibitat.function({
               name: "auto_execute",
-              description: "Automatically handle any action request by creating and executing workflows",
+              description:
+                "Automatically handle any action request by creating and executing workflows",
               parameters: {
                 type: "object",
                 properties: {
                   request: {
                     type: "string",
-                    description: "The action request to handle"
-                  }
+                    description: "The action request to handle",
+                  },
                 },
-                required: ["request"]
+                required: ["request"],
               },
-              handler: plugin.autoExecute.bind(plugin)
+              handler: plugin.autoExecute.bind(plugin),
             });
-            
+
             // In auto mode, intercept all action-like requests
             const originalIntrospect = aibitat.introspect.bind(aibitat);
-            aibitat.introspect = function(message) {
+            aibitat.introspect = function (message) {
               // Check if this looks like an action request
-              const actionKeywords = ["send", "create", "schedule", "check", "find", "get", "post", "update", "delete"];
-              const hasAction = actionKeywords.some(keyword => 
+              const actionKeywords = [
+                "send",
+                "create",
+                "schedule",
+                "check",
+                "find",
+                "get",
+                "post",
+                "update",
+                "delete",
+              ];
+              const hasAction = actionKeywords.some((keyword) =>
                 message.toLowerCase().includes(keyword)
               );
-              
+
               if (hasAction && !message.startsWith("[")) {
                 // Auto-handle action requests
                 plugin.autoExecute({ request: message });
               }
-              
+
               return originalIntrospect(message);
             };
             break;
         }
-        
+
         // Common function for all modes - get workflow status
         aibitat.function({
           name: "get_workflow_status",
           description: "Get the status of current workflow session",
           parameters: {
             type: "object",
-            properties: {}
+            properties: {},
           },
           handler: () => {
             const session = plugin.getSession(aibitat.conversationId);
@@ -541,13 +568,13 @@ const unifiedWorkflow = {
               state: session.state,
               tasks: session.tasks.length,
               workflows: session.workflows.length,
-              context_keys: Object.keys(session.context)
+              context_keys: Object.keys(session.context),
             };
-          }
+          },
         });
-      }
+      },
     };
-  }
+  },
 };
 
 module.exports = { unifiedWorkflow };

@@ -1,40 +1,48 @@
 import React, { useState } from "react";
-import { MagnifyingGlass, DotsThreeVertical, CaretDown } from "@phosphor-icons/react";
+import {
+  MagnifyingGlass,
+  DotsThreeVertical,
+  CaretDown,
+} from "@phosphor-icons/react";
 
-export default function ResponsiveTable({ 
-  data = [], 
-  columns = [], 
+export default function ResponsiveTable({
+  data = [],
+  columns = [],
   searchable = true,
   actions = [],
-  mobileCardConfig = {} 
+  mobileCardConfig = {},
 }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState(null);
 
-  const filteredData = data.filter(item =>
-    searchTerm === "" || 
-    columns.some(col => 
-      item[col.key]?.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    )
+  const filteredData = data.filter(
+    (item) =>
+      searchTerm === "" ||
+      columns.some((col) =>
+        item[col.key]
+          ?.toString()
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      )
   );
 
   const sortedData = React.useMemo(() => {
     if (!sortConfig) return filteredData;
-    
+
     return [...filteredData].sort((a, b) => {
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
-      
-      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+
+      if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
       return 0;
     });
   }, [filteredData, sortConfig]);
 
   const handleSort = (key) => {
-    setSortConfig(prev => ({
+    setSortConfig((prev) => ({
       key,
-      direction: prev?.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+      direction: prev?.key === key && prev.direction === "asc" ? "desc" : "asc",
     }));
   };
 
@@ -63,18 +71,19 @@ export default function ResponsiveTable({
                 <th
                   key={column.key}
                   className={`px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
-                    column.sortable ? 'cursor-pointer hover:bg-gray-100' : ''
+                    column.sortable ? "cursor-pointer hover:bg-gray-100" : ""
                   }`}
                   onClick={() => column.sortable && handleSort(column.key)}
                 >
                   <div className="flex items-center gap-2">
                     {column.label}
                     {column.sortable && (
-                      <CaretDown 
+                      <CaretDown
                         className={`w-4 h-4 transition-transform ${
-                          sortConfig?.key === column.key && sortConfig.direction === 'desc' 
-                            ? 'transform rotate-180' 
-                            : ''
+                          sortConfig?.key === column.key &&
+                          sortConfig.direction === "desc"
+                            ? "transform rotate-180"
+                            : ""
                         }`}
                       />
                     )}
@@ -93,7 +102,9 @@ export default function ResponsiveTable({
               <tr key={item.id || index} className="hover:bg-gray-50">
                 {columns.map((column) => (
                   <td key={column.key} className="px-6 py-4 whitespace-nowrap">
-                    {column.render ? column.render(item[column.key], item) : item[column.key]}
+                    {column.render
+                      ? column.render(item[column.key], item)
+                      : item[column.key]}
                   </td>
                 ))}
                 {actions.length > 0 && (
@@ -110,10 +121,10 @@ export default function ResponsiveTable({
       {/* Mobile Cards */}
       <div className="md:hidden space-y-4">
         {sortedData.map((item, index) => (
-          <MobileCard 
-            key={item.id || index} 
-            item={item} 
-            columns={columns} 
+          <MobileCard
+            key={item.id || index}
+            item={item}
+            columns={columns}
             actions={actions}
             config={mobileCardConfig}
           />
@@ -126,7 +137,9 @@ export default function ResponsiveTable({
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <MagnifyingGlass className="w-8 h-8 text-gray-400" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No results found</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            No results found
+          </h3>
           <p className="text-gray-500">Try adjusting your search terms</p>
         </div>
       )}
@@ -151,9 +164,7 @@ function MobileCard({ item, columns, actions, config }) {
             <p className="text-sm text-gray-500">{item[secondaryField]}</p>
           )}
         </div>
-        {actions.length > 0 && (
-          <ActionDropdown actions={actions} item={item} />
-        )}
+        {actions.length > 0 && <ActionDropdown actions={actions} item={item} />}
       </div>
 
       {/* Status Badge */}
@@ -166,10 +177,17 @@ function MobileCard({ item, columns, actions, config }) {
       {/* Additional Fields */}
       <div className="space-y-2">
         {columns.slice(2).map((column) => (
-          <div key={column.key} className="flex justify-between items-center py-1">
-            <span className="text-sm text-gray-500 font-medium">{column.label}</span>
+          <div
+            key={column.key}
+            className="flex justify-between items-center py-1"
+          >
+            <span className="text-sm text-gray-500 font-medium">
+              {column.label}
+            </span>
             <span className="text-sm text-gray-900">
-              {column.render ? column.render(item[column.key], item) : item[column.key]}
+              {column.render
+                ? column.render(item[column.key], item)
+                : item[column.key]}
             </span>
           </div>
         ))}
@@ -192,8 +210,8 @@ function ActionDropdown({ actions, item }) {
 
       {isOpen && (
         <>
-          <div 
-            className="fixed inset-0 z-10" 
+          <div
+            className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
           <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20 min-w-[120px]">
@@ -219,16 +237,18 @@ function ActionDropdown({ actions, item }) {
 
 function StatusBadge({ status }) {
   const statusColors = {
-    active: 'bg-green-100 text-green-800',
-    inactive: 'bg-gray-100 text-gray-800',
-    pending: 'bg-yellow-100 text-yellow-800',
-    error: 'bg-red-100 text-red-800',
+    active: "bg-green-100 text-green-800",
+    inactive: "bg-gray-100 text-gray-800",
+    pending: "bg-yellow-100 text-yellow-800",
+    error: "bg-red-100 text-red-800",
   };
 
   return (
-    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-      statusColors[status] || statusColors.inactive
-    }`}>
+    <span
+      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+        statusColors[status] || statusColors.inactive
+      }`}
+    >
       {status}
     </span>
   );

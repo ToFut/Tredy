@@ -34,7 +34,7 @@ export default function CommunityHub() {
               </div>
             </div>
           </div>
-          
+
           {/* Navigation Tabs */}
           <div className="flex gap-4 mb-6">
             <a
@@ -45,7 +45,7 @@ export default function CommunityHub() {
               Full Marketplace
             </a>
           </div>
-          
+
           <HubItems />
         </div>
       </div>

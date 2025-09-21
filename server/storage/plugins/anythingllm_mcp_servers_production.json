@@ -76,6 +76,42 @@
         "description": "Google Drive integration - handles all Drive operations",
         "toolPrefix": "gdrive"
       }
+    },
+    "gdrive-tools": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/app/server/g-drive-mcp-tools.js"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "google-drive"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "Enhanced Google Drive tools with large file support and content extraction",
+        "toolPrefix": "gdrive"
+      }
+    },
+    "supabase-tools": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/app/server/supabase-mcp-server.js"
+      ],
+      "env": {
+        "SUPABASE_URL": "${SUPABASE_URL}",
+        "SUPABASE_ANON_KEY": "${SUPABASE_ANON_KEY}",
+        "SUPABASE_SERVICE_ROLE_KEY": "${SUPABASE_SERVICE_ROLE_KEY}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "Supabase database and storage integration",
+        "toolPrefix": "supabase"
+      }
     }
   }
 }

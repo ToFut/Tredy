@@ -1,0 +1,33 @@
+{
+  "name": "tredy",
+  "version": "1.0.0",
+  "description": "AnythingLLM - Document-aware AI chat platform",
+  "private": true,
+  "workspaces": [
+    "server",
+    "frontend",
+    "collector"
+  ],
+  "scripts": {
+    "setup": "yarn install && cp server/.env.example server/.env && cp frontend/.env.example frontend/.env && cp collector/.env.example collector/.env",
+    "dev:server": "cd server && yarn dev",
+    "dev:frontend": "cd frontend && yarn dev",
+    "dev:collector": "cd collector && yarn dev",
+    "dev:all": "concurrently \"yarn dev:server\" \"yarn dev:frontend\" \"yarn dev:collector\"",
+    "prod:server": "cd server && yarn start",
+    "prod:frontend": "cd frontend && yarn build",
+    "lint": "cd server && yarn lint && cd ../frontend && yarn lint",
+    "prisma:setup": "cd server && npx prisma generate && npx prisma migrate deploy",
+    "prisma:generate": "cd server && npx prisma generate",
+    "prisma:migrate": "cd server && npx prisma migrate deploy",
+    "prisma:reset": "cd server && npx prisma migrate reset",
+    "verify:translations": "cd frontend && yarn verify:translations"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.12.1"
+  },
+  "license": "MIT"
+}

@@ -77,7 +77,7 @@ class GoogleDriveMCPTools {
         },
         {
           name: 'get_gdrive_file_content',
-          description: 'STEP 2: Get the actual content of a Google Drive file. Use this AFTER getting the file ID from search_gdrive_files. Supports all file types including text files, Google Docs, Sheets, etc. CRITICAL: You MUST have the actual Google Drive file ID (NOT the filename).',
+          description: 'STEP 2: Get the actual content of a Google Drive file. Use this AFTER getting the file ID from search_gdrive_files. Supports all file types including text files, Google Docs, Sheets, etc. CRITICAL: You MUST have the actual Google Drive file ID (NOT the filename). Handles large files with size limits and chunking.',
           inputSchema: {
             type: 'object',
             properties: {
@@ -89,6 +89,16 @@ class GoogleDriveMCPTools {
                 type: 'string',
                 description: 'Optional: Export format for Google Workspace files (txt, html, pdf, docx, etc). Default is txt.',
                 default: 'txt'
+              },
+              maxSize: {
+                type: 'number',
+                description: 'Optional: Maximum content size in bytes (default: 50MB). Larger files will be truncated or chunked.',
+                default: 52428800
+              },
+              chunked: {
+                type: 'boolean',
+                description: 'Optional: For large files, return first chunk with info instead of truncating (default: false).',
+                default: false
               }
             },
             required: ['fileId']
@@ -297,7 +307,7 @@ class GoogleDriveMCPTools {
   async getGoogleDriveFileContent(args, workspaceId) {
     const nango = new Nango(this.nangoConfig);
     const connectionId = this.getConnectionId(workspaceId);
-    const { fileId, format = 'txt' } = args;
+    const { fileId, format = 'txt', maxSize = 50 * 1024 * 1024, chunked = false } = args; // 50MB default limit
 
     try {
       // First get file metadata
@@ -311,6 +321,17 @@ class GoogleDriveMCPTools {
       });
 
       const file = metaResponse.data;
+
+      // Check file size and warn if large
+      const fileSize = parseInt(file.size) || 0;
+      if (fileSize > maxSize) {
+        return {
+          content: [{
+            type: 'text',
+            text: `⚠️ File "${file.name}" is too large (${this.formatFileSize(fileSize)}).\n\nMaximum supported size: ${this.formatFileSize(maxSize)}\n\nFor large files, consider:\n1. Using chunked reading with chunked=true parameter\n2. Downloading the file locally first\n3. Using a smaller maxSize parameter\n\nFile ID: ${fileId}\nActual size: ${this.formatFileSize(fileSize)}`
+          }]
+        };
+      }
 
       // Handle folders
       if (file.mimeType === 'application/vnd.google-apps.folder') {
@@ -413,6 +434,39 @@ class GoogleDriveMCPTools {
         content = contentResponse.data.toString('utf8');
       } else {
         content = String(contentResponse.data);
+      }
+
+      // Handle large content with chunking or truncation
+      if (content.length > maxSize) {
+        if (chunked) {
+          // Return first chunk with info about remaining content
+          const chunkSize = Math.floor(maxSize * 0.8); // Use 80% of max size for safety
+          const truncatedContent = content.substring(0, chunkSize);
+          const remainingLength = content.length - chunkSize;
+
+          return {
+            content: [{
+              type: 'text',
+              text: `Content of "${file.name}" (CHUNK 1 of large file):\n` +
+                    `Total size: ${this.formatFileSize(content.length)} | Showing: ${this.formatFileSize(chunkSize)}\n` +
+                    `Remaining: ${this.formatFileSize(remainingLength)}\n\n` +
+                    `${truncatedContent}\n\n` +
+                    `[Content continues... Use fetch_gdrive_file_to_local for complete file]`
+            }]
+          };
+        } else {
+          // Truncate content
+          const truncatedContent = content.substring(0, maxSize);
+          return {
+            content: [{
+              type: 'text',
+              text: `Content of "${file.name}" (TRUNCATED):\n` +
+                    `Original size: ${this.formatFileSize(content.length)} | Showing: ${this.formatFileSize(maxSize)}\n\n` +
+                    `${truncatedContent}\n\n` +
+                    `[Content truncated - use fetch_gdrive_file_to_local for complete file or increase maxSize parameter]`
+            }]
+          };
+        }
       }
 
       return {

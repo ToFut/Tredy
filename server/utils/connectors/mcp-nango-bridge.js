@@ -44,6 +44,7 @@ class MCPNangoBridge {
       "google-drive":
         "/Users/segevbin/anything-llm/server/google-drive-generated-mcp.js",
       linkedin: "/Users/segevbin/anything-llm/server/linkedin-mcp.js",
+      supabase: "/mnt/c/MyProjects/Tredy/server/supabase-mcp-server.js",
       // Add other providers as needed
       default: "/Users/segevbin/anything-llm/server/universal-nango-mcp.js",
     };
@@ -266,6 +267,7 @@ class MCPNangoBridge {
       twilio: "communication",
       sendgrid: "email",
       mailchimp: "email",
+      supabase: "database"
     };
 
     return categoryMap[providerId] || "other";
@@ -384,6 +386,14 @@ class MCPNangoBridge {
         category: "communication",
         authType: "oauth",
         logo: "/icons/slack.svg",
+      },
+      {
+        id: "supabase",
+        name: "Supabase",
+        description: "Backend as a service with database and storage",
+        category: "database",
+        authType: "oauth",
+        logo: "/icons/gmail.svg",
       }
     );
 

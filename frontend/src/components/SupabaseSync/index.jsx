@@ -1,27 +1,17 @@
 import React, { useState } from 'react';
 import { CloudArrowDown, Spinner } from '@phosphor-icons/react';
 import showToast from '@/utils/toast';
-import { Nango } from '@nangohq/frontend';
 
 const SupabaseSync = ({ workspace, item, className = "" }) => {
   const [syncing, setSyncing] = useState(false);
-  const [nango] = useState(() => new Nango({
-    host: process.env.REACT_APP_NANGO_HOST || 'https://api.nango.dev'
-  }));
 
   const syncToSupabase = async () => {
     setSyncing(true);
 
     try {
-      // Step 1: Get Google Drive file content via Nango
-      const connectionId = `workspace_${workspace.id}`;
-      const providerConfigKey = 'google-drive';
-
-      // Check if we have a Google Drive connection
-      try {
-        await nango.getConnection(providerConfigKey, connectionId);
-      } catch (error) {
-        showToast('No Google Drive connection found. Please connect Google Drive first.', 'error');
+      // Check if we have the required file information
+      if (!item.name && !item.gdriveId) {
+        showToast('No file information available for sync', 'error');
         setSyncing(false);
         return;
       }

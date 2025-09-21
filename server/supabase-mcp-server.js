@@ -53,44 +53,59 @@ loadEnvFiles();
 const { Server } = require('@modelcontextprotocol/sdk/server/index.js');
 const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
 const { CallToolRequestSchema, ListToolsRequestSchema } = require('@modelcontextprotocol/sdk/types.js');
+const { Nango } = require('@nangohq/node');
 const { createClient } = require('@supabase/supabase-js');
+const SupabaseSync = require('./utils/supabase/SupabaseSync.js');
 
 let supabase = null;
 let supabaseAdmin = null;
 
-function initSupabase() {
+// Workspace detection methods (following Google Drive pattern)
+function getWorkspaceId(args) {
+  if (args?.workspaceId) return args.workspaceId;
+  if (process.env.NANGO_CONNECTION_ID) {
+    return process.env.NANGO_CONNECTION_ID.replace('workspace_', '');
+  }
+  return '1';
+}
+
+function getConnectionId(workspaceId) {
+  return process.env.NANGO_CONNECTION_ID || `workspace_${workspaceId}`;
+}
+
+async function getNangoClient() {
+  if (!process.env.NANGO_SECRET_KEY) {
+    throw new Error('NANGO_SECRET_KEY environment variable is required');
+  }
+
+  return new Nango({
+    secretKey: process.env.NANGO_SECRET_KEY,
+    host: process.env.NANGO_HOST || 'https://api.nango.dev'
+  });
+}
+
+async function initSupabase() {
   try {
+    // Fallback to environment variables if available
     const supabaseUrl = (process.env.SUPABASE_URL || '').trim();
     const supabaseAnonKey = (process.env.SUPABASE_ANON_KEY || '').trim();
     const supabaseServiceRoleKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 
     console.error('[supabase-mcp-tools] Environment validation:');
-    console.error(`  SUPABASE_URL: ${supabaseUrl ? 'SET' : 'NOT SET'} ${supabaseUrl ? `(${supabaseUrl})` : ''}`);
+    console.error(`  SUPABASE_URL: ${supabaseUrl ? 'SET' : 'NOT SET'}`);
     console.error(`  SUPABASE_ANON_KEY: ${supabaseAnonKey ? 'SET' : 'NOT SET'}`);
     console.error(`  SUPABASE_SERVICE_ROLE_KEY: ${supabaseServiceRoleKey ? 'SET' : 'NOT SET'}`);
+    console.error(`  NANGO_SECRET_KEY: ${process.env.NANGO_SECRET_KEY ? 'SET' : 'NOT SET'}`);
 
-    if (!supabaseUrl) {
-      console.error('[supabase-mcp-tools] SUPABASE_URL missing, skipping supabase init.');
-      return;
-    }
-
-    if (!/^https?:\/\/.+/.test(supabaseUrl)) {
-      throw new Error(`Invalid SUPABASE_URL (must start with http(s)): ${supabaseUrl}`);
-    }
-
-    if (!supabaseAnonKey) {
-      console.error('[supabase-mcp-tools] SUPABASE_ANON_KEY missing — read-only or many operations will fail.');
-    }
-
-    // Init clients (if keys exist)
-    if (supabaseAnonKey) {
+    // Init clients (if keys exist) for fallback
+    if (supabaseUrl && supabaseAnonKey) {
       supabase = createClient(supabaseUrl, supabaseAnonKey, {
         auth: { persistSession: false, autoRefreshToken: false }
       });
       console.error('[supabase-mcp-tools] Supabase client (anon) initialized.');
     }
 
-    if (supabaseServiceRoleKey) {
+    if (supabaseUrl && supabaseServiceRoleKey) {
       supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
         auth: { persistSession: false, autoRefreshToken: false }
       });
@@ -100,7 +115,9 @@ function initSupabase() {
     console.error('[supabase-mcp-tools] initSupabase error:', err && err.message ? err.message : err);
   }
 }
-initSupabase();
+initSupabase().catch(err => {
+  console.error('[supabase-mcp-tools] Failed to initialize Supabase:', err);
+});
 
 //
 // Helper utilities
@@ -226,6 +243,57 @@ class SupabaseMCPServer {
           name: 'list_tables',
           description: 'List public tables (best-effort).',
           inputSchema: { type: 'object', properties: {} }
+        },
+        {
+          name: 'sync_chat',
+          description: 'Sync a chat message to Supabase cloud storage.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              workspaceChat: { type: 'object' }
+            },
+            required: ['workspaceChat']
+          }
+        },
+        {
+          name: 'sync_document',
+          description: 'Sync a document and its vector data to Supabase cloud storage.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              document: { type: 'object' },
+              vectorData: { type: 'object' }
+            },
+            required: ['document']
+          }
+        },
+        {
+          name: 'sync_workspace',
+          description: 'Sync workspace configuration to Supabase cloud storage.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              workspace: { type: 'object' }
+            },
+            required: ['workspace']
+          }
+        },
+        {
+          name: 'track_usage',
+          description: 'Track usage event for billing/analytics.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              eventType: { type: 'string' },
+              metadata: { type: 'object' }
+            },
+            required: ['eventType']
+          }
+        },
+        {
+          name: 'restore_from_cloud',
+          description: 'Restore data from Supabase cloud storage.',
+          inputSchema: { type: 'object', properties: {} }
         }
       ]
     }));
@@ -243,6 +311,11 @@ class SupabaseMCPServer {
           case 'upload_file': return await this.uploadFile(args || {});
           case 'get_user_info': return await this.getUserInfo(args || {});
           case 'list_tables': return await this.listTables(args || {});
+          case 'sync_chat': return await this.syncChat(args || {});
+          case 'sync_document': return await this.syncDocument(args || {});
+          case 'sync_workspace': return await this.syncWorkspace(args || {});
+          case 'track_usage': return await this.trackUsage(args || {});
+          case 'restore_from_cloud': return await this.restoreFromCloud(args || {});
           default: throw new Error(`Unknown tool: ${name}`);
         }
       } catch (err) {
@@ -441,6 +514,123 @@ class SupabaseMCPServer {
         content: [{
           type: 'text',
           text: `Available tables (partial list):\n${knownTables.map(t => `• ${t}`).join('\n')}\n\nNote: Could not retrieve complete table list from information_schema (lack of permissions or different DB).`
+        }]
+      };
+    } catch (err) {
+      return makeErrorResponse(err && err.message ? err.message : String(err));
+    }
+  }
+
+  // -------------------------
+  // Sync Methods (SupabaseSync integration)
+  // -------------------------
+  async syncChat({ workspaceChat }) {
+    if (!workspaceChat) return makeErrorResponse('workspaceChat is required');
+
+    try {
+      const workspaceId = getWorkspaceId({ workspaceId: workspaceChat.workspaceId });
+
+      // Try to get workspace-specific Supabase credentials from Nango
+      let supabaseClient = supabase; // fallback to static client
+
+      if (process.env.NANGO_SECRET_KEY) {
+        try {
+          const nango = await getNangoClient();
+          const connectionId = getConnectionId(workspaceId);
+
+          // Get Supabase connection from Nango for this workspace
+          const connection = await nango.getConnection('supabase', connectionId);
+          if (connection && connection.credentials) {
+            const { supabase_url, supabase_anon_key } = connection.credentials;
+            if (supabase_url && supabase_anon_key) {
+              supabaseClient = createClient(supabase_url, supabase_anon_key, {
+                auth: { persistSession: false, autoRefreshToken: false }
+              });
+              console.error(`[supabase-mcp-tools] Using workspace-specific Supabase client for workspace ${workspaceId}`);
+            }
+          }
+        } catch (nangoError) {
+          console.error(`[supabase-mcp-tools] Failed to get Nango credentials for workspace ${workspaceId}:`, nangoError.message);
+        }
+      }
+
+      await SupabaseSync.syncChat(workspaceChat);
+      return {
+        content: [{
+          type: 'text',
+          text: `✅ Chat message synced successfully!\nWorkspace: ${workspaceChat.workspaceId}\nMessage ID: ${workspaceChat.id}`
+        }]
+      };
+    } catch (err) {
+      return makeErrorResponse(err && err.message ? err.message : String(err));
+    }
+  }
+
+  async syncDocument({ document, vectorData }) {
+    if (!document) return makeErrorResponse('document is required');
+
+    try {
+      await SupabaseSync.syncDocument(document, vectorData || null);
+      return {
+        content: [{
+          type: 'text',
+          text: `✅ Document synced successfully!\nTitle: ${document.title}\nWorkspace: ${document.workspaceId}\nHas vector: ${vectorData ? 'Yes' : 'No'}`
+        }]
+      };
+    } catch (err) {
+      return makeErrorResponse(err && err.message ? err.message : String(err));
+    }
+  }
+
+  async syncWorkspace({ workspace }) {
+    if (!workspace) return makeErrorResponse('workspace is required');
+
+    try {
+      await SupabaseSync.syncWorkspace(workspace);
+      return {
+        content: [{
+          type: 'text',
+          text: `✅ Workspace configuration synced successfully!\nName: ${workspace.name}\nSlug: ${workspace.slug}\nAgent: ${workspace.agentProvider}/${workspace.agentModel}`
+        }]
+      };
+    } catch (err) {
+      return makeErrorResponse(err && err.message ? err.message : String(err));
+    }
+  }
+
+  async trackUsage({ eventType, metadata = {} }) {
+    if (!eventType) return makeErrorResponse('eventType is required');
+
+    try {
+      await SupabaseSync.trackUsage(eventType, metadata);
+      return {
+        content: [{
+          type: 'text',
+          text: `✅ Usage event tracked!\nEvent: ${eventType}\nMetadata: ${Object.keys(metadata).length} fields`
+        }]
+      };
+    } catch (err) {
+      return makeErrorResponse(err && err.message ? err.message : String(err));
+    }
+  }
+
+  async restoreFromCloud() {
+    try {
+      const data = await SupabaseSync.restoreFromCloud();
+      if (!data) {
+        return {
+          content: [{
+            type: 'text',
+            text: 'ℹ️ No data to restore or cloud sync is disabled.'
+          }]
+        };
+      }
+
+      const { chats = [], documents = [], workspaces = [] } = data;
+      return {
+        content: [{
+          type: 'text',
+          text: `✅ Data restored from cloud!\nChats: ${chats.length}\nDocuments: ${documents.length}\nWorkspaces: ${workspaces.length}\n\n${safeStringify({ chats: chats.slice(0, 3), documents: documents.slice(0, 3), workspaces })}`
         }]
       };
     } catch (err) {

@@ -140,20 +140,11 @@ class NangoIntegration {
         provider, // exact match first
         `${provider}-getting-started`, // Nango template pattern
         // Google services mappings
-<<<<<<< HEAD
         provider === 'gmail' ? 'google-mail-urgd' : null,
         provider === 'gcalendar' ? 'google-calendar-getting-started' : null,
         provider === 'google-calendar' ? 'google-calendar-getting-started' : null,
         provider === 'gdrive' ? 'google-drive-xquh' : null,
         provider === 'google-drive' ? 'google-drive-xquh' : null,
-=======
-        provider === "gmail" ? "google-mail" : null,
-        provider === "gcalendar" ? "google-calendar-getting-started" : null,
-        provider === "google-calendar"
-          ? "google-calendar-getting-started"
-          : null,
-        provider === "gdrive" ? "google-drive" : null,
-        provider === "google-drive" ? "google-drive" : null,
       ].filter(Boolean);
 
       // Find the first matching key
@@ -272,19 +263,10 @@ class NangoIntegration {
         provider,
         `${provider}-getting-started`,
         `${provider}_getting_started`,
-<<<<<<< HEAD
         provider === 'gmail' ? 'google-mail-urgd' : null,
         provider === 'gmail' ? 'google' : null,
         provider === 'google-calendar' ? 'google-calendar-getting-started' : null,
         provider === 'google-calendar' ? 'google' : null,
-=======
-        provider === "gmail" ? "google-mail" : null,
-        provider === "gmail" ? "google" : null,
-        provider === "google-calendar"
-          ? "google-calendar-getting-started"
-          : null,
-        provider === "google-calendar" ? "google" : null,
->>>>>>> temp-changes
       ].filter(Boolean);
 
       const providerConfigKey = possibleKeys.find((key) =>

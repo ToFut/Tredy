@@ -141,9 +141,11 @@ class NangoIntegration {
         `${provider}-getting-started`, // Nango template pattern
         // Google services mappings
         provider === 'gmail' ? 'google-mail-urgd' : null,
+        provider === 'gmail' ? 'google-mail' : null,
         provider === 'gcalendar' ? 'google-calendar-getting-started' : null,
         provider === 'google-calendar' ? 'google-calendar-getting-started' : null,
-        provider === 'gdrive' ? 'google-drive-xquh' : null,
+        provider === 'gdrive' ? 'google-drive' : null,
+        provider === 'google-drive' ? 'google-drive' : null,
         provider === 'google-drive' ? 'google-drive-xquh' : null,
       ].filter(Boolean);
 
@@ -168,15 +170,14 @@ class NangoIntegration {
         }
 
         if (!providerConfigKey) {
-          // Return a special config that will trigger frontend to show setup instructions
-          return {
-            error: "provider_not_configured",
-            provider: provider,
-            message: `${provider} is not configured in Nango yet. Please add a provider config for ${provider} in your Nango dashboard.`,
-            setupInstructions: `To connect ${provider}, you need to:\n1. Go to your Nango dashboard\n2. Add a new integration for ${provider}\n3. Configure the OAuth settings\n4. Return here to connect`,
-            availableProviders: availableKeys,
-            nangoSetupUrl: `${isProduction ? nangoConfig?.NANGO_HOST : process.env.NANGO_HOST || "https://api.nango.dev"}/integrations`,
-          };
+          console.warn(
+            `[Nango] No matching provider config found for ${provider}. Available: ${availableKeys.join(", ")}`
+          );
+
+          // Use a fallback provider config key instead of returning error
+          providerConfigKey = provider; // Use the provider name as fallback
+
+          console.log(`[Nango] Using fallback provider config key: ${providerConfigKey}`);
         }
       }
     } catch (error) {
@@ -264,9 +265,12 @@ class NangoIntegration {
         `${provider}-getting-started`,
         `${provider}_getting_started`,
         provider === 'gmail' ? 'google-mail-urgd' : null,
+        provider === 'gmail' ? 'google-mail' : null,
         provider === 'gmail' ? 'google' : null,
         provider === 'google-calendar' ? 'google-calendar-getting-started' : null,
         provider === 'google-calendar' ? 'google' : null,
+        provider === 'gdrive' ? 'google-drive' : null,
+        provider === 'google-drive' ? 'google-drive' : null,
       ].filter(Boolean);
 
       const providerConfigKey = possibleKeys.find((key) =>

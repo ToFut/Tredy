@@ -248,7 +248,7 @@ class AIbitat {
 
     this._chats.push(chat);
     console.log(
-      `[Aibitat Core] New message registered from ${chat.from} to ${chat.to}: ${chat.content?.substring(0, 50)}...`
+      `[Aibitat Core] New message registered from ${chat.from} to ${chat.to}: ${typeof chat.content === 'string' ? chat.content.substring(0, 50) : JSON.stringify(chat.content).substring(0, 50)}...`
     );
     console.log(
       `[Aibitat Core] Total chats: ${this._chats.length}, Listeners: ${this.emitter.listenerCount("message")}`

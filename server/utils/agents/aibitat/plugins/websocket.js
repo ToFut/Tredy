@@ -140,7 +140,7 @@ const websocket = {
 
           // Debug: Log message being sent to identify duplicates
           console.log(
-            `[WebSocket Plugin] Sending message from ${message.from} to ${message.to}: ${message.content?.substring(0, 50)}...`
+            `[WebSocket Plugin] Sending message from ${message.from} to ${message.to}: ${typeof message.content === 'string' ? message.content.substring(0, 50) : JSON.stringify(message.content).substring(0, 50)}...`
           );
           socket.send(JSON.stringify(message));
         });

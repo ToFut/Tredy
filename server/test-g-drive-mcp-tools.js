@@ -377,6 +377,220 @@ class GoogleDriveMCPTester {
     }
   }
 
+  async testCreateFolder() {
+    this.log('Testing folder creation functionality...', 'info');
+
+    try {
+      const folderName = `Test-Folder-${Date.now()}`;
+      const metadata = {
+        name: folderName,
+        mimeType: 'application/vnd.google-apps.folder'
+      };
+
+      const response = await this.nango.post({
+        endpoint: '/drive/v3/files',
+        connectionId: TEST_CONFIG.nango.connectionId,
+        providerConfigKey: TEST_CONFIG.nango.providerConfigKey,
+        data: metadata,
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.data?.id) {
+        this.log(`Successfully created folder "${folderName}" with ID: ${response.data.id}`, 'success');
+        return response.data.id;
+      } else {
+        this.log('Folder creation failed - no ID returned', 'error');
+        return null;
+      }
+    } catch (error) {
+      this.log(`Folder creation failed: ${error.message}`, 'error');
+      return null;
+    }
+  }
+
+  async testCreateFile() {
+    this.log('Testing file creation functionality...', 'info');
+
+    try {
+      const fileName = `test-created-file-${Date.now()}.txt`;
+      const content = `This is a test file created directly in Google Drive
+Created at: ${new Date().toISOString()}
+Content for testing purposes.`;
+
+      const metadata = { name: fileName };
+      const boundary = '-------314159265358979323846264';
+      const delimiter = "\r\n--" + boundary + "\r\n";
+      const close_delim = "\r\n--" + boundary + "--";
+
+      const metadataPart = Buffer.from(
+        delimiter +
+        'Content-Type: application/json\r\n\r\n' +
+        JSON.stringify(metadata) +
+        delimiter +
+        'Content-Type: text/plain\r\n\r\n'
+      );
+
+      const contentPart = Buffer.from(content, 'utf8');
+      const endPart = Buffer.from(close_delim);
+      const multipartRequestBody = Buffer.concat([metadataPart, contentPart, endPart]);
+
+      const response = await this.nango.post({
+        endpoint: '/upload/drive/v3/files',
+        connectionId: TEST_CONFIG.nango.connectionId,
+        providerConfigKey: TEST_CONFIG.nango.providerConfigKey,
+        params: { uploadType: 'multipart' },
+        data: multipartRequestBody,
+        headers: { 'Content-Type': `multipart/related; boundary="${boundary}"` }
+      });
+
+      if (response.data?.id) {
+        this.log(`Successfully created file "${fileName}" with ID: ${response.data.id}`, 'success');
+        return response.data.id;
+      } else {
+        this.log('File creation failed - no ID returned', 'error');
+        return null;
+      }
+    } catch (error) {
+      this.log(`File creation failed: ${error.message}`, 'error');
+      return null;
+    }
+  }
+
+  async testVectorEmbeddings() {
+    this.log('Testing vector embeddings creation...', 'info');
+
+    try {
+      const outputPath = path.resolve(__dirname, 'test-vector-embeddings');
+
+      // Ensure output directory exists
+      if (!fs.existsSync(outputPath)) {
+        fs.mkdirSync(outputPath, { recursive: true });
+      }
+
+      let allFiles = [];
+      let nextPageToken = null;
+
+      // Get first page of files (limit to 10 for testing)
+      const params = {
+        pageSize: 10,
+        fields: 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedTime, parents, webViewLink)',
+        q: "trashed = false and mimeType != 'application/vnd.google-apps.folder'"
+      };
+
+      const response = await this.nango.get({
+        endpoint: '/drive/v3/files',
+        connectionId: TEST_CONFIG.nango.connectionId,
+        providerConfigKey: TEST_CONFIG.nango.providerConfigKey,
+        params
+      });
+
+      const files = response.data?.files || [];
+      this.log(`Found ${files.length} files for vector embedding test`, 'info');
+
+      let processedFiles = 0;
+      let skippedFiles = 0;
+
+      for (const file of files) {
+        try {
+          const fileSize = parseInt(file.size) || 0;
+
+          // Skip large files
+          if (fileSize > 5 * 1024 * 1024) {
+            this.log(`Skipping large file: ${file.name}`, 'info');
+            skippedFiles++;
+            continue;
+          }
+
+          let content = '';
+          const metadata = {
+            id: file.id,
+            name: file.name,
+            mimeType: file.mimeType,
+            size: fileSize,
+            createdTime: file.createdTime,
+            modifiedTime: file.modifiedTime,
+            webViewLink: file.webViewLink
+          };
+
+          // Extract content based on file type
+          if (file.mimeType.startsWith('application/vnd.google-apps.')) {
+            try {
+              const exportResponse = await this.nango.get({
+                endpoint: `/drive/v3/files/${file.id}/export`,
+                connectionId: TEST_CONFIG.nango.connectionId,
+                providerConfigKey: TEST_CONFIG.nango.providerConfigKey,
+                params: { mimeType: 'text/plain' }
+              });
+              content = String(exportResponse.data || '');
+            } catch (exportError) {
+              this.log(`Could not export ${file.name}: ${exportError.message}`, 'info');
+              skippedFiles++;
+              continue;
+            }
+          } else if (this.isTextMimeType(file.mimeType)) {
+            try {
+              const contentResponse = await this.nango.get({
+                endpoint: `/drive/v3/files/${file.id}`,
+                connectionId: TEST_CONFIG.nango.connectionId,
+                providerConfigKey: TEST_CONFIG.nango.providerConfigKey,
+                params: { alt: 'media' }
+              });
+              content = String(contentResponse.data || '');
+            } catch (contentError) {
+              this.log(`Could not get content for ${file.name}: ${contentError.message}`, 'info');
+              skippedFiles++;
+              continue;
+            }
+          } else {
+            this.log(`Skipping binary file: ${file.name}`, 'info');
+            skippedFiles++;
+            continue;
+          }
+
+          if (!content || content.trim().length === 0) {
+            this.log(`Skipping empty file: ${file.name}`, 'info');
+            skippedFiles++;
+            continue;
+          }
+
+          // Create vector document
+          const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+          const outputFile = path.join(outputPath, `${file.id}_${sanitizedName}.json`);
+
+          const vectorDocument = {
+            id: file.id,
+            content: content,
+            metadata: metadata,
+            source: 'google_drive',
+            timestamp: new Date().toISOString()
+          };
+
+          fs.writeFileSync(outputFile, JSON.stringify(vectorDocument, null, 2), 'utf8');
+          this.log(`Created vector document for: ${file.name}`, 'success');
+          processedFiles++;
+
+        } catch (error) {
+          this.log(`Error processing file ${file.name}: ${error.message}`, 'error');
+        }
+      }
+
+      this.log(`Vector embeddings test complete: ${processedFiles} processed, ${skippedFiles} skipped`, 'success');
+      this.log(`Vector documents saved to: ${outputPath}`, 'info');
+
+      return { processedFiles, skippedFiles, outputPath };
+    } catch (error) {
+      this.log(`Vector embeddings test failed: ${error.message}`, 'error');
+      return null;
+    }
+  }
+
+  isTextMimeType(mimeType) {
+    const textMimeTypes = [
+      'text/', 'application/json', 'application/xml', 'application/javascript', 'application/typescript'
+    ];
+    return textMimeTypes.some(textType => mimeType.startsWith(textType));
+  }
+
   formatFileSize(bytes) {
     if (!bytes) return 'Unknown size';
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -427,6 +641,9 @@ class GoogleDriveMCPTester {
     console.log('  • list_gdrive_files - List ALL files and directories');
     console.log('  • get_gdrive_file_content - Print FULL content of files');
     console.log('  • upload_local_file_to_gdrive - Upload local files to Drive');
+    console.log('  • create_gdrive_folder - Create new folders in Google Drive');
+    console.log('  • create_gdrive_file - Create new text files in Google Drive');
+    console.log('  • create_vector_embeddings_from_gdrive - Extract all file contents as vector embeddings');
 
     console.log('\n' + '='.repeat(60));
   }
@@ -465,8 +682,17 @@ class GoogleDriveMCPTester {
       }
     }
 
-    // Test 6: Upload file
+    // Test 5: Create folder
+    const folderId = await this.testCreateFolder();
+
+    // Test 6: Create file
+    const createdFileId = await this.testCreateFile();
+
+    // Test 7: Upload file
     const uploadedFileId = await this.testUploadFile();
+
+    // Test 8: Vector embeddings
+    const vectorResult = await this.testVectorEmbeddings();
 
     // Cleanup
     this.cleanup();
@@ -479,6 +705,18 @@ class GoogleDriveMCPTester {
 
     if (uploadedFileId) {
       console.log(`\n📝 Note: Uploaded test file (ID: ${uploadedFileId}) was left in Google Drive for manual verification.`);
+    }
+
+    if (folderId) {
+      console.log(`📁 Note: Created test folder (ID: ${folderId}) was left in Google Drive.`);
+    }
+
+    if (createdFileId) {
+      console.log(`📄 Note: Created test file (ID: ${createdFileId}) was left in Google Drive.`);
+    }
+
+    if (vectorResult && vectorResult.outputPath) {
+      console.log(`🔍 Note: Vector embeddings saved to: ${vectorResult.outputPath}`);
     }
 
     return success;

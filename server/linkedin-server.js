@@ -269,7 +269,6 @@ Or run: \`@agent integrate linkedin\``
       
       console.error(`[LinkedIn MCP] Using connectionId: ${connectionId}`);
       const provider = process.env.NANGO_PROVIDER || 'linkedin-getting-started';
-      }
 
       try {
         switch (name) {

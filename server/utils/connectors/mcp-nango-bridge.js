@@ -315,6 +315,7 @@ class MCPNangoBridge {
         category: "communication",
         authType: "oauth",
         logo: "/icons/gmail.svg",
+        nangoProviderConfigKey: "google-mail-urgd",
       },
       {
         id: "google-calendar",
@@ -323,6 +324,7 @@ class MCPNangoBridge {
         category: "productivity",
         authType: "oauth",
         logo: "/icons/google.svg",
+        nangoProviderConfigKey: "google-calendar-getting-started",
       },
       {
         id: "linkedin",
@@ -331,6 +333,7 @@ class MCPNangoBridge {
         category: "communication",
         authType: "oauth",
         logo: "/icons/linkedin.svg",
+        nangoProviderConfigKey: "linkedin",
       },
       {
         id: "stripe",

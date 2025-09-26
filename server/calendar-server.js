@@ -199,7 +199,7 @@ class SimpleCalendarMCP {
       const response = await nango.get({
         endpoint,
         connectionId,
-        providerConfigKey: process.env.NANGO_PROVIDER_CONFIG_KEY || 'google-calendar-getting-started'
+        providerConfigKey: process.env.NANGO_PROVIDER_CONFIG_KEY || 'google-calendar'
       });
 
     const data = response.data;
@@ -354,7 +354,7 @@ class SimpleCalendarMCP {
       const response = await nango.post({
         endpoint: '/calendar/v3/calendars/primary/events',
         connectionId: connectionId,
-        providerConfigKey: 'google-calendar-getting-started',
+        providerConfigKey: 'google-calendar',
         data: eventData
       });
 

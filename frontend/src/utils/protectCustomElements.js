@@ -22,6 +22,11 @@ if (window.customElements && originalDefine) {
     }
   });
 
+  // Also check if the element is already defined and prevent re-registration
+  if (window.customElements.get('mce-autosize-textarea')) {
+    console.warn('mce-autosize-textarea already defined, preventing duplicate registration');
+  }
+
   window.customElements.define = function(name, constructor, options) {
     try {
       // Check if element is already defined

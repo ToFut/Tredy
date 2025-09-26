@@ -114,6 +114,7 @@ class NangoIntegration {
         provider, // exact match first
         `${provider}-getting-started`, // Nango template pattern
         // Google services mappings
+        provider === 'gmail' ? 'google-mail-urgd' : null,
         provider === 'gmail' ? 'google-mail' : null,
         provider === 'gcalendar' ? 'google-calendar-getting-started' : null,
         provider === 'google-calendar' ? 'google-calendar-getting-started' : null,
@@ -142,7 +143,7 @@ class NangoIntegration {
       console.error('[Nango] Failed to list integrations:', error);
       // Fall back to simple mapping
       const providerConfigKeyMap = {
-        'gmail': isProduction ? 'google-mail-prod' : 'google-mail',
+        'gmail': isProduction ? 'google-mail-prod' : 'google-mail-urgd',
         'google-calendar': isProduction ? 'google-calendar-prod' : 'google-calendar-getting-started',  
         'linkedin': isProduction ? 'linkedin-prod' : 'linkedin',
         'shopify': isProduction ? 'shopify-prod' : 'shopify',
@@ -198,7 +199,7 @@ class NangoIntegration {
         provider,
         `${provider}-getting-started`,
         `${provider}_getting_started`,
-        provider === 'gmail' ? 'google-mail' : null,
+        provider === 'gmail' ? 'google-mail-urgd' : null,
         provider === 'gmail' ? 'google' : null,
         provider === 'google-calendar' ? 'google-calendar-getting-started' : null,
         provider === 'google-calendar' ? 'google' : null,

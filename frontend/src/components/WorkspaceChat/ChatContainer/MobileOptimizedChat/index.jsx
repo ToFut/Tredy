@@ -140,16 +140,20 @@ export default function MobileOptimizedChat({
       icon: AtSign, 
       label: 'Agent', 
       action: () => {
-        setInputText('@agent ');
-        inputRef.current?.focus();
+        // Trigger agent mode by dispatching event to prompt input
+        window.dispatchEvent(new CustomEvent(PROMPT_INPUT_EVENT, {
+          detail: { messageContent: '@agent ', writeMode: 'replace' }
+        }));
       }
     },
     { 
       icon: Hash, 
       label: 'Command', 
       action: () => {
-        setInputText('/');
-        inputRef.current?.focus();
+        // Trigger command mode by dispatching event to prompt input
+        window.dispatchEvent(new CustomEvent(PROMPT_INPUT_EVENT, {
+          detail: { messageContent: '/', writeMode: 'replace' }
+        }));
       }
     },
     { 

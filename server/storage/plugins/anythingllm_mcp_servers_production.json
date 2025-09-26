@@ -9,6 +9,7 @@
       "env": {
         "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
         "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "google-mail-urgd",
         "MCP_SERVICE_NAME": "gmail"
       },
       "anythingllm": {

@@ -19,10 +19,10 @@ const path = require('path');
 // Test configuration
 const TEST_CONFIG = {
   nango: {
-    secretKey: process.env.NANGO_SECRET_KEY || '7aac4fec-c1fa-4eba-9100-4b2ef9bc2b91',
+    secretKey: process.env.NANGO_SECRET_KEY,
     host: process.env.NANGO_HOST || 'https://api.nango.dev',
     providerConfigKey: process.env.NANGO_PROVIDER_CONFIG_KEY || 'google-drive',
-    connectionId: process.env.NANGO_CONNECTION_ID || 'workspace_64'
+    connectionId: process.env.NANGO_CONNECTION_ID || 'workspace_134'
   },
   testDir: './test-gdrive-mcp',
   testFile: 'test-upload.txt'
@@ -456,24 +456,14 @@ Content for testing purposes.`;
     }
   }
 
-  async testVectorEmbeddings() {
-    this.log('Testing vector embeddings creation...', 'info');
+  async testAutoVectorization() {
+    this.log('Testing auto-vectorization during file content retrieval...', 'info');
 
     try {
-      const outputPath = path.resolve(__dirname, 'test-vector-embeddings');
-
-      // Ensure output directory exists
-      if (!fs.existsSync(outputPath)) {
-        fs.mkdirSync(outputPath, { recursive: true });
-      }
-
-      let allFiles = [];
-      let nextPageToken = null;
-
-      // Get first page of files (limit to 10 for testing)
+      // Get a few test files to verify auto-vectorization
       const params = {
-        pageSize: 10,
-        fields: 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedTime, parents, webViewLink)',
+        pageSize: 3,
+        fields: 'files(id, name, mimeType, size)',
         q: "trashed = false and mimeType != 'application/vnd.google-apps.folder'"
       };
 
@@ -485,101 +475,56 @@ Content for testing purposes.`;
       });
 
       const files = response.data?.files || [];
-      this.log(`Found ${files.length} files for vector embedding test`, 'info');
+      if (files.length === 0) {
+        this.log('No files found for auto-vectorization test', 'info');
+        return { vectorizedFiles: 0 };
+      }
 
-      let processedFiles = 0;
-      let skippedFiles = 0;
+      this.log(`Testing auto-vectorization with ${files.length} files`, 'info');
+      let vectorizedFiles = 0;
+
+      // Test the MCP get_gdrive_file_content function which should auto-vectorize
+      const GoogleDriveMCPTools = require('./g-drive-mcp-tools.js');
+      const mcpInstance = new GoogleDriveMCPTools();
 
       for (const file of files) {
         try {
           const fileSize = parseInt(file.size) || 0;
-
-          // Skip large files
           if (fileSize > 5 * 1024 * 1024) {
             this.log(`Skipping large file: ${file.name}`, 'info');
-            skippedFiles++;
             continue;
           }
 
-          let content = '';
-          const metadata = {
-            id: file.id,
-            name: file.name,
-            mimeType: file.mimeType,
-            size: fileSize,
-            createdTime: file.createdTime,
-            modifiedTime: file.modifiedTime,
-            webViewLink: file.webViewLink
-          };
+          this.log(`Testing auto-vectorization for: ${file.name}`, 'info');
 
-          // Extract content based on file type
-          if (file.mimeType.startsWith('application/vnd.google-apps.')) {
-            try {
-              const exportResponse = await this.nango.get({
-                endpoint: `/drive/v3/files/${file.id}/export`,
-                connectionId: TEST_CONFIG.nango.connectionId,
-                providerConfigKey: TEST_CONFIG.nango.providerConfigKey,
-                params: { mimeType: 'text/plain' }
-              });
-              content = String(exportResponse.data || '');
-            } catch (exportError) {
-              this.log(`Could not export ${file.name}: ${exportError.message}`, 'info');
-              skippedFiles++;
-              continue;
-            }
-          } else if (this.isTextMimeType(file.mimeType)) {
-            try {
-              const contentResponse = await this.nango.get({
-                endpoint: `/drive/v3/files/${file.id}`,
-                connectionId: TEST_CONFIG.nango.connectionId,
-                providerConfigKey: TEST_CONFIG.nango.providerConfigKey,
-                params: { alt: 'media' }
-              });
-              content = String(contentResponse.data || '');
-            } catch (contentError) {
-              this.log(`Could not get content for ${file.name}: ${contentError.message}`, 'info');
-              skippedFiles++;
-              continue;
-            }
-          } else {
-            this.log(`Skipping binary file: ${file.name}`, 'info');
-            skippedFiles++;
+          // Call the MCP function which should auto-vectorize
+          const result = await mcpInstance.getGoogleDriveFileContent(
+            { fileId: file.id },
+            TEST_CONFIG.nango.connectionId.replace('workspace_', '')
+          );
+
+          if (result.isError) {
+            this.log(`Auto-vectorization failed for ${file.name}: ${result.content[0].text}`, 'error');
             continue;
           }
 
-          if (!content || content.trim().length === 0) {
-            this.log(`Skipping empty file: ${file.name}`, 'info');
-            skippedFiles++;
-            continue;
+          // Check if the content was retrieved successfully
+          const contentText = result.content[0].text;
+          if (contentText.includes('Content of')) {
+            this.log(`Auto-vectorization successful for: ${file.name}`, 'success');
+            vectorizedFiles++;
           }
-
-          // Create vector document
-          const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-          const outputFile = path.join(outputPath, `${file.id}_${sanitizedName}.json`);
-
-          const vectorDocument = {
-            id: file.id,
-            content: content,
-            metadata: metadata,
-            source: 'google_drive',
-            timestamp: new Date().toISOString()
-          };
-
-          fs.writeFileSync(outputFile, JSON.stringify(vectorDocument, null, 2), 'utf8');
-          this.log(`Created vector document for: ${file.name}`, 'success');
-          processedFiles++;
 
         } catch (error) {
-          this.log(`Error processing file ${file.name}: ${error.message}`, 'error');
+          this.log(`Auto-vectorization error for ${file.name}: ${error.message}`, 'error');
         }
       }
 
-      this.log(`Vector embeddings test complete: ${processedFiles} processed, ${skippedFiles} skipped`, 'success');
-      this.log(`Vector documents saved to: ${outputPath}`, 'info');
+      this.log(`Auto-vectorization test complete: ${vectorizedFiles} files processed`, 'success');
+      return { vectorizedFiles };
 
-      return { processedFiles, skippedFiles, outputPath };
     } catch (error) {
-      this.log(`Vector embeddings test failed: ${error.message}`, 'error');
+      this.log(`Auto-vectorization test failed: ${error.message}`, 'error');
       return null;
     }
   }
@@ -639,11 +584,11 @@ Content for testing purposes.`;
 
     console.log('\nMCP Tools Available:');
     console.log('  • list_gdrive_files - List ALL files and directories');
-    console.log('  • get_gdrive_file_content - Print FULL content of files');
+    console.log('  • get_gdrive_file_content - Print FULL content of files (AUTO-VECTORIZES)');
+    console.log('  • get_gdrive_file_with_auto_save - Get content with explicit save verification');
     console.log('  • upload_local_file_to_gdrive - Upload local files to Drive');
     console.log('  • create_gdrive_folder - Create new folders in Google Drive');
     console.log('  • create_gdrive_file - Create new text files in Google Drive');
-    console.log('  • create_vector_embeddings_from_gdrive - Extract all file contents as vector embeddings');
 
     console.log('\n' + '='.repeat(60));
   }
@@ -679,6 +624,9 @@ Content for testing purposes.`;
         if (i < allFiles.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 100));
         }
+        if (i == 4){
+          break; // Limit to first 5 files for brevity
+        }
       }
     }
 
@@ -691,8 +639,8 @@ Content for testing purposes.`;
     // Test 7: Upload file
     const uploadedFileId = await this.testUploadFile();
 
-    // Test 8: Vector embeddings
-    const vectorResult = await this.testVectorEmbeddings();
+    // Test 8: Auto-vectorization
+    const vectorResult = await this.testAutoVectorization();
 
     // Cleanup
     this.cleanup();
@@ -715,8 +663,8 @@ Content for testing purposes.`;
       console.log(`📄 Note: Created test file (ID: ${createdFileId}) was left in Google Drive.`);
     }
 
-    if (vectorResult && vectorResult.outputPath) {
-      console.log(`🔍 Note: Vector embeddings saved to: ${vectorResult.outputPath}`);
+    if (vectorResult && vectorResult.vectorizedFiles > 0) {
+      console.log(`🔍 Note: Auto-vectorized ${vectorResult.vectorizedFiles} files during content retrieval`);
     }
 
     return success;

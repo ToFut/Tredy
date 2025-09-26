@@ -147,6 +147,7 @@ class NangoIntegration {
         provider === 'gdrive' ? 'google-drive' : null,
         provider === 'google-drive' ? 'google-drive' : null,
         provider === 'google-drive' ? 'google-drive-xquh' : null,
+        provider === 'twilio' ? 'twilio' : null
       ].filter(Boolean);
 
       // Find the first matching key
@@ -193,6 +194,7 @@ class NangoIntegration {
         github: isProduction ? "github-prod" : "github",
         stripe: isProduction ? "stripe-prod" : "stripe",
         slack: isProduction ? "slack-prod" : "slack",
+        twilio: isProduction ? "twilio-prod" : "twilio",
       };
       providerConfigKey =
         providerConfigKeyMap[provider] ||
@@ -271,6 +273,7 @@ class NangoIntegration {
         provider === 'google-calendar' ? 'google' : null,
         provider === 'gdrive' ? 'google-drive' : null,
         provider === 'google-drive' ? 'google-drive' : null,
+        provider === 'twilio' ? 'twilio' : null,
       ].filter(Boolean);
 
       const providerConfigKey = possibleKeys.find((key) =>

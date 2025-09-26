@@ -1,0 +1,34 @@
+integrations:
+  twilio:
+    provider: twilio
+    auth_mode: BASIC
+    credentials:
+      account_sid:
+        type: input
+        label: Account SID
+        description: Your Twilio Account SID
+      auth_token:
+        type: input
+        label: Auth Token
+        description: Your Twilio Auth Token
+
+    syncs:
+      twilio-messages:
+        runs: every 30 minutes
+        auto_start: true
+
+    actions:
+      send-message:
+        description: Send SMS message via Twilio
+      get-messages:
+        description: Retrieve SMS messages
+      get-message-details:
+        description: Get specific message details
+      update-message:
+        description: Update message properties
+      delete-message:
+        description: Delete a message
+      get-calls:
+        description: Retrieve call logs
+      make-call:
+        description: Initiate phone call

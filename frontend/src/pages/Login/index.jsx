@@ -35,11 +35,16 @@ export default function Login() {
   // Removed auto-redirect to prevent loops
 
   if (loading || ssoLoading) return <FullScreenLoader />;
-  if (ssoConfig.enabled && ssoConfig.noLogin)
-    return <Navigate to={paths.sso.login()} />;
-  
-  // Don't redirect if we're already authenticated AND not in OAuth callback
-  if (requiresAuth === false && !isOAuthCallback) return <Navigate to={paths.home()} />;
+  // If simple SSO is enabled and no login is allowed, redirect to the SSO login page.
+  if (ssoConfig.enabled && ssoConfig.noLogin) {
+    // If a noLoginRedirect is provided and no token is provided, redirect to that webpage.
+    if (!!ssoConfig.noLoginRedirect && !query.has("token"))
+      return window.location.replace(ssoConfig.noLoginRedirect);
+    // Otherwise, redirect to the SSO login page.
+    else return <Navigate to={paths.sso.login()} />;
+  }
+
+  if (requiresAuth === false) return <Navigate to={paths.home()} />;
 
   // Determine which login method to use based on the URL path
   // Always default to Supabase login unless explicitly requesting password login

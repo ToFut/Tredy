@@ -196,14 +196,6 @@ class GoogleDriveMCPTools {
           }
         },
         {
-          name: 'sync_all_drive_files_to_local_vectors',
-          description: 'Fetches all files from Google Drive and saves them to a local directory for vector processing.',
-          inputSchema: {
-            type: 'object',
-            properties: {}
-          }
-        },
-        {
           name: 'create_gdrive_folder',
           description: 'Create a new folder in Google Drive. Use when user wants to organize files or create directory structure.',
           inputSchema: {
@@ -227,19 +219,6 @@ class GoogleDriveMCPTools {
               mimeType: { type: 'string', description: 'Optional: MIME type of the file (default: text/plain)', default: 'text/plain' }
             },
             required: ['fileName', 'content']
-          }
-        },
-        {
-          name: 'create_vector_embeddings_from_gdrive',
-          description: 'Extract content from all Google Drive files and save as vector embeddings in local storage for semantic search. Processes text files, documents, PDFs, and Google Workspace files.',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              outputPath: { type: 'string', description: 'Optional: Custom output directory path (default: server/storage/documents)', default: 'server/storage/documents' },
-              includeMetadata: { type: 'boolean', description: 'Optional: Include file metadata in embeddings (default: true)', default: true },
-              chunkSize: { type: 'number', description: 'Optional: Text chunk size for embeddings (default: 1000)', default: 1000 },
-              skipLargeFiles: { type: 'boolean', description: 'Optional: Skip files larger than 50MB (default: true)', default: true }
-            }
           }
         },
         {
@@ -273,10 +252,8 @@ class GoogleDriveMCPTools {
           case 'search_gdrive_files': return await this.searchGoogleDriveFiles(args, workspaceId);
           case 'convert_document_to_text': return await this.convertDocumentToText(args, workspaceId);
           case 'get_gdrive_file_content_by_name': return await this.getGoogleDriveFileContentByName(args, workspaceId);
-          case 'sync_all_drive_files_to_local_vectors': return await this.syncAllDriveFilesToLocalVectors(args, workspaceId);
           case 'create_gdrive_folder': return await this.createGoogleDriveFolder(args, workspaceId);
           case 'create_gdrive_file': return await this.createGoogleDriveFile(args, workspaceId);
-          case 'create_vector_embeddings_from_gdrive': return await this.createVectorEmbeddingsFromGoogleDrive(args, workspaceId);
           case 'get_gdrive_file_with_auto_save': return await this.getGoogleDriveFileWithAutoSave(args, workspaceId);
           default: throw new Error(`Unknown tool: ${name}`);
         }
@@ -473,8 +450,16 @@ class GoogleDriveMCPTools {
       const metaResponse = await this._getFileMetadata(fileId, connectionId, 'id,name,mimeType,size');
       const file = metaResponse.data;
 
-      if (file.size && file.size > 50 * 1024 * 1024) { 
-        throw new Error(`File size (${this.formatFileSize(file.size)}) exceeds 300mb limit`);
+      // Check if it's a folder
+      if (file.mimeType === 'application/vnd.google-apps.folder') {
+        return {
+          content: [{ type: 'text', text: `❌ Cannot download "${file.name}" - it is a folder, not a file. Use list_gdrive_files to see folder contents.` }],
+          isError: true
+        };
+      }
+
+      if (file.size && file.size > 50 * 1024 * 1024) {
+        throw new Error(`File size (${this.formatFileSize(file.size)}) exceeds 50MB limit`);
       }
 
       const dir = path.dirname(localPath);
@@ -505,26 +490,32 @@ class GoogleDriveMCPTools {
 
     try {
       if (!fs.existsSync(localPath)) throw new Error(`Local file does not exist: ${localPath}`);
-      
+
       const stats = fs.statSync(localPath);
       if (stats.size > 5 * 1024 * 1024 * 1024) throw new Error(`File size exceeds 5GB limit`);
       if (stats.size === 0) throw new Error('Cannot upload empty files');
-      
+
       const fileContent = fs.readFileSync(localPath);
       const actualFileName = fileName || path.basename(localPath);
       if (!actualFileName || actualFileName.trim() === '') throw new Error('File name cannot be empty');
 
       const metadata = { name: actualFileName };
       if (folderId) metadata.parents = [folderId];
+      const mimeType = this.getMimeType(localPath);
 
+      // Use exact working string format from test file
       const boundary = '-------314159265358979323846';
       const delimiter = "\r\n--" + boundary + "\r\n";
       const close_delim = "\r\n--" + boundary + "--";
-      const mimeType = this.getMimeType(localPath);
 
-      const metadataPart = Buffer.from(delimiter + 'Content-Type: application/json\r\n\r\n' + JSON.stringify(metadata) + delimiter + `Content-Type: ${mimeType}\r\n\r\n`);
-      const endPart = Buffer.from(close_delim);
-      const multipartRequestBody = Buffer.concat([metadataPart, fileContent, endPart]);
+      const multipartRequestBody =
+        delimiter +
+        'Content-Type: application/json\r\n\r\n' +
+        JSON.stringify(metadata) +
+        delimiter +
+        `Content-Type: ${mimeType}\r\n\r\n` +
+        fileContent.toString() +
+        close_delim;
 
       const uploadResponse = await this.nango.post({
         endpoint: '/upload/drive/v3/files',
@@ -630,142 +621,6 @@ class GoogleDriveMCPTools {
     return await this.getGoogleDriveFileContent({ fileId }, workspaceId);
   }
 
-  async syncAllDriveFilesToLocalVectors(args, workspaceId) {
-    const connectionId = this.getConnectionId(workspaceId);
-    const googleDriveFolderPath = this._getWorkspaceStoragePath(workspaceId);
-
-    if (!fs.existsSync(googleDriveFolderPath)) {
-      fs.mkdirSync(googleDriveFolderPath, { recursive: true });
-    }
-
-    let allFiles = [];
-    let nextPageToken = null;
-    let filesProcessed = 0;
-    let skippedFiles = 0;
-    let errorFiles = 0;
-    let totalSize = 0;
-
-    try {
-      console.log(`[GoogleDrive] Starting sync for workspace ${workspaceId}...`);
-
-      // Get all files from Google Drive
-      do {
-        const params = {
-          pageSize: 100,
-          fields: 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink)',
-          q: "trashed = false and mimeType != 'application/vnd.google-apps.folder'"
-        };
-        if (nextPageToken) params.pageToken = nextPageToken;
-
-        const response = await this.nango.get({
-          endpoint: '/drive/v3/files',
-          connectionId,
-          providerConfigKey: this.nangoConfig.providerConfigKey,
-          params
-        });
-
-        const files = response.data?.files || [];
-        allFiles = allFiles.concat(files);
-        nextPageToken = response.data.nextPageToken;
-      } while (nextPageToken);
-
-      console.log(`[GoogleDrive] Found ${allFiles.length} files to process`);
-
-      // Process each file
-      for (const file of allFiles) {
-        try {
-          const fileSize = parseInt(file.size) || 0;
-
-          // Skip very large files (over 50MB)
-          if (fileSize > 50 * 1024 * 1024) {
-            console.log(`[GoogleDrive] Skipping large file: ${file.name} (${this.formatFileSize(fileSize)})`);
-            skippedFiles++;
-            continue;
-          }
-
-          let content = '';
-
-          // Extract content based on file type
-          if (file.mimeType.startsWith('application/vnd.google-apps.')) {
-            try {
-              const exportResponse = await this._exportGoogleWorkspaceFile(file.id, 'txt', connectionId);
-              content = this.cleanTextContent(String(exportResponse.data));
-            } catch (exportError) {
-              console.log(`[GoogleDrive] Could not export ${file.name}: ${exportError.message}`);
-              errorFiles++;
-              continue;
-            }
-          } else if (this.isTextMimeType(file.mimeType)) {
-            try {
-              const contentResponse = await this.nango.get({
-                endpoint: `/drive/v3/files/${file.id}`,
-                connectionId,
-                providerConfigKey: this.nangoConfig.providerConfigKey,
-                params: { alt: 'media' }
-              });
-              content = this.cleanTextContent(String(contentResponse.data));
-            } catch (contentError) {
-              console.log(`[GoogleDrive] Could not get content for ${file.name}: ${contentError.message}`);
-              errorFiles++;
-              continue;
-            }
-          } else if (file.mimeType === 'application/pdf') {
-            try {
-              const exportResponse = await this._exportGoogleWorkspaceFile(file.id, 'txt', connectionId);
-              content = this.cleanTextContent(String(exportResponse.data));
-            } catch (extractError) {
-              console.log(`[GoogleDrive] Could not extract text from PDF ${file.name}: ${extractError.message}`);
-              errorFiles++;
-              continue;
-            }
-          } else {
-            console.log(`[GoogleDrive] Skipping binary file: ${file.name} (${file.mimeType})`);
-            skippedFiles++;
-            continue;
-          }
-
-          if (!content || content.trim().length === 0) {
-            console.log(`[GoogleDrive] Skipping empty file: ${file.name}`);
-            skippedFiles++;
-            continue;
-          }
-
-          // Save as AnythingLLM document
-          await this._saveFileAsVectorDocument(file, content, workspaceId, this._getFileTypeFromMime(file.mimeType));
-
-          filesProcessed++;
-          totalSize += fileSize;
-          console.log(`[GoogleDrive] ✅ Processed: ${file.name}`);
-
-        } catch (error) {
-          console.error(`[GoogleDrive] ❌ Error processing file ${file.name}:`, error.message);
-          errorFiles++;
-        }
-      }
-
-      const summary = `🎯 SYNC COMPLETE FOR WORKSPACE ${workspaceId}
-
-📊 PROCESSING SUMMARY:
-✅ Successfully processed: ${filesProcessed} files
-⏭️  Skipped files: ${skippedFiles} files
-❌ Error files: ${errorFiles} files
-📁 Total files found: ${allFiles.length} files
-📏 Total content size: ${this.formatFileSize(totalSize)}
-
-📂 STORAGE LOCATION:
-${googleDriveFolderPath}
-
-💡 FILES SAVED IN ANYTHINGLLM FORMAT:
-• Each file saved as JSON with 'pageContent' field in put_here directory
-• Files are now available for vector embedding
-• Documents can be added to workspaces for chat
-• All files from all workspaces are saved in the same put_here folder`;
-
-      return { content: [{ type: 'text', text: summary }] };
-    } catch (error) {
-      return buildNangoError(error, 'sync all files from Google Drive');
-    }
-  }
 
   async createGoogleDriveFolder(args, workspaceId) {
     const connectionId = this.getConnectionId(workspaceId);
@@ -773,7 +628,10 @@ ${googleDriveFolderPath}
 
     try {
       if (!folderName || folderName.trim() === '') {
-        throw new Error('Folder name cannot be empty');
+        return {
+          content: [{ type: 'text', text: '❌ Folder name cannot be empty' }],
+          isError: true
+        };
       }
 
       const metadata = {
@@ -827,7 +685,7 @@ ${googleDriveFolderPath}
         metadata.parents = [folderId];
       }
 
-      // Create multipart upload
+      // Use exact working format from test file
       const boundary = '-------314159265358979323846264';
       const delimiter = "\r\n--" + boundary + "\r\n";
       const close_delim = "\r\n--" + boundary + "--";
@@ -868,210 +726,6 @@ ${googleDriveFolderPath}
     }
   }
 
-  async createVectorEmbeddingsFromGoogleDrive(args, workspaceId) {
-    const connectionId = this.getConnectionId(workspaceId);
-    const {
-      outputPath = null, // Will use workspace-specific path if not provided
-      includeMetadata = true,
-      chunkSize = 1000,
-      skipLargeFiles = true
-    } = args;
-
-    try {
-      // Use workspace-specific storage path
-      const googleDriveFolderPath = outputPath || this._getWorkspaceStoragePath(workspaceId);
-
-      // Ensure output directory exists
-      if (!fs.existsSync(googleDriveFolderPath)) {
-        fs.mkdirSync(googleDriveFolderPath, { recursive: true });
-      }
-
-      let allFiles = [];
-      let nextPageToken = null;
-      let processedFiles = 0;
-      let skippedFiles = 0;
-      let errorFiles = 0;
-      let totalSize = 0;
-
-      // Get all files from Google Drive
-      console.log(`[GoogleDrive] 📁 Fetching all files from Google Drive for workspace ${workspaceId}...`);
-      do {
-        const params = {
-          pageSize: 100,
-          fields: 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedTime, parents, webViewLink)',
-          q: "trashed = false and mimeType != 'application/vnd.google-apps.folder'"
-        };
-        if (nextPageToken) params.pageToken = nextPageToken;
-
-        const response = await this.nango.get({
-          endpoint: '/drive/v3/files',
-          connectionId,
-          providerConfigKey: this.nangoConfig.providerConfigKey,
-          params
-        });
-
-        const files = response.data?.files || [];
-        allFiles = allFiles.concat(files);
-        nextPageToken = response.data.nextPageToken;
-      } while (nextPageToken);
-
-      console.log(`[GoogleDrive] 📊 Found ${allFiles.length} files to process`);
-
-      // Process each file
-      for (const file of allFiles) {
-        try {
-          const fileSize = parseInt(file.size) || 0;
-
-          // Skip large files if requested
-          if (skipLargeFiles && fileSize > 50 * 1024 * 1024) {
-            console.log(`[GoogleDrive] ⏭️  Skipping large file: ${file.name} (${this.formatFileSize(fileSize)})`);
-            skippedFiles++;
-            continue;
-          }
-
-          // Get file content
-          let content = '';
-
-          // Extract content based on file type
-          if (file.mimeType.startsWith('application/vnd.google-apps.')) {
-            // Google Workspace files
-            try {
-              const exportResponse = await this._exportGoogleWorkspaceFile(file.id, 'txt', connectionId);
-              content = this.cleanTextContent(String(exportResponse.data));
-            } catch (exportError) {
-              console.log(`[GoogleDrive] ⚠️  Could not export ${file.name}: ${exportError.message}`);
-              errorFiles++;
-              continue;
-            }
-          } else if (this.isTextMimeType(file.mimeType)) {
-            // Regular text files
-            try {
-              const contentResponse = await this.nango.get({
-                endpoint: `/drive/v3/files/${file.id}`,
-                connectionId,
-                providerConfigKey: this.nangoConfig.providerConfigKey,
-                params: { alt: 'media' }
-              });
-              content = this.cleanTextContent(String(contentResponse.data));
-            } catch (contentError) {
-              console.log(`[GoogleDrive] ⚠️  Could not get content for ${file.name}: ${contentError.message}`);
-              errorFiles++;
-              continue;
-            }
-          } else if (file.mimeType === 'application/pdf' ||
-                     file.mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-            // PDF and DOCX files - try to extract text
-            try {
-              const exportResponse = await this._exportGoogleWorkspaceFile(file.id, 'txt', connectionId);
-              content = this.cleanTextContent(String(exportResponse.data));
-            } catch (extractError) {
-              console.log(`[GoogleDrive] ⚠️  Could not extract text from ${file.name}: ${extractError.message}`);
-              errorFiles++;
-              continue;
-            }
-          } else {
-            console.log(`[GoogleDrive] ⏭️  Skipping binary file: ${file.name} (${file.mimeType})`);
-            skippedFiles++;
-            continue;
-          }
-
-          if (!content || content.trim().length === 0) {
-            console.log(`[GoogleDrive] ⏭️  Skipping empty file: ${file.name}`);
-            skippedFiles++;
-            continue;
-          }
-
-          // Create chunks for embedding if content is large
-          const chunks = chunkSize > 0 ? this._createTextChunks(content, chunkSize) : [content];
-
-          // Save each chunk as a separate AnythingLLM document
-          for (let i = 0; i < chunks.length; i++) {
-            const chunk = chunks[i];
-            const tokenCount = Math.ceil(chunk.length / 4);
-
-            // Create AnythingLLM-compatible document
-            const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-            const chunkFileName = chunks.length > 1
-              ? `${file.id}_${sanitizedName}_chunk_${i + 1}_of_${chunks.length}.json`
-              : `${file.id}_${sanitizedName}.json`;
-
-            const outputFile = path.join(googleDriveFolderPath, chunkFileName);
-
-            const anythingLLMDocument = {
-              id: chunks.length > 1 ? `${file.id}_chunk_${i}` : file.id,
-              url: file.webViewLink || `https://drive.google.com/file/d/${file.id}/view`,
-              title: chunks.length > 1 ? `${file.name} (chunk ${i + 1}/${chunks.length})` : file.name,
-              docAuthor: 'Google Drive',
-              description: `Google Drive ${this._getFileTypeFromMime(file.mimeType)} file: ${file.name}${chunks.length > 1 ? ` (chunk ${i + 1}/${chunks.length})` : ''}`,
-              docSource: `Google Drive file imported via MCP tools for workspace ${workspaceId}`,
-              chunkSource: `google-drive-workspace-${workspaceId}`,
-              published: file.modifiedTime || file.createdTime || new Date().toISOString(),
-              wordCount: chunk.split(/\s+/).length,
-              pageContent: chunk,
-              token_count_estimate: tokenCount,
-              // Additional metadata
-              mimeType: file.mimeType,
-              fileSize: file.size ? parseInt(file.size) : 0,
-              fileType: this._getFileTypeFromMime(file.mimeType),
-              googleDriveId: file.id,
-              createdTime: file.createdTime,
-              modifiedTime: file.modifiedTime,
-              importedAt: new Date().toISOString(),
-              workspaceId: workspaceId,
-              chunkIndex: chunks.length > 1 ? i : null,
-              totalChunks: chunks.length > 1 ? chunks.length : null
-            };
-
-            fs.writeFileSync(outputFile, JSON.stringify(anythingLLMDocument, null, 2), 'utf8');
-          }
-
-          processedFiles++;
-          totalSize += fileSize;
-          console.log(`[GoogleDrive] ✅ Processed: ${file.name} (${chunks.length} ${chunks.length > 1 ? 'chunks' : 'document'})`);
-
-        } catch (error) {
-          console.error(`[GoogleDrive] ❌ Error processing file ${file.name}:`, error.message);
-          errorFiles++;
-        }
-      }
-
-      const summary = `🎯 VECTOR EMBEDDINGS CREATION COMPLETE FOR WORKSPACE ${workspaceId}
-
-📊 PROCESSING SUMMARY:
-✅ Successfully processed: ${processedFiles} files
-⏭️  Skipped files: ${skippedFiles} files
-❌ Error files: ${errorFiles} files
-📁 Total files found: ${allFiles.length} files
-📏 Total content size: ${this.formatFileSize(totalSize)}
-
-📂 STORAGE LOCATION:
-${googleDriveFolderPath}
-
-💡 ANYTHINGLLM INTEGRATION:
-• Documents saved in AnythingLLM-compatible format in put_here directory
-• Each file has required 'pageContent' field
-• Files are ready for vector database indexing
-• Documents can be added to workspaces for chat
-• Large files were chunked into ${chunkSize}-character segments
-• All workspace files are saved in the same put_here folder
-
-🔧 CONFIGURATION:
-• Chunk size: ${chunkSize} characters
-• Include metadata: ${includeMetadata}
-• Skip large files: ${skipLargeFiles}
-• Workspace ID: ${workspaceId}`;
-
-      return {
-        content: [{
-          type: 'text',
-          text: summary
-        }]
-      };
-
-    } catch (error) {
-      return buildNangoError(error, 'create vector embeddings from Google Drive');
-    }
-  }
 
   async getGoogleDriveFileWithAutoSave(args, workspaceId) {
     const { fileId, format = 'txt', saveToVectors = true, workspaceId: customWorkspaceId } = args;
@@ -1189,7 +843,7 @@ ${saveToVectors ? 'Attempting manual save...' : 'Auto-save was disabled'}`;
     // Use the correct server storage path
     const baseStoragePath = process.env.STORAGE_DIR
       ? path.resolve(process.env.STORAGE_DIR, 'documents')
-      : path.resolve('/mnt/c/MyProjects/Tredy/server/storage', 'documents');
+      : path.resolve('/mnt/c/Myprojects/Tredy/server/storage', 'documents');
 
     // Save all files in the put_here directory as requested
     const googleDriveFolderPath = path.join(baseStoragePath, 'put_here');
@@ -1300,14 +954,69 @@ ${saveToVectors ? 'Attempting manual save...' : 'Auto-save was disabled'}`;
       'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'odp': 'application/vnd.oasis.opendocument.presentation',
       'svg': 'image/svg+xml', 'png': 'image/png', 'jpg': 'image/jpeg'
     };
-    const mimeType = exportMimeTypes[format] || exportMimeTypes['txt'];
 
-    return this.nango.get({
-      endpoint: `/drive/v3/files/${fileId}/export`,
-      connectionId,
-      providerConfigKey: this.nangoConfig.providerConfigKey,
-      params: { mimeType }
-    });
+    // Get file metadata to determine supported export formats
+    let fileMetadata;
+    try {
+      const metaResponse = await this._getFileMetadata(fileId, connectionId);
+      fileMetadata = metaResponse.data;
+    } catch (metaError) {
+      console.error(`Failed to get metadata for export: ${metaError.message}`);
+      // Fallback - try with requested format
+    }
+
+    // Define fallback formats for each Google Workspace file type
+    const fallbackFormats = {
+      'application/vnd.google-apps.document': ['txt', 'html', 'pdf'],
+      'application/vnd.google-apps.spreadsheet': ['csv', 'xlsx', 'txt'],
+      'application/vnd.google-apps.presentation': ['txt', 'pdf', 'pptx'],
+      'application/vnd.google-apps.drawing': ['png', 'svg', 'pdf'],
+      'application/vnd.google-apps.form': ['txt', 'html']
+    };
+
+    const targetMimeType = exportMimeTypes[format] || exportMimeTypes['txt'];
+
+    // First try with the requested format
+    try {
+      return await this.nango.get({
+        endpoint: `/drive/v3/files/${fileId}/export`,
+        connectionId,
+        providerConfigKey: this.nangoConfig.providerConfigKey,
+        params: { mimeType: targetMimeType }
+      });
+    } catch (exportError) {
+      console.error(`Export failed for format ${format}: ${exportError.message}`);
+
+      // If the original format failed, try fallback formats
+      if (fileMetadata && fallbackFormats[fileMetadata.mimeType]) {
+        const fallbacks = fallbackFormats[fileMetadata.mimeType];
+
+        for (const fallbackFormat of fallbacks) {
+          if (fallbackFormat !== format) { // Don't retry the same format
+            try {
+              console.log(`Trying fallback export format: ${fallbackFormat}`);
+              const fallbackMimeType = exportMimeTypes[fallbackFormat];
+
+              const result = await this.nango.get({
+                endpoint: `/drive/v3/files/${fileId}/export`,
+                connectionId,
+                providerConfigKey: this.nangoConfig.providerConfigKey,
+                params: { mimeType: fallbackMimeType }
+              });
+
+              console.log(`Successfully exported using fallback format: ${fallbackFormat}`);
+              return result;
+            } catch (fallbackError) {
+              console.error(`Fallback format ${fallbackFormat} also failed: ${fallbackError.message}`);
+              continue;
+            }
+          }
+        }
+      }
+
+      // If all fallback formats failed, throw the original error with more context
+      throw new Error(`Export failed for all supported formats. Original error: ${exportError.message}. File type: ${fileMetadata?.mimeType || 'unknown'}`);
+    }
   }
 
   _handleLargeContent(content, fileName, maxSize, chunked, format = 'raw') {

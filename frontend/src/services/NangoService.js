@@ -1,5 +1,6 @@
 import Nango from "@nangohq/frontend";
-
+import { showCredentialsPopup } from "./popups/CredentialsPopup.js";
+import { showWhatsAppPopup } from "./popups/WhatsAppPopup.js";
 /**
  * Modular Nango service for handling OAuth connections
  */
@@ -50,7 +51,8 @@ class NangoService {
   }
 
   /**
-   * Start OAuth flow for a provider
+   * Start OAuth flow or BASIC auth for a provider
+   * Automatically prompts for credentials when needed
    */
   async connect(providerConfigKey, connectionId, options = {}) {
     await this.initialize();
@@ -61,21 +63,63 @@ class NangoService {
 
     try {
       console.log(
-        `[NangoService] Starting OAuth for ${providerConfigKey} with connection ${connectionId}`
+        `[NangoService] Starting connection for ${providerConfigKey} with connection ${connectionId}`
       );
 
-      const result = await this.nango.auth(providerConfigKey, connectionId, {
-        detectClosedAuthWindow: true,
-        ...options,
-      });
+      let result;
 
-      console.log("[NangoService] OAuth completed:", result);
+      if (providerConfigKey === "twilio" ) {
+        // Show popup for credentials if not provided
+        let credentials = options.credentials;
+        if (!credentials) {
+          credentials = await showCredentialsPopup(providerConfigKey);
+          if (!credentials) {
+            throw new Error("Credentials are required for this provider");
+          }
+        }
+
+        console.log(`[NangoService] Starting BASIC auth for ${providerConfigKey}`);
+        result = await this.nango.auth(providerConfigKey, connectionId, {
+          credentials: {
+            username: credentials.username,
+            password: credentials.password 
+          }
+        });
+      } 
+      else if (providerConfigKey === "whatsapp") {
+        // Show popup for credentials if not provided
+        let credentials = options.credentials;
+        if (!credentials) {
+          credentials = await showWhatsAppPopup(providerConfigKey);
+          if (!credentials) {
+            throw new Error("Credentials are required for this provider");
+          }
+        }
+
+        console.log(`[NangoService] Starting BASIC auth for ${providerConfigKey}`);
+        result = await this.nango.auth(providerConfigKey, connectionId, { 
+          credentials: {
+            apiKey: ''
+          }
+        });
+      } 
+      else {
+        // OAuth flow for other providers
+        console.log(`[NangoService] Starting OAuth for ${providerConfigKey}`);
+        result = await this.nango.auth(providerConfigKey, connectionId, {
+          detectClosedAuthWindow: true,
+          ...options,
+        });
+      }
+
+      console.log("[NangoService] Connection completed:", result);
       return result;
     } catch (error) {
-      console.error("[NangoService] OAuth failed:", error);
+      console.error("[NangoService] Connection failed:", error);
       throw error;
     }
   }
+
 
   /**
    * Get connection status

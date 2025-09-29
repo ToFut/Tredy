@@ -1,4 +1,5 @@
 const { handleNangoWebhook } = require("../nango/webhooks");
+const { handleTwilioWebhook } = require("../twilio/webhooks");
 
 function nangoWebhookEndpoints(app) {
   if (!app) return;
@@ -12,6 +13,12 @@ function nangoWebhookEndpoints(app) {
   app.post("/api/webhooks/nango", async (req, res) => {
     await handleNangoWebhook(req, res);
   });
+
+  // Twilio WhatsApp webhook endpoints
+  app.post("/api/webhooks/twilio/whatsapp", async (req, res) => {
+    await handleTwilioWebhook(req, res);
+  });
+
 }
 
 module.exports = { nangoWebhookEndpoints };

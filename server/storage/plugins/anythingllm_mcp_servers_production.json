@@ -113,6 +113,24 @@
         "description": "Supabase database and storage integration",
         "toolPrefix": "supabase"
       }
+    },
+    "twilio-whatsapp-tools": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/mnt/c/MyProjects/Tredy/server/twilio-whatsapp-mcp-tools.js"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "twilio"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "Twilio WhatsApp integration - send/receive WhatsApp messages, manage templates, and track conversations",
+        "toolPrefix": "twilio_whatsapp"
+      }
     }
   }
 }

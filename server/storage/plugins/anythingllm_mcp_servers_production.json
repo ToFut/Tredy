@@ -4,7 +4,7 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "/app/server/gmail-server.js"
+        "/Users/segevbin/anything-llm/server/gmail-server.js"
       ],
       "env": {
         "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
@@ -43,7 +43,7 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "/app/server/linkedin-server.js"
+        "/Users/segevbin/anything-llm/server/linkedin-server.js"
       ],
       "env": {
         "NANGO_PROVIDER": "linkedin",
@@ -63,7 +63,7 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "/app/server/drive-server.js"
+        "/Users/segevbin/anything-llm/server/drive-server.js"
       ],
       "env": {
         "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",

@@ -288,7 +288,8 @@ class NangoTemplateMCP {
           per_page: { type: 'number', description: 'Number of repos per page' },
           page: { type: 'number', description: 'Page number' },
           sort: { type: 'string', description: 'Sort order' }
-        }
+        },
+        required: []
       },
       'create-issue': {
         type: 'object',
@@ -384,9 +385,9 @@ class NangoTemplateMCP {
       'get-contacts': '/crm/v3/objects/contacts',
       'update-deal': '/crm/v3/objects/deals/{dealId}',
       'get-companies': '/crm/v3/objects/companies',
-      'create-issue': '/issue',
-      'get-issues': '/issue',
-      'update-issue': '/issue/{issueId}',
+      'create-issue': '/repos/{owner}/{repo}/issues',
+      'get-issues': '/repos/{owner}/{repo}/issues',
+      'update-issue': '/repos/{owner}/{repo}/issues/{issueId}',
       'search-jql': '/search',
       'create-task': '/tasks',
       'get-tasks': '/tasks',
@@ -522,12 +523,20 @@ class NangoTemplateMCP {
         blocks: args.blocks || undefined
       };
     } else if (this.templateName === 'github' && actionName === 'create-issue') {
-      return {
+      const body = {
         title: args.title,
-        body: args.body || '',
-        labels: args.labels || [],
-        assignees: args.assignees || []
+        body: args.body || ''
       };
+      
+      if (args.labels && args.labels.length > 0) {
+        body.labels = args.labels;
+      }
+      
+      if (args.assignees && args.assignees.length > 0) {
+        body.assignees = args.assignees;
+      }
+      
+      return body;
     } else if (this.templateName === 'google-mail' && actionName === 'send-email') {
       return {
         raw: Buffer.from(

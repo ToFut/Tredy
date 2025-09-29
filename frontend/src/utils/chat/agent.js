@@ -21,7 +21,13 @@ const handledEvents = [
 
 export function websocketURI() {
   const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  if (API_BASE === "/api") return `${wsProtocol}//${window.location.host}`;
+  if (API_BASE === "/api") {
+    // In development, we need to connect to the server port (3001) not the frontend port (8123)
+    if (window.location.host.includes(":8123")) {
+      return `${wsProtocol}//localhost:3001`;
+    }
+    return `${wsProtocol}//${window.location.host}`;
+  }
   return `${wsProtocol}//${new URL(import.meta.env.VITE_API_BASE).host}`;
 }
 

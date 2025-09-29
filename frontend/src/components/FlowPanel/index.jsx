@@ -223,6 +223,7 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
   };
 
   const handleScheduleFlow = (flow) => {
+    console.log('handleScheduleFlow called with:', flow);
     setSelectedFlowForSchedule(flow);
     setShowScheduleModal(true);
   };
@@ -656,6 +657,10 @@ function ScheduleModal({ flow, workspace, onClose, onSchedule }) {
         })
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
       const result = await response.json();
       
       if (result.success) {
@@ -666,7 +671,7 @@ function ScheduleModal({ flow, workspace, onClose, onSchedule }) {
       }
     } catch (error) {
       console.error('Error scheduling flow:', error);
-      showToast("Error scheduling flow", "error");
+      showToast(`Error scheduling flow: ${error.message}`, "error");
     } finally {
       setIsSaving(false);
     }

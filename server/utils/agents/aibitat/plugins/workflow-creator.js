@@ -447,8 +447,9 @@ Only return the JSON array, no other text.`;
   }
 
   generateWorkflowName(description) {
-    const words = description.split(" ").slice(0, 4);
-    return words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    // Use the same smart naming logic as DynamicFlowBuilder
+    const builder = new (require('../flowBuilder/dynamicFlowBuilder').DynamicFlowBuilder)();
+    return builder.generateFlowName(description);
   }
 
   formatWorkflowPreview(workflow, steps) {

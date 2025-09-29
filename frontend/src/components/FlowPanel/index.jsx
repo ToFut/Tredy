@@ -14,7 +14,8 @@ import {
   CalendarBlank,
   Timer,
   Target,
-  DotsThree
+  DotsThree,
+  Trash
 } from "@phosphor-icons/react";
 import WorkflowBuilder from "./WorkflowBuilder";
 import AgentFlows from "@/models/agentFlows";
@@ -30,6 +31,7 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
   const [previousFlowCount, setPreviousFlowCount] = useState(0);
   const [hasNewFlows, setHasNewFlows] = useState(false);
   const [isCreatingWorkflow, setIsCreatingWorkflow] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   useEffect(() => {
     if (workspace?.slug && isVisible) {
@@ -235,6 +237,29 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
     return date.toLocaleDateString();
   };
 
+  const getCategoryColor = (category) => {
+    const colors = {
+      'Communication': 'bg-blue-100 text-blue-700',
+      'Data Processing': 'bg-green-100 text-green-700',
+      'Web Scraping': 'bg-orange-100 text-orange-700',
+      'Automation': 'bg-purple-100 text-purple-700',
+      'Integration': 'bg-indigo-100 text-indigo-700',
+      'Analysis': 'bg-pink-100 text-pink-700',
+      'General': 'bg-gray-100 text-gray-700'
+    };
+    return colors[category] || colors['General'];
+  };
+
+  const getAvailableCategories = () => {
+    const categories = ['All', ...new Set(flows.map(flow => flow.category).filter(Boolean))];
+    return categories;
+  };
+
+  const getFilteredFlows = () => {
+    if (selectedCategory === 'All') return flows;
+    return flows.filter(flow => flow.category === selectedCategory);
+  };
+
   if (showBuilder) {
     return (
       <WorkflowBuilder
@@ -396,8 +421,31 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
               </div>
             </div>
           ) : (
-            <div className="p-1.5 space-y-1.5 overflow-y-auto h-full" style={{ maxHeight: 'calc(100vh - 180px)' }}>
-              {flows.map((flow, index) => (
+            <div className="flex flex-col h-full">
+              {/* Category Filter */}
+              {flows.length > 0 && (
+                <div className="p-3 border-b border-gray-200/30">
+                  <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+                    {getAvailableCategories().map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => setSelectedCategory(category)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+                          selectedCategory === category
+                            ? 'bg-purple-100 text-purple-700 border border-purple-200'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Flows List */}
+              <div className="p-1.5 space-y-1.5 overflow-y-auto flex-1" style={{ maxHeight: 'calc(100vh - 240px)' }}>
+                {getFilteredFlows().map((flow, index) => (
                 <div
                   key={flow.uuid}
                   className="group relative"
@@ -429,6 +477,11 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
                           >
                             {flow.name}
                           </h3>
+                          {flow.category && (
+                            <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-1 ${getCategoryColor(flow.category)}`}>
+                              {flow.category}
+                            </div>
+                          )}
                         </div>
                         <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
                           flow.active ? 'bg-green-400' : 'bg-gray-300'
@@ -450,11 +503,19 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
                         >
                           <Gear size={12} />
                         </button>
+                        <button
+                          onClick={() => handleDeleteFlow(flow)}
+                          className="p-1 bg-red-50 hover:bg-red-100 text-red-600 rounded transition-all"
+                          title="Delete"
+                        >
+                          <Trash size={12} />
+                        </button>
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
+              </div>
             </div>
           )}
         </div>
@@ -482,6 +543,10 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
               <div className="flex items-center gap-2">
                 <Play size={12} />
                 <span>Run immediately</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Trash size={12} />
+                <span>Delete workflow</span>
               </div>
             </div>
           )}

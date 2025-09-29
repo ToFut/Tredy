@@ -398,8 +398,9 @@ Return the tool to use and parameters, or indicate if this should be handled by 
    * Generate workflow name from request
    */
   generateWorkflowName(request) {
-    const words = request.split(" ").slice(0, 5);
-    return words.join(" ") + (words.length < request.split(" ").length ? "..." : "");
+    // Use the same smart naming logic as DynamicFlowBuilder
+    const builder = new (require('../flowBuilder/dynamicFlowBuilder').DynamicFlowBuilder)();
+    return builder.generateFlowName(request);
   }
 }
 

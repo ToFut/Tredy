@@ -338,9 +338,18 @@ function BlockNode({
         return (
           <div className="space-y-2">
             <div>
-              <label className="block text-xs font-medium mb-1 text-gray-700">
-                Flow Name *
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-medium text-gray-700">
+                  Flow Name *
+                </label>
+                <button
+                  onClick={() => suggestFlowName()}
+                  className="text-xs text-purple-600 hover:text-purple-700 font-medium hover:underline"
+                  title="Suggest name based on workflow blocks"
+                >
+                  Suggest Name
+                </button>
+              </div>
               <input
                 type="text"
                 value={block.config.name || ""}
@@ -1278,6 +1287,69 @@ export default function WorkflowBuilder({ workspace, noteData, onClose }) {
     const newBlocks = [...blocks];
     newBlocks.splice(finishIndex, 0, newBlock);
     setBlocks(newBlocks);
+    
+    // Auto-suggest name if flow info block is empty
+    suggestFlowName(newBlocks);
+  };
+
+  const suggestFlowName = (blocksToAnalyze = blocks) => {
+    const flowInfoBlock = blocksToAnalyze.find(block => block.type === BLOCK_TYPES.FLOW_INFO);
+    if (!flowInfoBlock || flowInfoBlock.config.name.trim()) return;
+    
+    const suggestedName = generateSmartFlowName(blocksToAnalyze);
+    if (suggestedName) {
+      setBlocks(prevBlocks => 
+        prevBlocks.map(block => 
+          block.type === BLOCK_TYPES.FLOW_INFO 
+            ? { ...block, config: { ...block.config, name: suggestedName } }
+            : block
+        )
+      );
+    }
+  };
+
+  const generateSmartFlowName = (blocksToAnalyze) => {
+    const nonInfoBlocks = blocksToAnalyze.filter(block => 
+      block.type !== BLOCK_TYPES.FLOW_INFO && block.type !== BLOCK_TYPES.FINISH
+    );
+    
+    if (nonInfoBlocks.length === 0) return null;
+    
+    // Analyze block types to determine category and action
+    const blockTypes = nonInfoBlocks.map(block => block.type);
+    const hasApiCall = blockTypes.includes(BLOCK_TYPES.API_CALL);
+    const hasWebScraping = blockTypes.includes(BLOCK_TYPES.WEB_SCRAPING);
+    const hasLLMInstruction = blockTypes.includes(BLOCK_TYPES.LLM_INSTRUCTION);
+    
+    // Generate name based on block composition
+    if (hasWebScraping && hasLLMInstruction) {
+      return "Website Data Analysis";
+    }
+    
+    if (hasWebScraping) {
+      return "Web Scraping Automation";
+    }
+    
+    if (hasApiCall && hasLLMInstruction) {
+      return "API Data Processing";
+    }
+    
+    if (hasApiCall) {
+      return "API Integration Workflow";
+    }
+    
+    if (hasLLMInstruction) {
+      return "AI Content Processing";
+    }
+    
+    // Default based on number of blocks
+    if (nonInfoBlocks.length === 1) {
+      return "Simple Automation";
+    } else if (nonInfoBlocks.length <= 3) {
+      return "Multi-Step Workflow";
+    } else {
+      return "Complex Automation Pipeline";
+    }
   };
 
   const saveFlow = async (isAutoSave = false) => {

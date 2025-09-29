@@ -275,10 +275,12 @@ class DynamicFlowBuilder {
     }
 
     // Create flow configuration
+    const category = this.categorizeFlow(prompt, steps);
     const flow = {
       uuid: uuidv4(),
-      name: metadata.name || this.generateFlowName(prompt),
+      name: metadata.name || this.generateFlowName(prompt, steps),
       description: metadata.description || `Automated flow: ${prompt.substring(0, 100)}`,
+      category: category,
       version: "1.0.0",
       created_by: metadata.userId || 'system',
       created_at: new Date().toISOString(),
@@ -351,12 +353,172 @@ class DynamicFlowBuilder {
   }
 
   /**
-   * Generate flow name from prompt
+   * Generate smart flow name from prompt and steps
    */
-  generateFlowName(prompt) {
-    // Take first few words or action
-    const words = prompt.split(' ').slice(0, 5);
-    return words.join(' ') + '...';
+  generateFlowName(prompt, steps = []) {
+    const category = this.categorizeFlow(prompt, steps);
+    const mainAction = this.extractMainAction(prompt, steps);
+    const context = this.extractContext(prompt);
+    
+    // Generate contextual name based on category and action
+    return this.buildSmartName(category, mainAction, context);
+  }
+
+  /**
+   * Categorize flow based on content
+   */
+  categorizeFlow(prompt, steps) {
+    const lowerPrompt = prompt.toLowerCase();
+    const stepTypes = steps.map(s => s.type).join(' ');
+    
+    // Communication flows
+    if (lowerPrompt.includes('email') || lowerPrompt.includes('send message') || 
+        lowerPrompt.includes('notification') || stepTypes.includes('email')) {
+      return 'Communication';
+    }
+    
+    // Data processing flows
+    if (lowerPrompt.includes('data') || lowerPrompt.includes('process') || 
+        lowerPrompt.includes('analyze') || lowerPrompt.includes('transform') ||
+        stepTypes.includes('data_processing')) {
+      return 'Data Processing';
+    }
+    
+    // Web scraping flows
+    if (lowerPrompt.includes('scrape') || lowerPrompt.includes('web') || 
+        lowerPrompt.includes('website') || lowerPrompt.includes('crawl') ||
+        stepTypes.includes('web_scraping')) {
+      return 'Web Scraping';
+    }
+    
+    // Automation flows
+    if (lowerPrompt.includes('automate') || lowerPrompt.includes('schedule') || 
+        lowerPrompt.includes('daily') || lowerPrompt.includes('weekly') ||
+        lowerPrompt.includes('recurring')) {
+      return 'Automation';
+    }
+    
+    // Integration flows
+    if (lowerPrompt.includes('api') || lowerPrompt.includes('integrate') || 
+        lowerPrompt.includes('connect') || stepTypes.includes('api_call')) {
+      return 'Integration';
+    }
+    
+    // Analysis flows
+    if (lowerPrompt.includes('analyze') || lowerPrompt.includes('report') || 
+        lowerPrompt.includes('insights') || lowerPrompt.includes('metrics')) {
+      return 'Analysis';
+    }
+    
+    return 'General';
+  }
+
+  /**
+   * Extract main action from prompt
+   */
+  extractMainAction(prompt, steps) {
+    const lowerPrompt = prompt.toLowerCase();
+    
+    // Action keywords mapping
+    const actionMap = {
+      'send': 'Send',
+      'create': 'Create',
+      'process': 'Process',
+      'analyze': 'Analyze',
+      'scrape': 'Scrape',
+      'extract': 'Extract',
+      'generate': 'Generate',
+      'update': 'Update',
+      'monitor': 'Monitor',
+      'collect': 'Collect',
+      'transform': 'Transform',
+      'validate': 'Validate',
+      'schedule': 'Schedule',
+      'automate': 'Automate'
+    };
+    
+    // Find the first action word
+    for (const [key, value] of Object.entries(actionMap)) {
+      if (lowerPrompt.includes(key)) {
+        return value;
+      }
+    }
+    
+    // Fallback: extract first meaningful verb
+    const words = prompt.split(' ');
+    const firstVerb = words.find(word => 
+      ['create', 'make', 'build', 'do', 'run', 'execute'].includes(word.toLowerCase())
+    );
+    
+    return firstVerb ? firstVerb.charAt(0).toUpperCase() + firstVerb.slice(1) : 'Process';
+  }
+
+  /**
+   * Extract context/subject from prompt
+   */
+  extractContext(prompt) {
+    const lowerPrompt = prompt.toLowerCase();
+    
+    // Common context patterns
+    const contextPatterns = [
+      { pattern: /emails?/i, context: 'Email' },
+      { pattern: /data/i, context: 'Data' },
+      { pattern: /website/i, context: 'Website' },
+      { pattern: /customer/i, context: 'Customer' },
+      { pattern: /user/i, context: 'User' },
+      { pattern: /report/i, context: 'Report' },
+      { pattern: /content/i, context: 'Content' },
+      { pattern: /file/i, context: 'File' },
+      { pattern: /document/i, context: 'Document' },
+      { pattern: /notification/i, context: 'Notification' }
+    ];
+    
+    for (const { pattern, context } of contextPatterns) {
+      if (pattern.test(prompt)) {
+        return context;
+      }
+    }
+    
+    // Extract noun after action verb
+    const words = prompt.split(' ');
+    const actionIndex = words.findIndex(word => 
+      ['create', 'send', 'process', 'analyze', 'scrape'].includes(word.toLowerCase())
+    );
+    
+    if (actionIndex !== -1 && words[actionIndex + 1]) {
+      return words[actionIndex + 1].charAt(0).toUpperCase() + words[actionIndex + 1].slice(1);
+    }
+    
+    return 'Workflow';
+  }
+
+  /**
+   * Build smart name from components
+   */
+  buildSmartName(category, action, context) {
+    // Special cases for common patterns
+    if (category === 'Communication' && context === 'Email') {
+      return `${action} Email Automation`;
+    }
+    
+    if (category === 'Web Scraping') {
+      return `${action} Website Data`;
+    }
+    
+    if (category === 'Data Processing') {
+      return `${action} ${context} Pipeline`;
+    }
+    
+    if (category === 'Automation') {
+      return `${action} ${context} Automation`;
+    }
+    
+    if (category === 'Analysis') {
+      return `${action} ${context} Analysis`;
+    }
+    
+    // Default pattern
+    return `${action} ${context} ${category}`;
   }
 
   /**

@@ -1,0 +1,178 @@
+{
+  "mcpServers": {
+    "notion": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+        "notion"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "notion-getting-started",
+        "MCP_SERVICE_NAME": "notion",
+        "WORKSPACE_ID": "${WORKSPACE_ID}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "notion integration via Nango templates",
+        "toolPrefix": "notion",
+        "priority": "high",
+        "category": "productivity",
+        "capabilities": {
+          "oauth": true,
+          "api": true,
+          "realtime": false,
+          "webhooks": false
+        }
+      }
+    },
+    "asana": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+        "asana"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "asana-getting-started",
+        "MCP_SERVICE_NAME": "asana",
+        "WORKSPACE_ID": "${WORKSPACE_ID}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "asana integration via Nango templates",
+        "toolPrefix": "asana",
+        "priority": "high",
+        "category": "productivity",
+        "capabilities": {
+          "oauth": true,
+          "api": true,
+          "realtime": false,
+          "webhooks": false
+        }
+      }
+    },
+    "trello": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+        "trello"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "trello-getting-started",
+        "MCP_SERVICE_NAME": "trello",
+        "WORKSPACE_ID": "${WORKSPACE_ID}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "trello integration via Nango templates",
+        "toolPrefix": "trello",
+        "priority": "high",
+        "category": "productivity",
+        "capabilities": {
+          "oauth": true,
+          "api": true,
+          "realtime": false,
+          "webhooks": false
+        }
+      }
+    },
+    "linear": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+        "linear"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "linear-getting-started",
+        "MCP_SERVICE_NAME": "linear",
+        "WORKSPACE_ID": "${WORKSPACE_ID}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "linear integration via Nango templates",
+        "toolPrefix": "linear",
+        "priority": "high",
+        "category": "productivity",
+        "capabilities": {
+          "oauth": true,
+          "api": true,
+          "realtime": false,
+          "webhooks": false
+        }
+      }
+    },
+    "jira": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+        "jira"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "jira-getting-started",
+        "MCP_SERVICE_NAME": "jira",
+        "WORKSPACE_ID": "${WORKSPACE_ID}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "jira integration via Nango templates",
+        "toolPrefix": "jira",
+        "priority": "high",
+        "category": "productivity",
+        "capabilities": {
+          "oauth": true,
+          "api": true,
+          "realtime": false,
+          "webhooks": false
+        }
+      }
+    },
+    "confluence": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+        "confluence"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "confluence-getting-started",
+        "MCP_SERVICE_NAME": "confluence",
+        "WORKSPACE_ID": "${WORKSPACE_ID}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "confluence integration via Nango templates",
+        "toolPrefix": "confluence",
+        "priority": "high",
+        "category": "productivity",
+        "capabilities": {
+          "oauth": true,
+          "api": true,
+          "realtime": false,
+          "webhooks": false
+        }
+      }
+    }
+  }
+}

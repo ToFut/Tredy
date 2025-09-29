@@ -1,0 +1,120 @@
+{
+  "mcpServers": {
+    "salesforce": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+        "salesforce"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "salesforce-getting-started",
+        "MCP_SERVICE_NAME": "salesforce",
+        "WORKSPACE_ID": "${WORKSPACE_ID}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "salesforce integration via Nango templates",
+        "toolPrefix": "salesforce",
+        "priority": "high",
+        "category": "crm",
+        "capabilities": {
+          "oauth": true,
+          "api": true,
+          "realtime": false,
+          "webhooks": true
+        }
+      }
+    },
+    "hubspot": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+        "hubspot"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "hubspot-getting-started",
+        "MCP_SERVICE_NAME": "hubspot",
+        "WORKSPACE_ID": "${WORKSPACE_ID}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "hubspot integration via Nango templates",
+        "toolPrefix": "hubspot",
+        "priority": "high",
+        "category": "crm",
+        "capabilities": {
+          "oauth": true,
+          "api": true,
+          "realtime": false,
+          "webhooks": true
+        }
+      }
+    },
+    "pipedrive": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+        "pipedrive"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "pipedrive-getting-started",
+        "MCP_SERVICE_NAME": "pipedrive",
+        "WORKSPACE_ID": "${WORKSPACE_ID}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "pipedrive integration via Nango templates",
+        "toolPrefix": "pipedrive",
+        "priority": "high",
+        "category": "crm",
+        "capabilities": {
+          "oauth": true,
+          "api": true,
+          "realtime": false,
+          "webhooks": false
+        }
+      }
+    },
+    "zoho_crm": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+        "zoho-crm"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "zoho-crm-getting-started",
+        "MCP_SERVICE_NAME": "zoho-crm",
+        "WORKSPACE_ID": "${WORKSPACE_ID}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "zoho-crm integration via Nango templates",
+        "toolPrefix": "zoho-crm",
+        "priority": "high",
+        "category": "crm",
+        "capabilities": {
+          "oauth": true,
+          "api": true,
+          "realtime": false,
+          "webhooks": false
+        }
+      }
+    }
+  }
+}

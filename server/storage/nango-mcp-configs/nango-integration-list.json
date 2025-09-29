@@ -1,0 +1,845 @@
+{
+  "priority": [
+    "slack",
+    "github",
+    "notion",
+    "google-mail",
+    "google-calendar",
+    "google-drive",
+    "salesforce",
+    "hubspot",
+    "jira",
+    "asana",
+    "linear",
+    "confluence",
+    "dropbox",
+    "zoom",
+    "microsoft-teams",
+    "stripe-app",
+    "shopify",
+    "zendesk",
+    "intercom",
+    "pipedrive",
+    "airtable",
+    "trello",
+    "figma",
+    "canva",
+    "typeform",
+    "mailchimp",
+    "sendgrid",
+    "twilio",
+    "stripe",
+    "paypal"
+  ],
+  "all": [
+    "aircall",
+    "airtable",
+    "airtable-pat",
+    "algolia",
+    "anrok",
+    "asana",
+    "ashby",
+    "attio",
+    "avalara",
+    "avalara-sandbox",
+    "aws-iam",
+    "bamboo",
+    "bamboohr-basic",
+    "basecamp",
+    "bill",
+    "bill-sandbox",
+    "bitdefender",
+    "box",
+    "brightcrowd",
+    "cal-com-v2",
+    "calendly",
+    "checkr-partner",
+    "checkr-partner-staging",
+    "clari-copilot",
+    "clicksend",
+    "confluence",
+    "databricks-workspace",
+    "datadog",
+    "dialpad",
+    "dialpad-sandbox",
+    "discourse",
+    "docusign",
+    "docusign-sandbox",
+    "dropbox",
+    "evaluagent",
+    "exact-online",
+    "expensify",
+    "fireflies",
+    "freshdesk",
+    "front",
+    "gem",
+    "github",
+    "github-app",
+    "github-app-oauth",
+    "gong",
+    "gong-oauth",
+    "google",
+    "google-calendar",
+    "google-docs",
+    "google-drive",
+    "google-mail",
+    "google-sheet",
+    "gorgias",
+    "gorgias-basic",
+    "grammarly",
+    "greenhouse",
+    "greenhouse-basic",
+    "gusto",
+    "gusto-demo",
+    "hackerrank-work",
+    "harvest",
+    "hibob-service-user",
+    "hubspot",
+    "instantly",
+    "intercom",
+    "jira",
+    "jira-basic",
+    "keeper-scim",
+    "kustomer",
+    "lastpass",
+    "lattice",
+    "lattice-scim",
+    "lever",
+    "lever-basic",
+    "lever-basic-sandbox",
+    "lever-sandbox",
+    "linear",
+    "linkedin",
+    "luma",
+    "metabase",
+    "microsoft-teams",
+    "next-cloud-ocs",
+    "notion",
+    "okta",
+    "okta-preview",
+    "one-drive",
+    "oracle-hcm",
+    "outlook",
+    "paylocity",
+    "pennylane",
+    "perimeter81",
+    "pipedrive",
+    "quickbooks",
+    "quickbooks-sandbox",
+    "ramp",
+    "ramp-sandbox",
+    "recharge",
+    "recruiterflow",
+    "ring-central",
+    "ring-central-sandbox",
+    "sage-intacct-oauth",
+    "salesforce",
+    "salesforce-sandbox",
+    "sap-success-factors",
+    "sharepoint-online",
+    "shopify",
+    "slack",
+    "stripe-app",
+    "stripe-app-sandbox",
+    "teamtailor",
+    "unanet",
+    "wildix-pbx",
+    "woocommerce",
+    "workable",
+    "workday",
+    "xero",
+    "zendesk",
+    "zoho-crm",
+    "zoho-mail",
+    "zoom"
+  ],
+  "categories": {
+    "communication": {
+      "mcpServers": {
+        "slack": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "slack"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "slack-getting-started",
+            "MCP_SERVICE_NAME": "slack",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "slack integration via Nango templates",
+            "toolPrefix": "slack",
+            "priority": "high",
+            "category": "communication",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": true,
+              "webhooks": true
+            }
+          }
+        },
+        "microsoft_teams": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "microsoft-teams"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "microsoft-teams-getting-started",
+            "MCP_SERVICE_NAME": "microsoft-teams",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "microsoft-teams integration via Nango templates",
+            "toolPrefix": "microsoft-teams",
+            "priority": "high",
+            "category": "communication",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": true,
+              "webhooks": false
+            }
+          }
+        },
+        "discord": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "discord"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "discord-getting-started",
+            "MCP_SERVICE_NAME": "discord",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "discord integration via Nango templates",
+            "toolPrefix": "discord",
+            "priority": "high",
+            "category": "communication",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": true,
+              "webhooks": false
+            }
+          }
+        },
+        "telegram": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "telegram"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "telegram-getting-started",
+            "MCP_SERVICE_NAME": "telegram",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "telegram integration via Nango templates",
+            "toolPrefix": "telegram",
+            "priority": "high",
+            "category": "communication",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": true,
+              "webhooks": false
+            }
+          }
+        },
+        "zoom": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "zoom"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "zoom-getting-started",
+            "MCP_SERVICE_NAME": "zoom",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "zoom integration via Nango templates",
+            "toolPrefix": "zoom",
+            "priority": "high",
+            "category": "communication",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": true,
+              "webhooks": false
+            }
+          }
+        }
+      }
+    },
+    "productivity": {
+      "mcpServers": {
+        "notion": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "notion"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "notion-getting-started",
+            "MCP_SERVICE_NAME": "notion",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "notion integration via Nango templates",
+            "toolPrefix": "notion",
+            "priority": "high",
+            "category": "productivity",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": false
+            }
+          }
+        },
+        "asana": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "asana"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "asana-getting-started",
+            "MCP_SERVICE_NAME": "asana",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "asana integration via Nango templates",
+            "toolPrefix": "asana",
+            "priority": "high",
+            "category": "productivity",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": false
+            }
+          }
+        },
+        "trello": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "trello"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "trello-getting-started",
+            "MCP_SERVICE_NAME": "trello",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "trello integration via Nango templates",
+            "toolPrefix": "trello",
+            "priority": "high",
+            "category": "productivity",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": false
+            }
+          }
+        },
+        "linear": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "linear"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "linear-getting-started",
+            "MCP_SERVICE_NAME": "linear",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "linear integration via Nango templates",
+            "toolPrefix": "linear",
+            "priority": "high",
+            "category": "productivity",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": false
+            }
+          }
+        },
+        "jira": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "jira"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "jira-getting-started",
+            "MCP_SERVICE_NAME": "jira",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "jira integration via Nango templates",
+            "toolPrefix": "jira",
+            "priority": "high",
+            "category": "productivity",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": false
+            }
+          }
+        },
+        "confluence": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "confluence"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "confluence-getting-started",
+            "MCP_SERVICE_NAME": "confluence",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "confluence integration via Nango templates",
+            "toolPrefix": "confluence",
+            "priority": "high",
+            "category": "productivity",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": false
+            }
+          }
+        }
+      }
+    },
+    "crm": {
+      "mcpServers": {
+        "salesforce": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "salesforce"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "salesforce-getting-started",
+            "MCP_SERVICE_NAME": "salesforce",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "salesforce integration via Nango templates",
+            "toolPrefix": "salesforce",
+            "priority": "high",
+            "category": "crm",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": true
+            }
+          }
+        },
+        "hubspot": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "hubspot"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "hubspot-getting-started",
+            "MCP_SERVICE_NAME": "hubspot",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "hubspot integration via Nango templates",
+            "toolPrefix": "hubspot",
+            "priority": "high",
+            "category": "crm",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": true
+            }
+          }
+        },
+        "pipedrive": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "pipedrive"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "pipedrive-getting-started",
+            "MCP_SERVICE_NAME": "pipedrive",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "pipedrive integration via Nango templates",
+            "toolPrefix": "pipedrive",
+            "priority": "high",
+            "category": "crm",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": false
+            }
+          }
+        },
+        "zoho_crm": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "zoho-crm"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "zoho-crm-getting-started",
+            "MCP_SERVICE_NAME": "zoho-crm",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "zoho-crm integration via Nango templates",
+            "toolPrefix": "zoho-crm",
+            "priority": "high",
+            "category": "crm",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": false
+            }
+          }
+        }
+      }
+    },
+    "development": {
+      "mcpServers": {
+        "github": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "github"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "github-getting-started",
+            "MCP_SERVICE_NAME": "github",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "github integration via Nango templates",
+            "toolPrefix": "github",
+            "priority": "high",
+            "category": "development",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": true
+            }
+          }
+        },
+        "gitlab": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "gitlab"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "gitlab-getting-started",
+            "MCP_SERVICE_NAME": "gitlab",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "gitlab integration via Nango templates",
+            "toolPrefix": "gitlab",
+            "priority": "high",
+            "category": "development",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": false
+            }
+          }
+        },
+        "jira": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "jira"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "jira-getting-started",
+            "MCP_SERVICE_NAME": "jira",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "jira integration via Nango templates",
+            "toolPrefix": "jira",
+            "priority": "high",
+            "category": "productivity",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": false
+            }
+          }
+        },
+        "linear": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "linear"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "linear-getting-started",
+            "MCP_SERVICE_NAME": "linear",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "linear integration via Nango templates",
+            "toolPrefix": "linear",
+            "priority": "high",
+            "category": "productivity",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": false
+            }
+          }
+        }
+      }
+    },
+    "ecommerce": {
+      "mcpServers": {
+        "shopify": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "shopify"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "shopify-getting-started",
+            "MCP_SERVICE_NAME": "shopify",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "shopify integration via Nango templates",
+            "toolPrefix": "shopify",
+            "priority": "high",
+            "category": "ecommerce",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": true
+            }
+          }
+        },
+        "woocommerce": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "woocommerce"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "woocommerce-getting-started",
+            "MCP_SERVICE_NAME": "woocommerce",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "woocommerce integration via Nango templates",
+            "toolPrefix": "woocommerce",
+            "priority": "high",
+            "category": "ecommerce",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": false
+            }
+          }
+        },
+        "stripe": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "stripe"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "stripe-getting-started",
+            "MCP_SERVICE_NAME": "stripe",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "stripe integration via Nango templates",
+            "toolPrefix": "stripe",
+            "priority": "high",
+            "category": "ecommerce",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": true
+            }
+          }
+        },
+        "paypal": {
+          "type": "stdio",
+          "command": "node",
+          "args": [
+            "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+            "paypal"
+          ],
+          "env": {
+            "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+            "NANGO_HOST": "${NANGO_HOST}",
+            "NANGO_PROVIDER_CONFIG_KEY": "paypal-getting-started",
+            "MCP_SERVICE_NAME": "paypal",
+            "WORKSPACE_ID": "${WORKSPACE_ID}"
+          },
+          "anythingllm": {
+            "autoStart": true,
+            "workspaceAware": true,
+            "description": "paypal integration via Nango templates",
+            "toolPrefix": "paypal",
+            "priority": "high",
+            "category": "ecommerce",
+            "capabilities": {
+              "oauth": true,
+              "api": true,
+              "realtime": false,
+              "webhooks": false
+            }
+          }
+        }
+      }
+    }
+  }
+}

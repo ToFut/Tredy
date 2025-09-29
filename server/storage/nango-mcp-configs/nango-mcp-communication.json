@@ -1,0 +1,149 @@
+{
+  "mcpServers": {
+    "slack": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+        "slack"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "slack-getting-started",
+        "MCP_SERVICE_NAME": "slack",
+        "WORKSPACE_ID": "${WORKSPACE_ID}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "slack integration via Nango templates",
+        "toolPrefix": "slack",
+        "priority": "high",
+        "category": "communication",
+        "capabilities": {
+          "oauth": true,
+          "api": true,
+          "realtime": true,
+          "webhooks": true
+        }
+      }
+    },
+    "microsoft_teams": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+        "microsoft-teams"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "microsoft-teams-getting-started",
+        "MCP_SERVICE_NAME": "microsoft-teams",
+        "WORKSPACE_ID": "${WORKSPACE_ID}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "microsoft-teams integration via Nango templates",
+        "toolPrefix": "microsoft-teams",
+        "priority": "high",
+        "category": "communication",
+        "capabilities": {
+          "oauth": true,
+          "api": true,
+          "realtime": true,
+          "webhooks": false
+        }
+      }
+    },
+    "discord": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+        "discord"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "discord-getting-started",
+        "MCP_SERVICE_NAME": "discord",
+        "WORKSPACE_ID": "${WORKSPACE_ID}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "discord integration via Nango templates",
+        "toolPrefix": "discord",
+        "priority": "high",
+        "category": "communication",
+        "capabilities": {
+          "oauth": true,
+          "api": true,
+          "realtime": true,
+          "webhooks": false
+        }
+      }
+    },
+    "telegram": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+        "telegram"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "telegram-getting-started",
+        "MCP_SERVICE_NAME": "telegram",
+        "WORKSPACE_ID": "${WORKSPACE_ID}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "telegram integration via Nango templates",
+        "toolPrefix": "telegram",
+        "priority": "high",
+        "category": "communication",
+        "capabilities": {
+          "oauth": true,
+          "api": true,
+          "realtime": true,
+          "webhooks": false
+        }
+      }
+    },
+    "zoom": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/nango-template-mcp-wrapper.js",
+        "zoom"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "zoom-getting-started",
+        "MCP_SERVICE_NAME": "zoom",
+        "WORKSPACE_ID": "${WORKSPACE_ID}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "zoom integration via Nango templates",
+        "toolPrefix": "zoom",
+        "priority": "high",
+        "category": "communication",
+        "capabilities": {
+          "oauth": true,
+          "api": true,
+          "realtime": true,
+          "webhooks": false
+        }
+      }
+    }
+  }
+}

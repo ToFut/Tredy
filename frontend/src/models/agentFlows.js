@@ -32,10 +32,15 @@ const AgentFlows = {
 
   /**
    * List all available flows in the system
+   * @param {string} workspaceSlug - Optional workspace slug to filter scheduled flows
    * @returns {Promise<{success: boolean, error: string | null, flows: Array<{name: string, uuid: string, description: string, steps: Array}>}>}
    */
-  listFlows: async () => {
-    return await fetch(`${API_BASE}/agent-flows/list`, {
+  listFlows: async (workspaceSlug = null) => {
+    const url = workspaceSlug 
+      ? `${API_BASE}/agent-flows/list?workspace=${workspaceSlug}`
+      : `${API_BASE}/agent-flows/list`;
+      
+    return await fetch(url, {
       method: "GET",
       headers: baseHeaders(),
     })

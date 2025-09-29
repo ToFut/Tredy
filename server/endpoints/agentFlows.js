@@ -54,12 +54,52 @@ function agentFlowEndpoints(app) {
   app.get(
     "/agent-flows/list",
     [validatedRequest, flexUserRoleValid([ROLES.admin])],
-    async (_request, response) => {
+    async (request, response) => {
       try {
         const flows = AgentFlows.listFlows();
+        
+        // Get scheduled flows for this workspace
+        const { AgentSchedule } = require("../models/agentSchedule");
+        const { Workspace } = require("../models/workspace");
+        
+        let scheduledFlows = [];
+        
+        // Try to get workspace from request context or query params
+        const workspaceSlug = request.query?.workspace || request.workspace?.slug;
+        if (workspaceSlug) {
+          const workspace = await Workspace.get({ slug: workspaceSlug });
+          if (workspace) {
+            const schedules = await AgentSchedule.where({ 
+              workspaceId: workspace.id,
+              agentType: 'flow'
+            });
+            
+            // Convert schedules to flow format
+            scheduledFlows = schedules.map(schedule => ({
+              uuid: schedule.agent_id,
+              name: schedule.name,
+              description: schedule.description || `Scheduled flow: ${schedule.name}`,
+              category: 'Automation',
+              active: schedule.enabled,
+              scheduled: true,
+              schedule: {
+                cron: schedule.cron_expression,
+                timezone: schedule.timezone,
+                nextRun: schedule.next_run_at,
+                lastRun: schedule.last_run_at
+              },
+              created_at: schedule.created_at,
+              created_by: schedule.created_by
+            }));
+          }
+        }
+        
+        // Combine regular flows and scheduled flows
+        const allFlows = [...flows, ...scheduledFlows];
+        
         return response.status(200).json({
           success: true,
-          flows,
+          flows: allFlows,
         });
       } catch (error) {
         console.error("Error listing flows:", error);

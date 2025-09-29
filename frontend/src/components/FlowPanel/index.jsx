@@ -15,11 +15,13 @@ import {
   Timer,
   Target,
   DotsThree,
-  Trash
+  Trash,
+  Calendar
 } from "@phosphor-icons/react";
 import WorkflowBuilder from "./WorkflowBuilder";
 import AgentFlows from "@/models/agentFlows";
 import showToast from "@/utils/toast";
+import { baseHeaders } from "@/utils/request";
 // import FlowItem from "./FlowItem";
 
 export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpen }) {
@@ -32,6 +34,8 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
   const [hasNewFlows, setHasNewFlows] = useState(false);
   const [isCreatingWorkflow, setIsCreatingWorkflow] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [selectedFlowForSchedule, setSelectedFlowForSchedule] = useState(null);
 
   useEffect(() => {
     if (workspace?.slug && isVisible) {
@@ -117,7 +121,7 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
     if (showLoadingIndicator) setIsLoading(true);
     
     try {
-      const { success, flows: flowList, error } = await AgentFlows.listFlows();
+      const { success, flows: flowList, error } = await AgentFlows.listFlows(workspace?.slug);
       if (success) {
         const newFlows = flowList || [];
         
@@ -218,6 +222,11 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
     }
   };
 
+  const handleScheduleFlow = (flow) => {
+    setSelectedFlowForSchedule(flow);
+    setShowScheduleModal(true);
+  };
+
   const formatLastUsed = (dateString) => {
     if (!dateString) return "Never used";
     
@@ -245,6 +254,7 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
       'Automation': 'bg-purple-100 text-purple-700',
       'Integration': 'bg-indigo-100 text-indigo-700',
       'Analysis': 'bg-pink-100 text-pink-700',
+      'Scheduled': 'bg-cyan-100 text-cyan-700',
       'General': 'bg-gray-100 text-gray-700'
     };
     return colors[category] || colors['General'];
@@ -252,11 +262,18 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
 
   const getAvailableCategories = () => {
     const categories = ['All', ...new Set(flows.map(flow => flow.category).filter(Boolean))];
+    
+    // Add "Scheduled" category if there are any scheduled flows
+    if (flows.some(flow => flow.scheduled)) {
+      categories.push('Scheduled');
+    }
+    
     return categories;
   };
 
   const getFilteredFlows = () => {
     if (selectedCategory === 'All') return flows;
+    if (selectedCategory === 'Scheduled') return flows.filter(flow => flow.scheduled);
     return flows.filter(flow => flow.category === selectedCategory);
   };
 
@@ -471,17 +488,29 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
                           )}
                         </button>
                         <div className="min-w-0 flex-1">
-                          <h3 
-                            className="font-medium text-gray-800 hover:text-purple-600 transition-colors cursor-pointer text-sm truncate"
-                            onClick={() => handleEditFlow(flow)}
-                          >
-                            {flow.name}
-                          </h3>
-                          {flow.category && (
-                            <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-1 ${getCategoryColor(flow.category)}`}>
-                              {flow.category}
-                            </div>
-                          )}
+                          <div className="flex items-center gap-2">
+                            <h3 
+                              className="font-medium text-gray-800 hover:text-purple-600 transition-colors cursor-pointer text-sm truncate"
+                              onClick={() => handleEditFlow(flow)}
+                            >
+                              {flow.name}
+                            </h3>
+                            {flow.scheduled && (
+                              <Clock size={12} className="text-blue-500" title="Scheduled Flow" />
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1">
+                            {flow.category && (
+                              <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(flow.category)}`}>
+                                {flow.category}
+                              </div>
+                            )}
+                            {flow.scheduled && flow.schedule?.nextRun && (
+                              <div className="text-xs text-gray-500">
+                                Next: {new Date(flow.schedule.nextRun).toLocaleDateString()}
+                              </div>
+                            )}
+                          </div>
                         </div>
                         <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
                           flow.active ? 'bg-green-400' : 'bg-gray-300'
@@ -502,6 +531,13 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
                           title="Edit"
                         >
                           <Gear size={12} />
+                        </button>
+                        <button
+                          onClick={() => handleScheduleFlow(flow)}
+                          className="p-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded transition-all"
+                          title="Schedule"
+                        >
+                          <Calendar size={12} />
                         </button>
                         <button
                           onClick={() => handleDeleteFlow(flow)}
@@ -545,6 +581,10 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
                 <span>Run immediately</span>
               </div>
               <div className="flex items-center gap-2">
+                <Calendar size={12} />
+                <span>Schedule workflow</span>
+              </div>
+              <div className="flex items-center gap-2">
                 <Trash size={12} />
                 <span>Delete workflow</span>
               </div>
@@ -552,6 +592,208 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
           )}
         </div>
       )}
+
+      {/* Schedule Modal */}
+      {showScheduleModal && selectedFlowForSchedule && (
+        <ScheduleModal
+          flow={selectedFlowForSchedule}
+          workspace={workspace}
+          onClose={() => {
+            setShowScheduleModal(false);
+            setSelectedFlowForSchedule(null);
+          }}
+          onSchedule={() => {
+            setShowScheduleModal(false);
+            setSelectedFlowForSchedule(null);
+            loadFlows(); // Refresh to show the new scheduled flow
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+// Schedule Modal Component
+function ScheduleModal({ flow, workspace, onClose, onSchedule }) {
+  const [scheduleName, setScheduleName] = useState(flow.name);
+  const [cronExpression, setCronExpression] = useState('0 9 * * *'); // Daily at 9 AM
+  const [timezone, setTimezone] = useState('UTC');
+  const [description, setDescription] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const commonSchedules = [
+    { label: 'Daily at 9 AM', cron: '0 9 * * *' },
+    { label: 'Daily at 6 PM', cron: '0 18 * * *' },
+    { label: 'Every Monday at 9 AM', cron: '0 9 * * 1' },
+    { label: 'Every hour', cron: '0 * * * *' },
+    { label: 'Every 30 minutes', cron: '*/30 * * * *' },
+    { label: 'Weekly on Sunday at 10 AM', cron: '0 10 * * 0' }
+  ];
+
+  const handleSchedule = async () => {
+    if (!scheduleName.trim()) {
+      showToast("Schedule name is required", "error");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/workspace/${workspace.slug}/agent-schedules`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...baseHeaders(),
+        },
+        body: JSON.stringify({
+          agentId: flow.uuid,
+          agentType: 'flow',
+          name: scheduleName,
+          description: description || `Scheduled execution of ${flow.name}`,
+          cronExpression: cronExpression,
+          timezone: timezone,
+          enabled: true,
+          context: JSON.stringify({ flowUuid: flow.uuid })
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        showToast("Flow scheduled successfully!", "success");
+        onSchedule();
+      } else {
+        showToast(`Failed to schedule flow: ${result.error}`, "error");
+      }
+    } catch (error) {
+      console.error('Error scheduling flow:', error);
+      showToast("Error scheduling flow", "error");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-gray-900">Schedule Flow</h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X size={20} className="text-gray-500" />
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Flow Name
+              </label>
+              <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                <FlowArrow size={16} className="text-purple-600" />
+                <span className="text-sm text-gray-600">{flow.name}</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Schedule Name *
+              </label>
+              <input
+                type="text"
+                value={scheduleName}
+                onChange={(e) => setScheduleName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Enter schedule name"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Schedule Pattern
+              </label>
+              <select
+                value={cronExpression}
+                onChange={(e) => setCronExpression(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              >
+                {commonSchedules.map((schedule) => (
+                  <option key={schedule.cron} value={schedule.cron}>
+                    {schedule.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Custom Cron Expression
+              </label>
+              <input
+                type="text"
+                value={cronExpression}
+                onChange={(e) => setCronExpression(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent font-mono text-sm"
+                placeholder="0 9 * * *"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Format: minute hour day month day-of-week
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Timezone
+              </label>
+              <select
+                value={timezone}
+                onChange={(e) => setTimezone(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              >
+                <option value="UTC">UTC</option>
+                <option value="America/New_York">Eastern Time</option>
+                <option value="America/Chicago">Central Time</option>
+                <option value="America/Denver">Mountain Time</option>
+                <option value="America/Los_Angeles">Pacific Time</option>
+                <option value="Europe/London">London</option>
+                <option value="Europe/Paris">Paris</option>
+                <option value="Asia/Tokyo">Tokyo</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description (Optional)
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                placeholder="Describe this schedule..."
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-3 mt-6">
+            <button
+              onClick={onClose}
+              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSchedule}
+              disabled={isSaving || !scheduleName.trim()}
+              className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isSaving ? 'Scheduling...' : 'Schedule Flow'}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

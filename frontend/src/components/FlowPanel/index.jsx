@@ -42,6 +42,8 @@ import {
 } from "@phosphor-icons/react";
 import WorkflowBuilder from "./WorkflowBuilder";
 import AgentFlows from "@/models/agentFlows";
+import AgentSchedule from "@/models/agentSchedule";
+import ScheduleModal from "@/components/AgentScheduling/ScheduleModal";
 import showToast from "@/utils/toast";
 
 // Workflow Block Component
@@ -94,6 +96,7 @@ function WorkflowItem({
   onSelect,
   onEdit,
   onRun,
+  onSchedule,
   onToggle,
   onDelete,
   onDuplicate,
@@ -172,19 +175,19 @@ function WorkflowItem({
   };
 
   const loadWorkflowStats = async () => {
-    setLoadingStats(true);
-    try {
-      // This would call the existing schedule execution stats
-      const response = await fetch(`/api/workspace/${workspaceSlug}/agent-schedules/stats`);
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data);
-      }
-    } catch (error) {
-      console.error("Failed to load workflow stats:", error);
-    } finally {
-      setLoadingStats(false);
-    }
+    // Stats loading disabled for now - requires workspace context
+    // setLoadingStats(true);
+    // try {
+    //   const response = await fetch(`/api/workspace/${workspace?.slug}/agent-schedules/stats`);
+    //   if (response.ok) {
+    //     const data = await response.json();
+    //     setStats(data);
+    //   }
+    // } catch (error) {
+    //   console.error("Failed to load workflow stats:", error);
+    // } finally {
+    //   setLoadingStats(false);
+    // }
   };
 
   const getStatusIcon = () => {
@@ -332,6 +335,13 @@ function WorkflowItem({
             <Play size={12} className="text-gray-600" weight="fill" />
           </button>
           <button
+            onClick={() => onSchedule?.(flow)}
+            className="p-1 hover:bg-gray-100 rounded transition-colors"
+            title="Schedule"
+          >
+            <Clock size={12} className="text-gray-600" />
+          </button>
+          <button
             onClick={() => onEdit(flow)}
             className="p-1 hover:bg-gray-100 rounded transition-colors"
             title="Edit"
@@ -358,6 +368,16 @@ function WorkflowItem({
               className="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2"
             >
               {flow.active ? "Deactivate" : "Activate"}
+            </button>
+            <button
+              onClick={() => {
+                onSchedule?.(flow);
+                setShowActions(false);
+              }}
+              className="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2"
+            >
+              <Clock size={12} className="text-gray-600" />
+              Schedule
             </button>
             <button
               onClick={() => {
@@ -471,6 +491,8 @@ export default function FlowPanel({
   const [sortBy, setSortBy] = useState("name"); // 'name', 'created', 'modified', 'status', 'usage', 'tokens', 'success', 'complexity'
   const [sortOrder, setSortOrder] = useState("asc"); // 'asc', 'desc'
   const [showFilters, setShowFilters] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [flowToSchedule, setFlowToSchedule] = useState(null);
 
   const searchInputRef = useRef(null);
 
@@ -798,6 +820,15 @@ export default function FlowPanel({
     }
   };
 
+  const handleScheduleFlow = (flow) => {
+    if (!workspace?.slug) {
+      showToast("Workspace not available", "error");
+      return;
+    }
+    setFlowToSchedule(flow);
+    setShowScheduleModal(true);
+  };
+
 
 
 
@@ -998,6 +1029,7 @@ export default function FlowPanel({
                     flow={flow}
                     onEdit={handleEditFlow}
                     onRun={handleRunFlow}
+                    onSchedule={handleScheduleFlow}
                     onToggle={handleToggleFlow}
                     onDelete={handleDeleteFlow}
                     onDuplicate={handleDuplicateFlow}
@@ -1032,9 +1064,35 @@ export default function FlowPanel({
                 <Play size={12} />
                 <span>Run immediately</span>
               </div>
+              <div className="flex items-center gap-2">
+                <Clock size={12} />
+                <span>Schedule workflow</span>
+              </div>
             </div>
           )}
         </div>
+      )}
+
+      {/* Schedule Modal */}
+      {showScheduleModal && flowToSchedule && workspace && (
+        <ScheduleModal
+          isOpen={showScheduleModal}
+          onClose={() => {
+            setShowScheduleModal(false);
+            setFlowToSchedule(null);
+          }}
+          onSave={() => {
+            setShowScheduleModal(false);
+            setFlowToSchedule(null);
+            showToast("Schedule created successfully!", "success");
+          }}
+          workspace={workspace}
+          agent={{
+            id: flowToSchedule.uuid,
+            name: flowToSchedule.name,
+            type: "flow",
+          }}
+        />
       )}
     </div>
   );

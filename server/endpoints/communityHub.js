@@ -49,9 +49,14 @@ function communityHubEndpoints(app) {
   app.get(
     "/community-hub/explore",
     [validatedRequest, flexUserRoleValid([ROLES.admin])],
-    async (_, response) => {
+    async (request, response) => {
       try {
-        const exploreItems = await CommunityHub.fetchExploreItems();
+        const { limit, offset } = request.query;
+        const params = {};
+        if (limit) params.limit = parseInt(limit, 10);
+        if (offset) params.offset = parseInt(offset, 10);
+
+        const exploreItems = await CommunityHub.fetchExploreItems(params);
         response.status(200).json({ success: true, result: exploreItems });
       } catch (error) {
         console.error(error);

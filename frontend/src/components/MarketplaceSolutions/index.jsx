@@ -6,157 +6,89 @@ import {
   Clock,
   ArrowsClockwise,
   Plus,
-  Gear,
-  Link as LinkIcon,
-  Building,
-  Users,
-  Briefcase,
-  ChartLine,
-  Globe,
-  Shield,
-  Lightning,
+  Package,
   Sparkle,
   Eye,
   ChatCircle,
   X,
+  Cube,
+  Terminal,
+  FileText,
 } from "@phosphor-icons/react";
 import { Tooltip } from "react-tooltip";
-import UserConnector from "@/models/userConnector";
-import Workspace from "@/models/workspace";
+import CommunityHub from "@/models/communityHub";
 import { useParams } from "react-router-dom";
-import BusinessChat from "./BusinessChat";
-import CustomizableDashboard from "./CustomizableDashboard";
+import MarketplaceChat from "./MarketplaceChat";
+import MarketplaceDashboard from "./MarketplaceDashboard";
 
-// Industry Solutions connector configurations
-const INDUSTRY_CONNECTORS = {
-  // Communication & Collaboration
-  gmail: {
-    name: "Gmail",
-    category: "Communication",
-    icon: "📧",
-    color: "from-red-400 to-red-600",
-    description: "Email management and automation",
-  },
-  slack: {
-    name: "Slack",
-    category: "Communication",
-    icon: "💬",
-    color: "from-purple-400 to-purple-600",
-    description: "Team communication and workflows",
-  },
-
-  // Productivity & Organization
-  "google-drive": {
-    name: "Google Drive",
-    category: "Productivity",
-    icon: "📁",
+// Marketplace item type configurations
+const ITEM_TYPE_CONFIGS = {
+  "agent-skill": {
+    name: "Agent Skill",
+    category: "Skills",
+    icon: "🤖",
     color: "from-blue-400 to-blue-600",
-    description: "Document storage and collaboration",
+    description: "AI agent capabilities",
   },
-  "google-calendar": {
-    name: "Google Calendar",
-    category: "Productivity",
-    icon: "📅",
-    color: "from-green-400 to-green-600",
-    description: "Schedule management and automation",
-  },
-  notion: {
-    name: "Notion",
-    category: "Productivity",
+  "system-prompt": {
+    name: "System Prompt",
+    category: "Prompts",
     icon: "📝",
-    color: "from-gray-400 to-gray-600",
-    description: "Workspace and knowledge management",
+    color: "from-purple-400 to-purple-600",
+    description: "Pre-configured prompts",
   },
-
-  // Business & Sales
-  linkedin: {
-    name: "LinkedIn",
-    category: "Business",
-    icon: "💼",
-    color: "from-blue-500 to-blue-700",
-    description: "Professional networking and outreach",
+  "slash-command": {
+    name: "Slash Command",
+    category: "Commands",
+    icon: "⚡",
+    color: "from-green-400 to-green-600",
+    description: "Quick commands",
   },
-  shopify: {
-    name: "Shopify",
-    category: "Business",
-    icon: "🛒",
-    color: "from-green-500 to-green-700",
-    description: "E-commerce platform integration",
-  },
-  stripe: {
-    name: "Stripe",
-    category: "Business",
-    icon: "💳",
-    color: "from-indigo-400 to-indigo-600",
-    description: "Payment processing and analytics",
-  },
-
-  // Development & Technical
-  github: {
-    name: "GitHub",
-    category: "Development",
-    icon: "🐙",
-    color: "from-gray-600 to-gray-800",
-    description: "Code repository and project management",
-  },
-
-  // Social & Marketing
-  facebook: {
-    name: "Facebook",
-    category: "Marketing",
-    icon: "📘",
-    color: "from-blue-600 to-blue-800",
-    description: "Social media management and advertising",
-  },
-
-  // Data & Analytics
-  airtable: {
-    name: "Airtable",
-    category: "Data",
-    icon: "📊",
-    color: "from-purple-500 to-purple-700",
-    description: "Database and workflow automation",
+  plugin: {
+    name: "Plugin",
+    category: "Plugins",
+    icon: "🔌",
+    color: "from-orange-400 to-orange-600",
+    description: "System extensions",
   },
 };
 
 // Category icons mapping
 const CATEGORY_ICONS = {
-  Communication: Users,
-  Productivity: Briefcase,
-  Business: ChartLine,
-  Development: Gear,
-  Marketing: Globe,
-  Data: Shield,
+  Skills: Cube,
+  Prompts: FileText,
+  Commands: Terminal,
+  Plugins: Package,
 };
 
-// Connector Circle Component - Google-style design
-function ConnectorCircle({
-  connector,
+// Marketplace Item Circle Component
+function MarketplaceItemCircle({
+  item,
   size = 40,
   onClick,
-  onConnect,
+  onBrowse,
   showStatus = true,
   className = "",
 }) {
-  const config = INDUSTRY_CONNECTORS[connector?.provider] || {
-    name: connector?.provider || "Unknown",
+  const config = ITEM_TYPE_CONFIGS[item?.itemType] || {
+    name: item?.itemType || "Unknown",
     category: "Other",
-    icon: "🔗",
+    icon: "📦",
     color: "from-gray-400 to-gray-600",
-    description: "External service integration",
+    description: "Marketplace item",
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case "connected":
+      case "active":
         return <CheckCircle className="w-3 h-3 text-green-500" />;
-      case "syncing":
+      case "installing":
         return (
           <ArrowsClockwise className="w-3 h-3 text-blue-500 animate-spin" />
         );
       case "error":
         return <XCircle className="w-3 h-3 text-red-500" />;
-      case "pending":
+      case "inactive":
         return <Clock className="w-3 h-3 text-yellow-500" />;
       default:
         return <XCircle className="w-3 h-3 text-gray-400" />;
@@ -165,35 +97,38 @@ function ConnectorCircle({
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "connected":
+      case "active":
         return "ring-green-500 bg-green-50 dark:bg-green-900/20";
-      case "syncing":
+      case "installing":
         return "ring-blue-500 bg-blue-50 dark:bg-blue-900/20";
       case "error":
         return "ring-red-500 bg-red-50 dark:bg-red-900/20";
-      case "pending":
+      case "inactive":
         return "ring-yellow-500 bg-yellow-50 dark:bg-yellow-900/20";
       default:
         return "ring-gray-300 bg-gray-50 dark:bg-gray-800";
     }
   };
 
-  const connectorId = `connector-circle-${connector?.provider}-${Math.random().toString(36).substr(2, 9)}`;
+  const itemId = `marketplace-circle-${item?.id || Math.random().toString(36).substr(2, 9)}`;
 
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (connector?.status === "connected" && onClick) {
-      onClick(connector);
-    } else if (onConnect) {
-      onConnect(connector?.provider || config.name.toLowerCase());
+    if (item?.active && onClick) {
+      onClick(item);
+    } else if (onBrowse) {
+      onBrowse();
     }
   };
+
+  // Determine status
+  const status = item?.active ? "active" : item?.installing ? "installing" : "inactive";
 
   return (
     <>
       <div
-        id={connectorId}
+        id={itemId}
         onClick={handleClick}
         className={`
           relative group cursor-pointer transform transition-all duration-300 hover:scale-110 hover:shadow-lg
@@ -209,7 +144,7 @@ function ConnectorCircle({
           ring-2 ring-white dark:ring-gray-800
           hover:ring-4 hover:ring-blue-200 dark:hover:ring-blue-900
           transition-all duration-200
-          ${showStatus ? getStatusColor(connector?.status) : ""}
+          ${showStatus ? getStatusColor(status) : ""}
         `}
         >
           <span style={{ fontSize: size * 0.4 }}>{config.icon}</span>
@@ -218,29 +153,29 @@ function ConnectorCircle({
         {/* Status Indicator */}
         {showStatus && (
           <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white dark:bg-gray-800 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center">
-            {getStatusIcon(connector?.status)}
+            {getStatusIcon(status)}
           </div>
         )}
 
-        {/* Sync Animation */}
-        {connector?.status === "syncing" && (
+        {/* Installing Animation */}
+        {status === "installing" && (
           <div className="absolute inset-0 rounded-full animate-ping bg-blue-400 opacity-20" />
         )}
 
         {/* Hover Tooltip */}
         <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 whitespace-nowrap">
-          <div className="font-medium">{config.name}</div>
+          <div className="font-medium">{item?.name || config.name}</div>
           <div className="text-gray-400">{config.description}</div>
-          {connector?.status && (
-            <div className="text-gray-300 mt-1">Status: {connector.status}</div>
+          {item && (
+            <div className="text-gray-300 mt-1">Status: {status}</div>
           )}
         </div>
       </div>
 
       {/* Tooltip */}
-      <Tooltip anchorSelect={`#${connectorId}`} place="bottom" className="z-50">
+      <Tooltip anchorSelect={`#${itemId}`} place="bottom" className="z-50">
         <div className="text-center">
-          <div className="font-medium">{config.name}</div>
+          <div className="font-medium">{item?.name || config.name}</div>
           <div className="text-xs text-gray-400">{config.category}</div>
         </div>
       </Tooltip>
@@ -248,24 +183,24 @@ function ConnectorCircle({
   );
 }
 
-// Industry Solutions Component
-export default function IndustrySolutions({
+// Marketplace Solutions Component
+export default function MarketplaceSolutions({
   className = "",
-  onConnectorClick,
-  onConnectConnector,
+  onItemClick,
+  onBrowseMarketplace,
   maxVisible = 8,
   showCategories = true,
   compact = false,
 }) {
   const { slug } = useParams();
-  const [connectors, setConnectors] = useState([]);
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
-  const [showBusinessChat, setShowBusinessChat] = useState(false);
+  const [showMarketplaceChat, setShowMarketplaceChat] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
 
   useEffect(() => {
-    loadConnectors();
+    loadInstalledItems();
   }, [slug]);
 
   // Handle ESC key for dashboard modal
@@ -277,11 +212,9 @@ export default function IndustrySolutions({
     };
 
     if (showDashboard) {
-      // Lock body scroll
       document.body.style.overflow = "hidden";
       window.addEventListener("keydown", handleEscape);
     } else {
-      // Restore body scroll
       document.body.style.overflow = "";
     }
 
@@ -291,85 +224,29 @@ export default function IndustrySolutions({
     };
   }, [showDashboard]);
 
-  const loadConnectors = async () => {
+  const loadInstalledItems = async () => {
     try {
       setLoading(true);
-      let userConnectors = [];
-      let workspaceConnectors = [];
-
-      // Load user-level connectors
-      try {
-        userConnectors = await UserConnector.list();
-      } catch (error) {
-        console.error("Failed to load user connectors:", error);
-      }
-
-      // Load workspace-level connectors if in a workspace
-      if (slug) {
-        try {
-          const workspaceData = await Workspace.connectors.list(slug);
-          workspaceConnectors = workspaceData.connectors || [];
-        } catch (error) {
-          console.error("Failed to load workspace connectors:", error);
-        }
-      }
-
-      // Combine and deduplicate connectors
-      const allConnectors = [...userConnectors, ...workspaceConnectors];
-      const uniqueConnectors = allConnectors.reduce((acc, connector) => {
-        if (!acc.find((c) => c.provider === connector.provider)) {
-          acc.push(connector);
-        }
-        return acc;
-      }, []);
-
-      setConnectors(uniqueConnectors);
+      const installedItems = await CommunityHub.getInstalledItems();
+      setItems(installedItems || []);
     } catch (error) {
-      console.error("Error loading connectors:", error);
+      console.error("Error loading installed items:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleConnect = async (provider) => {
-    try {
-      if (slug) {
-        // Connect to workspace
-        const result = await Workspace.connectors.connect(slug, { provider });
-        if (result.success) {
-          loadConnectors(); // Refresh the list
-        }
-      } else {
-        // Connect to user account
-        await UserConnector.initOAuth(provider);
-        loadConnectors(); // Refresh the list
-      }
-    } catch (error) {
-      console.error("Failed to connect:", error);
+  const handleBrowse = () => {
+    if (onBrowseMarketplace) {
+      onBrowseMarketplace();
+    } else {
+      setShowMarketplaceChat(true);
     }
   };
 
-  // Group connectors by category
-  const groupedConnectors = Object.entries(INDUSTRY_CONNECTORS).reduce(
-    (acc, [provider, config]) => {
-      const connector = connectors.find((c) => c.provider === provider);
-      if (!acc[config.category]) {
-        acc[config.category] = [];
-      }
-      acc[config.category].push({
-        provider,
-        ...config,
-        ...connector,
-        status: connector?.status || "disconnected",
-      });
-      return acc;
-    },
-    {}
-  );
-
-  const visibleConnectors = showAll
-    ? Object.values(groupedConnectors).flat()
-    : Object.values(groupedConnectors).flat().slice(0, maxVisible);
+  const visibleItems = showAll
+    ? items
+    : items.slice(0, maxVisible);
 
   if (loading) {
     return (
@@ -395,48 +272,51 @@ export default function IndustrySolutions({
         {/* Label - Hidden in compact mode */}
         {!compact && (
           <div className="flex items-center gap-2">
-            <Building className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            <Package className="w-4 h-4 text-gray-600 dark:text-gray-400" />
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300 hidden sm:inline">
-              Industry Solutions:
+              Marketplace:
             </span>
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300 sm:hidden">
-              Solutions:
+              Items:
             </span>
           </div>
         )}
 
-        {/* Connector Circles */}
+        {/* Marketplace Item Circles */}
         <div className="flex items-center gap-1">
-          {visibleConnectors.map((connector, index) => (
-            <ConnectorCircle
-              key={`${connector.provider}-${index}`}
-              connector={connector}
+          {visibleItems.map((item, index) => (
+            <MarketplaceItemCircle
+              key={`${item.itemType}-${item.id}-${index}`}
+              item={item}
               size={compact ? 28 : 32}
-              onClick={onConnectorClick}
-              onConnect={handleConnect}
+              onClick={onItemClick}
+              onBrowse={handleBrowse}
               showStatus={true}
               className="hover:z-10"
             />
           ))}
 
-          {/* Show More/Less Button - Hidden in compact mode */}
-          {!compact &&
-            Object.values(groupedConnectors).flat().length > maxVisible && (
-              <button
-                onClick={() => setShowAll(!showAll)}
-                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
-                title={showAll ? "Show less" : "Show more"}
-              >
-                <Plus className="w-3 h-3 text-gray-500" />
-              </button>
-            )}
+          {/* Show More/Less Button */}
+          {items.length > maxVisible && (
+            <button
+              onClick={() => setShowAll(!showAll)}
+              className={`${compact ? "w-7 h-7" : "w-8 h-8"} rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-all`}
+              title={showAll ? "Show less" : `Show ${items.length - maxVisible} more`}
+            >
+              {showAll ? (
+                <span className="text-xs font-bold text-gray-500">−</span>
+              ) : (
+                <span className="text-xs font-bold text-gray-500">+{items.length - maxVisible}</span>
+              )}
+            </button>
+          )}
 
-          {/* Business Chat Button */}
+          {/* Marketplace Chat Button */}
           {!compact && (
             <button
-              onClick={() => setShowBusinessChat(true)}
+              onClick={() => setShowMarketplaceChat(true)}
               className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white flex items-center justify-center shadow-md hover:shadow-lg transition-all"
-              title="Open Business Chat"
+              title="Browse Marketplace"
             >
               <ChatCircle className="w-3 h-3" />
             </button>
@@ -453,36 +333,37 @@ export default function IndustrySolutions({
             </button>
           )}
 
-          {/* Add New Connector Button */}
+          {/* Browse Marketplace Button */}
           <button
-            onClick={() => onConnectConnector && onConnectConnector()}
+            onClick={handleBrowse}
             className={`${compact ? "w-7 h-7" : "w-8 h-8"} rounded-full bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white flex items-center justify-center shadow-md hover:shadow-lg transition-all`}
-            title="Add new connector"
+            title="Browse marketplace"
           >
             <Plus className={`${compact ? "w-2.5 h-2.5" : "w-3 h-3"}`} />
           </button>
         </div>
 
         {/* Status Summary - Hidden in compact mode */}
-        {!compact && connectors.length > 0 && (
+        {!compact && items.length > 0 && (
           <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hidden lg:flex">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
             <span>
-              {connectors.filter((c) => c.status === "connected").length} active
+              {items.filter((i) => i.active).length} active
             </span>
           </div>
         )}
       </div>
 
-      {/* Business Chat Modal */}
-      <BusinessChat
-        isOpen={showBusinessChat}
-        onClose={() => setShowBusinessChat(false)}
-        connectors={connectors}
-        onConnectorAction={(connector) => {
-          console.log("Connector action:", connector);
-          // Handle connector actions
+      {/* Marketplace Chat Modal */}
+      <MarketplaceChat
+        isOpen={showMarketplaceChat}
+        onClose={() => setShowMarketplaceChat(false)}
+        items={items}
+        onItemAction={(item) => {
+          console.log("Item action:", item);
+          loadInstalledItems();
         }}
+        onRefresh={loadInstalledItems}
       />
 
       {/* Dashboard Modal */}
@@ -497,7 +378,7 @@ export default function IndustrySolutions({
             }}
             role="dialog"
             aria-modal="true"
-            aria-labelledby="dashboard-modal-title"
+            aria-labelledby="marketplace-dashboard-title"
           >
             <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden z-[9999]">
               {/* Dashboard Header */}
@@ -508,16 +389,16 @@ export default function IndustrySolutions({
                   </div>
                   <div>
                     <h2
-                      id="dashboard-modal-title"
+                      id="marketplace-dashboard-title"
                       className="text-xl font-bold text-gray-900 dark:text-white"
                     >
-                      Your Business Platform
+                      Your Marketplace Items
                     </h2>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Tailored to you • From all your platforms • Fit to your eyes
+                      All your installed agent skills, prompts, and commands
                     </p>
                     <p className="text-xs text-green-600 dark:text-green-400 font-medium mt-1">
-                      Personalized dashboard with your connected data sources
+                      {items.filter((i) => i.active).length} active items • {items.length} total
                     </p>
                   </div>
                 </div>
@@ -532,11 +413,12 @@ export default function IndustrySolutions({
 
               {/* Dashboard Content */}
               <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-                <CustomizableDashboard
-                  layout="workflow-mirror"
-                  connectors={connectors}
-                  onCustomize={() => {
-                    console.log("Customize dashboard");
+                <MarketplaceDashboard
+                  items={items}
+                  onRefresh={loadInstalledItems}
+                  onItemAction={(item) => {
+                    console.log("Dashboard item action:", item);
+                    loadInstalledItems();
                   }}
                 />
               </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   X,
   Sparkle,
@@ -89,12 +90,38 @@ export default function IndustrySolutionsBusinessChat({
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
+      // Lock body scroll
+      document.body.style.overflow = "hidden";
       setTimeout(() => {
         searchRef.current?.focus();
       }, 300);
     } else {
       setIsVisible(false);
+      // Restore body scroll
+      document.body.style.overflow = "";
     }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  // Handle ESC key
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === "Escape" && isOpen) {
+        handleClose();
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener("keydown", handleEscape);
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
   }, [isOpen]);
 
   const handleClose = () => {
@@ -125,22 +152,33 @@ export default function IndustrySolutionsBusinessChat({
     suggestion.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleBackdropClick = (e) => {
+    // Only close if clicking directly on the backdrop, not on children
+    if (e.target === e.currentTarget) {
+      handleClose();
+    }
+  };
+
   if (!isOpen) return null;
 
-  return (
+  const modalContent = (
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 bg-black/20 backdrop-blur-sm z-50 transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/20 backdrop-blur-sm z-[9998] transition-opacity duration-300 ${
           isVisible ? "opacity-100" : "opacity-0"
         }`}
-        onClick={handleClose}
+        onClick={handleBackdropClick}
+        aria-hidden="true"
       />
 
       {/* Chat Interface */}
       <div
         ref={chatRef}
-        className={`fixed top-0 right-0 h-full w-full max-w-2xl bg-white dark:bg-gray-900 shadow-2xl z-50 transform transition-transform duration-300 ${
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="business-chat-title"
+        className={`fixed top-0 right-0 h-full w-full max-w-2xl bg-white dark:bg-gray-900 shadow-2xl z-[9999] transform transition-transform duration-300 overflow-hidden ${
           isVisible ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -151,7 +189,7 @@ export default function IndustrySolutionsBusinessChat({
               <Sparkle className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 id="business-chat-title" className="text-2xl font-bold text-gray-900 dark:text-white">
                 Industry Solutions
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
@@ -219,7 +257,7 @@ export default function IndustrySolutionsBusinessChat({
         </div>
 
         {/* Content */}
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-[calc(100vh-180px)] overflow-y-auto">
           {/* Search Section */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="relative">
@@ -415,4 +453,7 @@ export default function IndustrySolutionsBusinessChat({
       </div>
     </>
   );
+
+  // Render modal using React Portal to ensure proper z-index and positioning
+  return createPortal(modalContent, document.body);
 }

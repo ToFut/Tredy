@@ -15,6 +15,7 @@ const { unifiedWorkflow } = require("./unified-workflow.js");
 const { workflowCreator } = require("./workflow-creator.js");
 const { createWorkflow } = require("./create-workflow.js");
 const { summaryGenerator } = require("./summary-generator.js");
+const { procurementOrchestrator } = require("./procurement-orchestrator.js");
 // const { simpleWorkflow } = require("./simple-workflow.js"); // Disabled in favor of workflowCreator
 
 module.exports = {
@@ -35,6 +36,7 @@ module.exports = {
   workflowCreator,
   createWorkflow,
   summaryGenerator,
+  procurementOrchestrator,
   // simpleWorkflow, // Disabled in favor of workflowCreator
 
   // Plugin name aliases so they can be pulled by slug as well.
@@ -55,5 +57,6 @@ module.exports = {
   [workflowCreator.name]: workflowCreator,
   [createWorkflow.name]: createWorkflow,
   [summaryGenerator.name]: summaryGenerator,
+  [procurementOrchestrator.name]: procurementOrchestrator,
   // [simpleWorkflow.name]: simpleWorkflow, // Disabled in favor of workflowCreator
 };

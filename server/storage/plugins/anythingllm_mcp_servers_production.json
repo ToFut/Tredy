@@ -925,6 +925,40 @@
         "description": "Twilio WhatsApp integration - send/receive WhatsApp messages, manage templates, and track conversations",
         "toolPrefix": "twilio_whatsapp"
       }
+    },
+    "dhl-tracking": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/storage/plugins/dhl-tracking-mcp.js"
+      ],
+      "env": {
+        "DHL_API_KEY": "${DHL_API_KEY}"
+      },
+      "anythingllm": {
+        "autoStart": false,
+        "workspaceAware": true,
+        "description": "DHL shipment tracking for procurement workflows - real-time tracking, delivery estimates, and status updates",
+        "toolPrefix": "dhl",
+        "priority": "medium",
+        "category": "logistics"
+      }
+    },
+    "supplier-crm": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/segevbin/anything-llm/server/storage/plugins/supplier-crm-mcp.js"
+      ],
+      "env": {},
+      "anythingllm": {
+        "autoStart": false,
+        "workspaceAware": true,
+        "description": "Supplier database and CRM for procurement - manage supplier info, contacts, search by proximity, and track relationships",
+        "toolPrefix": "supplier",
+        "priority": "medium",
+        "category": "procurement"
+      }
     }
   }
 }

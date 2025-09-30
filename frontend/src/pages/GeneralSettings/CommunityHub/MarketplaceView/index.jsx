@@ -39,8 +39,8 @@ export default function MarketplaceView() {
   const loadData = async () => {
     setLoading(true);
     try {
-      // Load explore items
-      const { result } = await CommunityHub.fetchExploreItems();
+      // Load explore items with high limit to show all available items
+      const { result } = await CommunityHub.fetchExploreItems({ limit: 1000 });
       if (result) {
         setExploreItems(result);
       }

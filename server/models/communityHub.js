@@ -30,10 +30,16 @@ const CommunityHub = {
 
   /**
    * Fetch the explore items from the community hub that are publicly available.
+   * @param {Object} params - Pagination parameters
+   * @param {number} params.limit - Number of items to fetch per category (default: all)
+   * @param {number} params.offset - Offset for pagination
    * @returns {Promise<{agentSkills: {items: [], hasMore: boolean, totalCount: number}, systemPrompts: {items: [], hasMore: boolean, totalCount: number}, slashCommands: {items: [], hasMore: boolean, totalCount: number}}>}
    */
-  fetchExploreItems: async function () {
-    return await fetch(`${this.apiBase}/explore`, {
+  fetchExploreItems: async function (params = {}) {
+    const { limit = 1000, offset = 0 } = params;
+    const queryParams = new URLSearchParams({ limit: limit.toString(), offset: offset.toString() });
+
+    return await fetch(`${this.apiBase}/explore?${queryParams}`, {
       method: "GET",
     })
       .then((response) => response.json())

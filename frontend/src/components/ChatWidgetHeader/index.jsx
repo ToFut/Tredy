@@ -14,6 +14,7 @@ import {
   Trash,
   ArrowClockwise,
   Check,
+  ChartBar,
 } from "@phosphor-icons/react";
 import { isMobile } from "react-device-detect";
 import Admin from "@/models/admin";
@@ -22,6 +23,8 @@ import showToast from "@/utils/toast";
 import ModalWrapper from "../ModalWrapper";
 import nangoService from "@/services/NangoService";
 import BackgroundTasksBubble from "../WorkspaceChat/BackgroundTasksBubble";
+import MarketplaceSolutions from "../MarketplaceSolutions";
+import BusinessChat from "../IndustrySolutions/BusinessChat";
 
 // Avatar Component - Google-style circular avatars
 function Avatar({
@@ -104,39 +107,52 @@ function Avatar({
   );
 }
 
-// Simple Connector Bubble
+// Connector Bubble with Real Brand Colors
 function ConnectorBubble({ connector, size = 40, onClick }) {
+  // Real brand colors and logos
   const styles = {
-    gmail: { color: "from-red-400 to-red-600", emoji: "📧" },
-    slack: { color: "from-purple-500 to-purple-700", emoji: "💬" },
-    github: { color: "from-gray-700 to-gray-900", emoji: "🐙" },
-    notion: { color: "from-gray-600 to-gray-800", emoji: "📝" },
-    default: { color: "from-gray-400 to-gray-600", emoji: "🔌" },
+    gmail: { bg: "#EA4335", text: "white", letter: "G" },
+    google: { bg: "#4285F4", text: "white", letter: "G" },
+    slack: { bg: "#4A154B", text: "white", letter: "S" },
+    github: { bg: "#181717", text: "white", letter: "G" },
+    notion: { bg: "#000000", text: "white", letter: "N" },
+    drive: { bg: "#4285F4", text: "white", letter: "D" },
+    calendar: { bg: "#4285F4", text: "white", letter: "C" },
+    linkedin: { bg: "#0A66C2", text: "white", letter: "in" },
+    stripe: { bg: "#635BFF", text: "white", letter: "S" },
+    shopify: { bg: "#96BF48", text: "white", letter: "S" },
+    default: { bg: "#6B7280", text: "white", letter: "?" },
   };
 
-  const style = styles[connector?.type] || styles.default;
+  const provider = connector?.type?.toLowerCase() || 'default';
+  const style = styles[provider] || styles.default;
 
   return (
     <div
-      className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105"
+      className="relative group cursor-pointer transform transition-all duration-200 hover:scale-110"
       onClick={onClick}
       style={{ width: size, height: size }}
     >
       <div
-        className={`w-full h-full rounded-full flex items-center justify-center bg-gradient-to-br ${style.color} shadow-md ring-2 ring-white dark:ring-gray-800 hover:shadow-lg`}
+        className="w-full h-full rounded-full flex items-center justify-center shadow-md ring-2 ring-white dark:ring-gray-800 hover:shadow-lg font-bold"
+        style={{
+          backgroundColor: style.bg,
+          color: style.text,
+          fontSize: size * 0.35
+        }}
       >
-        <span style={{ fontSize: size * 0.5 }}>{style.emoji}</span>
+        {style.letter}
       </div>
-      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 animate-pulse" />
+      <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 animate-pulse" />
       <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
-        {connector?.name || "Service"}
+        {connector?.name || provider}
       </div>
     </div>
   );
 }
 
 // Real Nango Connector Modal
-function ConnectorModal({ isOpen, onClose, workspace }) {
+function ConnectorModal({ isOpen, onClose, workspace, onConnected }) {
   const [connectors, setConnectors] = useState([]);
   const [availableProviders, setAvailableProviders] = useState([]);
   const [saving, setSaving] = useState("");
@@ -313,6 +329,11 @@ function ConnectorModal({ isOpen, onClose, workspace }) {
         // Trigger celebration animation
         setJustConnected(provider.id);
         setTimeout(() => setJustConnected(null), 3000);
+
+        // Notify parent to refresh
+        if (onConnected) {
+          onConnected();
+        }
 
         // Progressive refresh with better status checking
         const checkConnectionStatus = async (
@@ -1067,11 +1088,12 @@ function InviteModal({ isOpen, onClose, workspace }) {
 // Main Header Component - Enhanced Clean Design
 export default function ChatWidgetHeader({ workspace, connectors = [] }) {
   const [members, setMembers] = useState([]);
-  const [services] = useState(connectors);
+  const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showConnectorModal, setShowConnectorModal] = useState(false);
   const [showExpanded, setShowExpanded] = useState(false);
+  const [showBusinessChat, setShowBusinessChat] = useState(false);
   const avatarSize = isMobile ? 40 : 40; // Consistent size for better layout
 
   // Check for openConnectors query parameter on mount
@@ -1085,21 +1107,33 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
     }
   }, []);
 
-  useEffect(() => {
-    async function fetchMembers() {
-      try {
-        if (workspace?.slug) {
-          const workspaceMembers = await Workspace.members(workspace.slug);
-          setMembers(workspaceMembers || []);
-        }
-      } catch (error) {
-        console.error("Failed to fetch members:", error);
-      } finally {
-        setLoading(false);
+  // Fetch data function
+  const fetchData = async () => {
+    try {
+      if (workspace?.slug) {
+        setLoading(true);
+
+        // Fetch members
+        const workspaceMembers = await Workspace.members(workspace.slug);
+        setMembers(workspaceMembers || []);
+
+        // Fetch connected services
+        const connectorsResponse = await Workspace.connectors.list(workspace.slug);
+        const connectedServices = connectorsResponse?.connectors?.filter(
+          (c) => c.status === "connected"
+        ) || [];
+        setServices(connectedServices);
       }
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    } finally {
+      setLoading(false);
     }
-    fetchMembers();
-  }, [workspace]);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [workspace?.slug]);
 
   const visibleMembers = isMobile ? 3 : 5;
   const visibleServices = isMobile ? 2 : 3;
@@ -1110,117 +1144,128 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
 
   return (
     <>
-      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-[60px] z-40 w-full">
-        <div className="px-4 sm:px-6 lg:px-8 py-2.5">
-          <div className="flex items-center justify-between">
-            {/* Left: Clean Breadcrumb Navigation */}
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              {/* Breadcrumb for Desktop */}
-              <div className="hidden sm:flex items-center gap-2 text-sm">
-                <a href="/" className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
-                  Home
-                </a>
-                <span className="text-gray-400 dark:text-gray-600">/</span>
-                <a href="/workspaces" className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
-                  Workspaces
-                </a>
-                <span className="text-gray-400 dark:text-gray-600">/</span>
-                <div className="flex items-center gap-2">
-                  <div className="p-1 bg-purple-100 dark:bg-purple-900/30 rounded">
-                    <Robot className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <span className="font-medium text-gray-900 dark:text-white">
-                    {workspace?.name || "Workspace"}
-                  </span>
-                </div>
+      {/* Modern Compact Sticky Header */}
+      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200/80 dark:border-gray-700/80 sticky top-0 z-50 w-full shadow-sm">
+        <div className="max-w-[1920px] mx-auto px-3 sm:px-4 lg:px-6 py-2">
+          {/* Modern Minimal Header */}
+          <div className="flex items-center justify-between gap-3">
+            {/* Left: Context */}
+            <div className="flex items-center gap-2 min-w-0">
+              {/* Workspace */}
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-sm">
+                <Robot className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" weight="duotone" />
+                <span className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[120px]">
+                  {workspace?.name || "Workspace"}
+                </span>
               </div>
 
-              {/* Mobile: Simple Title */}
-              <div className="sm:hidden flex items-center gap-2">
-                <div className="p-1.5 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                  <Robot className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div className="min-w-0">
-                  <h2 className="font-medium text-gray-900 dark:text-white truncate text-sm">
-                    {workspace?.name || "Workspace"}
-                  </h2>
-                </div>
+              {/* Connected Services */}
+              <div className="hidden lg:flex items-center -space-x-1.5">
+                {loading ? (
+                  <div className="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                ) : services.length > 0 ? (
+                  <>
+                    {services.slice(0, 5).map((service, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setShowConnectorModal(true)}
+                        title={service.name || service.provider}
+                      >
+                        <ConnectorBubble
+                          connector={{
+                            type: service.provider,
+                            name: service.name || service.provider
+                          }}
+                          size={28}
+                        />
+                      </button>
+                    ))}
+                    {services.length > 5 && (
+                      <div className="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-700 border-2 border-white dark:border-gray-900 flex items-center justify-center text-[9px] font-bold text-gray-700 dark:text-gray-300">
+                        +{services.length - 5}
+                      </div>
+                    )}
+                  </>
+                ) : null}
+                <button
+                  onClick={() => setShowConnectorModal(true)}
+                  className="ml-1 w-7 h-7 rounded-full bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all"
+                  title="Add data source"
+                >
+                  <Plus className="w-3 h-3 text-gray-500 dark:text-gray-400" />
+                </button>
+              </div>
+
+              {/* Agent Skills */}
+              <div className="hidden xl:flex items-center -space-x-1.5">
+                <MarketplaceSolutions
+                  compact={true}
+                  maxVisible={12}
+                  onItemClick={(item) => {
+                    console.log("Skill:", item);
+                  }}
+                  showCategories={false}
+                />
               </div>
             </div>
 
-            {/* Right: Clean Action Buttons and Avatars */}
-            <div className="flex items-center gap-2 sm:gap-3">
-              {/* Action Buttons - Clean Design */}
-              <div className="hidden sm:flex items-center gap-2">
-                <button
-                  onClick={() => setShowConnectorModal(true)}
-                  className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-1.5"
-                >
-                  <Plug className="w-3.5 h-3.5" />
-                  <span>Connectors</span>
-                  {services.length > 0 && (
-                    <span className="ml-1 px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs rounded-full">
-                      {services.length}
-                    </span>
-                  )}
-                </button>
+            {/* Right: Actions */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Dashboard */}
+              <button
+                onClick={() => setShowBusinessChat(true)}
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg shadow-sm hover:shadow-md transition-all"
+                title="Dashboard"
+              >
+                <ChartBar className="w-3.5 h-3.5" weight="fill" />
+              </button>
 
-                <button
-                  onClick={() => setShowInviteModal(true)}
-                  className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-1.5"
-                >
-                  <UserPlus className="w-3.5 h-3.5" />
-                  <span>Invite</span>
-                </button>
-              </div>
-
-              {/* Members Stack - Cleaner Layout */}
-              <div className="flex items-center -space-x-2">
+              {/* Team */}
+              <div className="flex items-center -space-x-1.5">
                 {loading ? (
-                  <div className="flex -space-x-2">
-                    {[...Array(2)].map((_, i) => (
-                      <div key={i} className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse border-2 border-white dark:border-gray-900" />
-                    ))}
-                  </div>
-                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse border-2 border-white dark:border-gray-900" />
+                ) : members.length > 0 ? (
                   <>
-                    {members.slice(0, isMobile ? 3 : 4).map((member, idx) => (
-                      <div key={idx} className="relative">
+                    {members.slice(0, 3).map((member, idx) => (
+                      <div key={idx}>
                         <Avatar
                           user={member}
                           size={32}
                           showBadge={false}
-                          badgeIcon={member.role === 'admin' && !isMobile ? Crown : null}
+                          badgeIcon={member.role === 'admin' ? Crown : null}
                         />
                       </div>
                     ))}
-
-                    {/* Overflow Indicator */}
-                    {members.length > (isMobile ? 3 : 4) && (
+                    {members.length > 3 && (
                       <button
                         onClick={() => setShowExpanded(true)}
-                        className="relative"
+                        className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 border-2 border-white dark:border-gray-900 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-[10px] font-bold text-gray-700 dark:text-gray-300"
+                        title={`+${members.length - 3} more`}
                       >
-                        <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-400 border-2 border-white dark:border-gray-900 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                          +{members.length - (isMobile ? 3 : 4)}
-                        </div>
+                        +{members.length - 3}
                       </button>
                     )}
                   </>
-                )}
+                ) : null}
+                <button
+                  onClick={() => setShowInviteModal(true)}
+                  className="ml-1 w-8 h-8 rounded-full bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all"
+                  title="Invite team"
+                >
+                  <UserPlus className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
+                </button>
               </div>
 
-              {/* Background Tasks - Clean Integration */}
-              <BackgroundTasksBubble workspace={workspace} />
+              {/* Tasks */}
+              <BackgroundTasksBubble workspace={workspace} size={32} />
 
-              {/* Mobile Menu Button */}
+              {/* Mobile */}
               {isMobile && (
                 <button
                   onClick={() => setShowExpanded(true)}
-                  className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg sm:hidden"
-                  aria-label="More options"
+                  className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg"
                 >
-                  <Lightning className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  <Lightning className="w-4 h-4" />
                 </button>
               )}
             </div>
@@ -1239,6 +1284,10 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
         isOpen={showConnectorModal}
         onClose={() => setShowConnectorModal(false)}
         workspace={workspace}
+        onConnected={() => {
+          // Refresh services when a new connector is added
+          fetchData();
+        }}
       />
 
       <ExpandedMobileView
@@ -1254,6 +1303,20 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
         onManageConnectors={() => {
           setShowExpanded(false);
           setShowConnectorModal(true);
+        }}
+      />
+
+      {/* Business Chat Modal */}
+      <BusinessChat
+        isOpen={showBusinessChat}
+        onClose={() => setShowBusinessChat(false)}
+        connectors={services.map(service => ({
+          ...service,
+          type: service.provider,
+          status: 'connected'
+        }))}
+        onConnectorAction={(connector) => {
+          console.log("Connector action:", connector);
         }}
       />
     </>

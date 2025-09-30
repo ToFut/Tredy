@@ -11,6 +11,7 @@ import {
   ChartLine,
   Plugs,
   ListChecks,
+  ShoppingCart,
 } from "@phosphor-icons/react";
 import RAGImage from "@/media/agents/rag-memory.png";
 import SummarizeImage from "@/media/agents/view-summarize.png";
@@ -138,5 +139,14 @@ export const configurableSkills = {
     skill: "universal-integrator",
     icon: Plugs,
     image: ScrapeWebsitesImage,
+  },
+  "procurement-orchestrator": {
+    title: "Procurement Workflow System",
+    description:
+      "Complete 11-stage procurement workflow from BOM extraction to delivery. Includes AI compliance analysis (CAL 117-2013, ADA), supplier matching with weighted scoring, RFQ management, bid comparison, contract generation, payment processing, and shipment tracking. Perfect for hotel/hospitality procurement.",
+    component: GenericSkillPanel,
+    skill: "procurement-orchestrator",
+    icon: ShoppingCart,
+    image: GenerateChartsImage,
   },
 };

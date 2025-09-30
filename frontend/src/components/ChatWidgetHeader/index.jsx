@@ -869,7 +869,7 @@ function InviteModal({ isOpen, onClose, workspace }) {
   );
 }
 
-// Main Header Component
+// Main Header Component - Enhanced Clean Design
 export default function ChatWidgetHeader({ workspace, connectors = [] }) {
   const [members, setMembers] = useState([]);
   const [services] = useState(connectors);
@@ -915,118 +915,117 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
 
   return (
     <>
-      <div className="bg-white/98 dark:bg-gray-900/98 backdrop-blur-md border-b border-gray-200/60 dark:border-gray-700/60 sticky top-[60px] z-40 w-full shadow-sm">
-        <div className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
-          <div className="flex items-center justify-between gap-2 sm:gap-3">
-            {/* Left: Workspace Info - Enhanced design */}
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink-0">
-              <div className="hidden sm:flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-sm">
-                  <Sparkle className="w-4 h-4 text-white" />
-                </div>
-                <div className="min-w-0">
-                  <h2 className="font-semibold text-gray-900 dark:text-white truncate text-base">
+      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-[60px] z-40 w-full">
+        <div className="px-4 sm:px-6 lg:px-8 py-2.5">
+          <div className="flex items-center justify-between">
+            {/* Left: Clean Breadcrumb Navigation */}
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              {/* Breadcrumb for Desktop */}
+              <div className="hidden sm:flex items-center gap-2 text-sm">
+                <a href="/" className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
+                  Home
+                </a>
+                <span className="text-gray-400 dark:text-gray-600">/</span>
+                <a href="/workspaces" className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
+                  Workspaces
+                </a>
+                <span className="text-gray-400 dark:text-gray-600">/</span>
+                <div className="flex items-center gap-2">
+                  <div className="p-1 bg-purple-100 dark:bg-purple-900/30 rounded">
+                    <Robot className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <span className="font-medium text-gray-900 dark:text-white">
                     {workspace?.name || "Workspace"}
-                  </h2>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                    Active workspace
-                  </p>
+                  </span>
                 </div>
               </div>
-              
-              {/* Mobile: Compact but improved */}
+
+              {/* Mobile: Simple Title */}
               <div className="sm:hidden flex items-center gap-2">
-                <div className="p-1.5 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex-shrink-0 shadow-sm">
-                  <Sparkle className="w-3.5 h-3.5 text-white" />
+                <div className="p-1.5 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                  <Robot className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                 </div>
                 <div className="min-w-0">
-                  <h2 className="font-semibold text-gray-900 dark:text-white truncate text-sm">
+                  <h2 className="font-medium text-gray-900 dark:text-white truncate text-sm">
                     {workspace?.name || "Workspace"}
                   </h2>
                 </div>
               </div>
             </div>
 
-            {/* Right: Avatar Stack - Enhanced design */}
-            <div className="flex items-center gap-1 sm:gap-2">
-              {/* Members Stack - Improved spacing */}
-              <div className="flex items-center -space-x-1 sm:-space-x-2">
+            {/* Right: Clean Action Buttons and Avatars */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Action Buttons - Clean Design */}
+              <div className="hidden sm:flex items-center gap-2">
+                <button
+                  onClick={() => setShowConnectorModal(true)}
+                  className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-1.5"
+                >
+                  <Plug className="w-3.5 h-3.5" />
+                  <span>Connectors</span>
+                  {services.length > 0 && (
+                    <span className="ml-1 px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs rounded-full">
+                      {services.length}
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => setShowInviteModal(true)}
+                  className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-1.5"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Invite</span>
+                </button>
+              </div>
+
+              {/* Members Stack - Cleaner Layout */}
+              <div className="flex items-center -space-x-2">
                 {loading ? (
-                  <div className="flex -space-x-1">
+                  <div className="flex -space-x-2">
                     {[...Array(2)].map((_, i) => (
-                      <div key={i} className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse ring-1 ring-white dark:ring-gray-900`} />
+                      <div key={i} className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse border-2 border-white dark:border-gray-900" />
                     ))}
                   </div>
                 ) : (
                   <>
-                    {members.slice(0, isMobile ? 2 : visibleMembers).map((member, idx) => (
-                      <Avatar 
-                        key={idx}
-                        user={member}
-                        size={isMobile ? 28 : avatarSize}
-                        showBadge={false}
-                        badgeIcon={member.role === 'admin' && !isMobile ? Crown : null}
-                      />
+                    {members.slice(0, isMobile ? 3 : 4).map((member, idx) => (
+                      <div key={idx} className="relative">
+                        <Avatar
+                          user={member}
+                          size={32}
+                          showBadge={false}
+                          badgeIcon={member.role === 'admin' && !isMobile ? Crown : null}
+                        />
+                      </div>
                     ))}
-                    
+
                     {/* Overflow Indicator */}
-                    {totalOverflow > 0 && (
+                    {members.length > (isMobile ? 3 : 4) && (
                       <button
                         onClick={() => setShowExpanded(true)}
-                        className="relative transform transition-all duration-200 hover:scale-110"
-                        style={{ width: isMobile ? 28 : avatarSize, height: isMobile ? 28 : avatarSize }}
+                        className="relative"
                       >
-                        <div className="w-full h-full rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300 ring-1 ring-white dark:ring-gray-900 hover:bg-gray-300 dark:hover:bg-gray-600">
-                          +{totalOverflow}
+                        <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-400 border-2 border-white dark:border-gray-900 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                          +{members.length - (isMobile ? 3 : 4)}
                         </div>
                       </button>
-                    )}
-                    
-                    {/* Add Member Button - Hidden on mobile */}
-                    {!isMobile && (
-                      <AddButton 
-                        onClick={() => setShowInviteModal(true)}
-                        type="member"
-                        size={avatarSize}
-                      />
                     )}
                   </>
                 )}
               </div>
 
-              {/* Services Stack - Enhanced separator */}
-              <div className="h-4 sm:h-5 w-px bg-gray-300/60 dark:bg-gray-600/60 mx-1 sm:mx-2" />
-              <div className="flex items-center -space-x-1 sm:-space-x-2">
-                {services.slice(0, isMobile ? 1 : visibleServices).map((service, idx) => (
-                  <ConnectorBubble 
-                    key={idx}
-                    connector={service}
-                    size={isMobile ? 28 : avatarSize}
-                    onClick={() => setShowConnectorModal(true)}
-                  />
-                ))}
-                {!isMobile && (
-                  <AddButton 
-                    onClick={() => setShowConnectorModal(true)}
-                    type="service"
-                    size={avatarSize}
-                  />
-                )}
-              </div>
-              
-              {/* Background Tasks Bubble */}
-              <div className="h-4 sm:h-5 w-px bg-gray-300/60 dark:bg-gray-600/60 mx-1 sm:mx-2" />
+              {/* Background Tasks - Clean Integration */}
               <BackgroundTasksBubble workspace={workspace} />
 
-              {/* Expand Button (Mobile) - Enhanced design */}
+              {/* Mobile Menu Button */}
               {isMobile && (
                 <button
                   onClick={() => setShowExpanded(true)}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 sm:hidden touch-manipulation ml-1 hover:scale-105"
-                  style={{ minWidth: '36px', minHeight: '36px' }}
-                  aria-label="Expand team view"
+                  className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg sm:hidden"
+                  aria-label="More options"
                 >
-                  <ArrowsOut className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  <Lightning className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                 </button>
               )}
             </div>

@@ -1,18 +1,18 @@
 // Base interfaces for document handling
-const { systemEvents } = require('./systemInterfaces');
+const { systemEvents } = require("./systemInterfaces");
 
 const DOCUMENT_STATES = {
-  PENDING: 'pending',
-  PROCESSING: 'processing',
-  COMPLETED: 'completed',
-  ERROR: 'error',
+  PENDING: "pending",
+  PROCESSING: "processing",
+  COMPLETED: "completed",
+  ERROR: "error",
 };
 
 const DOCUMENT_TYPES = {
-  TEXT: 'text',
-  PDF: 'pdf',
-  DOCX: 'docx',
-  HTML: 'html',
+  TEXT: "text",
+  PDF: "pdf",
+  DOCX: "docx",
+  HTML: "html",
 };
 
 // Base document event handlers

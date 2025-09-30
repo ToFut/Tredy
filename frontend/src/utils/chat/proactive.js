@@ -2,20 +2,43 @@
 
 // Provider detection patterns
 const PROVIDER_KEYWORDS = {
-  gmail: ['gmail', 'google mail', 'email', 'send email', 'check email', 'inbox'],
-  'google-calendar': ['calendar', 'google calendar', 'schedule', 'meeting', 'appointment', 'events'],
-  'google-drive': ['drive', 'google drive', 'document', 'file', 'sheet', 'doc'],
-  slack: ['slack', 'message', 'channel', 'team communication'],
-  outlook: ['outlook', 'microsoft email', 'office 365'],
-  github: ['github', 'repository', 'code', 'commit', 'pull request'],
-  dropbox: ['dropbox', 'file storage', 'cloud storage'],
-  linkedin: ['linkedin', 'professional network', 'job', 'career']
+  gmail: [
+    "gmail",
+    "google mail",
+    "email",
+    "send email",
+    "check email",
+    "inbox",
+  ],
+  "google-calendar": [
+    "calendar",
+    "google calendar",
+    "schedule",
+    "meeting",
+    "appointment",
+    "events",
+  ],
+  "google-drive": ["drive", "google drive", "document", "file", "sheet", "doc"],
+  slack: ["slack", "message", "channel", "team communication"],
+  outlook: ["outlook", "microsoft email", "office 365"],
+  github: ["github", "repository", "code", "commit", "pull request"],
+  dropbox: ["dropbox", "file storage", "cloud storage"],
+  linkedin: ["linkedin", "professional network", "job", "career"],
 };
 
 // Connection status keywords
 const CONNECTION_KEYWORDS = [
-  'connect', 'link', 'integrate', 'setup', 'configure', 'authorize',
-  'oauth', 'login', 'authentication', 'access', 'permission'
+  "connect",
+  "link",
+  "integrate",
+  "setup",
+  "configure",
+  "authorize",
+  "oauth",
+  "login",
+  "authentication",
+  "access",
+  "permission",
 ];
 
 /**
@@ -28,10 +51,10 @@ export function detectRequiredProviders(userMessage) {
   const detectedProviders = [];
 
   Object.entries(PROVIDER_KEYWORDS).forEach(([provider, keywords]) => {
-    const hasProviderKeyword = keywords.some(keyword => 
+    const hasProviderKeyword = keywords.some((keyword) =>
       message.includes(keyword.toLowerCase())
     );
-    
+
     if (hasProviderKeyword) {
       detectedProviders.push(provider);
     }
@@ -47,7 +70,7 @@ export function detectRequiredProviders(userMessage) {
  */
 export function isConnectionRequest(userMessage) {
   const message = userMessage.toLowerCase();
-  return CONNECTION_KEYWORDS.some(keyword => 
+  return CONNECTION_KEYWORDS.some((keyword) =>
     message.includes(keyword.toLowerCase())
   );
 }
@@ -63,7 +86,7 @@ export function generateProactiveSystemPrompt(userMessage, workspaceSlug) {
   const isConnectionReq = isConnectionRequest(userMessage);
 
   if (requiredProviders.length === 0 && !isConnectionReq) {
-    return '';
+    return "";
   }
 
   let proactivePrompt = `
@@ -76,8 +99,10 @@ The user's request may benefit from third-party integrations. Consider the follo
   if (requiredProviders.length > 0) {
     proactivePrompt += `### Detected Integration Needs:
 `;
-    requiredProviders.forEach(provider => {
-      const providerName = provider.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    requiredProviders.forEach((provider) => {
+      const providerName = provider
+        .replace("-", " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase());
       proactivePrompt += `- ${providerName}: Consider if the user needs to connect this service\n`;
     });
 
@@ -126,43 +151,50 @@ Remember: Only suggest connections that are actually relevant to the user's requ
  * @param {string[]} connectedProviders - Already connected providers
  * @returns {Object} - Suggestion object with provider and reason
  */
-export function generateConnectionSuggestions(userMessage, connectedProviders = []) {
+export function generateConnectionSuggestions(
+  userMessage,
+  connectedProviders = []
+) {
   const requiredProviders = detectRequiredProviders(userMessage);
   const suggestions = [];
 
-  requiredProviders.forEach(provider => {
+  requiredProviders.forEach((provider) => {
     if (!connectedProviders.includes(provider)) {
-      let reason = '';
-      const providerName = provider.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+      let reason = "";
+      const providerName = provider
+        .replace("-", " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase());
 
       switch (provider) {
-        case 'gmail':
-          reason = 'to send, read, and manage your emails directly from the chat';
+        case "gmail":
+          reason =
+            "to send, read, and manage your emails directly from the chat";
           break;
-        case 'google-calendar':
-          reason = 'to schedule meetings, check availability, and manage events';
+        case "google-calendar":
+          reason =
+            "to schedule meetings, check availability, and manage events";
           break;
-        case 'google-drive':
-          reason = 'to access, create, and manage your documents and files';
+        case "google-drive":
+          reason = "to access, create, and manage your documents and files";
           break;
-        case 'slack':
-          reason = 'to send messages and interact with your team channels';
+        case "slack":
+          reason = "to send messages and interact with your team channels";
           break;
-        case 'outlook':
-          reason = 'to manage your Microsoft email and calendar';
+        case "outlook":
+          reason = "to manage your Microsoft email and calendar";
           break;
-        case 'github':
-          reason = 'to access repositories, create issues, and manage code';
+        case "github":
+          reason = "to access repositories, create issues, and manage code";
           break;
         default:
-          reason = 'to enable enhanced functionality for your requests';
+          reason = "to enable enhanced functionality for your requests";
       }
 
       suggestions.push({
         provider,
         providerName,
         reason,
-        priority: requiredProviders.length === 1 ? 'high' : 'medium'
+        priority: requiredProviders.length === 1 ? "high" : "medium",
       });
     }
   });

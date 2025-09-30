@@ -25,7 +25,7 @@ class MCPNangoBridge {
    */
   async getMCPConfig(provider, workspaceId) {
     const connector = await ConnectorTokens.get({ workspaceId, provider });
-    
+
     if (!connector || !connector.nangoConnectionId) {
       return null;
     }
@@ -35,33 +35,39 @@ class MCPNangoBridge {
     if (!connection) {
       return null;
     }
-    
+
     // Use specific MCP servers for each provider
     const mcpServerMap = {
-      'gmail': '/Users/segevbin/anything-llm/server/gmail-mcp-server.js',
-      'google-calendar': '/Users/segevbin/anything-llm/server/simple-google-calendar-mcp.js',
-      'google-drive': '/Users/segevbin/anything-llm/server/google-drive-generated-mcp.js',
-      'linkedin': '/Users/segevbin/anything-llm/server/linkedin-mcp.js',
+      gmail: "/Users/segevbin/anything-llm/server/gmail-mcp-server.js",
+      "google-calendar":
+        "/Users/segevbin/anything-llm/server/simple-google-calendar-mcp.js",
+      "google-drive":
+        "/Users/segevbin/anything-llm/server/google-drive-generated-mcp.js",
+      linkedin: "/Users/segevbin/anything-llm/server/linkedin-mcp.js",
+      supabase: "/mnt/c/MyProjects/Tredy/server/supabase-mcp-server.js",
       // Add other providers as needed
-      'default': '/Users/segevbin/anything-llm/server/universal-nango-mcp.js'
+      default: "/Users/segevbin/anything-llm/server/universal-nango-mcp.js",
     };
-    
-    const mcpServer = mcpServerMap[provider] || mcpServerMap['default'];
-    
+
+    const mcpServer = mcpServerMap[provider] || mcpServerMap["default"];
+
     return {
       type: "stdio",
       command: "node",
       args: [mcpServer],
       env: {
         NANGO_PROVIDER: provider,
-        NANGO_PROVIDER_CONFIG_KEY: connector.nangoProviderConfigKey || `${provider}-getting-started`,
-        NANGO_SECRET_KEY: process.env.NANGO_SECRET_KEY || '7aac4fec-c1fa-4eba-9100-4b2ef9bc2b91',
-        NANGO_HOST: process.env.NANGO_HOST || 'https://api.nango.dev',
+        NANGO_PROVIDER_CONFIG_KEY:
+          connector.nangoProviderConfigKey || `${provider}-getting-started`,
+        NANGO_SECRET_KEY:
+          process.env.NANGO_SECRET_KEY ||
+          "7aac4fec-c1fa-4eba-9100-4b2ef9bc2b91",
+        NANGO_HOST: process.env.NANGO_HOST || "https://api.nango.dev",
         NANGO_CONNECTION_ID: `workspace_${workspaceId}`,
       },
       anythingllm: {
-        autoStart: true
-      }
+        autoStart: true,
+      },
     };
   }
 
@@ -71,11 +77,13 @@ class MCPNangoBridge {
    */
   async updateMCPServersForWorkspace(workspaceId) {
     // Validate workspaceId - skip if invalid or test data
-    if (!workspaceId || workspaceId.toString().includes('test-')) {
-      console.log(`[MCPBridge] Skipping MCP update for test/invalid workspace: ${workspaceId}`);
+    if (!workspaceId || workspaceId.toString().includes("test-")) {
+      console.log(
+        `[MCPBridge] Skipping MCP update for test/invalid workspace: ${workspaceId}`
+      );
       return {};
     }
-    
+
     const connectors = await ConnectorTokens.forWorkspace(workspaceId);
     const mcpConfigs = {};
 
@@ -94,8 +102,14 @@ class MCPNangoBridge {
     const path = require("path");
     const configPath =
       process.env.NODE_ENV === "development"
-        ? path.resolve(__dirname, "../../storage/plugins/anythingllm_mcp_servers.json")
-        : path.resolve(process.env.STORAGE_DIR || path.resolve(__dirname, "../../storage"), "plugins/anythingllm_mcp_servers.json");
+        ? path.resolve(
+            __dirname,
+            "../../storage/plugins/anythingllm_mcp_servers.json"
+          )
+        : path.resolve(
+            process.env.STORAGE_DIR || path.resolve(__dirname, "../../storage"),
+            "plugins/anythingllm_mcp_servers.json"
+          );
 
     let existingConfig = { mcpServers: {} };
     if (fs.existsSync(configPath)) {
@@ -129,7 +143,11 @@ class MCPNangoBridge {
    */
   async handleCallback(provider, workspaceId, connectionId) {
     // Use NangoIntegration to verify and store connection
-    const result = await this.nango.createConnection(provider, workspaceId, connectionId);
+    const result = await this.nango.createConnection(
+      provider,
+      workspaceId,
+      connectionId
+    );
 
     // Update MCP servers
     await this.updateMCPServersForWorkspace(workspaceId);
@@ -143,7 +161,7 @@ class MCPNangoBridge {
   async disconnect(provider, workspaceId) {
     // Use NangoIntegration to handle disconnection
     const result = await this.nango.deleteConnection(provider, workspaceId);
-    
+
     // Update MCP servers
     await this.updateMCPServersForWorkspace(workspaceId);
 
@@ -156,7 +174,9 @@ class MCPNangoBridge {
   async configureMCPServer(provider, workspaceId) {
     // This is called during integration to prepare MCP config
     // Actual MCP server starts when OAuth completes
-    console.log(`[MCPBridge] MCP server configured for ${provider} in workspace ${workspaceId}`);
+    console.log(
+      `[MCPBridge] MCP server configured for ${provider} in workspace ${workspaceId}`
+    );
     return { success: true };
   }
 
@@ -167,38 +187,44 @@ class MCPNangoBridge {
     try {
       const connection = await this.nango.getConnection(provider, workspaceId);
       if (!connection) {
-        throw new Error('No connection found');
+        throw new Error("No connection found");
       }
 
       // Make a simple test API call based on provider
       let testEndpoint;
       switch (provider) {
-        case 'linkedin':
-        case 'linkedin-getting-started':
-          testEndpoint = '/v2/userinfo';
+        case "linkedin":
+        case "linkedin-getting-started":
+          testEndpoint = "/v2/userinfo";
           break;
-        case 'google-mail-getting-started':
-        case 'gmail':
-          testEndpoint = '/gmail/v1/users/me/profile';
+        case "google-mail-getting-started":
+        case "gmail":
+          testEndpoint = "/gmail/v1/users/me/profile";
           break;
-        case 'google-calendar-getting-started':
-          testEndpoint = '/calendar/v3/users/me/calendarList';
+        case "google-calendar-getting-started":
+          testEndpoint = "/calendar/v3/users/me/calendarList";
           break;
         default:
           // Skip test for unknown providers
-          return { success: true, message: 'Connection configured (test skipped)' };
+          return {
+            success: true,
+            message: "Connection configured (test skipped)",
+          };
       }
 
       const testResponse = await this.nango.get({
         endpoint: testEndpoint,
         connectionId: `workspace_${workspaceId}`,
-        providerConfigKey: provider
+        providerConfigKey: provider,
       });
 
       console.log(`[MCPBridge] Connection test successful for ${provider}`);
       return { success: true, data: testResponse.data };
     } catch (error) {
-      console.error(`[MCPBridge] Connection test failed for ${provider}:`, error);
+      console.error(
+        `[MCPBridge] Connection test failed for ${provider}:`,
+        error
+      );
       throw new Error(`Connection test failed: ${error.message}`);
     }
   }
@@ -208,42 +234,43 @@ class MCPNangoBridge {
    */
   getCategory(providerId) {
     const categoryMap = {
-      'gmail': 'communication',
-      'google-calendar': 'productivity',
-      'google-drive': 'productivity',
-      'google-sheets': 'productivity',
-      'linkedin': 'communication',
-      'facebook': 'communication',
-      'whatsapp': 'communication',
-      'instagram': 'communication',
-      'twitter': 'communication',
-      'slack': 'communication',
-      'discord': 'communication',
-      'telegram': 'communication',
-      'github': 'development',
-      'stripe': 'payments',
-      'shopify': 'ecommerce',
-      'airtable': 'productivity',
-      'notion': 'productivity',
-      'hubspot': 'crm',
-      'salesforce': 'crm',
-      'zendesk': 'support',
-      'jira': 'development',
-      'meta-ads': 'marketing',
-      'reddit': 'communication',
-      'youtube': 'media',
-      'postgres': 'database',
-      'mongodb': 'database',
-      'docker': 'infrastructure',
-      'kubernetes': 'infrastructure',
-      'aws': 'infrastructure',
-      'azure': 'infrastructure',
-      'twilio': 'communication',
-      'sendgrid': 'email',
-      'mailchimp': 'email'
+      gmail: "communication",
+      "google-calendar": "productivity",
+      "google-drive": "productivity",
+      "google-sheets": "productivity",
+      linkedin: "communication",
+      facebook: "communication",
+      whatsapp: "communication",
+      instagram: "communication",
+      twitter: "communication",
+      slack: "communication",
+      discord: "communication",
+      telegram: "communication",
+      github: "development",
+      stripe: "payments",
+      shopify: "ecommerce",
+      airtable: "productivity",
+      notion: "productivity",
+      hubspot: "crm",
+      salesforce: "crm",
+      zendesk: "support",
+      jira: "development",
+      "meta-ads": "marketing",
+      reddit: "communication",
+      youtube: "media",
+      postgres: "database",
+      mongodb: "database",
+      docker: "infrastructure",
+      kubernetes: "infrastructure",
+      aws: "infrastructure",
+      azure: "infrastructure",
+      twilio: "communication",
+      sendgrid: "email",
+      mailchimp: "email",
+      supabase: "database"
     };
-    
-    return categoryMap[providerId] || 'other';
+
+    return categoryMap[providerId] || "other";
   }
 
   /**
@@ -251,24 +278,28 @@ class MCPNangoBridge {
    */
   getAvailableProviders() {
     // Load from MCP registry
-    const registry = require('../../mcp-registry.json');
+    const registry = require("../../mcp-registry.json");
     const providers = [];
-    
+
     for (const [id, config] of Object.entries(registry.mcpServers)) {
       // Only show OAuth/API key providers (not local ones)
-      if (config.auth.startsWith('nango:') || config.auth.startsWith('api_key:')) {
+      if (
+        config.auth.startsWith("nango:") ||
+        config.auth.startsWith("api_key:")
+      ) {
         providers.push({
           id,
-          name: id.charAt(0).toUpperCase() + id.slice(1).replace(/-/g, ' '),
+          name: id.charAt(0).toUpperCase() + id.slice(1).replace(/-/g, " "),
           description: config.description,
           category: this.getCategory(id),
-          authType: config.auth.startsWith('nango:') ? 'oauth' : 'api_key',
+          authType: config.auth.startsWith("nango:") ? "oauth" : "api_key",
           logo: `/icons/${id}.svg`,
-          requiresMetadata: config.auth.includes('instagram') || config.auth.includes('meta')
+          requiresMetadata:
+            config.auth.includes("instagram") || config.auth.includes("meta"),
         });
       }
     }
-    
+
     // Keep existing providers for compatibility
     providers.push(
       {
@@ -281,8 +312,8 @@ class MCPNangoBridge {
         requiresMetadata: true,
         metadataFields: {
           folders: "Folder IDs to sync (use 'root' for all)",
-          files: "Specific file IDs to sync (optional)"
-        }
+          files: "Specific file IDs to sync (optional)",
+        },
       },
       {
         id: "facebook",
@@ -358,9 +389,17 @@ class MCPNangoBridge {
         category: "communication",
         authType: "oauth",
         logo: "/icons/slack.svg",
+      },
+      {
+        id: "supabase",
+        name: "Supabase",
+        description: "Backend as a service with database and storage",
+        category: "database",
+        authType: "oauth",
+        logo: "/icons/gmail.svg",
       }
     );
-    
+
     return providers;
   }
 }

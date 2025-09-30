@@ -1,10 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Sparkle, Plus, EnvelopeSimple, Calendar, Play, FlowArrow, Globe, ArrowRight, Users, Brain } from "@phosphor-icons/react";
+import {
+  Sparkle,
+  Plus,
+  EnvelopeSimple,
+  Calendar,
+  Play,
+  FlowArrow,
+  Globe,
+  ArrowRight,
+  Users,
+  Brain,
+} from "@phosphor-icons/react";
 import useUser from "@/hooks/useUser";
 import Workspace from "@/models/workspace";
 import WorkspaceChat from "@/components/WorkspaceChat";
 import { FullScreenLoader } from "@/components/Preloader";
-import NewWorkspaceModal, { useNewWorkspaceModal } from "@/components/Modals/NewWorkspace";
+import NewWorkspaceModal, {
+  useNewWorkspaceModal,
+} from "@/components/Modals/NewWorkspace";
 import AgentFlows from "@/models/agentFlows";
 import { useTranslation } from "react-i18next";
 import { useLanguageOptions } from "@/hooks/useLanguageOptions";
@@ -17,76 +30,89 @@ const DEMO_CHAT_MESSAGES = [
   {
     id: 1,
     role: "user",
-    content: "Hi! I'm interested in getting a quote for a kitchen remodel. Can you help me?",
+    content:
+      "Hi! I'm interested in getting a quote for a kitchen remodel. Can you help me?",
     timestamp: new Date(Date.now() - 1000 * 60 * 5), // 5 minutes ago
-    uuid: "demo-user-1"
+    uuid: "demo-user-1",
   },
   {
     id: 2,
     role: "assistant",
-    content: "Hello! I'd be happy to help you with your kitchen remodel quote. Let me gather some information about your project and check our current availability.",
+    content:
+      "Hello! I'd be happy to help you with your kitchen remodel quote. Let me gather some information about your project and check our current availability.",
     timestamp: new Date(Date.now() - 1000 * 60 * 4), // 4 minutes ago
-    uuid: "demo-assistant-1"
+    uuid: "demo-assistant-1",
   },
   {
     id: 3,
     role: "assistant",
-    content: "🏗️ **Kitchen Remodel Analysis Complete**\n\n**Based on your location and typical kitchen remodels:**\n• Estimated timeline: 4-6 weeks\n• Material cost range: $15,000-$25,000\n• Labor estimate: $8,000-$12,000\n• Next available start: March 15th\n\n**Popular upgrades in your area:**\n• Quartz countertops (+$3,000)\n• Custom cabinets (+$5,000)\n• Smart appliances (+$2,000)\n\nWould you like me to schedule a free consultation with our project manager?",
+    content:
+      "🏗️ **Kitchen Remodel Analysis Complete**\n\n**Based on your location and typical kitchen remodels:**\n• Estimated timeline: 4-6 weeks\n• Material cost range: $15,000-$25,000\n• Labor estimate: $8,000-$12,000\n• Next available start: March 15th\n\n**Popular upgrades in your area:**\n• Quartz countertops (+$3,000)\n• Custom cabinets (+$5,000)\n• Smart appliances (+$2,000)\n\nWould you like me to schedule a free consultation with our project manager?",
     timestamp: new Date(Date.now() - 1000 * 60 * 3), // 3 minutes ago
-    uuid: "demo-assistant-2"
+    uuid: "demo-assistant-2",
   },
   {
     id: 4,
     role: "user",
-    content: "Yes, that sounds great! Can you also send me some photos of recent kitchen projects?",
+    content:
+      "Yes, that sounds great! Can you also send me some photos of recent kitchen projects?",
     timestamp: new Date(Date.now() - 1000 * 60 * 2), // 2 minutes ago
-    uuid: "demo-user-2"
+    uuid: "demo-user-2",
   },
   {
     id: 5,
     role: "assistant",
-    content: "✅ **Consultation Scheduled & Portfolio Sent**\n\n**Your Consultation:**\n• Date: March 8th at 2:00 PM\n• Location: Your home (free in-home visit)\n• Duration: 1 hour\n• Project Manager: Mike Rodriguez\n\n**Portfolio Gallery:**\n• 12 recent kitchen remodels sent to your email\n• Before/after photos included\n• Material samples will be brought to consultation\n\n**Next Steps:**\n• Calendar invite sent to your email\n• Project questionnaire sent for pre-consultation\n• Material catalog will be emailed tomorrow\n\nI've also added you to our project tracking system - you'll get weekly updates automatically!",
+    content:
+      "✅ **Consultation Scheduled & Portfolio Sent**\n\n**Your Consultation:**\n• Date: March 8th at 2:00 PM\n• Location: Your home (free in-home visit)\n• Duration: 1 hour\n• Project Manager: Mike Rodriguez\n\n**Portfolio Gallery:**\n• 12 recent kitchen remodels sent to your email\n• Before/after photos included\n• Material samples will be brought to consultation\n\n**Next Steps:**\n• Calendar invite sent to your email\n• Project questionnaire sent for pre-consultation\n• Material catalog will be emailed tomorrow\n\nI've also added you to our project tracking system - you'll get weekly updates automatically!",
     timestamp: new Date(Date.now() - 1000 * 60 * 1), // 1 minute ago
-    uuid: "demo-assistant-3"
-  }
+    uuid: "demo-assistant-3",
+  },
 ];
-
 
 export default function Home() {
   const { user } = useUser();
   const { t } = useTranslation();
-  const { currentLanguage, supportedLanguages, getLanguageName, changeLanguage } = useLanguageOptions();
+  const {
+    currentLanguage,
+    supportedLanguages,
+    getLanguageName,
+    changeLanguage,
+  } = useLanguageOptions();
   const [workspace, setWorkspace] = useState(null);
   const [loading, setLoading] = useState(true);
   const [flows, setFlows] = useState([]);
   const [showLangDropdown, setShowLangDropdown] = useState(false);
-  const { showing: showingNewWorkspace, showModal, hideModal } = useNewWorkspaceModal();
+  const {
+    showing: showingNewWorkspace,
+    showModal,
+    hideModal,
+  } = useNewWorkspaceModal();
 
   useEffect(() => {
     async function getDefaultWorkspace() {
       try {
         setLoading(true);
-        
+
         // Get all workspaces
         const allWorkspaces = await Workspace.all();
-        
+
         // Try to find a home workspace or use the first available
-        let defaultWorkspace = allWorkspaces?.find(ws => ws.slug === 'home');
-        
+        let defaultWorkspace = allWorkspaces?.find((ws) => ws.slug === "home");
+
         if (!defaultWorkspace && allWorkspaces?.length > 0) {
           // Use the first available workspace
           defaultWorkspace = allWorkspaces[0];
         }
-        
+
         if (!defaultWorkspace) {
           // If no workspaces exist, we'll show a welcome screen
           // The workspace creation should be handled by the onboarding flow
-          console.log('No workspaces available');
+          console.log("No workspaces available");
         }
-        
+
         setWorkspace(defaultWorkspace);
       } catch (error) {
-        console.error('Error loading workspace:', error);
+        console.error("Error loading workspace:", error);
         // Even on error, set loading to false to show UI
       } finally {
         setLoading(false);
@@ -95,7 +121,7 @@ export default function Home() {
 
     getDefaultWorkspace();
   }, []);
-  
+
   // Load available flows
   useEffect(() => {
     async function loadFlows() {
@@ -105,15 +131,14 @@ export default function Home() {
           setFlows(flowList.slice(0, 4)); // Show max 4 flows
         }
       } catch (error) {
-        console.error('Error loading flows:', error);
+        console.error("Error loading flows:", error);
       }
     }
-    
+
     if (workspace) {
       loadFlows();
     }
   }, [workspace]);
-
 
   if (loading) {
     return <FullScreenLoader />;
@@ -129,7 +154,9 @@ export default function Home() {
             className="flex items-center gap-2 px-3 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-800 rounded-xl border border-gray-200/60 dark:border-gray-700/60 transition-all shadow-sm"
           >
             <Globe className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{getLanguageName(currentLanguage)}</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {getLanguageName(currentLanguage)}
+            </span>
           </button>
           {showLangDropdown && (
             <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 backdrop-blur-sm">
@@ -141,9 +168,13 @@ export default function Home() {
                     setShowLangDropdown(false);
                   }}
                   className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                    lang === currentLanguage ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium' : 'text-gray-700 dark:text-gray-300'
-                  } ${lang === supportedLanguages[0] ? 'rounded-t-xl' : ''} ${
-                    lang === supportedLanguages[supportedLanguages.length - 1] ? 'rounded-b-xl' : ''
+                    lang === currentLanguage
+                      ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium"
+                      : "text-gray-700 dark:text-gray-300"
+                  } ${lang === supportedLanguages[0] ? "rounded-t-xl" : ""} ${
+                    lang === supportedLanguages[supportedLanguages.length - 1]
+                      ? "rounded-b-xl"
+                      : ""
                   }`}
                 >
                   {getLanguageName(lang)}
@@ -153,7 +184,7 @@ export default function Home() {
           )}
         </div>
       </div>
-      
+
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         {workspace ? (
@@ -170,14 +201,17 @@ export default function Home() {
                     </span>
                   </h1>
                   <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed">
-                    Turn your ideas into action. Let AI handle your workflows, emails, scheduling, and automation.
+                    Turn your ideas into action. Let AI handle your workflows,
+                    emails, scheduling, and automation.
                   </p>
-                  
+
                   {/* CTA Section */}
                   <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                     <button
                       onClick={() => {
-                        const chatInput = document.querySelector('textarea[placeholder*="Send a message"]');
+                        const chatInput = document.querySelector(
+                          'textarea[placeholder*="Send a message"]'
+                        );
                         if (chatInput) {
                           chatInput.focus();
                         }
@@ -188,7 +222,11 @@ export default function Home() {
                       <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </button>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Just type <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded font-mono text-blue-600 dark:text-blue-400">@agent</code> to begin
+                      Just type{" "}
+                      <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded font-mono text-blue-600 dark:text-blue-400">
+                        @agent
+                      </code>{" "}
+                      to begin
                     </p>
                   </div>
                 </div>
@@ -201,7 +239,7 @@ export default function Home() {
                 <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
                   What can your AI assistant do?
                 </h2>
-                
+
                 {/* Flow Automation Section */}
                 <div className="mb-16">
                   <h3 className="text-xl font-bold text-center text-gray-900 dark:text-white mb-8 flex items-center justify-center gap-3">
@@ -212,10 +250,14 @@ export default function Home() {
                     {/* Create Tasks & Automate */}
                     <button
                       onClick={() => {
-                        const chatInput = document.querySelector('textarea[placeholder*="Send a message"]');
+                        const chatInput = document.querySelector(
+                          'textarea[placeholder*="Send a message"]'
+                        );
                         if (chatInput) {
-                          chatInput.value = '@flow create tasks then automate';
-                          chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+                          chatInput.value = "@flow create tasks then automate";
+                          chatInput.dispatchEvent(
+                            new Event("input", { bubbles: true })
+                          );
                           chatInput.focus();
                         }
                       }}
@@ -226,22 +268,31 @@ export default function Home() {
                           <Plus className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h4 className="font-bold text-gray-900 dark:text-white text-sm">Create & Automate</h4>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">New tasks</p>
+                          <h4 className="font-bold text-gray-900 dark:text-white text-sm">
+                            Create & Automate
+                          </h4>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                            New tasks
+                          </p>
                         </div>
                       </div>
                       <p className="text-xs text-gray-600 dark:text-gray-400 text-left">
-                        Create multiple tasks and automatically execute them in sequence
+                        Create multiple tasks and automatically execute them in
+                        sequence
                       </p>
                     </button>
 
                     {/* Automate Existing Tasks */}
                     <button
                       onClick={() => {
-                        const chatInput = document.querySelector('textarea[placeholder*="Send a message"]');
+                        const chatInput = document.querySelector(
+                          'textarea[placeholder*="Send a message"]'
+                        );
                         if (chatInput) {
-                          chatInput.value = '@flow automate existing tasks';
-                          chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+                          chatInput.value = "@flow automate existing tasks";
+                          chatInput.dispatchEvent(
+                            new Event("input", { bubbles: true })
+                          );
                           chatInput.focus();
                         }
                       }}
@@ -252,8 +303,12 @@ export default function Home() {
                           <Play className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h4 className="font-bold text-gray-900 dark:text-white text-sm">Automate Existing</h4>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">Current tasks</p>
+                          <h4 className="font-bold text-gray-900 dark:text-white text-sm">
+                            Automate Existing
+                          </h4>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                            Current tasks
+                          </p>
                         </div>
                       </div>
                       <p className="text-xs text-gray-600 dark:text-gray-400 text-left">
@@ -264,10 +319,15 @@ export default function Home() {
                     {/* Customer Onboarding */}
                     <button
                       onClick={() => {
-                        const chatInput = document.querySelector('textarea[placeholder*="Send a message"]');
+                        const chatInput = document.querySelector(
+                          'textarea[placeholder*="Send a message"]'
+                        );
                         if (chatInput) {
-                          chatInput.value = '@flow customer onboarding automation';
-                          chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+                          chatInput.value =
+                            "@flow customer onboarding automation";
+                          chatInput.dispatchEvent(
+                            new Event("input", { bubbles: true })
+                          );
                           chatInput.focus();
                         }
                       }}
@@ -278,22 +338,31 @@ export default function Home() {
                           <Users className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h4 className="font-bold text-gray-900 dark:text-white text-sm">Customer Onboarding</h4>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">Complex workflow</p>
+                          <h4 className="font-bold text-gray-900 dark:text-white text-sm">
+                            Customer Onboarding
+                          </h4>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                            Complex workflow
+                          </p>
                         </div>
                       </div>
                       <p className="text-xs text-gray-600 dark:text-gray-400 text-left">
-                        Automated customer onboarding with task creation and execution
+                        Automated customer onboarding with task creation and
+                        execution
                       </p>
                     </button>
 
                     {/* Dynamic Task Creation */}
                     <button
                       onClick={() => {
-                        const chatInput = document.querySelector('textarea[placeholder*="Send a message"]');
+                        const chatInput = document.querySelector(
+                          'textarea[placeholder*="Send a message"]'
+                        );
                         if (chatInput) {
-                          chatInput.value = '@flow dynamic task creation';
-                          chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+                          chatInput.value = "@flow dynamic task creation";
+                          chatInput.dispatchEvent(
+                            new Event("input", { bubbles: true })
+                          );
                           chatInput.focus();
                         }
                       }}
@@ -304,8 +373,12 @@ export default function Home() {
                           <Brain className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h4 className="font-bold text-gray-900 dark:text-white text-sm">Dynamic Creation</h4>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">Smart automation</p>
+                          <h4 className="font-bold text-gray-900 dark:text-white text-sm">
+                            Dynamic Creation
+                          </h4>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                            Smart automation
+                          </p>
                         </div>
                       </div>
                       <p className="text-xs text-gray-600 dark:text-gray-400 text-left">
@@ -313,14 +386,14 @@ export default function Home() {
                       </p>
                     </button>
                   </div>
-                  
+
                   {/* Live Chat Demo */}
                   <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/10 dark:to-blue-900/10 rounded-2xl p-6 border border-purple-200/50 dark:border-purple-700/50">
                     <h4 className="font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                       <Sparkle className="w-5 h-5 text-purple-600" />
                       See Tredy in Action
                     </h4>
-                    
+
                     {/* Chat Demo Component */}
                     <ChatDemo />
                   </div>
@@ -330,18 +403,29 @@ export default function Home() {
                   <div className="group">
                     <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl p-8 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
                       <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 rounded-2xl flex items-center justify-center mb-6">
-                        <EnvelopeSimple className="w-8 h-8 text-blue-600 dark:text-blue-400" weight="duotone" />
+                        <EnvelopeSimple
+                          className="w-8 h-8 text-blue-600 dark:text-blue-400"
+                          weight="duotone"
+                        />
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Smart Email</h3>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                        Smart Email
+                      </h3>
                       <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
-                        AI drafts, sends, and manages your emails automatically. From team updates to client communications.
+                        AI drafts, sends, and manages your emails automatically.
+                        From team updates to client communications.
                       </p>
                       <button
                         onClick={() => {
-                          const chatInput = document.querySelector('textarea[placeholder*="Send a message"]');
+                          const chatInput = document.querySelector(
+                            'textarea[placeholder*="Send a message"]'
+                          );
                           if (chatInput) {
-                            chatInput.value = '@agent send an email to team@company.com about our Q4 results';
-                            chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+                            chatInput.value =
+                              "@agent send an email to team@company.com about our Q4 results";
+                            chatInput.dispatchEvent(
+                              new Event("input", { bubbles: true })
+                            );
                             chatInput.focus();
                           }
                         }}
@@ -356,18 +440,29 @@ export default function Home() {
                   <div className="group">
                     <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl p-8 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
                       <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/30 dark:to-green-800/30 rounded-2xl flex items-center justify-center mb-6">
-                        <Calendar className="w-8 h-8 text-green-600 dark:text-green-400" weight="duotone" />
+                        <Calendar
+                          className="w-8 h-8 text-green-600 dark:text-green-400"
+                          weight="duotone"
+                        />
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Smart Scheduling</h3>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                        Smart Scheduling
+                      </h3>
                       <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
-                        Schedule meetings, set reminders, and manage your calendar with natural language commands.
+                        Schedule meetings, set reminders, and manage your
+                        calendar with natural language commands.
                       </p>
                       <button
                         onClick={() => {
-                          const chatInput = document.querySelector('textarea[placeholder*="Send a message"]');
+                          const chatInput = document.querySelector(
+                            'textarea[placeholder*="Send a message"]'
+                          );
                           if (chatInput) {
-                            chatInput.value = '@agent schedule a meeting for tomorrow at 2pm with the product team';
-                            chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+                            chatInput.value =
+                              "@agent schedule a meeting for tomorrow at 2pm with the product team";
+                            chatInput.dispatchEvent(
+                              new Event("input", { bubbles: true })
+                            );
                             chatInput.focus();
                           }
                         }}
@@ -382,18 +477,29 @@ export default function Home() {
                   <div className="group">
                     <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl p-8 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
                       <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 rounded-2xl flex items-center justify-center mb-6">
-                        <FlowArrow className="w-8 h-8 text-purple-600 dark:text-purple-400" weight="duotone" />
+                        <FlowArrow
+                          className="w-8 h-8 text-purple-600 dark:text-purple-400"
+                          weight="duotone"
+                        />
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Custom Workflows</h3>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                        Custom Workflows
+                      </h3>
                       <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
-                        Create intelligent workflows that connect your tools and automate complex business processes.
+                        Create intelligent workflows that connect your tools and
+                        automate complex business processes.
                       </p>
                       <button
                         onClick={() => {
-                          const chatInput = document.querySelector('textarea[placeholder*="Send a message"]');
+                          const chatInput = document.querySelector(
+                            'textarea[placeholder*="Send a message"]'
+                          );
                           if (chatInput) {
-                            chatInput.value = '@agent create a new workflow for me';
-                            chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+                            chatInput.value =
+                              "@agent create a new workflow for me";
+                            chatInput.dispatchEvent(
+                              new Event("input", { bubbles: true })
+                            );
                             chatInput.focus();
                           }
                         }}
@@ -417,10 +523,14 @@ export default function Home() {
                         <button
                           key={flow.uuid || index}
                           onClick={() => {
-                            const chatInput = document.querySelector('textarea[placeholder*="Send a message"]');
+                            const chatInput = document.querySelector(
+                              'textarea[placeholder*="Send a message"]'
+                            );
                             if (chatInput) {
                               chatInput.value = `@agent Execute the "${flow.name}" workflow`;
-                              chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+                              chatInput.dispatchEvent(
+                                new Event("input", { bubbles: true })
+                              );
                               chatInput.focus();
                             }
                           }}
@@ -430,10 +540,13 @@ export default function Home() {
                             <div className="p-2 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-lg group-hover:scale-110 transition-transform">
                               <Play className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                             </div>
-                            <span className="font-medium text-gray-900 dark:text-white text-sm">{flow.name}</span>
+                            <span className="font-medium text-gray-900 dark:text-white text-sm">
+                              {flow.name}
+                            </span>
                           </div>
                           <p className="text-xs text-gray-500 dark:text-gray-400 text-left">
-                            {flow.description || `${flow.steps?.length || 0} ${t('homePage.steps')}`}
+                            {flow.description ||
+                              `${flow.steps?.length || 0} ${t("homePage.steps")}`}
                           </p>
                         </button>
                       ))}
@@ -446,10 +559,7 @@ export default function Home() {
             {/* Chat Interface - Compact and focused */}
             <div className="flex-1 min-h-0">
               <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-t border-gray-200/50 dark:border-gray-700/50">
-                <WorkspaceChat 
-                  loading={loading} 
-                  workspace={workspace}
-                />
+                <WorkspaceChat loading={loading} workspace={workspace} />
               </div>
             </div>
           </div>
@@ -468,9 +578,10 @@ export default function Home() {
                     </span>
                   </h1>
                   <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed">
-                    Turn your ideas into action. Let AI handle your workflows, emails, scheduling, and automation.
+                    Turn your ideas into action. Let AI handle your workflows,
+                    emails, scheduling, and automation.
                   </p>
-                  
+
                   {/* CTA Section */}
                   <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                     <button
@@ -482,7 +593,11 @@ export default function Home() {
                       <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </button>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Just type <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded font-mono text-blue-600 dark:text-blue-400">@agent</code> to begin
+                      Just type{" "}
+                      <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded font-mono text-blue-600 dark:text-blue-400">
+                        @agent
+                      </code>{" "}
+                      to begin
                     </p>
                   </div>
                 </div>
@@ -501,8 +616,12 @@ export default function Home() {
                           <Sparkle className="w-4 h-4 text-white" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900 dark:text-white">Demo Chat</h3>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">See how AI can help with your business</p>
+                          <h3 className="font-semibold text-gray-900 dark:text-white">
+                            Demo Chat
+                          </h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            See how AI can help with your business
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
@@ -511,32 +630,41 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Demo Messages */}
                   <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {DEMO_CHAT_MESSAGES.map((message) => (
                       <div
                         key={message.uuid}
-                        className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                       >
                         <div
                           className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                            message.role === 'user'
-                              ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
-                              : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'
+                            message.role === "user"
+                              ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                              : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
                           }`}
                         >
-                          <div className="text-sm whitespace-pre-wrap">{message.content}</div>
-                          <div className={`text-xs mt-2 ${
-                            message.role === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
-                          }`}>
-                            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          <div className="text-sm whitespace-pre-wrap">
+                            {message.content}
+                          </div>
+                          <div
+                            className={`text-xs mt-2 ${
+                              message.role === "user"
+                                ? "text-blue-100"
+                                : "text-gray-500 dark:text-gray-400"
+                            }`}
+                          >
+                            {message.timestamp.toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
-                  
+
                   {/* Demo Input */}
                   <div className="p-4 border-t border-gray-200/50 dark:border-gray-700/50">
                     <div className="flex items-center gap-3">
@@ -557,13 +685,13 @@ export default function Home() {
           </div>
         )}
       </div>
-      
+
       {/* AI Enterprise Platform Section - Shows for all users */}
       <div className="px-4 py-16">
         <AIEnterprisePlatform />
         <ProfessionalDemo />
       </div>
-      
+
       {showingNewWorkspace && <NewWorkspaceModal hideModal={hideModal} />}
     </div>
   );

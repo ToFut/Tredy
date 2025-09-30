@@ -450,8 +450,7 @@ const TRANSLATIONS = {
     },
     branding: {
       title: "Zīmolrade un identitāte",
-      description:
-        "Pielāgojiet savu Tredy instanci ar pielāgotu zīmolradi.",
+      description: "Pielāgojiet savu Tredy instanci ar pielāgotu zīmolradi.",
     },
     chat: {
       title: "Saruna",

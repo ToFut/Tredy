@@ -120,10 +120,12 @@ export default function WorkspaceAgentConfiguration({ workspace }) {
 
       {/* Agent Scheduling Section */}
       <div className="mt-10 border-t border-gray-700 pt-8">
-        <h2 className="text-lg font-semibold text-white mb-2">Agent Scheduling</h2>
+        <h2 className="text-lg font-semibold text-white mb-2">
+          Agent Scheduling
+        </h2>
         <p className="text-white text-opacity-60 text-sm mb-6">
-          Schedule agents to run automatically at specified times. Perfect for regular reports, 
-          data collection, or automated tasks.
+          Schedule agents to run automatically at specified times. Perfect for
+          regular reports, data collection, or automated tasks.
         </p>
         <ScheduleList workspace={workspace} />
       </div>

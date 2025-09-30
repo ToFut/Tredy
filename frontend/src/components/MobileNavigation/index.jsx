@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { List, X, House, Gear, Users, ChatCircle, Brain } from "@phosphor-icons/react";
+import {
+  List,
+  X,
+  House,
+  Gear,
+  Users,
+  ChatCircle,
+  Brain,
+} from "@phosphor-icons/react";
 import { Link, useLocation } from "react-router-dom";
 
 export default function MobileNavigation() {
@@ -31,11 +39,11 @@ export default function MobileNavigation() {
       {isOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
           {/* Backdrop */}
-          <div 
+          <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setIsOpen(false)}
           />
-          
+
           {/* Navigation Panel */}
           <div className="relative flex flex-col w-80 max-w-[85vw] bg-white h-full shadow-xl">
             {/* Header */}
@@ -55,7 +63,7 @@ export default function MobileNavigation() {
               {navigationItems.map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.path);
-                
+
                 return (
                   <Link
                     key={item.path}
@@ -63,11 +71,13 @@ export default function MobileNavigation() {
                     onClick={() => setIsOpen(false)}
                     className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${
                       active
-                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                        : 'text-gray-700 hover:bg-gray-50'
+                        ? "bg-blue-50 text-blue-700 border border-blue-200"
+                        : "text-gray-700 hover:bg-gray-50"
                     }`}
                   >
-                    <Icon className={`w-6 h-6 ${active ? 'text-blue-700' : 'text-gray-500'}`} />
+                    <Icon
+                      className={`w-6 h-6 ${active ? "text-blue-700" : "text-gray-500"}`}
+                    />
                     <span className="font-medium">{item.label}</span>
                   </Link>
                 );
@@ -96,16 +106,18 @@ export default function MobileNavigation() {
           {navigationItems.slice(0, 5).map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
-            
+
             return (
               <Link
                 key={item.path}
                 to={item.path}
                 className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all ${
-                  active ? 'text-blue-600' : 'text-gray-500'
+                  active ? "text-blue-600" : "text-gray-500"
                 }`}
               >
-                <Icon className={`w-6 h-6 ${active ? 'text-blue-600' : 'text-gray-400'}`} />
+                <Icon
+                  className={`w-6 h-6 ${active ? "text-blue-600" : "text-gray-400"}`}
+                />
                 <span className="text-xs font-medium">{item.label}</span>
               </Link>
             );

@@ -97,7 +97,9 @@ function getVectorDbClass(getExactly = null) {
         const { LanceDb } = require("../vectorDbProviders/lance");
         return LanceDb;
       } catch (error) {
-        console.log("[VectorDB] LanceDB not available, using in-memory fallback");
+        console.log(
+          "[VectorDB] LanceDB not available, using in-memory fallback"
+        );
         const { MemoryVectorDB } = require("../vectorDbProviders/memory");
         return MemoryVectorDB;
       }
@@ -120,7 +122,9 @@ function getVectorDbClass(getExactly = null) {
       const { PGVector } = require("../vectorDbProviders/pgvector");
       return PGVector;
     default:
-      console.log("[VectorDB] No VECTOR_DB specified, using in-memory fallback");
+      console.log(
+        "[VectorDB] No VECTOR_DB specified, using in-memory fallback"
+      );
       const { MemoryVectorDB } = require("../vectorDbProviders/memory");
       return MemoryVectorDB;
   }

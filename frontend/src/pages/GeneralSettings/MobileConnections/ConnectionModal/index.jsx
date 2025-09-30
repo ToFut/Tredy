@@ -37,8 +37,8 @@ export default function MobileConnectModal({ isOpen, onClose }) {
               Go mobile. Stay local. Tredy Mobile.
             </p>
             <p className="text-[#FFF] text-lg">
-              Tredy for mobile allows you to connect or clone your
-              workspace's chats, threads and documents for you to use on the go.
+              Tredy for mobile allows you to connect or clone your workspace's
+              chats, threads and documents for you to use on the go.
               <br />
               <br />
               Run with local models on your phone privately or relay chats
@@ -52,8 +52,8 @@ export default function MobileConnectModal({ isOpen, onClose }) {
               <ConnectionQrCode isOpen={isOpen} />
             </div>
             <p className="text-[#FFF] text-sm w-[300px] text-center">
-              Scan the QR code with the Tredy Mobile app to enable live
-              sync of your workspaces, chats, threads and documents.
+              Scan the QR code with the Tredy Mobile app to enable live sync of
+              your workspaces, chats, threads and documents.
               <br />
               <Link
                 to={paths.documentation.mobileIntroduction()}

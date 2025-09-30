@@ -15,9 +15,21 @@ class WorkflowScheduler {
   async loadWorkflow(workflowId) {
     // Try multiple possible paths
     const possiblePaths = [
-      path.resolve(__dirname, "../../../../storage/plugins/agent-flows", `${workflowId}.json`),
-      path.resolve(process.cwd(), "storage/plugins/agent-flows", `${workflowId}.json`),
-      path.resolve(__dirname, "../../../storage/plugins/agent-flows", `${workflowId}.json`)
+      path.resolve(
+        __dirname,
+        "../../../../storage/plugins/agent-flows",
+        `${workflowId}.json`
+      ),
+      path.resolve(
+        process.cwd(),
+        "storage/plugins/agent-flows",
+        `${workflowId}.json`
+      ),
+      path.resolve(
+        __dirname,
+        "../../../storage/plugins/agent-flows",
+        `${workflowId}.json`
+      ),
     ];
 
     let workflowPath = null;
@@ -32,7 +44,9 @@ class WorkflowScheduler {
     }
 
     if (!workflowPath) {
-      throw new Error(`Workflow file not found in any expected location: ${workflowId}`);
+      throw new Error(
+        `Workflow file not found in any expected location: ${workflowId}`
+      );
     }
 
     try {
@@ -54,7 +68,7 @@ class WorkflowScheduler {
       timezone = "UTC",
       maxExecutions = null,
       context = {},
-      name = "Scheduled Workflow"
+      name = "Scheduled Workflow",
     } = options;
 
     // Load the workflow
@@ -80,7 +94,9 @@ class WorkflowScheduler {
         executionCount++;
         const startTime = new Date();
 
-        console.log(`\n⚡ [${startTime.toLocaleString()}] Executing workflow: ${workflow.name || workflowId}`);
+        console.log(
+          `\n⚡ [${startTime.toLocaleString()}] Executing workflow: ${workflow.name || workflowId}`
+        );
         console.log(`   Schedule: ${name}`);
         console.log(`   Execution #${executionCount}`);
 
@@ -88,7 +104,7 @@ class WorkflowScheduler {
           // Create executor instance
           const executor = new FlowExecutor(workflow, {
             workspaceSlug: context.workspaceSlug || "default",
-            userId: context.userId || null
+            userId: context.userId || null,
           });
 
           // Execute the workflow with context
@@ -96,18 +112,22 @@ class WorkflowScheduler {
             ...context,
             scheduledExecution: true,
             executionNumber: executionCount,
-            scheduledAt: startTime
+            scheduledAt: startTime,
           });
 
           const endTime = new Date();
           const duration = ((endTime - startTime) / 1000).toFixed(2);
 
           if (result.success) {
-            console.log(`   ✅ Workflow completed successfully in ${duration}s`);
+            console.log(
+              `   ✅ Workflow completed successfully in ${duration}s`
+            );
 
             // Log any direct output
             if (result.directOutput) {
-              console.log(`   📤 Output: ${JSON.stringify(result.directOutput).substring(0, 100)}...`);
+              console.log(
+                `   📤 Output: ${JSON.stringify(result.directOutput).substring(0, 100)}...`
+              );
             }
           } else {
             console.log(`   ❌ Workflow failed after ${duration}s`);
@@ -116,17 +136,18 @@ class WorkflowScheduler {
 
           // Check if we should stop after max executions
           if (maxExecutions && executionCount >= maxExecutions) {
-            console.log(`\n🏁 Reached maximum executions (${maxExecutions}). Stopping schedule.`);
+            console.log(
+              `\n🏁 Reached maximum executions (${maxExecutions}). Stopping schedule.`
+            );
             this.stopSchedule(scheduleId);
           }
-
         } catch (error) {
           console.error(`   ❌ Failed to execute workflow:`, error.message);
         }
       },
       {
         scheduled: true,
-        timezone: timezone
+        timezone: timezone,
       }
     );
 
@@ -140,7 +161,7 @@ class WorkflowScheduler {
       name,
       startedAt: new Date(),
       executionCount: 0,
-      maxExecutions
+      maxExecutions,
     });
 
     console.log(`\n✅ Workflow scheduled successfully!`);
@@ -178,11 +199,15 @@ class WorkflowScheduler {
    * Stop all scheduled workflows
    */
   stopAll() {
-    console.log(`\n⏹️  Stopping all ${this.activeSchedules.size} scheduled workflows...`);
+    console.log(
+      `\n⏹️  Stopping all ${this.activeSchedules.size} scheduled workflows...`
+    );
 
     for (const [scheduleId, schedule] of this.activeSchedules) {
       schedule.task.stop();
-      console.log(`   - Stopped: ${schedule.name} (${schedule.executionCount} executions)`);
+      console.log(
+        `   - Stopped: ${schedule.name} (${schedule.executionCount} executions)`
+      );
     }
 
     this.activeSchedules.clear();
@@ -205,14 +230,14 @@ class WorkflowScheduler {
         timezone: schedule.timezone,
         startedAt: schedule.startedAt,
         executionCount: schedule.executionCount,
-        maxExecutions: schedule.maxExecutions
+        maxExecutions: schedule.maxExecutions,
       });
     }
 
     return {
       running: this.running,
       activeSchedules: this.activeSchedules.size,
-      schedules
+      schedules,
     };
   }
 
@@ -249,5 +274,5 @@ function getWorkflowScheduler() {
 
 module.exports = {
   WorkflowScheduler,
-  getWorkflowScheduler
+  getWorkflowScheduler,
 };

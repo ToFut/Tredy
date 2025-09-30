@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase, onAuthStateChange } from '@/utils/supabase';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { supabase, onAuthStateChange } from "@/utils/supabase";
 
 const SupabaseAuthContext = createContext({});
 
@@ -16,25 +16,27 @@ export const SupabaseAuthProvider = ({ children }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session) {
-        localStorage.setItem('tredy_supabase_token', session.access_token);
+        localStorage.setItem("tredy_supabase_token", session.access_token);
       }
       setLoading(false);
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
-      if (event === 'SIGNED_IN') {
-        console.log('User signed in via Supabase');
-      } else if (event === 'SIGNED_OUT') {
-        console.log('User signed out');
-        window.location.href = '/login';
-      } else if (event === 'TOKEN_REFRESHED') {
-        console.log('Token refreshed');
+
+      if (event === "SIGNED_IN") {
+        console.log("User signed in via Supabase");
+      } else if (event === "SIGNED_OUT") {
+        console.log("User signed out");
+        window.location.href = "/login";
+      } else if (event === "TOKEN_REFRESHED") {
+        console.log("Token refreshed");
         if (session) {
-          localStorage.setItem('tredy_supabase_token', session.access_token);
+          localStorage.setItem("tredy_supabase_token", session.access_token);
         }
       }
     });
@@ -44,7 +46,7 @@ export const SupabaseAuthProvider = ({ children }) => {
 
   const signInWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
+      provider: "google",
       options: {
         redirectTo: `${window.location.origin}/login`,
       },
@@ -74,8 +76,8 @@ export const SupabaseAuthProvider = ({ children }) => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (!error) {
-      localStorage.removeItem('tredy_supabase_token');
-      localStorage.removeItem('tredy_user');
+      localStorage.removeItem("tredy_supabase_token");
+      localStorage.removeItem("tredy_user");
     }
     return { error };
   };

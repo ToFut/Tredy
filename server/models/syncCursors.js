@@ -5,7 +5,7 @@ const prisma = require("../utils/prisma");
  * Tracks sync cursors for incremental sync across providers
  */
 const SyncCursors = {
-  writable: ['cursor', 'lastSyncAt', 'recordCount', 'status', 'error'],
+  writable: ["cursor", "lastSyncAt", "recordCount", "status", "error"],
 
   /**
    * Get the last sync cursor for a provider/model combination
@@ -13,7 +13,7 @@ const SyncCursors = {
   get: async function ({ workspaceId, provider, model }) {
     try {
       const cursor = await prisma.sync_cursors.findFirst({
-        where: { workspaceId, provider, model }
+        where: { workspaceId, provider, model },
       });
       return cursor;
     } catch (error) {
@@ -25,15 +25,23 @@ const SyncCursors = {
   /**
    * Update or create a sync cursor
    */
-  upsert: async function ({ workspaceId, provider, model, cursor, recordCount = 0, status = 'success', error = null }) {
+  upsert: async function ({
+    workspaceId,
+    provider,
+    model,
+    cursor,
+    recordCount = 0,
+    status = "success",
+    error = null,
+  }) {
     try {
       const result = await prisma.sync_cursors.upsert({
         where: {
           workspaceId_provider_model: {
             workspaceId,
             provider,
-            model
-          }
+            model,
+          },
         },
         create: {
           workspaceId,
@@ -43,15 +51,15 @@ const SyncCursors = {
           lastSyncAt: new Date(),
           recordCount,
           status,
-          error
+          error,
         },
         update: {
           cursor,
           lastSyncAt: new Date(),
           recordCount,
           status,
-          error
-        }
+          error,
+        },
       });
       return result;
     } catch (error) {
@@ -67,7 +75,7 @@ const SyncCursors = {
     try {
       const cursors = await prisma.sync_cursors.findMany({
         where: { workspaceId },
-        orderBy: { lastSyncAt: 'desc' }
+        orderBy: { lastSyncAt: "desc" },
       });
       return cursors;
     } catch (error) {
@@ -83,7 +91,7 @@ const SyncCursors = {
     try {
       const cursors = await prisma.sync_cursors.findMany({
         where: { provider },
-        orderBy: { lastSyncAt: 'desc' }
+        orderBy: { lastSyncAt: "desc" },
       });
       return cursors;
     } catch (error) {
@@ -103,7 +111,7 @@ const SyncCursors = {
       }
 
       await prisma.sync_cursors.deleteMany({
-        where: whereClause
+        where: whereClause,
       });
       return true;
     } catch (error) {
@@ -118,47 +126,50 @@ const SyncCursors = {
   getStats: async function (workspaceId) {
     try {
       const stats = await prisma.sync_cursors.groupBy({
-        by: ['provider', 'status'],
+        by: ["provider", "status"],
         where: { workspaceId },
         _count: {
-          id: true
+          id: true,
         },
         _sum: {
-          recordCount: true
+          recordCount: true,
         },
         _max: {
-          lastSyncAt: true
-        }
+          lastSyncAt: true,
+        },
       });
-      
+
       // Transform to easier format
       const result = {};
-      stats.forEach(stat => {
+      stats.forEach((stat) => {
         if (!result[stat.provider]) {
           result[stat.provider] = {
             total: 0,
             totalRecords: 0,
             lastSync: null,
-            byStatus: {}
+            byStatus: {},
           };
         }
-        
+
         result[stat.provider].byStatus[stat.status] = stat._count.id;
         result[stat.provider].total += stat._count.id;
         result[stat.provider].totalRecords += stat._sum.recordCount || 0;
-        
-        if (!result[stat.provider].lastSync || 
-            (stat._max.lastSyncAt && stat._max.lastSyncAt > result[stat.provider].lastSync)) {
+
+        if (
+          !result[stat.provider].lastSync ||
+          (stat._max.lastSyncAt &&
+            stat._max.lastSyncAt > result[stat.provider].lastSync)
+        ) {
           result[stat.provider].lastSync = stat._max.lastSyncAt;
         }
       });
-      
+
       return result;
     } catch (error) {
       console.error("[SyncCursors] Failed to get stats:", error);
       return {};
     }
-  }
+  },
 };
 
 module.exports = { SyncCursors };

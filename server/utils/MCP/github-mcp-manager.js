@@ -3,19 +3,19 @@
  * Manages cloning, updating, and running MCP servers from GitHub repositories
  */
 
-const { spawn } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+const { spawn } = require("child_process");
+const fs = require("fs");
+const path = require("path");
+const { execSync } = require("child_process");
 
 class GitHubMCPManager {
   constructor() {
     // Store cloned repos in a dedicated directory
     this.reposDir = path.join(
-      process.env.STORAGE_DIR || path.join(__dirname, '../../storage'),
-      'mcp-repos'
+      process.env.STORAGE_DIR || path.join(__dirname, "../../storage"),
+      "mcp-repos"
     );
-    
+
     // Ensure directory exists
     if (!fs.existsSync(this.reposDir)) {
       fs.mkdirSync(this.reposDir, { recursive: true });
@@ -29,32 +29,32 @@ class GitHubMCPManager {
    */
   async cloneOrUpdate(repoUrl) {
     // Convert owner/repo to full URL if needed
-    if (!repoUrl.startsWith('http')) {
+    if (!repoUrl.startsWith("http")) {
       repoUrl = `https://github.com/${repoUrl}.git`;
     }
-    
+
     // Extract repo name from URL
-    const repoName = repoUrl.split('/').pop().replace('.git', '');
+    const repoName = repoUrl.split("/").pop().replace(".git", "");
     const repoPath = path.join(this.reposDir, repoName);
-    
+
     try {
       if (fs.existsSync(repoPath)) {
         // Update existing repo
         console.log(`[GitHubMCP] Updating ${repoName}...`);
-        execSync('git pull', { cwd: repoPath });
+        execSync("git pull", { cwd: repoPath });
       } else {
         // Clone new repo
         console.log(`[GitHubMCP] Cloning ${repoName}...`);
         execSync(`git clone ${repoUrl} ${repoPath}`, { cwd: this.reposDir });
       }
-      
+
       // Install dependencies if package.json exists
-      const packageJsonPath = path.join(repoPath, 'package.json');
+      const packageJsonPath = path.join(repoPath, "package.json");
       if (fs.existsSync(packageJsonPath)) {
         console.log(`[GitHubMCP] Installing dependencies for ${repoName}...`);
-        execSync('npm install', { cwd: repoPath });
+        execSync("npm install", { cwd: repoPath });
       }
-      
+
       return repoPath;
     } catch (error) {
       console.error(`[GitHubMCP] Failed to clone/update ${repoName}:`, error);
@@ -70,37 +70,38 @@ class GitHubMCPManager {
   getEntryPoint(repoPath) {
     // Check common entry points
     const possibleEntries = [
-      'dist/index.js',
-      'build/index.js',
-      'lib/index.js',
-      'src/index.js',
-      'src/index.ts',
-      'index.js',
-      'server.js',
-      'main.js'
+      "dist/index.js",
+      "build/index.js",
+      "lib/index.js",
+      "src/index.js",
+      "src/index.ts",
+      "index.js",
+      "server.js",
+      "main.js",
     ];
-    
+
     // Check package.json for main/bin field
-    const packageJsonPath = path.join(repoPath, 'package.json');
+    const packageJsonPath = path.join(repoPath, "package.json");
     if (fs.existsSync(packageJsonPath)) {
-      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-      
+      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+
       // Check bin field
       if (packageJson.bin) {
-        const binPath = typeof packageJson.bin === 'string' 
-          ? packageJson.bin 
-          : Object.values(packageJson.bin)[0];
+        const binPath =
+          typeof packageJson.bin === "string"
+            ? packageJson.bin
+            : Object.values(packageJson.bin)[0];
         if (binPath) {
           possibleEntries.unshift(binPath);
         }
       }
-      
+
       // Check main field
       if (packageJson.main) {
         possibleEntries.unshift(packageJson.main);
       }
     }
-    
+
     // Find first existing entry point
     for (const entry of possibleEntries) {
       const fullPath = path.join(repoPath, entry);
@@ -108,7 +109,7 @@ class GitHubMCPManager {
         return fullPath;
       }
     }
-    
+
     throw new Error(`No entry point found for MCP server in ${repoPath}`);
   }
 
@@ -117,18 +118,21 @@ class GitHubMCPManager {
    * @param {string} repoPath - Path to the repository
    */
   async buildIfNeeded(repoPath) {
-    const packageJsonPath = path.join(repoPath, 'package.json');
+    const packageJsonPath = path.join(repoPath, "package.json");
     if (!fs.existsSync(packageJsonPath)) return;
-    
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-    
+
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+
     // Check if build script exists
     if (packageJson.scripts && packageJson.scripts.build) {
       console.log(`[GitHubMCP] Building project...`);
       try {
-        execSync('npm run build', { cwd: repoPath });
+        execSync("npm run build", { cwd: repoPath });
       } catch (error) {
-        console.warn(`[GitHubMCP] Build failed, continuing anyway:`, error.message);
+        console.warn(
+          `[GitHubMCP] Build failed, continuing anyway:`,
+          error.message
+        );
       }
     }
   }
@@ -144,36 +148,39 @@ class GitHubMCPManager {
     try {
       // Clone or update the repository
       const repoPath = await this.cloneOrUpdate(repoUrl);
-      
+
       // Build if needed
       await this.buildIfNeeded(repoPath);
-      
+
       // Get entry point
       const entryPoint = this.getEntryPoint(repoPath);
-      
+
       // Determine how to run it
-      const isTypeScript = entryPoint.endsWith('.ts');
-      const command = isTypeScript ? 'npx' : 'node';
-      const args = isTypeScript ? ['tsx', entryPoint] : [entryPoint];
-      
+      const isTypeScript = entryPoint.endsWith(".ts");
+      const command = isTypeScript ? "npx" : "node";
+      const args = isTypeScript ? ["tsx", entryPoint] : [entryPoint];
+
       return {
         type: "stdio",
         command,
         args,
         env: {
           ...options.env,
-          NODE_PATH: path.join(repoPath, 'node_modules')
+          NODE_PATH: path.join(repoPath, "node_modules"),
         },
         anythingllm: {
           autoStart: true,
-          source: 'github',
+          source: "github",
           repository: repoUrl,
           description: options.description || `GitHub MCP: ${serverName}`,
-          ...options.anythingllm
-        }
+          ...options.anythingllm,
+        },
       };
     } catch (error) {
-      console.error(`[GitHubMCP] Failed to create config for ${serverName}:`, error);
+      console.error(
+        `[GitHubMCP] Failed to create config for ${serverName}:`,
+        error
+      );
       return null;
     }
   }

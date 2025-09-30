@@ -12,7 +12,7 @@ const Workspace = {
   maxContextWindowLimit: 0.8,
   /** Simple cache to avoid redundant API calls */
   _cache: new Map(),
-  _getCacheKey: (method, ...args) => `${method}:${args.join(':')}`,
+  _getCacheKey: (method, ...args) => `${method}:${args.join(":")}`,
 
   new: async function (data = {}) {
     const { workspace, message } = await fetch(`${API_BASE}/workspace/new`, {
@@ -220,28 +220,29 @@ const Workspace = {
     return workspaces;
   },
   bySlug: async function (slug = "") {
-    const cacheKey = this._getCacheKey('bySlug', slug);
-    
+    const cacheKey = this._getCacheKey("bySlug", slug);
+
     // Return cached result if available and less than 5 minutes old
     if (this._cache.has(cacheKey)) {
       const { data, timestamp } = this._cache.get(cacheKey);
-      if (Date.now() - timestamp < 300000) { // 5 minutes
+      if (Date.now() - timestamp < 300000) {
+        // 5 minutes
         return data;
       }
     }
-    
+
     const workspace = await fetch(`${API_BASE}/workspace/${slug}`, {
       headers: baseHeaders(),
     })
       .then((res) => res.json())
       .then((res) => res.workspace)
       .catch(() => null);
-    
+
     // Cache the result
     if (workspace) {
       this._cache.set(cacheKey, { data: workspace, timestamp: Date.now() });
     }
-    
+
     return workspace;
   },
   delete: async function (slug) {
@@ -601,10 +602,13 @@ const Workspace = {
   // Connector management methods
   connectors: {
     getAvailable: async function (slug) {
-      return await fetch(`${API_BASE}/v1/workspace/${slug}/connectors/available`, {
-        method: "GET",
-        headers: baseHeaders(),
-      })
+      return await fetch(
+        `${API_BASE}/v1/workspace/${slug}/connectors/available`,
+        {
+          method: "GET",
+          headers: baseHeaders(),
+        }
+      )
         .then((res) => res.json())
         .catch((e) => {
           console.error(e);
@@ -625,11 +629,14 @@ const Workspace = {
     },
 
     connect: async function (slug, data) {
-      return await fetch(`${API_BASE}/v1/workspace/${slug}/connectors/connect`, {
-        method: "POST",
-        headers: baseHeaders(),
-        body: JSON.stringify(data),
-      })
+      return await fetch(
+        `${API_BASE}/v1/workspace/${slug}/connectors/connect`,
+        {
+          method: "POST",
+          headers: baseHeaders(),
+          body: JSON.stringify(data),
+        }
+      )
         .then((res) => res.json())
         .catch((e) => {
           console.error(e);
@@ -638,10 +645,13 @@ const Workspace = {
     },
 
     disconnect: async function (slug, provider) {
-      return await fetch(`${API_BASE}/v1/workspace/${slug}/connectors/${provider}`, {
-        method: "DELETE",
-        headers: baseHeaders(),
-      })
+      return await fetch(
+        `${API_BASE}/v1/workspace/${slug}/connectors/${provider}`,
+        {
+          method: "DELETE",
+          headers: baseHeaders(),
+        }
+      )
         .then((res) => res.json())
         .catch((e) => {
           console.error(e);
@@ -650,10 +660,13 @@ const Workspace = {
     },
 
     sync: async function (slug, provider) {
-      return await fetch(`${API_BASE}/v1/workspace/${slug}/connectors/${provider}/sync`, {
-        method: "POST",
-        headers: baseHeaders(),
-      })
+      return await fetch(
+        `${API_BASE}/v1/workspace/${slug}/connectors/${provider}/sync`,
+        {
+          method: "POST",
+          headers: baseHeaders(),
+        }
+      )
         .then((res) => res.json())
         .catch((e) => {
           console.error(e);
@@ -662,11 +675,14 @@ const Workspace = {
     },
 
     callback: async function (slug, data) {
-      return await fetch(`${API_BASE}/v1/workspace/${slug}/connectors/callback`, {
-        method: "POST",
-        headers: baseHeaders(),
-        body: JSON.stringify(data),
-      })
+      return await fetch(
+        `${API_BASE}/v1/workspace/${slug}/connectors/callback`,
+        {
+          method: "POST",
+          headers: baseHeaders(),
+          body: JSON.stringify(data),
+        }
+      )
         .then((res) => res.json())
         .catch((e) => {
           console.error(e);
@@ -690,13 +706,20 @@ const Workspace = {
   },
 
   // Chat Summary Methods
-  getChatSummary: async function (slug, threadSlug = null, forceRefresh = false) {
+  getChatSummary: async function (
+    slug,
+    threadSlug = null,
+    forceRefresh = false
+  ) {
     try {
-      const response = await fetch(`${API_BASE}/workspace/${slug}/chat-summary`, {
-        method: "POST",
-        headers: baseHeaders(),
-        body: JSON.stringify({ threadSlug, forceRefresh })
-      });
+      const response = await fetch(
+        `${API_BASE}/workspace/${slug}/chat-summary`,
+        {
+          method: "POST",
+          headers: baseHeaders(),
+          body: JSON.stringify({ threadSlug, forceRefresh }),
+        }
+      );
       const data = await response.json();
       return data;
     } catch (error) {
@@ -707,11 +730,14 @@ const Workspace = {
 
   getQuickSummary: async function (slug, threadSlug = null) {
     try {
-      const params = threadSlug ? `?threadSlug=${threadSlug}` : '';
-      const response = await fetch(`${API_BASE}/workspace/${slug}/quick-summary${params}`, {
-        method: "GET",
-        headers: baseHeaders()
-      });
+      const params = threadSlug ? `?threadSlug=${threadSlug}` : "";
+      const response = await fetch(
+        `${API_BASE}/workspace/${slug}/quick-summary${params}`,
+        {
+          method: "GET",
+          headers: baseHeaders(),
+        }
+      );
       const data = await response.json();
       return data;
     } catch (error) {

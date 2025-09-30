@@ -1,5 +1,11 @@
 import React from "react";
-import { Download, CheckCircle, Package, FileText, Command } from "@phosphor-icons/react";
+import {
+  Download,
+  CheckCircle,
+  Package,
+  FileText,
+  Command,
+} from "@phosphor-icons/react";
 
 export default function SkillCard({ item, viewMode, onInstall, isInstalled }) {
   const getItemIcon = () => {
@@ -37,14 +43,22 @@ export default function SkillCard({ item, viewMode, onInstall, isInstalled }) {
               {getItemIcon()}
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-theme-text-primary">{item.name}</h3>
-              <p className="text-sm text-theme-text-secondary line-clamp-1">{item.description}</p>
+              <h3 className="font-semibold text-theme-text-primary">
+                {item.name}
+              </h3>
+              <p className="text-sm text-theme-text-secondary line-clamp-1">
+                {item.description}
+              </p>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs text-theme-text-secondary">{item.category}</span>
+                <span className="text-xs text-theme-text-secondary">
+                  {item.category}
+                </span>
                 {item.author && (
                   <>
                     <span className="text-xs text-theme-text-secondary">•</span>
-                    <span className="text-xs text-theme-text-secondary">by {item.author}</span>
+                    <span className="text-xs text-theme-text-secondary">
+                      by {item.author}
+                    </span>
                   </>
                 )}
               </div>
@@ -57,10 +71,14 @@ export default function SkillCard({ item, viewMode, onInstall, isInstalled }) {
               isInstalled
                 ? "bg-green-500/20 text-green-500 cursor-not-allowed"
                 : item.itemType === "system-prompt"
-                ? "bg-orange-500/20 text-orange-500 cursor-not-allowed"
-                : "bg-primary-button text-white hover:bg-primary-button-hover"
+                  ? "bg-orange-500/20 text-orange-500 cursor-not-allowed"
+                  : "bg-primary-button text-white hover:bg-primary-button-hover"
             }`}
-            title={item.itemType === "system-prompt" ? "System prompts must be installed per workspace" : ""}
+            title={
+              item.itemType === "system-prompt"
+                ? "System prompts must be installed per workspace"
+                : ""
+            }
           >
             {isInstalled ? (
               <>
@@ -90,19 +108,17 @@ export default function SkillCard({ item, viewMode, onInstall, isInstalled }) {
         <div className={`p-2 rounded-lg ${getCategoryColor()}`}>
           {getItemIcon()}
         </div>
-        {isInstalled && (
-          <CheckCircle className="w-5 h-5 text-green-500" />
-        )}
+        {isInstalled && <CheckCircle className="w-5 h-5 text-green-500" />}
       </div>
-      
+
       <h3 className="font-semibold text-theme-text-primary mb-2 line-clamp-1">
         {item.name}
       </h3>
-      
+
       <p className="text-sm text-theme-text-secondary mb-3 line-clamp-2">
         {item.description}
       </p>
-      
+
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs text-theme-text-secondary px-2 py-1 bg-theme-bg-secondary rounded">
           {item.category}
@@ -113,7 +129,7 @@ export default function SkillCard({ item, viewMode, onInstall, isInstalled }) {
           </span>
         )}
       </div>
-      
+
       <button
         onClick={onInstall}
         disabled={isInstalled || item.itemType === "system-prompt"}
@@ -121,10 +137,14 @@ export default function SkillCard({ item, viewMode, onInstall, isInstalled }) {
           isInstalled
             ? "bg-green-500/20 text-green-500 cursor-not-allowed"
             : item.itemType === "system-prompt"
-            ? "bg-orange-500/20 text-orange-500 cursor-not-allowed"
-            : "bg-primary-button text-white hover:bg-primary-button-hover"
+              ? "bg-orange-500/20 text-orange-500 cursor-not-allowed"
+              : "bg-primary-button text-white hover:bg-primary-button-hover"
         }`}
-        title={item.itemType === "system-prompt" ? "System prompts must be installed per workspace" : ""}
+        title={
+          item.itemType === "system-prompt"
+            ? "System prompts must be installed per workspace"
+            : ""
+        }
       >
         {isInstalled ? (
           <>

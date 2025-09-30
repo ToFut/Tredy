@@ -4,7 +4,10 @@ const { WorkspaceThread } = require("../../models/workspaceThread");
 const { validatedRequest } = require("../../utils/middleware/validatedRequest");
 const { getLLMProvider } = require("../../utils/helpers");
 const { reqBody, safeJsonParse } = require("../../utils/http");
-const { getCachedSummary: getAutoSummary, generateAutoSummary } = require("../../utils/chats/summaryGenerator");
+const {
+  getCachedSummary: getAutoSummary,
+  generateAutoSummary,
+} = require("../../utils/chats/summaryGenerator");
 
 function chatSummaryEndpoints(app) {
   if (!app) return;
@@ -27,7 +30,10 @@ function chatSummaryEndpoints(app) {
         // Get thread if threadSlug provided
         let threadId = null;
         if (threadSlug) {
-          const thread = await WorkspaceThread.get({ slug: threadSlug, workspace_id: workspace.id });
+          const thread = await WorkspaceThread.get({
+            slug: threadSlug,
+            workspace_id: workspace.id,
+          });
           threadId = thread?.id || null;
         }
 
@@ -36,7 +42,7 @@ function chatSummaryEndpoints(app) {
           {
             workspaceId: workspace.id,
             thread_id: threadId,
-            include: true
+            include: true,
           },
           50, // Last 50 messages
           { id: "desc" }
@@ -51,8 +57,8 @@ function chatSummaryEndpoints(app) {
               lastActivity: null,
               messageCount: 0,
               actionItems: [],
-              sentiment: "neutral"
-            }
+              sentiment: "neutral",
+            },
           });
           return;
         }
@@ -60,7 +66,8 @@ function chatSummaryEndpoints(app) {
         // Check cache if not forcing refresh
         if (!forceRefresh) {
           const cached = await getCachedSummary(workspace.id, threadId);
-          if (cached && cached.timestamp > Date.now() - 30 * 60 * 1000) { // 30 min cache
+          if (cached && cached.timestamp > Date.now() - 30 * 60 * 1000) {
+            // 30 min cache
             response.status(200).json({ summary: cached.summary });
             return;
           }
@@ -68,7 +75,7 @@ function chatSummaryEndpoints(app) {
 
         // Generate summary using LLM
         const summary = await generateSummary(workspace, chats.reverse()); // Reverse to chronological order
-        
+
         // Cache the summary
         await cacheSummary(workspace.id, threadId, summary);
 
@@ -98,15 +105,18 @@ function chatSummaryEndpoints(app) {
         // Get thread if threadSlug provided
         let threadId = null;
         if (threadSlug) {
-          const thread = await WorkspaceThread.get({ slug: threadSlug, workspace_id: workspace.id });
+          const thread = await WorkspaceThread.get({
+            slug: threadSlug,
+            workspace_id: workspace.id,
+          });
           threadId = thread?.id || null;
         }
 
         // Try to get auto-generated summary from cache first
         const autoSummary = getAutoSummary(workspace.id, threadId);
         if (autoSummary) {
-          response.status(200).json({ 
-            summary: autoSummary
+          response.status(200).json({
+            summary: autoSummary,
           });
           return;
         }
@@ -139,14 +149,16 @@ async function generateSummary(workspace, chats) {
     // Format last 15 messages for concise summary
     const recentChats = chats.slice(-15);
     const chatText = recentChats
-      .map(chat => {
+      .map((chat) => {
         const role = chat.user_id ? "User" : "Assistant";
         const response = safeJsonParse(chat.response, {});
         const text = chat.prompt || response.text || "";
         // Limit each message to 150 chars for brevity
         return `${role}: ${text.substring(0, 150)}`;
       })
-      .filter(line => line.includes(": ") && line.split(": ")[1].trim().length > 0)
+      .filter(
+        (line) => line.includes(": ") && line.split(": ")[1].trim().length > 0
+      )
       .join("\n");
 
     const prompt = `Analyze this conversation and provide a VERY CONCISE summary (100 words MAX total):
@@ -164,7 +176,13 @@ Return a JSON with this EXACT structure:
 Be EXTREMELY concise. Total summary must be under 100 words.`;
 
     const response = await LLMConnector.getChatCompletion(
-      [{ role: "system", content: "You are a concise summarizer. Maximum 100 words total. Be extremely brief." }],
+      [
+        {
+          role: "system",
+          content:
+            "You are a concise summarizer. Maximum 100 words total. Be extremely brief.",
+        },
+      ],
       prompt,
       workspace
     );
@@ -180,7 +198,7 @@ Be EXTREMELY concise. Total summary must be under 100 words.`;
         overview: "Ongoing conversation",
         details: "",
         topics: [],
-        messageCount: chats.length
+        messageCount: chats.length,
       };
     }
 
@@ -204,7 +222,7 @@ Be EXTREMELY concise. Total summary must be under 100 words.`;
       details: "",
       topics: [],
       lastActivity: new Date(),
-      messageCount: chats.length
+      messageCount: chats.length,
     };
   }
 }
@@ -213,14 +231,14 @@ async function getQuickStats(workspaceId, threadId) {
   const count = await WorkspaceChats.count({
     workspaceId,
     thread_id: threadId,
-    include: true
+    include: true,
   });
 
   const lastChat = await WorkspaceChats.get(
     {
       workspaceId,
       thread_id: threadId,
-      include: true
+      include: true,
     },
     1,
     { id: "desc" }
@@ -230,7 +248,7 @@ async function getQuickStats(workspaceId, threadId) {
     brief: `${count} messages exchanged`,
     lastActivity: lastChat?.createdAt || null,
     messageCount: count,
-    topics: []
+    topics: [],
   };
 }
 
@@ -238,17 +256,17 @@ async function getQuickStats(workspaceId, threadId) {
 const summaryCache = new Map();
 
 async function getCachedSummary(workspaceId, threadId) {
-  const key = `${workspaceId}-${threadId || 'main'}`;
+  const key = `${workspaceId}-${threadId || "main"}`;
   return summaryCache.get(key);
 }
 
 async function cacheSummary(workspaceId, threadId, summary) {
-  const key = `${workspaceId}-${threadId || 'main'}`;
+  const key = `${workspaceId}-${threadId || "main"}`;
   summaryCache.set(key, {
     summary,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   });
-  
+
   // Clean old cache entries
   if (summaryCache.size > 100) {
     const oldestKey = summaryCache.keys().next().value;

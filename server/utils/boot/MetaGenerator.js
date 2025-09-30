@@ -189,9 +189,7 @@ class MetaGenerator {
         {
           tag: "title",
           props: null,
-          content:
-            customTitle ??
-            "Tready | Your personal AI trained on needs",
+          content: customTitle ?? "Tready | Your personal AI trained on needs",
         },
       ];
     }

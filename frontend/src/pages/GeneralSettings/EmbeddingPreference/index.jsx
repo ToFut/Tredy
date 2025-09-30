@@ -44,8 +44,7 @@ const EMBEDDERS = [
     value: "native",
     logo: TredyIcon,
     options: (settings) => <NativeEmbeddingOptions settings={settings} />,
-    description:
-      "Use the built-in embedding provider for Tredy. Zero setup!",
+    description: "Use the built-in embedding provider for Tredy. Zero setup!",
   },
   {
     name: "OpenAI",

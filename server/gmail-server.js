@@ -23,8 +23,7 @@ class UniversalGmailMCP {
 
     this.nangoConfig = {
       secretKey: process.env.NANGO_SECRET_KEY,
-      host: process.env.NANGO_HOST || 'https://api.nango.dev',
-      providerConfigKey: 'google-mail-urgd'
+      host: process.env.NANGO_HOST || 'https://api.nango.dev'
     };
 
     this.setupTools();

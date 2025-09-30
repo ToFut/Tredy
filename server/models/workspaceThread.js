@@ -161,10 +161,14 @@ const WorkspaceThread = {
 
       // Check if user is the thread owner or has permission
       const isOwner = thread.user_id === Number(userId);
-      const canShare = isOwner || (await ThreadParticipants.canEdit(threadId, userId));
+      const canShare =
+        isOwner || (await ThreadParticipants.canEdit(threadId, userId));
 
       if (!canShare) {
-        return { success: false, error: "You don't have permission to share this thread" };
+        return {
+          success: false,
+          error: "You don't have permission to share this thread",
+        };
       }
 
       // Add the owner as a participant if not already
@@ -179,7 +183,10 @@ const WorkspaceThread = {
       }
 
       // Add new participants
-      const { count, error } = await ThreadParticipants.bulkAdd(threadId, participants);
+      const { count, error } = await ThreadParticipants.bulkAdd(
+        threadId,
+        participants
+      );
 
       if (error) {
         return { success: false, error };
@@ -198,12 +205,18 @@ const WorkspaceThread = {
   unshareThread: async function (threadId, requestingUserId, targetUserId) {
     try {
       // Check if requesting user has permission to unshare
-      const canDelete = await ThreadParticipants.canDelete(threadId, requestingUserId);
+      const canDelete = await ThreadParticipants.canDelete(
+        threadId,
+        requestingUserId
+      );
       const thread = await this.get({ id: Number(threadId) });
       const isOwner = thread?.user_id === Number(requestingUserId);
 
       if (!canDelete && !isOwner) {
-        return { success: false, error: "You don't have permission to remove participants" };
+        return {
+          success: false,
+          error: "You don't have permission to remove participants",
+        };
       }
 
       // Don't allow removing the owner
@@ -211,7 +224,10 @@ const WorkspaceThread = {
         return { success: false, error: "Cannot remove the thread owner" };
       }
 
-      const { success, error } = await ThreadParticipants.remove(threadId, targetUserId);
+      const { success, error } = await ThreadParticipants.remove(
+        threadId,
+        targetUserId
+      );
       return { success, error };
     } catch (error) {
       console.error("Failed to unshare thread:", error.message);
@@ -224,7 +240,10 @@ const WorkspaceThread = {
    */
   getSharedThreads: async function (userId, workspaceId) {
     try {
-      const sharedThreads = await ThreadParticipants.getUserThreads(userId, workspaceId);
+      const sharedThreads = await ThreadParticipants.getUserThreads(
+        userId,
+        workspaceId
+      );
       return sharedThreads;
     } catch (error) {
       console.error("Failed to get shared threads:", error.message);

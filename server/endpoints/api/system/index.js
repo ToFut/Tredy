@@ -48,7 +48,9 @@ function apiSystemEndpoints(app) {
       response.status(200).json({
         publicKey: process.env.NANGO_PUBLIC_KEY || null,
         host: process.env.NANGO_HOST || "https://api.nango.dev",
-        configured: !!(process.env.NANGO_PUBLIC_KEY && process.env.NANGO_SECRET_KEY)
+        configured: !!(
+          process.env.NANGO_PUBLIC_KEY && process.env.NANGO_SECRET_KEY
+        ),
       });
     } catch (error) {
       console.error("Error in nango-config endpoint:", error);

@@ -10,16 +10,16 @@ import { motion, AnimatePresence } from "framer-motion";
  * Mobile-optimized Speech-to-Text component
  * Provides real-time transcription and appends text to input
  */
-export default function MobileSpeechToText({ 
-  onTranscript, 
+export default function MobileSpeechToText({
+  onTranscript,
   onClose,
-  isVisible = false 
+  isVisible = false,
 }) {
   const previousTranscriptRef = useRef("");
   const [isListening, setIsListening] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const recordingInterval = useRef(null);
-  
+
   const {
     transcript,
     listening,
@@ -42,7 +42,7 @@ export default function MobileSpeechToText({
         return;
       }
     }
-    
+
     if (!isMicrophoneAvailable) {
       alert("Please enable microphone access for this feature.");
       return;
@@ -52,17 +52,17 @@ export default function MobileSpeechToText({
     previousTranscriptRef.current = "";
     setRecordingTime(0);
     setIsListening(true);
-    
+
     SpeechRecognition.startListening({
       continuous: browserSupportsContinuousListening,
       language: window?.navigator?.language ?? "en-US",
     });
-    
+
     // Start recording timer
     recordingInterval.current = setInterval(() => {
-      setRecordingTime(prev => prev + 1);
+      setRecordingTime((prev) => prev + 1);
     }, 1000);
-    
+
     navigator.vibrate?.([50]);
   };
 
@@ -71,17 +71,17 @@ export default function MobileSpeechToText({
     SpeechRecognition.stopListening();
     setIsListening(false);
     clearInterval(recordingInterval.current);
-    
+
     // If auto-submit is enabled, trigger send
     if (Appearance.get("autoSubmitSttInput") && transcript.length > 0) {
       onTranscript(transcript, true); // true = auto-submit
     }
-    
+
     resetTranscript();
     previousTranscriptRef.current = "";
     setRecordingTime(0);
     navigator.vibrate?.([30]);
-    
+
     if (onClose) onClose();
   };
 
@@ -94,7 +94,7 @@ export default function MobileSpeechToText({
     previousTranscriptRef.current = "";
     setRecordingTime(0);
     navigator.vibrate?.([20, 10, 20]);
-    
+
     if (onClose) onClose();
   };
 
@@ -103,12 +103,12 @@ export default function MobileSpeechToText({
     if (transcript?.length > 0 && listening) {
       const previousTranscript = previousTranscriptRef.current;
       const newContent = transcript.slice(previousTranscript.length);
-      
+
       // Stream just the new content
       if (newContent.length > 0 && onTranscript) {
         onTranscript(newContent, false); // false = append mode
       }
-      
+
       previousTranscriptRef.current = transcript;
     }
   }, [transcript, listening, onTranscript]);
@@ -172,11 +172,11 @@ export default function MobileSpeechToText({
                   </div>
                   <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
                 </div>
-                
+
                 <div className="text-2xl font-mono text-gray-900 dark:text-white mb-2">
                   {formatTime(recordingTime)}
                 </div>
-                
+
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
                   Speak clearly into your microphone
                 </p>
@@ -189,7 +189,7 @@ export default function MobileSpeechToText({
                       className="w-1 bg-blue-500 dark:bg-blue-400 rounded-full animate-pulse"
                       style={{
                         height: `${Math.random() * 30 + 10}px`,
-                        animationDelay: `${i * 0.05}s`
+                        animationDelay: `${i * 0.05}s`,
                       }}
                     />
                   ))}
@@ -219,7 +219,7 @@ export default function MobileSpeechToText({
               >
                 Cancel
               </button>
-              
+
               {isListening ? (
                 <button
                   onClick={endSTTSession}

@@ -27,7 +27,11 @@ class ContextWindowFinder {
   cacheLocation = path.resolve(
     process.env.NODE_ENV === "development"
       ? path.resolve(__dirname, `../../../storage/models/context-windows`)
-      : path.resolve(process.env.STORAGE_DIR || "/app/storage", "models", "context-windows")
+      : path.resolve(
+          process.env.STORAGE_DIR || "/app/storage",
+          "models",
+          "context-windows"
+        )
   );
   cacheFilePath = path.resolve(this.cacheLocation, "context-windows.json");
   cacheFileExpiryPath = path.resolve(this.cacheLocation, ".cached_at");
@@ -40,11 +44,20 @@ class ContextWindowFinder {
       if (!fs.existsSync(this.cacheLocation))
         fs.mkdirSync(this.cacheLocation, { recursive: true });
     } catch (error) {
-      console.error('[ContextWindowFinder] Failed to create cache directory:', error);
+      console.error(
+        "[ContextWindowFinder] Failed to create cache directory:",
+        error
+      );
       // Create a fallback cache location in the current directory if STORAGE_DIR fails
-      this.cacheLocation = path.resolve(__dirname, '../../../storage/models/context-windows');
-      this.cacheFilePath = path.resolve(this.cacheLocation, 'context-windows.json');
-      this.cacheFileExpiryPath = path.resolve(this.cacheLocation, '.cached_at');
+      this.cacheLocation = path.resolve(
+        __dirname,
+        "../../../storage/models/context-windows"
+      );
+      this.cacheFilePath = path.resolve(
+        this.cacheLocation,
+        "context-windows.json"
+      );
+      this.cacheFileExpiryPath = path.resolve(this.cacheLocation, ".cached_at");
       if (!fs.existsSync(this.cacheLocation))
         fs.mkdirSync(this.cacheLocation, { recursive: true });
     }

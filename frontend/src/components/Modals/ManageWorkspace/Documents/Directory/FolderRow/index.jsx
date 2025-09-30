@@ -1,6 +1,6 @@
 import { useState } from "react";
 import FileRow from "../FileRow";
-import { CaretDown, FolderNotch } from "@phosphor-icons/react";
+import { CaretDown } from "@phosphor-icons/react";
 import { middleTruncate } from "@/utils/directories";
 
 export default function FolderRow({
@@ -53,10 +53,7 @@ export default function FolderRow({
           >
             <CaretDown className="text-base font-bold w-4 h-4" />
           </div>
-          <FolderNotch
-            className="shrink-0 text-base font-bold w-4 h-4 mr-[3px]"
-            weight="fill"
-          />
+          <div className="shrink-0 text-base font-bold w-4 h-4 mr-[3px] bg-gray-300 rounded"></div>
           <p className="whitespace-nowrap overflow-show max-w-[400px]">
             {middleTruncate(item.name, 35)}
           </p>

@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { ChevronDown, ChevronRight, Check, Warning, Info } from "lucide-react";
 
-export default function ProgressiveForm({ sections = [], onSubmit, className = "" }) {
+export default function ProgressiveForm({
+  sections = [],
+  onSubmit,
+  className = "",
+}) {
   const [expandedSections, setExpandedSections] = useState(new Set([0])); // First section expanded by default
   const [completedSections, setCompletedSections] = useState(new Set());
   const [formData, setFormData] = useState({});
@@ -17,18 +21,18 @@ export default function ProgressiveForm({ sections = [], onSubmit, className = "
   };
 
   const updateFormData = (sectionId, fieldName, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [sectionId]: {
         ...prev[sectionId],
-        [fieldName]: value
-      }
+        [fieldName]: value,
+      },
     }));
   };
 
   const validateSection = (section) => {
     const sectionData = formData[section.id] || {};
-    return section.fields.every(field => {
+    return section.fields.every((field) => {
       if (field.required) {
         const value = sectionData[field.name];
         return value !== undefined && value !== "" && value !== null;
@@ -43,7 +47,7 @@ export default function ProgressiveForm({ sections = [], onSubmit, className = "
       const newCompleted = new Set(completedSections);
       newCompleted.add(sectionIndex);
       setCompletedSections(newCompleted);
-      
+
       // Auto-expand next section
       if (sectionIndex + 1 < sections.length) {
         const newExpanded = new Set(expandedSections);
@@ -54,14 +58,14 @@ export default function ProgressiveForm({ sections = [], onSubmit, className = "
   };
 
   const getSectionStatus = (index) => {
-    if (completedSections.has(index)) return 'completed';
-    if (expandedSections.has(index)) return 'active';
-    return 'pending';
+    if (completedSections.has(index)) return "completed";
+    if (expandedSections.has(index)) return "active";
+    return "pending";
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const allValid = sections.every(section => validateSection(section));
+    const allValid = sections.every((section) => validateSection(section));
     if (allValid) {
       onSubmit(formData);
     }
@@ -80,11 +84,11 @@ export default function ProgressiveForm({ sections = [], onSubmit, className = "
             <div
               key={section.id}
               className={`border rounded-xl transition-all duration-200 ${
-                status === 'completed' 
-                  ? 'border-green-200 bg-green-50/50' 
-                  : status === 'active'
-                  ? 'border-blue-200 bg-blue-50/50'
-                  : 'border-gray-200 bg-white'
+                status === "completed"
+                  ? "border-green-200 bg-green-50/50"
+                  : status === "active"
+                    ? "border-blue-200 bg-blue-50/50"
+                    : "border-gray-200 bg-white"
               }`}
             >
               {/* Section Header */}
@@ -95,13 +99,15 @@ export default function ProgressiveForm({ sections = [], onSubmit, className = "
               >
                 <div className="flex items-center gap-3">
                   {/* Status Icon */}
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    isCompleted
-                      ? 'bg-green-100 text-green-600'
-                      : status === 'active'
-                      ? 'bg-blue-100 text-blue-600'
-                      : 'bg-gray-100 text-gray-400'
-                  }`}>
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      isCompleted
+                        ? "bg-green-100 text-green-600"
+                        : status === "active"
+                          ? "bg-blue-100 text-blue-600"
+                          : "bg-gray-100 text-gray-400"
+                    }`}
+                  >
                     {isCompleted ? (
                       <Check className="w-4 h-4" />
                     ) : (
@@ -111,9 +117,11 @@ export default function ProgressiveForm({ sections = [], onSubmit, className = "
 
                   {/* Section Info */}
                   <div>
-                    <h3 className={`font-semibold ${
-                      isCompleted ? 'text-green-900' : 'text-gray-900'
-                    }`}>
+                    <h3
+                      className={`font-semibold ${
+                        isCompleted ? "text-green-900" : "text-gray-900"
+                      }`}
+                    >
                       {section.title}
                     </h3>
                     {section.description && (
@@ -145,7 +153,9 @@ export default function ProgressiveForm({ sections = [], onSubmit, className = "
                       key={field.name}
                       field={field}
                       value={formData[section.id]?.[field.name] || ""}
-                      onChange={(value) => updateFormData(section.id, field.name, value)}
+                      onChange={(value) =>
+                        updateFormData(section.id, field.name, value)
+                      }
                     />
                   ))}
 
@@ -166,11 +176,11 @@ export default function ProgressiveForm({ sections = [], onSubmit, className = "
                       disabled={!isValid}
                       className={`px-6 py-2 rounded-lg font-medium transition-colors ${
                         isValid
-                          ? 'bg-blue-600 text-white hover:bg-blue-700'
-                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                          ? "bg-blue-600 text-white hover:bg-blue-700"
+                          : "bg-gray-200 text-gray-400 cursor-not-allowed"
                       }`}
                     >
-                      {index === sections.length - 1 ? 'Complete' : 'Continue'}
+                      {index === sections.length - 1 ? "Complete" : "Continue"}
                     </button>
                   </div>
                 </div>
@@ -200,8 +210,8 @@ export default function ProgressiveForm({ sections = [], onSubmit, className = "
       <div className="mt-6 bg-gray-100 rounded-full h-2">
         <div
           className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-          style={{ 
-            width: `${(completedSections.size / sections.length) * 100}%` 
+          style={{
+            width: `${(completedSections.size / sections.length) * 100}%`,
           }}
         />
       </div>
@@ -215,9 +225,9 @@ export default function ProgressiveForm({ sections = [], onSubmit, className = "
 function FormField({ field, value, onChange }) {
   const renderField = () => {
     switch (field.type) {
-      case 'text':
-      case 'email':
-      case 'password':
+      case "text":
+      case "email":
+      case "password":
         return (
           <input
             type={field.type}
@@ -229,7 +239,7 @@ function FormField({ field, value, onChange }) {
           />
         );
 
-      case 'textarea':
+      case "textarea":
         return (
           <textarea
             value={value}
@@ -241,7 +251,7 @@ function FormField({ field, value, onChange }) {
           />
         );
 
-      case 'select':
+      case "select":
         return (
           <select
             value={value}
@@ -258,7 +268,7 @@ function FormField({ field, value, onChange }) {
           </select>
         );
 
-      case 'checkbox':
+      case "checkbox":
         return (
           <label className="flex items-center gap-2 cursor-pointer">
             <input
@@ -271,11 +281,14 @@ function FormField({ field, value, onChange }) {
           </label>
         );
 
-      case 'radio':
+      case "radio":
         return (
           <div className="space-y-2">
             {field.options.map((option) => (
-              <label key={option.value} className="flex items-center gap-2 cursor-pointer">
+              <label
+                key={option.value}
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <input
                   type="radio"
                   name={field.name}

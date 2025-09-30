@@ -1,5 +1,12 @@
 import React from "react";
-import { ToggleLeft, ToggleRight, Trash, Package, Gear, ArrowSquareOut } from "@phosphor-icons/react";
+import {
+  ToggleLeft,
+  ToggleRight,
+  Trash,
+  Package,
+  Gear,
+  ArrowSquareOut,
+} from "@phosphor-icons/react";
 
 export default function InstalledSkills({ items, onToggle, onUninstall }) {
   if (items.length === 0) {
@@ -70,31 +77,38 @@ export default function InstalledSkills({ items, onToggle, onUninstall }) {
                       </span>
                     )}
                   </div>
-                  
+
                   <p className="text-sm text-theme-text-secondary mb-2">
                     {item.description}
                   </p>
-                  
+
                   <div className="flex items-center gap-3 text-xs text-theme-text-secondary">
                     <span>Version: {item.version || "1.0.0"}</span>
                     {item.author && <span>• Author: {item.author}</span>}
                     <span>• ID: {item.hubId || item.id}</span>
                   </div>
 
-                  {item.setup_args && Object.keys(item.setup_args).length > 0 && (
-                    <div className="mt-3 p-2 bg-theme-bg-secondary rounded">
-                      <p className="text-xs font-medium text-theme-text-primary mb-1">
-                        Configuration Required:
-                      </p>
-                      <div className="space-y-1">
-                        {Object.entries(item.setup_args).map(([key, config]) => (
-                          <div key={key} className="text-xs text-theme-text-secondary">
-                            • {key}: {config.description || "No description"}
-                          </div>
-                        ))}
+                  {item.setup_args &&
+                    Object.keys(item.setup_args).length > 0 && (
+                      <div className="mt-3 p-2 bg-theme-bg-secondary rounded">
+                        <p className="text-xs font-medium text-theme-text-primary mb-1">
+                          Configuration Required:
+                        </p>
+                        <div className="space-y-1">
+                          {Object.entries(item.setup_args).map(
+                            ([key, config]) => (
+                              <div
+                                key={key}
+                                className="text-xs text-theme-text-secondary"
+                              >
+                                • {key}:{" "}
+                                {config.description || "No description"}
+                              </div>
+                            )
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               </div>
 
@@ -107,10 +121,14 @@ export default function InstalledSkills({ items, onToggle, onUninstall }) {
                     <Gear className="w-5 h-5" />
                   </button>
                 )}
-                
+
                 <button
                   onClick={() => {
-                    if (confirm(`Are you sure you want to uninstall "${item.name}"?`)) {
+                    if (
+                      confirm(
+                        `Are you sure you want to uninstall "${item.name}"?`
+                      )
+                    ) {
                       onUninstall(item.hubId || item.id);
                     }
                   }}

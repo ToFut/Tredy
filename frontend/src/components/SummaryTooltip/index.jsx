@@ -3,12 +3,12 @@ import { createPortal } from "react-dom";
 import { Sparkle, Clock, ChatCircle, Lightning } from "@phosphor-icons/react";
 import Workspace from "@/models/workspace";
 
-export default function SummaryTooltip({ 
-  workspace, 
+export default function SummaryTooltip({
+  workspace,
   threadSlug = null,
   anchor,
   isVisible,
-  onClose 
+  onClose,
 }) {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -52,7 +52,10 @@ export default function SummaryTooltip({
   const fetchSummary = async () => {
     try {
       setLoading(true);
-      const response = await Workspace.getQuickSummary(workspace.slug, threadSlug);
+      const response = await Workspace.getQuickSummary(
+        workspace.slug,
+        threadSlug
+      );
       if (response.summary) {
         setSummary(response.summary);
       }
@@ -62,7 +65,7 @@ export default function SummaryTooltip({
         brief: "Unable to load summary",
         topics: [],
         keyPoints: [],
-        messageCount: 0
+        messageCount: 0,
       });
     } finally {
       setLoading(false);
@@ -96,7 +99,7 @@ export default function SummaryTooltip({
     >
       <div className="relative">
         {/* Arrow pointing to workspace */}
-        <div 
+        <div
           className="absolute -left-3 top-6 w-0 h-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-r-[12px] border-r-white/95"
           style={{ filter: "drop-shadow(-2px 0 4px rgba(0,0,0,0.08))" }}
         />
@@ -106,10 +109,15 @@ export default function SummaryTooltip({
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12">
               <div className="relative">
-                <Sparkle className="animate-pulse text-blue-500 mb-3" size={32} />
+                <Sparkle
+                  className="animate-pulse text-blue-500 mb-3"
+                  size={32}
+                />
                 <div className="absolute inset-0 blur-xl bg-blue-400/20 animate-pulse" />
               </div>
-              <p className="text-sm text-gray-500 font-medium">Analyzing conversation...</p>
+              <p className="text-sm text-gray-500 font-medium">
+                Analyzing conversation...
+              </p>
             </div>
           ) : summary ? (
             <div className="space-y-4">
@@ -123,25 +131,36 @@ export default function SummaryTooltip({
                     onClick={onClose}
                     className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-lg"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 italic">
-                  {getTagline()}
-                </p>
+                <p className="text-xs text-gray-500 italic">{getTagline()}</p>
               </div>
 
               {/* Summary Section */}
               <div>
                 <div className="flex items-center gap-1.5 mb-2">
                   <Lightning className="text-blue-500" size={14} />
-                  <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Summary</span>
+                  <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                    Summary
+                  </span>
                 </div>
                 <div className="bg-gradient-to-br from-blue-50/50 to-purple-50/50 rounded-xl p-3 border border-blue-100/50">
                   <p className="text-sm text-gray-700 leading-relaxed">
-                    {summary.brief || "No summary available yet. Start a conversation to generate insights."}
+                    {summary.brief ||
+                      "No summary available yet. Start a conversation to generate insights."}
                   </p>
                 </div>
               </div>
@@ -150,12 +169,16 @@ export default function SummaryTooltip({
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-1.5">
                   <ChatCircle className="text-gray-400" size={14} />
-                  <span className="text-xs text-gray-600">{summary.messageCount || 0} messages</span>
+                  <span className="text-xs text-gray-600">
+                    {summary.messageCount || 0} messages
+                  </span>
                 </div>
                 {summary.lastActivity && (
                   <div className="flex items-center gap-1.5">
                     <Clock className="text-gray-400" size={14} />
-                    <span className="text-xs text-gray-600">{formatTime(summary.lastActivity)}</span>
+                    <span className="text-xs text-gray-600">
+                      {formatTime(summary.lastActivity)}
+                    </span>
                   </div>
                 )}
               </div>
@@ -163,7 +186,9 @@ export default function SummaryTooltip({
               {/* Topics */}
               {summary.topics && summary.topics.length > 0 && (
                 <div>
-                  <p className="text-xs font-semibold text-gray-600 mb-2">Key Topics</p>
+                  <p className="text-xs font-semibold text-gray-600 mb-2">
+                    Key Topics
+                  </p>
                   <div className="flex flex-wrap gap-1.5">
                     {summary.topics.slice(0, 5).map((topic, i) => (
                       <span
@@ -180,12 +205,16 @@ export default function SummaryTooltip({
               {/* Key Points */}
               {summary.keyPoints && summary.keyPoints.length > 0 && (
                 <div>
-                  <p className="text-xs font-semibold text-gray-600 mb-2">Highlights</p>
+                  <p className="text-xs font-semibold text-gray-600 mb-2">
+                    Highlights
+                  </p>
                   <ul className="space-y-1.5">
                     {summary.keyPoints.slice(0, 3).map((point, i) => (
                       <li key={i} className="flex items-start gap-2">
                         <span className="text-blue-400 mt-0.5 text-xs">•</span>
-                        <span className="text-xs text-gray-600 leading-relaxed">{point}</span>
+                        <span className="text-xs text-gray-600 leading-relaxed">
+                          {point}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -195,10 +224,15 @@ export default function SummaryTooltip({
               {/* Action Items */}
               {summary.actionItems && summary.actionItems.length > 0 && (
                 <div className="pt-3 border-t border-gray-100">
-                  <p className="text-xs font-semibold text-orange-600 mb-2">Action Items</p>
+                  <p className="text-xs font-semibold text-orange-600 mb-2">
+                    Action Items
+                  </p>
                   <ul className="space-y-1">
                     {summary.actionItems.map((item, i) => (
-                      <li key={i} className="text-xs text-gray-600 flex items-start gap-2">
+                      <li
+                        key={i}
+                        className="text-xs text-gray-600 flex items-start gap-2"
+                      >
                         <input type="checkbox" className="mt-0.5" />
                         <span>{item}</span>
                       </li>
@@ -215,7 +249,7 @@ export default function SummaryTooltip({
                 <button
                   onClick={() => {
                     // Navigate to thread if threadSlug exists, otherwise to workspace
-                    const url = threadSlug 
+                    const url = threadSlug
                       ? `/workspace/${workspace.slug}/t/${threadSlug}`
                       : `/workspace/${workspace.slug}`;
                     window.location.href = url;
@@ -231,8 +265,12 @@ export default function SummaryTooltip({
               <div className="mb-3">
                 <ChatCircle className="mx-auto text-gray-300" size={32} />
               </div>
-              <p className="text-sm text-gray-500">No conversation data available</p>
-              <p className="text-xs text-gray-400 mt-1">Start chatting to see insights here</p>
+              <p className="text-sm text-gray-500">
+                No conversation data available
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                Start chatting to see insights here
+              </p>
             </div>
           )}
         </div>
@@ -244,19 +282,19 @@ export default function SummaryTooltip({
 
 function formatTime(timestamp) {
   if (!timestamp) return "Unknown";
-  
+
   const date = new Date(timestamp);
   const now = new Date();
   const diff = now - date;
-  
+
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
-  
+
   if (minutes < 1) return "Just now";
   if (minutes < 60) return `${minutes}m ago`;
   if (hours < 24) return `${hours}h ago`;
   if (days < 7) return `${days}d ago`;
-  
+
   return date.toLocaleDateString();
 }

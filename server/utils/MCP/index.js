@@ -18,34 +18,34 @@ class MCPCompatibilityLayer extends MCPHypervisor {
   async activeMCPServers(workspaceId = null) {
     await this.bootMCPServers();
     const allServers = Object.keys(this.mcps);
-    
+
     // If no workspace ID, return all servers
     if (!workspaceId) {
       return allServers.flatMap((name) => `@@mcp_${name}`);
     }
-    
+
     // Filter to prioritize workspace-specific servers and exclude generic OAuth providers
     const workspaceServers = [];
     const genericServers = [];
     const workspaceProviders = new Set(); // Providers that have workspace-specific servers
-    
+
     // First pass: collect workspace-specific servers and track their base providers
     for (const serverName of allServers) {
       if (serverName.includes(`_ws${workspaceId}`)) {
         workspaceServers.push(serverName);
-        const baseProvider = serverName.replace(`_ws${workspaceId}`, '');
+        const baseProvider = serverName.replace(`_ws${workspaceId}`, "");
         workspaceProviders.add(baseProvider);
       }
     }
-    
+
     // Second pass: include all generic servers for now
     for (const serverName of allServers) {
-      const isWorkspaceSpecific = serverName.includes('_ws');
+      const isWorkspaceSpecific = serverName.includes("_ws");
       if (!isWorkspaceSpecific) {
         genericServers.push(serverName);
       }
     }
-    
+
     // Only return servers that are actually usable
     const filteredServers = [...workspaceServers, ...genericServers];
     return filteredServers.flatMap((name) => `@@mcp_${name}`);
@@ -88,15 +88,18 @@ class MCPCompatibilityLayer extends MCPHypervisor {
                     // Always include workspace context in args
                     // If workspaceId is provided but looks like an email, override it
                     const providedWorkspaceId = args.workspaceId;
-                    const isInvalidWorkspaceId = providedWorkspaceId && 
-                      (typeof providedWorkspaceId === 'string' && 
-                       (providedWorkspaceId.includes('@') || providedWorkspaceId.includes('.')));
-                    
+                    const isInvalidWorkspaceId =
+                      providedWorkspaceId &&
+                      typeof providedWorkspaceId === "string" &&
+                      (providedWorkspaceId.includes("@") ||
+                        providedWorkspaceId.includes("."));
+
                     if (!args.workspaceId || isInvalidWorkspaceId) {
                       if (aibitat.handlerProps?.invocation) {
-                        args.workspaceId = aibitat.handlerProps.invocation.workspace_id || 
-                                          aibitat.handlerProps.invocation.workspace?.id;
-                        
+                        args.workspaceId =
+                          aibitat.handlerProps.invocation.workspace_id ||
+                          aibitat.handlerProps.invocation.workspace?.id;
+
                         // Log if we're overriding an invalid workspace ID
                         if (isInvalidWorkspaceId) {
                           aibitat.handlerProps.log(
@@ -105,27 +108,39 @@ class MCPCompatibilityLayer extends MCPHypervisor {
                         }
                       }
                     }
-                    
-                    if (!args.workspaceSlug && aibitat.handlerProps?.invocation?.workspace) {
-                      args.workspaceSlug = aibitat.handlerProps.invocation.workspace.slug;
+
+                    if (
+                      !args.workspaceSlug &&
+                      aibitat.handlerProps?.invocation?.workspace
+                    ) {
+                      args.workspaceSlug =
+                        aibitat.handlerProps.invocation.workspace.slug;
                     }
 
                     // Add user context for tools that need it
                     if (!args.senderName && aibitat.handlerProps?.invocation) {
                       // First try to get username from user directly
                       if (aibitat.handlerProps.invocation.user?.username) {
-                        args.senderName = aibitat.handlerProps.invocation.user.username;
+                        args.senderName =
+                          aibitat.handlerProps.invocation.user.username;
                       }
                       // Fallback to workspace name or slug
-                      else if (aibitat.handlerProps.invocation.workspace?.name) {
-                        args.senderName = aibitat.handlerProps.invocation.workspace.name;
+                      else if (
+                        aibitat.handlerProps.invocation.workspace?.name
+                      ) {
+                        args.senderName =
+                          aibitat.handlerProps.invocation.workspace.name;
                       }
                     }
 
-                    if (!args.workspaceName && aibitat.handlerProps?.invocation?.workspace?.name) {
-                      args.workspaceName = aibitat.handlerProps.invocation.workspace.name;
+                    if (
+                      !args.workspaceName &&
+                      aibitat.handlerProps?.invocation?.workspace?.name
+                    ) {
+                      args.workspaceName =
+                        aibitat.handlerProps.invocation.workspace.name;
                     }
-                    
+
                     aibitat.handlerProps.log(
                       `Executing MCP server: ${name}:${tool.name} with args:`,
                       args
@@ -141,21 +156,29 @@ class MCPCompatibilityLayer extends MCPHypervisor {
                       `MCP server: ${name}:${tool.name} completed successfully`,
                       result
                     );
-                    
+
                     // Format calendar events nicely if this is a calendar tool
-                    if (tool.name.includes('calendar_events') && Array.isArray(result)) {
-                      const formattedEvents = result.map(event => 
-                        `📅 ${event.summary || 'No title'}\n` +
-                        `   📍 ${event.start?.dateTime || event.start?.date || 'No time'}\n` +
-                        `   ${event.location ? '📍 ' + event.location : ''}`
-                      ).join('\n\n');
-                      
+                    if (
+                      tool.name.includes("calendar_events") &&
+                      Array.isArray(result)
+                    ) {
+                      const formattedEvents = result
+                        .map(
+                          (event) =>
+                            `📅 ${event.summary || "No title"}\n` +
+                            `   📍 ${event.start?.dateTime || event.start?.date || "No time"}\n` +
+                            `   ${event.location ? "📍 " + event.location : ""}`
+                        )
+                        .join("\n\n");
+
                       aibitat.introspect(
                         `Found ${result.length} calendar events`
                       );
-                      return formattedEvents || "No events found on your calendar.";
+                      return (
+                        formattedEvents || "No events found on your calendar."
+                      );
                     }
-                    
+
                     aibitat.introspect(
                       `MCP server: ${name}:${tool.name} completed successfully`
                     );

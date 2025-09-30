@@ -6,13 +6,17 @@ const AgentSchedule = {
    * Get all schedules for a workspace
    */
   list: async (workspaceSlug) => {
-    return await fetch(`${API_BASE}/workspace/${workspaceSlug}/agent-schedules`, {
-      method: "GET",
-      headers: baseHeaders(),
-    })
+    return await fetch(
+      `${API_BASE}/workspace/${workspaceSlug}/agent-schedules`,
+      {
+        method: "GET",
+        headers: baseHeaders(),
+      }
+    )
       .then((res) => res.json())
       .then((res) => {
-        if (!res.success) throw new Error(res.error || "Failed to fetch schedules");
+        if (!res.success)
+          throw new Error(res.error || "Failed to fetch schedules");
         return res.schedules;
       })
       .catch((e) => {
@@ -25,14 +29,18 @@ const AgentSchedule = {
    * Create a new schedule
    */
   create: async (workspaceSlug, scheduleData) => {
-    return await fetch(`${API_BASE}/workspace/${workspaceSlug}/agent-schedules`, {
-      method: "POST",
-      headers: baseHeaders(),
-      body: JSON.stringify(scheduleData),
-    })
+    return await fetch(
+      `${API_BASE}/workspace/${workspaceSlug}/agent-schedules`,
+      {
+        method: "POST",
+        headers: baseHeaders(),
+        body: JSON.stringify(scheduleData),
+      }
+    )
       .then((res) => res.json())
       .then((res) => {
-        if (!res.success) throw new Error(res.error || "Failed to create schedule");
+        if (!res.success)
+          throw new Error(res.error || "Failed to create schedule");
         return res.schedule;
       })
       .catch((e) => {
@@ -55,7 +63,8 @@ const AgentSchedule = {
     )
       .then((res) => res.json())
       .then((res) => {
-        if (!res.success) throw new Error(res.error || "Failed to update schedule");
+        if (!res.success)
+          throw new Error(res.error || "Failed to update schedule");
         return res.schedule;
       })
       .catch((e) => {
@@ -77,7 +86,8 @@ const AgentSchedule = {
     )
       .then((res) => res.json())
       .then((res) => {
-        if (!res.success) throw new Error(res.error || "Failed to delete schedule");
+        if (!res.success)
+          throw new Error(res.error || "Failed to delete schedule");
         return true;
       })
       .catch((e) => {
@@ -99,7 +109,8 @@ const AgentSchedule = {
     )
       .then((res) => res.json())
       .then((res) => {
-        if (!res.success) throw new Error(res.error || "Failed to fetch executions");
+        if (!res.success)
+          throw new Error(res.error || "Failed to fetch executions");
         return res.executions;
       })
       .catch((e) => {
@@ -121,7 +132,8 @@ const AgentSchedule = {
     )
       .then((res) => res.json())
       .then((res) => {
-        if (!res.success) throw new Error(res.error || "Failed to run schedule");
+        if (!res.success)
+          throw new Error(res.error || "Failed to run schedule");
         return res;
       })
       .catch((e) => {
@@ -162,7 +174,8 @@ const AgentSchedule = {
    */
   validateCronExpression: (expression) => {
     // Basic validation - can be enhanced with a library
-    const cronPattern = /^(\*|([0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9])|\*\/([0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9])) (\*|([0-9]|1[0-9]|2[0-3])|\*\/([0-9]|1[0-9]|2[0-3])) (\*|([1-9]|1[0-9]|2[0-9]|3[0-1])|\*\/([1-9]|1[0-9]|2[0-9]|3[0-1])) (\*|([1-9]|1[0-2])|\*\/([1-9]|1[0-2])) (\*|([0-6])|\*\/([0-6]))$/;
+    const cronPattern =
+      /^(\*|([0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9])|\*\/([0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9])) (\*|([0-9]|1[0-9]|2[0-3])|\*\/([0-9]|1[0-9]|2[0-3])) (\*|([1-9]|1[0-9]|2[0-9]|3[0-1])|\*\/([1-9]|1[0-9]|2[0-9]|3[0-1])) (\*|([1-9]|1[0-2])|\*\/([1-9]|1[0-2])) (\*|([0-6])|\*\/([0-6]))$/;
     return cronPattern.test(expression);
   },
 
@@ -187,9 +200,10 @@ const AgentSchedule = {
 
     // Build custom description
     let desc = "";
-    
+
     if (minute === "*") desc += "Every minute";
-    else if (minute.includes("*/")) desc += `Every ${minute.split("/")[1]} minutes`;
+    else if (minute.includes("*/"))
+      desc += `Every ${minute.split("/")[1]} minutes`;
     else desc += `At minute ${minute}`;
 
     if (hour !== "*") {

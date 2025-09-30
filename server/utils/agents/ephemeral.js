@@ -329,7 +329,9 @@ class EphemeralAgentHandler extends AgentHandler {
       ...(await agentSkillsFromSystemSettings()),
       ...ImportedPlugin.activeImportedPlugins(),
       ...AgentFlows.activeFlowPlugins(),
-      ...(await new MCPCompatibilityLayer().activeMCPServers(this.#workspace?.id)),
+      ...(await new MCPCompatibilityLayer().activeMCPServers(
+        this.#workspace?.id
+      )),
     ];
   }
 

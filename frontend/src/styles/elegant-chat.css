@@ -188,11 +188,13 @@
 .prose-elegant hr {
   border: none;
   height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    var(--theme-sidebar-border) 20%, 
-    var(--theme-sidebar-border) 80%, 
-    transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--theme-sidebar-border) 20%,
+    var(--theme-sidebar-border) 80%,
+    transparent
+  );
   margin: 1rem 0;
 }
 
@@ -229,19 +231,19 @@
     padding: 10px 12px;
     margin: 4px 0;
   }
-  
+
   .prose-elegant {
     font-size: 13px;
   }
-  
+
   .prose-elegant h1 {
     font-size: 18px;
   }
-  
+
   .prose-elegant h2 {
     font-size: 15px;
   }
-  
+
   .prose-elegant h3 {
     font-size: 13px;
   }
@@ -315,18 +317,43 @@
 }
 
 /* 18. ELEGANT TYPOGRAPHY SCALE */
-.text-elegant-xs { font-size: 11px; line-height: 1.4; }
-.text-elegant-sm { font-size: 12px; line-height: 1.5; }
-.text-elegant-base { font-size: 14px; line-height: 1.6; }
-.text-elegant-lg { font-size: 16px; line-height: 1.6; }
-.text-elegant-xl { font-size: 18px; line-height: 1.5; }
+.text-elegant-xs {
+  font-size: 11px;
+  line-height: 1.4;
+}
+.text-elegant-sm {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.text-elegant-base {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.text-elegant-lg {
+  font-size: 16px;
+  line-height: 1.6;
+}
+.text-elegant-xl {
+  font-size: 18px;
+  line-height: 1.5;
+}
 
 /* 19. ELEGANT SPACING SCALE */
-.space-elegant-xs { margin: 0.125rem 0; }
-.space-elegant-sm { margin: 0.25rem 0; }
-.space-elegant-md { margin: 0.5rem 0; }
-.space-elegant-lg { margin: 0.75rem 0; }
-.space-elegant-xl { margin: 1rem 0; }
+.space-elegant-xs {
+  margin: 0.125rem 0;
+}
+.space-elegant-sm {
+  margin: 0.25rem 0;
+}
+.space-elegant-md {
+  margin: 0.5rem 0;
+}
+.space-elegant-lg {
+  margin: 0.75rem 0;
+}
+.space-elegant-xl {
+  margin: 1rem 0;
+}
 
 /* 20. ELEGANT CONTENT FLOW */
 .content-flow-elegant {

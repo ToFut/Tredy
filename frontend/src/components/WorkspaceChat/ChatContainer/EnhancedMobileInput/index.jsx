@@ -26,7 +26,7 @@ import {
   Robot,
   Command,
   Clock,
-  Sparkle
+  Sparkle,
 } from "@phosphor-icons/react";
 import SpeechToText from "../PromptInput/SpeechToText";
 
@@ -36,7 +36,7 @@ export default function EnhancedMobileInput({
   workspace,
   isStreaming = false,
   responseMode = "chat",
-  sendCommand
+  sendCommand,
 }) {
   // State management
   const [inputText, setInputText] = useState("");
@@ -59,7 +59,7 @@ export default function EnhancedMobileInput({
       const newHeight = Math.min(scrollHeight, 240); // Max 5 lines
       setInputHeight(newHeight);
       textareaRef.current.style.height = `${newHeight}px`;
-      
+
       // Also ensure the actual textarea value is synced
       if (textareaRef.current.value !== inputText) {
         textareaRef.current.value = inputText;
@@ -71,7 +71,7 @@ export default function EnhancedMobileInput({
   const handleInputChange = (e) => {
     const value = e.target.value;
     setInputText(value);
-    
+
     // Detect triggers for suggestions
     if (value.endsWith("@")) {
       setShowSuggestions("agents");
@@ -85,19 +85,19 @@ export default function EnhancedMobileInput({
       setShowSuggestions(false);
     }
   };
-  
+
   // Handle paste events for auto-formatting
   const handlePaste = (e) => {
     const pastedText = e.clipboardData.getData("text");
-    
+
     // Detect code blocks (multiple lines with indentation or common code patterns)
-    const looksLikeCode = 
-      (pastedText.includes("function") || 
-       pastedText.includes("const ") || 
-       pastedText.includes("import ") ||
-       pastedText.includes("{") && pastedText.includes("}") ||
-       pastedText.split("\n").length > 3 && pastedText.includes("  "));
-    
+    const looksLikeCode =
+      pastedText.includes("function") ||
+      pastedText.includes("const ") ||
+      pastedText.includes("import ") ||
+      (pastedText.includes("{") && pastedText.includes("}")) ||
+      (pastedText.split("\n").length > 3 && pastedText.includes("  "));
+
     if (looksLikeCode) {
       e.preventDefault();
       const formattedCode = "```\n" + pastedText + "\n```";
@@ -105,9 +105,10 @@ export default function EnhancedMobileInput({
       setInputText(newText);
       navigator.vibrate?.([20]);
     }
-    
+
     // Detect URLs and auto-link them
-    const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+    const urlPattern =
+      /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
     if (urlPattern.test(pastedText)) {
       e.preventDefault();
       const formattedLink = `[Link](${pastedText})`;
@@ -118,18 +119,22 @@ export default function EnhancedMobileInput({
   };
 
   // Create sendCommand wrapper that updates local state
-  const handleSendCommand = ({ text, writeMode = "append", autoSubmit = false }) => {
+  const handleSendCommand = ({
+    text,
+    writeMode = "append",
+    autoSubmit = false,
+  }) => {
     if (writeMode === "append") {
-      setInputText(prev => prev + text);
+      setInputText((prev) => prev + text);
     } else {
       setInputText(text);
     }
-    
+
     // If original sendCommand provided, call it too (for parent state sync)
     if (sendCommand) {
       sendCommand({ text, writeMode, autoSubmit });
     }
-    
+
     // Auto-submit if requested
     if (autoSubmit && text.trim()) {
       setTimeout(() => handleSend(), 100);
@@ -139,22 +144,22 @@ export default function EnhancedMobileInput({
   // Handle send message
   const handleSend = () => {
     if (!inputText.trim() || isStreaming) return;
-    
+
     navigator.vibrate?.([20]);
-    
+
     // Add response mode prefix if needed
     let message = inputText;
     if (responseMode === "agent" && !message.startsWith("@agent")) {
       message = "@agent " + message;
     }
-    
+
     if (onSend) {
       onSend({
         type: "text",
-        content: message
+        content: message,
       });
     }
-    
+
     setInputText("");
     setShowSuggestions(false);
     setShowAttachments(false);
@@ -163,7 +168,7 @@ export default function EnhancedMobileInput({
   // Format text selection
   const formatSelection = (format) => {
     if (!selectedText) return;
-    
+
     let formattedText = "";
     switch (format) {
       case "bold":
@@ -181,12 +186,12 @@ export default function EnhancedMobileInput({
       default:
         formattedText = selectedText;
     }
-    
-    const newText = 
-      inputText.substring(0, cursorPosition) + 
-      formattedText + 
+
+    const newText =
+      inputText.substring(0, cursorPosition) +
+      formattedText +
       inputText.substring(cursorPosition + selectedText.length);
-    
+
     setInputText(newText);
     setShowFormatting(false);
     navigator.vibrate?.([10]);
@@ -196,7 +201,7 @@ export default function EnhancedMobileInput({
   const handleTextSelection = () => {
     const selection = window.getSelection();
     const selected = selection.toString();
-    
+
     if (selected && selected.length > 0) {
       setSelectedText(selected);
       setCursorPosition(textareaRef.current?.selectionStart || 0);
@@ -210,8 +215,12 @@ export default function EnhancedMobileInput({
   const attachmentOptions = [
     { icon: Image, label: "Photo", action: () => console.log("Photo") },
     { icon: Camera, label: "Camera", action: () => console.log("Camera") },
-    { icon: FileText, label: "Document", action: () => console.log("Document") },
-    { icon: MapPin, label: "Location", action: () => console.log("Location") }
+    {
+      icon: FileText,
+      label: "Document",
+      action: () => console.log("Document"),
+    },
+    { icon: MapPin, label: "Location", action: () => console.log("Location") },
   ];
 
   // Smart suggestions based on trigger
@@ -230,11 +239,11 @@ export default function EnhancedMobileInput({
     }
   };
 
-
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 transition-all duration-300 z-30"
-         style={{ paddingBottom: "env(safe-area-inset-bottom, 8px)" }}>
-      
+    <div
+      className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 transition-all duration-300 z-30"
+      style={{ paddingBottom: "env(safe-area-inset-bottom, 8px)" }}
+    >
       {/* Formatting Toolbar (appears on text selection) */}
       <AnimatePresence>
         {showFormatting && (
@@ -244,16 +253,28 @@ export default function EnhancedMobileInput({
             exit={{ opacity: 0, y: 10 }}
             className="absolute -top-12 left-1/2 -translate-x-1/2 bg-gray-800 dark:bg-gray-700 rounded-full px-2 py-1 flex gap-1 shadow-lg"
           >
-            <button onClick={() => formatSelection("bold")} className="p-2 text-white hover:bg-gray-700 dark:hover:bg-gray-600 rounded-full">
+            <button
+              onClick={() => formatSelection("bold")}
+              className="p-2 text-white hover:bg-gray-700 dark:hover:bg-gray-600 rounded-full"
+            >
               <Bold className="w-4 h-4" />
             </button>
-            <button onClick={() => formatSelection("italic")} className="p-2 text-white hover:bg-gray-700 dark:hover:bg-gray-600 rounded-full">
+            <button
+              onClick={() => formatSelection("italic")}
+              className="p-2 text-white hover:bg-gray-700 dark:hover:bg-gray-600 rounded-full"
+            >
               <Italic className="w-4 h-4" />
             </button>
-            <button onClick={() => formatSelection("code")} className="p-2 text-white hover:bg-gray-700 dark:hover:bg-gray-600 rounded-full">
+            <button
+              onClick={() => formatSelection("code")}
+              className="p-2 text-white hover:bg-gray-700 dark:hover:bg-gray-600 rounded-full"
+            >
               <Code className="w-4 h-4" />
             </button>
-            <button onClick={() => formatSelection("link")} className="p-2 text-white hover:bg-gray-700 dark:hover:bg-gray-600 rounded-full">
+            <button
+              onClick={() => formatSelection("link")}
+              className="p-2 text-white hover:bg-gray-700 dark:hover:bg-gray-600 rounded-full"
+            >
               <Link className="w-4 h-4" />
             </button>
           </motion.div>
@@ -334,86 +355,97 @@ export default function EnhancedMobileInput({
       <div className="flex items-end gap-2 p-3">
         {/* Attachment Button */}
         <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              setShowAttachments(!showAttachments);
-              navigator.vibrate?.([10]);
+          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            setShowAttachments(!showAttachments);
+            navigator.vibrate?.([10]);
+          }}
+          className={`p-3 rounded-xl transition-all ${
+            showAttachments
+              ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600"
+              : "bg-gray-100 dark:bg-gray-800 text-gray-600"
+          }`}
+        >
+          <Plus
+            className={`w-5 h-5 transition-transform ${showAttachments ? "rotate-45" : ""}`}
+          />
+        </motion.button>
+
+        {/* Text Input */}
+        <div className="flex-1 relative">
+          <motion.textarea
+            ref={textareaRef}
+            id="primary-prompt-input" // Add the ID that parent expects
+            value={inputText}
+            onChange={handleInputChange}
+            onPaste={handlePaste}
+            onSelect={handleTextSelection}
+            placeholder={
+              responseMode === "agent"
+                ? "Ask AI agents..."
+                : "Type a message..."
+            }
+            className="w-full bg-gray-100 dark:bg-gray-800 rounded-2xl px-4 py-3 pr-12 resize-none outline-none text-gray-900 dark:text-white placeholder-gray-500 transition-all"
+            style={{
+              fontSize: "16px",
+              lineHeight: "1.5",
+              minHeight: "48px",
+              maxHeight: "240px",
             }}
-            className={`p-3 rounded-xl transition-all ${
-              showAttachments 
-                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600" 
-                : "bg-gray-100 dark:bg-gray-800 text-gray-600"
-            }`}
-          >
-            <Plus className={`w-5 h-5 transition-transform ${showAttachments ? "rotate-45" : ""}`} />
-          </motion.button>
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+          />
 
-            {/* Text Input */}
-            <div className="flex-1 relative">
-              <motion.textarea
-                ref={textareaRef}
-                id="primary-prompt-input"  // Add the ID that parent expects
-                value={inputText}
-                onChange={handleInputChange}
-                onPaste={handlePaste}
-                onSelect={handleTextSelection}
-                placeholder={responseMode === "agent" ? "Ask AI agents..." : "Type a message..."}
-                className="w-full bg-gray-100 dark:bg-gray-800 rounded-2xl px-4 py-3 pr-12 resize-none outline-none text-gray-900 dark:text-white placeholder-gray-500 transition-all"
-                style={{
-                  fontSize: "16px",
-                  lineHeight: "1.5",
-                  minHeight: "48px",
-                  maxHeight: "240px"
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
-                  }
-                }}
-              />
-              
-              {/* Character counter */}
-              {inputText.length > 200 && (
-                <span className="absolute bottom-1 right-2 text-xs text-gray-400">
-                  {inputText.length}/2000
-                </span>
-              )}
-            </div>
+          {/* Character counter */}
+          {inputText.length > 200 && (
+            <span className="absolute bottom-1 right-2 text-xs text-gray-400">
+              {inputText.length}/2000
+            </span>
+          )}
+        </div>
 
-            {/* Voice Toggle Button - Using original SpeechToText */}
-            <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-xl">
-              <SpeechToText sendCommand={handleSendCommand} />
-            </div>
+        {/* Voice Toggle Button - Using original SpeechToText */}
+        <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-xl">
+          <SpeechToText sendCommand={handleSendCommand} />
+        </div>
 
-            {/* Send Button */}
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={handleSend}
-              disabled={!inputText.trim() || isStreaming}
-              className={`p-3 rounded-xl transition-all ${
-                inputText.trim() && !isStreaming
-                  ? responseMode === "agent"
-                    ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
-                    : "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
-                  : "bg-gray-200 dark:bg-gray-700 text-gray-400"
-              }`}
-            >
-              {isStreaming ? (
-                <Clock className="w-5 h-5 animate-spin" />
-              ) : responseMode === "agent" ? (
-                <Robot className="w-5 h-5" />
-              ) : (
-                <ArrowUp className="w-5 h-5" weight="bold" />
-              )}
-            </motion.button>
+        {/* Send Button */}
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          onClick={handleSend}
+          disabled={!inputText.trim() || isStreaming}
+          className={`p-3 rounded-xl transition-all ${
+            inputText.trim() && !isStreaming
+              ? responseMode === "agent"
+                ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
+                : "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+              : "bg-gray-200 dark:bg-gray-700 text-gray-400"
+          }`}
+        >
+          {isStreaming ? (
+            <Clock className="w-5 h-5 animate-spin" />
+          ) : responseMode === "agent" ? (
+            <Robot className="w-5 h-5" />
+          ) : (
+            <ArrowUp className="w-5 h-5" weight="bold" />
+          )}
+        </motion.button>
       </div>
 
       {/* Quick Phrases (when input is empty) */}
       {!inputText && (
         <div className="px-3 pb-2">
           <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-            {["How can I help?", "Tell me more", "What's next?", "Show examples"].map((phrase) => (
+            {[
+              "How can I help?",
+              "Tell me more",
+              "What's next?",
+              "Show examples",
+            ].map((phrase) => (
               <button
                 key={phrase}
                 onClick={() => {

@@ -1,11 +1,11 @@
-const { prisma } = require("../utils/prisma");
+const prisma = require("../utils/prisma");
 
 class Waitlist {
   static async add(email) {
     try {
       // Check if email already exists
       const existing = await prisma.waitlist.findUnique({
-        where: { email: email.toLowerCase() }
+        where: { email: email.toLowerCase() },
       });
 
       if (existing) {
@@ -17,7 +17,7 @@ class Waitlist {
         data: {
           email: email.toLowerCase(),
           joinedAt: new Date(),
-        }
+        },
       });
 
       return { success: true, data: waitlistEntry };
@@ -30,7 +30,7 @@ class Waitlist {
   static async getAll() {
     try {
       const entries = await prisma.waitlist.findMany({
-        orderBy: { joinedAt: 'desc' }
+        orderBy: { joinedAt: "desc" },
       });
       return { success: true, data: entries };
     } catch (error) {
@@ -52,7 +52,7 @@ class Waitlist {
   static async remove(email) {
     try {
       await prisma.waitlist.delete({
-        where: { email: email.toLowerCase() }
+        where: { email: email.toLowerCase() },
       });
       return { success: true };
     } catch (error) {

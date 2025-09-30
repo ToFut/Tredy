@@ -1,3 +1,4 @@
+
 {
   "mcpServers": {
     "slack": {
@@ -868,6 +869,61 @@
           "realtime": false,
           "webhooks": false
         }
+      }
+    },
+    "gdrive-tools": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/mnt/c/MyProjects/Tredy/server/g-drive-mcp-tools.js"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "google-drive",
+        "STORAGE_DIR": "/mnt/c/MyProjects/Tredy/server/storage"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "Enhanced Google Drive tools with automatic vector save - saves all file content to local storage for embeddings",
+        "toolPrefix": "gdrive"
+      }
+    },
+    "supabase-tools": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/app/server/supabase-mcp-server.js"
+      ],
+      "env": {
+        "SUPABASE_URL": "${SUPABASE_URL}",
+        "SUPABASE_ANON_KEY": "${SUPABASE_ANON_KEY}",
+        "SUPABASE_SERVICE_ROLE_KEY": "${SUPABASE_SERVICE_ROLE_KEY}"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "Supabase database and storage integration",
+        "toolPrefix": "supabase"
+      }
+    },
+    "twilio-whatsapp-tools": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/mnt/c/MyProjects/Tredy/server/twilio-whatsapp-mcp-tools.js"
+      ],
+      "env": {
+        "NANGO_SECRET_KEY": "${NANGO_SECRET_KEY}",
+        "NANGO_HOST": "${NANGO_HOST}",
+        "NANGO_PROVIDER_CONFIG_KEY": "twilio"
+      },
+      "anythingllm": {
+        "autoStart": true,
+        "workspaceAware": true,
+        "description": "Twilio WhatsApp integration - send/receive WhatsApp messages, manage templates, and track conversations",
+        "toolPrefix": "twilio_whatsapp"
       }
     }
   }

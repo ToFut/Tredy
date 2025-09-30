@@ -17,7 +17,7 @@ class ThinkingTracker {
       confidence: null,
       workflowsTriggered: [],
       errors: [],
-      retries: 0
+      retries: 0,
     };
     this.currentThought = null;
     this.socket = null;
@@ -31,18 +31,18 @@ class ThinkingTracker {
   startThinking(context) {
     this.currentThought = {
       id: `thought_${Date.now()}`,
-      type: 'thinking',
+      type: "thinking",
       content: context,
       startTime: Date.now(),
-      status: 'in_progress'
+      status: "in_progress",
     };
-    
-    this.emit('thinking_start', {
+
+    this.emit("thinking_start", {
       id: this.currentThought.id,
       content: context,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     return this.currentThought.id;
   }
 
@@ -50,32 +50,33 @@ class ThinkingTracker {
   logThought(content, metadata = {}) {
     const event = {
       id: `step_${Date.now()}`,
-      type: 'thought_step',
+      type: "thought_step",
       content,
       metadata,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-    
+
     this.events.push(event);
-    this.emit('thought_step', event);
+    this.emit("thought_step", event);
   }
 
   // End current thinking session
   endThinking(thoughtId, result = null) {
     if (this.currentThought && this.currentThought.id === thoughtId) {
       this.currentThought.endTime = Date.now();
-      this.currentThought.duration = this.currentThought.endTime - this.currentThought.startTime;
-      this.currentThought.status = 'completed';
+      this.currentThought.duration =
+        this.currentThought.endTime - this.currentThought.startTime;
+      this.currentThought.status = "completed";
       this.currentThought.result = result;
-      
+
       this.metrics.thinkingDuration += this.currentThought.duration;
-      
-      this.emit('thinking_end', {
+
+      this.emit("thinking_end", {
         id: thoughtId,
         duration: this.currentThought.duration,
-        result: result
+        result: result,
       });
-      
+
       this.events.push(this.currentThought);
       this.currentThought = null;
     }
@@ -85,55 +86,55 @@ class ThinkingTracker {
   trackToolUse(toolName, input, output = null, duration = null) {
     const toolEvent = {
       id: `tool_${Date.now()}`,
-      type: 'tool_use',
+      type: "tool_use",
       tool: toolName,
       input,
       output,
       duration,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-    
+
     this.events.push(toolEvent);
     this.metrics.toolsUsed.push({
       name: toolName,
       timestamp: toolEvent.timestamp,
-      duration
+      duration,
     });
-    
-    this.emit('tool_use', {
+
+    this.emit("tool_use", {
       tool: toolName,
-      status: output ? 'completed' : 'started',
-      duration
+      status: output ? "completed" : "started",
+      duration,
     });
-    
+
     return toolEvent.id;
   }
 
   // Track workflow execution
-  trackWorkflow(workflowId, workflowName, status = 'started') {
+  trackWorkflow(workflowId, workflowName, status = "started") {
     const workflowEvent = {
       id: `workflow_${Date.now()}`,
-      type: 'workflow',
+      type: "workflow",
       workflowId,
       workflowName,
       status,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-    
+
     this.events.push(workflowEvent);
-    
-    if (status === 'started') {
+
+    if (status === "started") {
       this.metrics.workflowsTriggered.push({
         id: workflowId,
         name: workflowName,
-        startTime: workflowEvent.timestamp
+        startTime: workflowEvent.timestamp,
       });
     }
-    
-    this.emit('workflow_update', {
+
+    this.emit("workflow_update", {
       workflowId,
       workflowName,
-      status
+      status,
     });
   }
 
@@ -141,23 +142,23 @@ class ThinkingTracker {
   trackModelUse(model, provider, tokens = 0) {
     this.metrics.modelsUsed.add(`${provider}:${model}`);
     this.metrics.tokensUsed += tokens;
-    
+
     const modelEvent = {
       id: `model_${Date.now()}`,
-      type: 'model_use',
+      type: "model_use",
       model,
       provider,
       tokens,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-    
+
     this.events.push(modelEvent);
-    
-    this.emit('model_use', {
+
+    this.emit("model_use", {
       model,
       provider,
       tokens,
-      totalTokens: this.metrics.tokensUsed
+      totalTokens: this.metrics.tokensUsed,
     });
   }
 
@@ -165,39 +166,39 @@ class ThinkingTracker {
   trackError(error, context = null) {
     const errorEvent = {
       id: `error_${Date.now()}`,
-      type: 'error',
+      type: "error",
       error: error.message || error,
       stack: error.stack,
       context,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-    
+
     this.events.push(errorEvent);
     this.metrics.errors.push(errorEvent);
-    
-    this.emit('error', {
+
+    this.emit("error", {
       error: error.message || error,
-      context
+      context,
     });
   }
 
   trackRetry(action, attempt) {
     this.metrics.retries++;
-    
+
     const retryEvent = {
       id: `retry_${Date.now()}`,
-      type: 'retry',
+      type: "retry",
       action,
       attempt,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-    
+
     this.events.push(retryEvent);
-    
-    this.emit('retry', {
+
+    this.emit("retry", {
       action,
       attempt,
-      totalRetries: this.metrics.retries
+      totalRetries: this.metrics.retries,
     });
   }
 
@@ -206,27 +207,29 @@ class ThinkingTracker {
     this.metrics.confidence = {
       score,
       reasoning,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-    
-    this.emit('confidence', {
+
+    this.emit("confidence", {
       score,
-      reasoning
+      reasoning,
     });
   }
 
   // Emit events to WebSocket
   emit(eventType, data) {
     if (this.socket && this.socket.readyState === 1) {
-      this.socket.send(JSON.stringify({
-        type: 'thinking_process',
-        eventType,
-        data,
-        invocationId: this.invocationId,
-        timestamp: new Date().toISOString()
-      }));
+      this.socket.send(
+        JSON.stringify({
+          type: "thinking_process",
+          eventType,
+          data,
+          invocationId: this.invocationId,
+          timestamp: new Date().toISOString(),
+        })
+      );
     }
-    
+
     // Also log to console for debugging
     console.log(`[ThinkingTracker] ${eventType}:`, data);
   }
@@ -235,7 +238,7 @@ class ThinkingTracker {
   getSummary() {
     const endTime = Date.now();
     const totalDuration = endTime - this.startTime;
-    
+
     return {
       invocationId: this.invocationId,
       workspaceId: this.workspaceId,
@@ -245,32 +248,32 @@ class ThinkingTracker {
       metrics: {
         ...this.metrics,
         modelsUsed: Array.from(this.metrics.modelsUsed),
-        eventCount: this.events.length
+        eventCount: this.events.length,
       },
-      events: this.events
+      events: this.events,
     };
   }
 
   // Get formatted display data for UI
   getDisplayData() {
     const summary = this.getSummary();
-    
+
     return {
       duration: this.formatDuration(summary.totalDuration),
       thinkingTime: this.formatDuration(this.metrics.thinkingDuration),
-      toolsUsed: this.metrics.toolsUsed.map(t => ({
+      toolsUsed: this.metrics.toolsUsed.map((t) => ({
         name: t.name,
         icon: this.getToolIcon(t.name),
-        duration: t.duration ? this.formatDuration(t.duration) : null
+        duration: t.duration ? this.formatDuration(t.duration) : null,
       })),
       workflowCount: this.metrics.workflowsTriggered.length,
       workflows: this.metrics.workflowsTriggered,
-      modelsUsed: Array.from(this.metrics.modelsUsed).map(m => {
-        const [provider, model] = m.split(':');
+      modelsUsed: Array.from(this.metrics.modelsUsed).map((m) => {
+        const [provider, model] = m.split(":");
         return {
           provider,
           model,
-          icon: this.getProviderIcon(provider)
+          icon: this.getProviderIcon(provider),
         };
       }),
       tokensUsed: this.formatTokens(this.metrics.tokensUsed),
@@ -278,72 +281,72 @@ class ThinkingTracker {
       errorCount: this.metrics.errors.length,
       retryCount: this.metrics.retries,
       // Expandable thought process
-      thoughtProcess: this.formatThoughtProcess()
+      thoughtProcess: this.formatThoughtProcess(),
     };
   }
 
   // Format thought process for display
   formatThoughtProcess() {
-    return this.events.map(event => {
-      switch(event.type) {
-        case 'thinking':
+    return this.events.map((event) => {
+      switch (event.type) {
+        case "thinking":
           return {
-            type: 'thinking',
+            type: "thinking",
             content: event.content,
             duration: event.duration,
             timestamp: event.timestamp,
-            icon: '🤔'
+            icon: "🤔",
           };
-        case 'thought_step':
+        case "thought_step":
           return {
-            type: 'step',
+            type: "step",
             content: event.content,
             metadata: event.metadata,
             timestamp: event.timestamp,
-            icon: '💭'
+            icon: "💭",
           };
-        case 'tool_use':
+        case "tool_use":
           return {
-            type: 'tool',
+            type: "tool",
             tool: event.tool,
             input: event.input,
             output: event.output,
             duration: event.duration,
             timestamp: event.timestamp,
-            icon: this.getToolIcon(event.tool)
+            icon: this.getToolIcon(event.tool),
           };
-        case 'workflow':
+        case "workflow":
           return {
-            type: 'workflow',
+            type: "workflow",
             name: event.workflowName,
             status: event.status,
             timestamp: event.timestamp,
-            icon: '⚡'
+            icon: "⚡",
           };
-        case 'model_use':
+        case "model_use":
           return {
-            type: 'model',
+            type: "model",
             model: event.model,
             provider: event.provider,
             tokens: event.tokens,
             timestamp: event.timestamp,
-            icon: '🧠'
+            icon: "🧠",
           };
-        case 'error':
+        case "error":
           return {
-            type: 'error',
+            type: "error",
             error: event.error,
             context: event.context,
             timestamp: event.timestamp,
-            icon: '⚠️'
+            icon: "⚠️",
           };
-        case 'retry':
+        case "retry":
           return {
-            type: 'retry',
+            type: "retry",
             action: event.action,
             attempt: event.attempt,
             timestamp: event.timestamp,
-            icon: '🔄'
+            icon: "🔄",
           };
         default:
           return event;
@@ -365,34 +368,34 @@ class ThinkingTracker {
 
   getToolIcon(toolName) {
     const icons = {
-      'web-search': '🌐',
-      'web-scraping': '🔍',
-      'document-summarizer': '📄',
-      'rag-memory': '🧠',
-      'sql-query': '🗄️',
-      'create-chart': '📊',
-      'stock-market': '📈',
-      'create-workflow': '⚡',
-      'filesystem': '📁',
-      'puppeteer': '🎭',
-      'gmail': '📧',
-      'calendar': '📅',
-      'linkedin': '💼'
+      "web-search": "🌐",
+      "web-scraping": "🔍",
+      "document-summarizer": "📄",
+      "rag-memory": "🧠",
+      "sql-query": "🗄️",
+      "create-chart": "📊",
+      "stock-market": "📈",
+      "create-workflow": "⚡",
+      filesystem: "📁",
+      puppeteer: "🎭",
+      gmail: "📧",
+      calendar: "📅",
+      linkedin: "💼",
     };
-    return icons[toolName] || '🔧';
+    return icons[toolName] || "🔧";
   }
 
   getProviderIcon(provider) {
     const icons = {
-      'openai': '🤖',
-      'anthropic': '🎭',
-      'google': '🔮',
-      'togetherai': '🤝',
-      'groq': '⚡',
-      'ollama': '🦙',
-      'azure': '☁️'
+      openai: "🤖",
+      anthropic: "🎭",
+      google: "🔮",
+      togetherai: "🤝",
+      groq: "⚡",
+      ollama: "🦙",
+      azure: "☁️",
     };
-    return icons[provider] || '🤖';
+    return icons[provider] || "🤖";
   }
 }
 

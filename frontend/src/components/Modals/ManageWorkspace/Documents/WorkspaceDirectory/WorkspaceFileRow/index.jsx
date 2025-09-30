@@ -8,6 +8,7 @@ import { ArrowUUpLeft, Eye, File, PushPin } from "@phosphor-icons/react";
 import Workspace from "@/models/workspace";
 import showToast from "@/utils/toast";
 import System from "@/models/system";
+import SupabaseSync from "@/components/SupabaseSync";
 
 export default function WorkspaceFileRow({
   item,
@@ -102,6 +103,10 @@ export default function WorkspaceFileRow({
           <div className="w-4 h-4 ml-2 flex-shrink-0" />
         ) : (
           <div className="flex gap-x-2 items-center">
+            <SupabaseSync
+              workspace={workspace}
+              item={item}
+            />
             <WatchForChanges
               workspace={workspace}
               docPath={`${folderName}/${item.name}`}

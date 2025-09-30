@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { 
-  X, 
-  Sparkle, 
+import {
+  X,
+  Sparkle,
   ChatCircle,
   Globe,
   Shield,
@@ -15,42 +15,43 @@ import {
   Eye,
   Code,
   Rocket,
-  Palette
+  Palette,
 } from "@phosphor-icons/react";
 
 // Real Client Website Content
 const DEMO_WEBSITE_CONTENT = {
   company: "Greenfield Construction",
   tagline: "Building Dreams Since 1985",
-  description: "Family-owned construction company specializing in residential and commercial projects. Licensed, bonded, and insured.",
+  description:
+    "Family-owned construction company specializing in residential and commercial projects. Licensed, bonded, and insured.",
   features: [
     "Licensed & Insured",
-    "Free Estimates", 
+    "Free Estimates",
     "Quality Guarantee",
-    "Local References"
+    "Local References",
   ],
   stats: {
     projects: "150+",
     clients: "200+",
     years: "38",
-    rating: "4.9★"
+    rating: "4.9★",
   },
   services: [
     "Residential Construction",
-    "Commercial Renovations", 
+    "Commercial Renovations",
     "Kitchen & Bath Remodeling",
-    "Custom Home Building"
+    "Custom Home Building",
   ],
   testimonials: [
     "Mike and his team did an amazing job on our kitchen remodel. Professional, on time, and within budget.",
     "We've used Greenfield for 3 projects now. Always reliable and great quality work.",
-    "Best construction company in the area. Highly recommend!"
+    "Best construction company in the area. Highly recommend!",
   ],
   contact: {
     phone: "(555) 123-4567",
     email: "info@greenfieldconstruction.com",
-    address: "123 Main St, Springfield, IL 62701"
-  }
+    address: "123 Main St, Springfield, IL 62701",
+  },
 };
 
 // Demo Chat Messages - SMB Construction Business
@@ -58,36 +59,45 @@ const DEMO_CHAT_MESSAGES = [
   {
     id: 1,
     type: "user",
-    message: "Hi! I'm interested in getting a quote for a kitchen remodel. Can you help me?",
-    timestamp: "2:34 PM"
+    message:
+      "Hi! I'm interested in getting a quote for a kitchen remodel. Can you help me?",
+    timestamp: "2:34 PM",
   },
   {
     id: 2,
-    type: "assistant", 
-    message: "Hello! I'd be happy to help you with your kitchen remodel quote. Let me gather some information about your project and check our current availability.",
+    type: "assistant",
+    message:
+      "Hello! I'd be happy to help you with your kitchen remodel quote. Let me gather some information about your project and check our current availability.",
     timestamp: "2:34 PM",
-    actions: ["Checking project calendar", "Analyzing similar projects", "Calculating material costs"]
+    actions: [
+      "Checking project calendar",
+      "Analyzing similar projects",
+      "Calculating material costs",
+    ],
   },
   {
     id: 3,
     type: "assistant",
-    message: "🏗️ **Kitchen Remodel Analysis Complete**\n\n**Based on your location and typical kitchen remodels:**\n• Estimated timeline: 4-6 weeks\n• Material cost range: $15,000-$25,000\n• Labor estimate: $8,000-$12,000\n• Next available start: March 15th\n\n**Popular upgrades in your area:**\n• Quartz countertops (+$3,000)\n• Custom cabinets (+$5,000)\n• Smart appliances (+$2,000)\n\nWould you like me to schedule a free consultation with our project manager?",
+    message:
+      "🏗️ **Kitchen Remodel Analysis Complete**\n\n**Based on your location and typical kitchen remodels:**\n• Estimated timeline: 4-6 weeks\n• Material cost range: $15,000-$25,000\n• Labor estimate: $8,000-$12,000\n• Next available start: March 15th\n\n**Popular upgrades in your area:**\n• Quartz countertops (+$3,000)\n• Custom cabinets (+$5,000)\n• Smart appliances (+$2,000)\n\nWould you like me to schedule a free consultation with our project manager?",
     timestamp: "2:35 PM",
-    isAnalysis: true
+    isAnalysis: true,
   },
   {
     id: 4,
     type: "user",
-    message: "Yes, that sounds great! Can you also send me some photos of recent kitchen projects?",
-    timestamp: "2:36 PM"
+    message:
+      "Yes, that sounds great! Can you also send me some photos of recent kitchen projects?",
+    timestamp: "2:36 PM",
   },
   {
     id: 5,
     type: "assistant",
-    message: "✅ **Consultation Scheduled & Portfolio Sent**\n\n**Your Consultation:**\n• Date: March 8th at 2:00 PM\n• Location: Your home (free in-home visit)\n• Duration: 1 hour\n• Project Manager: Mike Rodriguez\n\n**Portfolio Gallery:**\n• 12 recent kitchen remodels sent to your email\n• Before/after photos included\n• Material samples will be brought to consultation\n\n**Next Steps:**\n• Calendar invite sent to your email\n• Project questionnaire sent for pre-consultation\n• Material catalog will be emailed tomorrow\n\nI've also added you to our project tracking system - you'll get weekly updates automatically!",
+    message:
+      "✅ **Consultation Scheduled & Portfolio Sent**\n\n**Your Consultation:**\n• Date: March 8th at 2:00 PM\n• Location: Your home (free in-home visit)\n• Duration: 1 hour\n• Project Manager: Mike Rodriguez\n\n**Portfolio Gallery:**\n• 12 recent kitchen remodels sent to your email\n• Before/after photos included\n• Material samples will be brought to consultation\n\n**Next Steps:**\n• Calendar invite sent to your email\n• Project questionnaire sent for pre-consultation\n• Material catalog will be emailed tomorrow\n\nI've also added you to our project tracking system - you'll get weekly updates automatically!",
     timestamp: "2:36 PM",
-    isAction: true
-  }
+    isAction: true,
+  },
 ];
 
 // Compact Embedded Chat Component
@@ -102,18 +112,21 @@ function EmbeddedChat({ isActive, onToggle }) {
       const timer = setTimeout(() => {
         setIsTyping(true);
         setTimeout(() => {
-          setMessages(prev => [...prev, DEMO_CHAT_MESSAGES[currentMessageIndex]]);
-          setCurrentMessageIndex(prev => prev + 1);
+          setMessages((prev) => [
+            ...prev,
+            DEMO_CHAT_MESSAGES[currentMessageIndex],
+          ]);
+          setCurrentMessageIndex((prev) => prev + 1);
           setIsTyping(false);
         }, 1500);
       }, 2000);
-      
+
       return () => clearTimeout(timer);
     }
   }, [isActive, currentMessageIndex]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
   const resetDemo = () => {
@@ -123,9 +136,11 @@ function EmbeddedChat({ isActive, onToggle }) {
   };
 
   return (
-    <div className={`fixed bottom-4 right-4 w-72 h-80 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 transform transition-all duration-300 ${
-      isActive ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
-    }`}>
+    <div
+      className={`fixed bottom-4 right-4 w-72 h-80 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 transform transition-all duration-300 ${
+        isActive ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
+      }`}
+    >
       {/* Chat Header */}
       <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
         <div className="flex items-center gap-2">
@@ -161,18 +176,25 @@ function EmbeddedChat({ isActive, onToggle }) {
       {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto p-3 space-y-2 max-h-56">
         {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] p-2 rounded-lg text-xs ${
-              msg.type === 'user' 
-                ? 'bg-blue-500 text-white' 
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
-            }`}>
+          <div
+            key={msg.id}
+            className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}
+          >
+            <div
+              className={`max-w-[85%] p-2 rounded-lg text-xs ${
+                msg.type === "user"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white"
+              }`}
+            >
               <p>{msg.message}</p>
               {msg.isAnalysis && (
                 <div className="mt-1 p-1.5 bg-green-50 dark:bg-green-900/20 rounded border border-green-200 dark:border-green-800">
                   <div className="flex items-center gap-1 mb-1">
                     <Sparkle className="w-2 h-2 text-green-600" />
-                    <span className="text-xs font-medium text-green-800 dark:text-green-200">AI Analysis</span>
+                    <span className="text-xs font-medium text-green-800 dark:text-green-200">
+                      AI Analysis
+                    </span>
                   </div>
                 </div>
               )}
@@ -180,7 +202,9 @@ function EmbeddedChat({ isActive, onToggle }) {
                 <div className="mt-1 p-1.5 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-200 dark:border-blue-800">
                   <div className="flex items-center gap-1 mb-1">
                     <Lightning className="w-2 h-2 text-blue-600" />
-                    <span className="text-xs font-medium text-blue-800 dark:text-blue-200">Automated Actions</span>
+                    <span className="text-xs font-medium text-blue-800 dark:text-blue-200">
+                      Automated Actions
+                    </span>
                   </div>
                 </div>
               )}
@@ -188,7 +212,7 @@ function EmbeddedChat({ isActive, onToggle }) {
             </div>
           </div>
         ))}
-        
+
         {/* Typing Indicator */}
         {isTyping && (
           <div className="flex justify-start">
@@ -196,15 +220,23 @@ function EmbeddedChat({ isActive, onToggle }) {
               <div className="flex items-center gap-1">
                 <div className="flex gap-1">
                   <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" />
-                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                  <div
+                    className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+                    style={{ animationDelay: "0.1s" }}
+                  />
+                  <div
+                    className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+                    style={{ animationDelay: "0.2s" }}
+                  />
                 </div>
-                <span className="text-xs text-gray-500 ml-1">AI is analyzing...</span>
+                <span className="text-xs text-gray-500 ml-1">
+                  AI is analyzing...
+                </span>
               </div>
             </div>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -241,44 +273,60 @@ export default function AIEnterprisePlatform({ className = "" }) {
   };
 
   return (
-    <section className={`py-12 bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/10 ${className}`}>
+    <section
+      className={`py-12 bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/10 ${className}`}
+    >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Modern Integration Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-full mb-6 shadow-lg">
             <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full animate-pulse"></div>
             <Code className="w-4 h-4 text-purple-600" />
-            <span className="text-sm font-semibold text-purple-800 dark:text-purple-200">Easy Website Integration</span>
+            <span className="text-sm font-semibold text-purple-800 dark:text-purple-200">
+              Easy Website Integration
+            </span>
           </div>
-          
+
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
             Embed AI Intelligence Into
-            <span className="block text-purple-600 dark:text-purple-400">Your Website</span>
+            <span className="block text-purple-600 dark:text-purple-400">
+              Your Website
+            </span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8 leading-relaxed">
-            Transform your existing website into an intelligent business platform. Add Tredy AI with just one line of code and watch your conversions soar.
+            Transform your existing website into an intelligent business
+            platform. Add Tredy AI with just one line of code and watch your
+            conversions soar.
           </p>
-          
+
           {/* Modern Feature Pills */}
           <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
             <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-full shadow-sm border border-gray-200 dark:border-gray-700">
               <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Works with any website</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Works with any website
+              </span>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-full shadow-sm border border-gray-200 dark:border-gray-700">
               <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">5-minute setup</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                5-minute setup
+              </span>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-full shadow-sm border border-gray-200 dark:border-gray-700">
               <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">No coding required</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                No coding required
+              </span>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-full shadow-sm border border-gray-200 dark:border-gray-700">
               <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Instant ROI</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Instant ROI
+              </span>
             </div>
           </div>
-          
+
           {/* Modern CTA Button */}
           <button
             onClick={startDemo}
@@ -296,16 +344,19 @@ export default function AIEnterprisePlatform({ className = "" }) {
             <div className="text-center mb-8">
               <div className="inline-flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-full mb-4">
                 <Rocket className="w-4 h-4 text-purple-600" />
-                <span className="text-sm font-semibold text-purple-800 dark:text-purple-200">4-Step Integration Process</span>
+                <span className="text-sm font-semibold text-purple-800 dark:text-purple-200">
+                  4-Step Integration Process
+                </span>
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
                 From Zero to AI-Powered in Minutes
               </h3>
               <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                Transform your website into an intelligent business platform with our simple integration process
+                Transform your website into an intelligent business platform
+                with our simple integration process
               </p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {/* Step 1 */}
               <div className="text-center group">
@@ -314,15 +365,22 @@ export default function AIEnterprisePlatform({ className = "" }) {
                     <Code className="w-8 h-8 text-white" />
                   </div>
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-lg border-2 border-blue-500">
-                    <span className="text-blue-600 dark:text-blue-400 font-bold text-sm">1</span>
+                    <span className="text-blue-600 dark:text-blue-400 font-bold text-sm">
+                      1
+                    </span>
                   </div>
                 </div>
-                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Add One Line of Code</h4>
+                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                  Add One Line of Code
+                </h4>
                 <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                  Simply add our lightweight script to your website's head section. Works with any platform.
+                  Simply add our lightweight script to your website's head
+                  section. Works with any platform.
                 </p>
                 <div className="mt-4 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                  <code className="text-xs text-gray-800 dark:text-gray-200">&lt;script src="tredy.ai/widget.js"&gt;&lt;/script&gt;</code>
+                  <code className="text-xs text-gray-800 dark:text-gray-200">
+                    &lt;script src="tredy.ai/widget.js"&gt;&lt;/script&gt;
+                  </code>
                 </div>
               </div>
 
@@ -333,22 +391,34 @@ export default function AIEnterprisePlatform({ className = "" }) {
                     <Users className="w-8 h-8 text-white" />
                   </div>
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-lg border-2 border-purple-500">
-                    <span className="text-purple-600 dark:text-purple-400 font-bold text-sm">2</span>
+                    <span className="text-purple-600 dark:text-purple-400 font-bold text-sm">
+                      2
+                    </span>
                   </div>
                 </div>
-                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Configure Your Business</h4>
+                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                  Configure Your Business
+                </h4>
                 <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                  Chat with Tredy to automatically build intelligent workflows using your connectors and our advanced AI for complex task automation and information generation.
+                  Chat with Tredy to automatically build intelligent workflows
+                  using your connectors and our advanced AI for complex task
+                  automation and information generation.
                 </p>
                 <div className="mt-4 flex justify-center space-x-2">
                   <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                    <span className="text-xs text-blue-600 dark:text-blue-400">CRM</span>
+                    <span className="text-xs text-blue-600 dark:text-blue-400">
+                      CRM
+                    </span>
                   </div>
                   <div className="w-6 h-6 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                    <span className="text-xs text-green-600 dark:text-green-400">📅</span>
+                    <span className="text-xs text-green-600 dark:text-green-400">
+                      📅
+                    </span>
                   </div>
                   <div className="w-6 h-6 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-                    <span className="text-xs text-orange-600 dark:text-orange-400">📧</span>
+                    <span className="text-xs text-orange-600 dark:text-orange-400">
+                      📧
+                    </span>
                   </div>
                 </div>
               </div>
@@ -360,17 +430,28 @@ export default function AIEnterprisePlatform({ className = "" }) {
                     <Lightning className="w-8 h-8 text-white" />
                   </div>
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-lg border-2 border-emerald-500">
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold text-sm">3</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold text-sm">
+                      3
+                    </span>
                   </div>
                 </div>
-                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">AI Goes Live Instantly</h4>
+                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                  AI Goes Live Instantly
+                </h4>
                 <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                  Your AI assistant starts handling leads, scheduling, and customer inquiries immediately.
+                  Your AI assistant starts handling leads, scheduling, and
+                  customer inquiries immediately.
                 </p>
                 <div className="mt-4 flex justify-center space-x-1">
                   <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                  <div
+                    className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"
+                    style={{ animationDelay: "0.2s" }}
+                  ></div>
+                  <div
+                    className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"
+                    style={{ animationDelay: "0.4s" }}
+                  ></div>
                 </div>
               </div>
 
@@ -381,22 +462,34 @@ export default function AIEnterprisePlatform({ className = "" }) {
                     <Palette className="w-8 h-8 text-white" />
                   </div>
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-lg border-2 border-orange-500">
-                    <span className="text-orange-600 dark:text-orange-400 font-bold text-sm">4</span>
+                    <span className="text-orange-600 dark:text-orange-400 font-bold text-sm">
+                      4
+                    </span>
                   </div>
                 </div>
-                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Design Your Chat Experience</h4>
+                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                  Design Your Chat Experience
+                </h4>
                 <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                  Customize your chat with supported languages, branding, logo, instructions, and any design needs to match your business perfectly.
+                  Customize your chat with supported languages, branding, logo,
+                  instructions, and any design needs to match your business
+                  perfectly.
                 </p>
                 <div className="mt-4 flex justify-center space-x-2">
                   <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                    <span className="text-xs text-blue-600 dark:text-blue-400">🌐</span>
+                    <span className="text-xs text-blue-600 dark:text-blue-400">
+                      🌐
+                    </span>
                   </div>
                   <div className="w-6 h-6 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                    <span className="text-xs text-purple-600 dark:text-purple-400">🎨</span>
+                    <span className="text-xs text-purple-600 dark:text-purple-400">
+                      🎨
+                    </span>
                   </div>
                   <div className="w-6 h-6 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                    <span className="text-xs text-green-600 dark:text-green-400">📝</span>
+                    <span className="text-xs text-green-600 dark:text-green-400">
+                      📝
+                    </span>
                   </div>
                 </div>
               </div>
@@ -408,7 +501,7 @@ export default function AIEnterprisePlatform({ className = "" }) {
         <div className="relative max-w-3xl mx-auto">
           {/* Background Blur Effect */}
           <div className="absolute inset-0 bg-gradient-to-br from-gray-100/60 to-blue-100/40 backdrop-blur-3xl rounded-3xl"></div>
-          
+
           {/* Main Demo Container - Smaller */}
           <div className="relative bg-white/85 dark:bg-gray-800/85 backdrop-blur-xl rounded-xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden transform scale-90">
             {/* Tredy Integration Badge */}
@@ -426,14 +519,20 @@ export default function AIEnterprisePlatform({ className = "" }) {
                     <Building className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white">{DEMO_WEBSITE_CONTENT.company}</h3>
-                    <p className="text-orange-100 text-xs font-medium">{DEMO_WEBSITE_CONTENT.tagline}</p>
+                    <h3 className="text-lg font-bold text-white">
+                      {DEMO_WEBSITE_CONTENT.company}
+                    </h3>
+                    <p className="text-orange-100 text-xs font-medium">
+                      {DEMO_WEBSITE_CONTENT.tagline}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="hidden md:flex items-center gap-1 text-orange-100">
                     <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-xs font-medium">Call: {DEMO_WEBSITE_CONTENT.contact.phone}</span>
+                    <span className="text-xs font-medium">
+                      Call: {DEMO_WEBSITE_CONTENT.contact.phone}
+                    </span>
                   </div>
                   <button className="px-4 py-2 bg-white text-orange-600 rounded-lg font-semibold hover:bg-orange-50 transition-all duration-300 hover:scale-105 shadow-lg text-sm">
                     Free Estimate
@@ -445,20 +544,26 @@ export default function AIEnterprisePlatform({ className = "" }) {
             {/* Compact Navigation */}
             <div className="bg-white/90 backdrop-blur-sm border-b border-gray-100/50 px-4 py-2">
               <div className="flex items-center gap-6">
-                {['Home', 'Services', 'Projects', 'About', 'Contact'].map((item, index) => (
-                  <a 
-                    key={item} 
-                    href="#" 
-                    className={`text-xs font-medium transition-all duration-300 hover:text-orange-600 relative group ${
-                      index === 0 ? 'text-orange-600' : 'text-gray-700'
-                    }`}
-                  >
-                    {item}
-                    <div className={`absolute -bottom-1 left-0 w-full h-0.5 bg-orange-600 transition-all duration-300 ${
-                      index === 0 ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                    }`}></div>
-                  </a>
-                ))}
+                {["Home", "Services", "Projects", "About", "Contact"].map(
+                  (item, index) => (
+                    <a
+                      key={item}
+                      href="#"
+                      className={`text-xs font-medium transition-all duration-300 hover:text-orange-600 relative group ${
+                        index === 0 ? "text-orange-600" : "text-gray-700"
+                      }`}
+                    >
+                      {item}
+                      <div
+                        className={`absolute -bottom-1 left-0 w-full h-0.5 bg-orange-600 transition-all duration-300 ${
+                          index === 0
+                            ? "opacity-100"
+                            : "opacity-0 group-hover:opacity-100"
+                        }`}
+                      ></div>
+                    </a>
+                  )
+                )}
               </div>
             </div>
 
@@ -472,12 +577,17 @@ export default function AIEnterprisePlatform({ className = "" }) {
                 <p className="text-gray-600 mb-6 text-lg leading-relaxed">
                   {DEMO_WEBSITE_CONTENT.description}
                 </p>
-                
+
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   {DEMO_WEBSITE_CONTENT.features.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100/50 hover:shadow-md hover:bg-white/90 transition-all duration-300">
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100/50 hover:shadow-md hover:bg-white/90 transition-all duration-300"
+                    >
                       <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                      <span className="text-sm font-medium text-gray-700">{feature}</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        {feature}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -485,15 +595,22 @@ export default function AIEnterprisePlatform({ className = "" }) {
 
               {/* Services Grid */}
               <div className="mb-8">
-                <h5 className="text-xl font-bold text-gray-900 mb-4">Our Services</h5>
+                <h5 className="text-xl font-bold text-gray-900 mb-4">
+                  Our Services
+                </h5>
                 <div className="grid grid-cols-2 gap-4">
                   {DEMO_WEBSITE_CONTENT.services.map((service, index) => (
-                    <div key={index} className="group p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-100/50 hover:border-orange-200/50 hover:shadow-lg hover:bg-white/90 transition-all duration-300 cursor-pointer">
+                    <div
+                      key={index}
+                      className="group p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-100/50 hover:border-orange-200/50 hover:shadow-lg hover:bg-white/90 transition-all duration-300 cursor-pointer"
+                    >
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-orange-100/80 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:bg-orange-200/80 transition-colors">
                           <Building className="w-4 h-4 text-orange-600" />
                         </div>
-                        <span className="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors">{service}</span>
+                        <span className="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors">
+                          {service}
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -503,32 +620,54 @@ export default function AIEnterprisePlatform({ className = "" }) {
               {/* Stats & Testimonials */}
               <div className="grid grid-cols-2 gap-6 mb-8">
                 <div>
-                  <h5 className="text-xl font-bold text-gray-900 mb-4">Why Choose Us</h5>
+                  <h5 className="text-xl font-bold text-gray-900 mb-4">
+                    Why Choose Us
+                  </h5>
                   <div className="grid grid-cols-2 gap-3">
-                    {Object.entries(DEMO_WEBSITE_CONTENT.stats).map(([key, value]) => (
-                      <div key={key} className="text-center p-4 bg-gradient-to-br from-orange-50/80 to-orange-100/80 backdrop-blur-sm rounded-xl border border-orange-200/50 hover:shadow-md hover:from-orange-50/90 hover:to-orange-100/90 transition-all duration-300">
-                        <div className="text-2xl font-bold text-orange-600 mb-1">{value}</div>
-                        <div className="text-xs text-gray-600 capitalize font-medium">{key}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                  <h5 className="text-xl font-bold text-gray-900 mb-4">What Our Clients Say</h5>
-                  <div className="space-y-3">
-                    {DEMO_WEBSITE_CONTENT.testimonials.slice(0, 2).map((testimonial, index) => (
-                      <div key={index} className="p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-100/50 shadow-sm hover:shadow-md hover:bg-white/90 transition-all duration-300">
-                        <div className="flex items-start gap-2 mb-2">
-                          <div className="flex text-yellow-400">
-                            {[...Array(5)].map((_, i) => (
-                              <span key={i} className="text-sm">★</span>
-                            ))}
+                    {Object.entries(DEMO_WEBSITE_CONTENT.stats).map(
+                      ([key, value]) => (
+                        <div
+                          key={key}
+                          className="text-center p-4 bg-gradient-to-br from-orange-50/80 to-orange-100/80 backdrop-blur-sm rounded-xl border border-orange-200/50 hover:shadow-md hover:from-orange-50/90 hover:to-orange-100/90 transition-all duration-300"
+                        >
+                          <div className="text-2xl font-bold text-orange-600 mb-1">
+                            {value}
+                          </div>
+                          <div className="text-xs text-gray-600 capitalize font-medium">
+                            {key}
                           </div>
                         </div>
-                        <p className="text-sm text-gray-700 italic leading-relaxed">"{testimonial}"</p>
-                      </div>
-                    ))}
+                      )
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h5 className="text-xl font-bold text-gray-900 mb-4">
+                    What Our Clients Say
+                  </h5>
+                  <div className="space-y-3">
+                    {DEMO_WEBSITE_CONTENT.testimonials
+                      .slice(0, 2)
+                      .map((testimonial, index) => (
+                        <div
+                          key={index}
+                          className="p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-100/50 shadow-sm hover:shadow-md hover:bg-white/90 transition-all duration-300"
+                        >
+                          <div className="flex items-start gap-2 mb-2">
+                            <div className="flex text-yellow-400">
+                              {[...Array(5)].map((_, i) => (
+                                <span key={i} className="text-sm">
+                                  ★
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-700 italic leading-relaxed">
+                            "{testimonial}"
+                          </p>
+                        </div>
+                      ))}
                   </div>
                 </div>
               </div>
@@ -541,7 +680,8 @@ export default function AIEnterprisePlatform({ className = "" }) {
                       Ready to Start Your Project?
                     </h5>
                     <p className="text-gray-600 mb-3">
-                      Get a free estimate today. Call {DEMO_WEBSITE_CONTENT.contact.phone}
+                      Get a free estimate today. Call{" "}
+                      {DEMO_WEBSITE_CONTENT.contact.phone}
                     </p>
                     <div className="flex items-center gap-6 text-sm text-gray-600">
                       <span className="flex items-center gap-1">
@@ -581,7 +721,7 @@ export default function AIEnterprisePlatform({ className = "" }) {
               </button>
             </div>
           </div>
-          
+
           {/* Directional Arrows and Labels */}
           <div className="absolute inset-0 pointer-events-none">
             {/* Your Website Label */}
@@ -589,12 +729,14 @@ export default function AIEnterprisePlatform({ className = "" }) {
               <div className="bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg border border-gray-200/50">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm font-semibold text-gray-800">Your Website</span>
+                  <span className="text-sm font-semibold text-gray-800">
+                    Your Website
+                  </span>
                 </div>
               </div>
               <div className="absolute top-12 left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white/95"></div>
             </div>
-            
+
             {/* Tredy Chat Label */}
             <div className="absolute bottom-20 right-20 z-40">
               <div className="bg-gradient-to-r from-blue-500/95 to-purple-500/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg text-white">
@@ -605,7 +747,7 @@ export default function AIEnterprisePlatform({ className = "" }) {
               </div>
               <div className="absolute bottom-12 right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-blue-500/95"></div>
             </div>
-            
+
             {/* Arrow from Website to Chat */}
             <div className="absolute bottom-32 right-32 z-30">
               <div className="flex items-center gap-2">
@@ -613,7 +755,7 @@ export default function AIEnterprisePlatform({ className = "" }) {
                 <div className="w-0 h-0 border-l-4 border-r-0 border-t-2 border-b-2 border-transparent border-l-purple-500"></div>
               </div>
             </div>
-            
+
             {/* Tredy Workspace Label */}
             <div className="absolute top-1/2 left-4 z-40">
               <div className="bg-gradient-to-r from-purple-500/95 to-pink-500/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg text-white">
@@ -621,11 +763,13 @@ export default function AIEnterprisePlatform({ className = "" }) {
                   <div className="w-3 h-3 bg-white rounded-full"></div>
                   <span className="text-sm font-semibold">Tredy Workspace</span>
                 </div>
-                <div className="text-xs text-purple-100 mt-1">All your business data</div>
+                <div className="text-xs text-purple-100 mt-1">
+                  All your business data
+                </div>
               </div>
               <div className="absolute top-12 left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-purple-500/95"></div>
             </div>
-            
+
             {/* Arrow from Website to Workspace */}
             <div className="absolute top-1/2 left-16 z-30">
               <div className="flex items-center gap-2">
@@ -636,31 +780,42 @@ export default function AIEnterprisePlatform({ className = "" }) {
           </div>
         </div>
 
-
         {/* Compact Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-6">
           <div className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mx-auto mb-2">
               <Code className="w-3 h-3 text-white" />
             </div>
-            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Easy Integration</h4>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Works with any website platform</p>
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+              Easy Integration
+            </h4>
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              Works with any website platform
+            </p>
           </div>
 
           <div className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mx-auto mb-2">
               <Users className="w-3 h-3 text-white" />
             </div>
-            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">24/7 Automation</h4>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Handle quotes and scheduling</p>
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+              24/7 Automation
+            </h4>
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              Handle quotes and scheduling
+            </p>
           </div>
 
           <div className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mx-auto mb-2">
               <Lightning className="w-3 h-3 text-white" />
             </div>
-            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Business Intelligence</h4>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Connect all your systems</p>
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+              Business Intelligence
+            </h4>
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              Connect all your systems
+            </p>
           </div>
         </div>
 

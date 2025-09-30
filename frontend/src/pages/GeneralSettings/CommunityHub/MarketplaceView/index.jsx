@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Package, Download, Check, ToggleLeft, ToggleRight, Trash, MagnifyingGlass, SquaresFour, List } from "@phosphor-icons/react";
+import {
+  Package,
+  Download,
+  Check,
+  ToggleLeft,
+  ToggleRight,
+  Trash,
+  MagnifyingGlass,
+  SquaresFour,
+  List,
+} from "@phosphor-icons/react";
 import Sidebar from "@/components/SettingsSidebar";
 import { isMobile } from "react-device-detect";
 import CommunityHub from "@/models/communityHub";
@@ -34,7 +44,7 @@ export default function MarketplaceView() {
       if (result) {
         setExploreItems(result);
       }
-      
+
       // Load installed items
       const installed = await CommunityHub.getInstalledItems();
       setInstalledItems(installed);
@@ -47,13 +57,16 @@ export default function MarketplaceView() {
 
   const handleInstallItem = async (item) => {
     try {
-      const importId = item.importId || `allm-community-id:${item.itemType}:${item.id}`;
-      
+      const importId =
+        item.importId || `allm-community-id:${item.itemType}:${item.id}`;
+
       if (item.itemType === "agent-skill") {
         await CommunityHub.importBundleItem(importId);
       } else if (item.itemType === "system-prompt") {
         // System prompts require workspace-specific installation
-        alert("System prompts must be installed per workspace. Go to a specific workspace and use the 'Import Item' feature to install this system prompt.");
+        alert(
+          "System prompts must be installed per workspace. Go to a specific workspace and use the 'Import Item' feature to install this system prompt."
+        );
         return;
       } else if (item.itemType === "slash-command") {
         await CommunityHub.applyItem(importId, {});
@@ -61,7 +74,7 @@ export default function MarketplaceView() {
         // For other item types, try to apply them
         await CommunityHub.applyItem(importId, {});
       }
-      
+
       // Reload data
       await loadData();
     } catch (error) {
@@ -91,39 +104,68 @@ export default function MarketplaceView() {
   // Get all items in a flat array
   const getAllItems = () => {
     const items = [];
-    
+
     if (selectedCategory === "all" || selectedCategory === "agent-skills") {
-      exploreItems.agentSkills?.items?.forEach(item => {
-        items.push({ ...item, itemType: "agent-skill", category: "Agent Skills" });
+      exploreItems.agentSkills?.items?.forEach((item) => {
+        items.push({
+          ...item,
+          itemType: "agent-skill",
+          category: "Agent Skills",
+        });
       });
     }
-    
+
     if (selectedCategory === "all" || selectedCategory === "prompts") {
-      exploreItems.systemPrompts?.items?.forEach(item => {
-        items.push({ ...item, itemType: "system-prompt", category: "System Prompts" });
+      exploreItems.systemPrompts?.items?.forEach((item) => {
+        items.push({
+          ...item,
+          itemType: "system-prompt",
+          category: "System Prompts",
+        });
       });
     }
-    
+
     if (selectedCategory === "all" || selectedCategory === "commands") {
-      exploreItems.slashCommands?.items?.forEach(item => {
-        items.push({ ...item, itemType: "slash-command", category: "Slash Commands" });
+      exploreItems.slashCommands?.items?.forEach((item) => {
+        items.push({
+          ...item,
+          itemType: "slash-command",
+          category: "Slash Commands",
+        });
       });
     }
-    
-    return items.filter(item => 
-      !searchQuery || item.name?.toLowerCase().includes(searchQuery.toLowerCase())
+
+    return items.filter(
+      (item) =>
+        !searchQuery ||
+        item.name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
 
   const categories = [
-    { id: "all", name: "All Items", count: 
-      (exploreItems.agentSkills?.totalCount || 0) + 
-      (exploreItems.systemPrompts?.totalCount || 0) + 
-      (exploreItems.slashCommands?.totalCount || 0) 
+    {
+      id: "all",
+      name: "All Items",
+      count:
+        (exploreItems.agentSkills?.totalCount || 0) +
+        (exploreItems.systemPrompts?.totalCount || 0) +
+        (exploreItems.slashCommands?.totalCount || 0),
     },
-    { id: "agent-skills", name: "Agent Skills", count: exploreItems.agentSkills?.totalCount || 0 },
-    { id: "prompts", name: "System Prompts", count: exploreItems.systemPrompts?.totalCount || 0 },
-    { id: "commands", name: "Slash Commands", count: exploreItems.slashCommands?.totalCount || 0 },
+    {
+      id: "agent-skills",
+      name: "Agent Skills",
+      count: exploreItems.agentSkills?.totalCount || 0,
+    },
+    {
+      id: "prompts",
+      name: "System Prompts",
+      count: exploreItems.systemPrompts?.totalCount || 0,
+    },
+    {
+      id: "commands",
+      name: "Slash Commands",
+      count: exploreItems.slashCommands?.totalCount || 0,
+    },
   ];
 
   return (
@@ -142,15 +184,22 @@ export default function MarketplaceView() {
                   Community Hub Marketplace
                 </p>
                 <p className="text-xs leading-[18px] font-base text-theme-text-secondary">
-                  Discover and install agent skills, prompts, and commands from the community
+                  Discover and install agent skills, prompts, and commands from
+                  the community
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
+                  onClick={() =>
+                    setViewMode(viewMode === "grid" ? "list" : "grid")
+                  }
                   className="p-2 rounded hover:bg-theme-bg-primary transition-colors"
                 >
-                  {viewMode === "grid" ? <List className="w-5 h-5" /> : <SquaresFour className="w-5 h-5" />}
+                  {viewMode === "grid" ? (
+                    <List className="w-5 h-5" />
+                  ) : (
+                    <SquaresFour className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -205,7 +254,7 @@ export default function MarketplaceView() {
           {/* Category Filter */}
           {activeTab === "discover" && (
             <div className="flex gap-2 mb-6 flex-wrap">
-              {categories.map(category => (
+              {categories.map((category) => (
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
@@ -225,14 +274,20 @@ export default function MarketplaceView() {
           {loading ? (
             <LoadingSkeleton />
           ) : activeTab === "discover" ? (
-            <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-4"}>
+            <div
+              className={
+                viewMode === "grid"
+                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                  : "space-y-4"
+              }
+            >
               {getAllItems().map((item) => (
                 <SkillCard
                   key={`${item.itemType}-${item.id}`}
                   item={item}
                   viewMode={viewMode}
                   onInstall={() => handleInstallItem(item)}
-                  isInstalled={installedItems.some(i => i.hubId === item.id)}
+                  isInstalled={installedItems.some((i) => i.hubId === item.id)}
                 />
               ))}
               {getAllItems().length === 0 && (

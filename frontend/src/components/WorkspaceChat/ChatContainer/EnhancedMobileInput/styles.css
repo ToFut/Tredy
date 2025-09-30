@@ -19,7 +19,8 @@
 
 /* Voice recording animation */
 @keyframes voice-pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.8;
   }
@@ -48,7 +49,9 @@
 
 /* Slide to cancel animation */
 .slide-to-cancel {
-  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+  transition:
+    transform 0.2s ease-out,
+    opacity 0.2s ease-out;
 }
 
 .slide-to-cancel.canceling {
@@ -132,7 +135,9 @@
 
 /* Mobile keyboard handling */
 .keyboard-aware {
-  transition: transform 0.3s ease-out, padding-bottom 0.3s ease-out;
+  transition:
+    transform 0.3s ease-out,
+    padding-bottom 0.3s ease-out;
 }
 
 /* iOS safe area handling */
@@ -142,7 +147,8 @@
 
 /* Haptic feedback simulation */
 @keyframes haptic {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
   25% {
@@ -174,7 +180,8 @@
 
 /* Loading dots */
 @keyframes loading-dots {
-  0%, 20% {
+  0%,
+  20% {
     opacity: 0.2;
     transform: scale(0.8);
   }

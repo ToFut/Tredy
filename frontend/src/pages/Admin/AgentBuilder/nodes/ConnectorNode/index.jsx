@@ -16,20 +16,22 @@ export default function ConnectorNode({
   const fetchAvailableConnectors = async () => {
     try {
       // Fetch SQL connections
-      const res = await Admin.systemPreferencesByFields(["agent_sql_connections"]);
+      const res = await Admin.systemPreferencesByFields([
+        "agent_sql_connections",
+      ]);
       const sqlConnections = res?.settings?.agent_sql_connections || [];
-      
+
       // Build connectors list
       const connectors = [];
-      
+
       // Add SQL connections
-      sqlConnections.forEach(conn => {
+      sqlConnections.forEach((conn) => {
         if (conn.action !== "remove") {
           connectors.push({
             type: "sql",
             id: conn.database_id,
             label: `SQL: ${conn.database_id}`,
-            config: conn
+            config: conn,
           });
         }
       });
@@ -58,7 +60,9 @@ export default function ConnectorNode({
           Connector
         </label>
         {loading ? (
-          <div className="text-sm text-theme-text-secondary">Loading connectors...</div>
+          <div className="text-sm text-theme-text-secondary">
+            Loading connectors...
+          </div>
         ) : (
           <select
             value={config?.connectorType || ""}
@@ -72,7 +76,10 @@ export default function ConnectorNode({
           >
             <option value="">Select a connector...</option>
             {availableConnectors.map((connector) => (
-              <option key={`${connector.type}-${connector.id}`} value={connector.id}>
+              <option
+                key={`${connector.type}-${connector.id}`}
+                value={connector.id}
+              >
                 {connector.label}
               </option>
             ))}

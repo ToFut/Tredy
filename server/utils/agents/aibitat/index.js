@@ -247,8 +247,12 @@ class AIbitat {
     };
 
     this._chats.push(chat);
-    console.log(`[Aibitat Core] New message registered from ${chat.from} to ${chat.to}: ${chat.content?.substring(0, 50)}...`);
-    console.log(`[Aibitat Core] Total chats: ${this._chats.length}, Listeners: ${this.emitter.listenerCount("message")}`);
+    console.log(
+      `[Aibitat Core] New message registered from ${chat.from} to ${chat.to}: ${typeof chat.content === 'string' ? chat.content.substring(0, 50) : JSON.stringify(chat.content).substring(0, 50)}...`
+    );
+    console.log(
+      `[Aibitat Core] Total chats: ${this._chats.length}, Listeners: ${this.emitter.listenerCount("message")}`
+    );
     this.emitter.emit("message", chat, this);
   }
 
@@ -648,7 +652,7 @@ ${this.getHistory({ to: route.to })
       // Track tool call start
       let toolCallId = null;
       if (this.trackToolCall) {
-        toolCallId = this.trackToolCall(name, args, 'running');
+        toolCallId = this.trackToolCall(name, args, "running");
       }
 
       let result;
@@ -656,36 +660,40 @@ ${this.getHistory({ to: route.to })
         result = await fn.handler(args);
         // Update tool call status to success
         if (toolCallId && this.updateToolCall) {
-          this.updateToolCall(toolCallId, { 
-            status: 'success',
+          this.updateToolCall(toolCallId, {
+            status: "success",
             response: result,
-            completedAt: Date.now()
+            completedAt: Date.now(),
           });
         }
       } catch (error) {
         // Update tool call status to error
         if (toolCallId && this.updateToolCall) {
-          this.updateToolCall(toolCallId, { 
-            status: 'error',
+          this.updateToolCall(toolCallId, {
+            status: "error",
             error: error.message,
-            completedAt: Date.now()
+            completedAt: Date.now(),
           });
         }
         throw error;
       }
-      
+
       Telemetry.sendTelemetry("agent_tool_call", { tool: name }, null, true);
 
       // Intercept MCP connection tools and add button patterns
-      if (name.includes('connect_gmail') || name.includes('connect_') || name.endsWith('-connect_gmail')) {
+      if (
+        name.includes("connect_gmail") ||
+        name.includes("connect_") ||
+        name.endsWith("-connect_gmail")
+      ) {
         console.log(`🔗 Intercepting connection tool: ${name}`);
-        
+
         // Extract service name from tool name
-        let serviceName = 'gmail'; // default
-        if (name.includes('gmail')) serviceName = 'gmail';
-        else if (name.includes('slack')) serviceName = 'slack';
-        else if (name.includes('linkedin')) serviceName = 'linkedin';
-        
+        let serviceName = "gmail"; // default
+        if (name.includes("gmail")) serviceName = "gmail";
+        else if (name.includes("slack")) serviceName = "slack";
+        else if (name.includes("linkedin")) serviceName = "linkedin";
+
         // Add connection button pattern to the result
         result += `\n\nTo connect your ${serviceName} account:\n\n[connect:${serviceName}]\n\nClick above to complete the OAuth connection process.`;
       }
@@ -721,10 +729,14 @@ ${this.getHistory({ to: route.to })
 
     // Log the completion for debugging
     this.handlerProps?.log?.("[debug] Final completion result:", completion);
-    
+
     // Extract the actual content from completion
-    const result = completion?.result || completion?.content || completion?.message || completion;
-    
+    const result =
+      completion?.result ||
+      completion?.content ||
+      completion?.message ||
+      completion;
+
     return result;
   }
 

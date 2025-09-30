@@ -2,7 +2,9 @@ let lancedb;
 try {
   lancedb = require("@lancedb/lancedb");
 } catch (error) {
-  console.log("[LanceDB] Native module not found, LanceDB will not be available");
+  console.log(
+    "[LanceDB] Native module not found, LanceDB will not be available"
+  );
   lancedb = null;
 }
 const { toChunks, getEmbeddingEngineSelection } = require("../../helpers");
@@ -30,7 +32,9 @@ const LanceDb = {
       throw new Error("LanceDB::Invalid ENV settings");
 
     if (!lancedb) {
-      throw new Error("LanceDB::Native module not available - please install @lancedb/lancedb or use a different vector database provider");
+      throw new Error(
+        "LanceDB::Native module not available - please install @lancedb/lancedb or use a different vector database provider"
+      );
     }
 
     const client = await lancedb.connect(this.uri);

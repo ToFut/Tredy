@@ -73,7 +73,7 @@ export default function DataConnectors() {
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Data Connectors
         </h2>
-        
+
         {/* Search */}
         <div className="relative mb-6">
           <MagnifyingGlass
@@ -131,7 +131,7 @@ export default function DataConnectors() {
               </p>
             </div>
           </div>
-          
+
           <div className="flex-1 overflow-y-auto">
             {DATA_CONNECTORS[selectedConnector].options}
           </div>

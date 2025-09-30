@@ -105,7 +105,15 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    include: ["@mintplex-labs/piper-tts-web"],
+    include: [
+      "@mintplex-labs/piper-tts-web",
+      "react-beautiful-dnd",
+      "react-dropzone",
+      "react-router-dom",
+      "react",
+      "react-dom"
+    ],
+    exclude: ["@phosphor-icons/react/dist/ssr"],
     esbuildOptions: {
       define: {
         global: "globalThis"

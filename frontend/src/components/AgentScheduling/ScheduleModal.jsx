@@ -29,11 +29,13 @@ export default function ScheduleModal({
         name: schedule.name || "",
         description: schedule.description || "",
         cronExpression: schedule.cron_expression || "0 * * * *",
-        timezone: schedule.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timezone:
+          schedule.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
         enabled: schedule.enabled ?? true,
-        context: typeof schedule.context === "string" 
-          ? JSON.parse(schedule.context) 
-          : schedule.context || {},
+        context:
+          typeof schedule.context === "string"
+            ? JSON.parse(schedule.context)
+            : schedule.context || {},
       });
     } else if (agent) {
       // Creating new schedule
@@ -50,11 +52,11 @@ export default function ScheduleModal({
 
   const validate = () => {
     const newErrors = {};
-    
+
     if (!formData.name.trim()) {
       newErrors.name = "Name is required";
     }
-    
+
     if (!AgentSchedule.validateCronExpression(formData.cronExpression)) {
       newErrors.cronExpression = "Invalid cron expression";
     }
@@ -65,7 +67,7 @@ export default function ScheduleModal({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validate()) return;
 
     setSaving(true);
@@ -130,7 +132,7 @@ export default function ScheduleModal({
             <h3 className="text-sm font-medium text-theme-text-primary">
               Basic Information
             </h3>
-            
+
             <div>
               <label className="block text-sm text-theme-text-secondary mb-1">
                 Schedule Name
@@ -138,7 +140,9 @@ export default function ScheduleModal({
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 className={`w-full px-3 py-2 bg-theme-bg-primary border rounded-lg focus:outline-none ${
                   errors.name
                     ? "border-red-500"
@@ -157,7 +161,9 @@ export default function ScheduleModal({
               </label>
               <textarea
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 className="w-full px-3 py-2 bg-theme-bg-primary border border-theme-border rounded-lg focus:outline-none focus:border-primary-button"
                 rows="2"
                 placeholder="Describe what this schedule does..."
@@ -170,10 +176,12 @@ export default function ScheduleModal({
             <h3 className="text-sm font-medium text-theme-text-primary">
               Schedule Configuration
             </h3>
-            
+
             <CronBuilder
               value={formData.cronExpression}
-              onChange={(expr) => setFormData({ ...formData, cronExpression: expr })}
+              onChange={(expr) =>
+                setFormData({ ...formData, cronExpression: expr })
+              }
               disabled={saving}
             />
             {errors.cronExpression && (
@@ -186,7 +194,9 @@ export default function ScheduleModal({
               </label>
               <select
                 value={formData.timezone}
-                onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, timezone: e.target.value })
+                }
                 className="w-full px-3 py-2 bg-theme-bg-primary border border-theme-border rounded-lg focus:outline-none focus:border-primary-button"
               >
                 <option value="UTC">UTC</option>
@@ -206,10 +216,15 @@ export default function ScheduleModal({
                 type="checkbox"
                 id="enabled"
                 checked={formData.enabled}
-                onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
+                onChange={(e) =>
+                  setFormData({ ...formData, enabled: e.target.checked })
+                }
                 className="w-4 h-4 text-primary-button rounded focus:ring-primary-button"
               />
-              <label htmlFor="enabled" className="text-sm text-theme-text-primary">
+              <label
+                htmlFor="enabled"
+                className="text-sm text-theme-text-primary"
+              >
                 Enable this schedule immediately
               </label>
             </div>
@@ -220,12 +235,13 @@ export default function ScheduleModal({
             <h3 className="text-sm font-medium text-theme-text-primary">
               Agent Context (Optional)
             </h3>
-            
+
             <div className="p-3 bg-theme-bg-primary rounded-lg flex items-start gap-2">
               <Info className="w-4 h-4 text-theme-text-secondary mt-0.5" />
               <p className="text-xs text-theme-text-secondary">
-                Add any parameters or context the agent should use when executing.
-                This could include URLs to scrape, prompts to use, or any other data.
+                Add any parameters or context the agent should use when
+                executing. This could include URLs to scrape, prompts to use, or
+                any other data.
               </p>
             </div>
 
@@ -280,7 +296,11 @@ export default function ScheduleModal({
               disabled={saving}
               className="px-4 py-2 bg-primary-button text-white rounded hover:bg-primary-button-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {saving ? "Saving..." : schedule ? "Update Schedule" : "Create Schedule"}
+              {saving
+                ? "Saving..."
+                : schedule
+                  ? "Update Schedule"
+                  : "Create Schedule"}
             </button>
           </div>
         </form>

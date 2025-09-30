@@ -20,13 +20,31 @@ export default function HubItems() {
       const { result } = await CommunityHub.fetchExploreItems();
       if (result) {
         const allItems = [
-          ...result.agentSkills.items.slice(0, 3).map(item => ({ ...item, itemType: "agent-skill", category: "Agent Skills" })),
-          ...result.systemPrompts.items.slice(0, 2).map(item => ({ ...item, itemType: "system-prompt", category: "System Prompts" })),
-          ...result.slashCommands.items.slice(0, 2).map(item => ({ ...item, itemType: "slash-command", category: "Slash Commands" })),
+          ...result.agentSkills.items
+            .slice(0, 3)
+            .map((item) => ({
+              ...item,
+              itemType: "agent-skill",
+              category: "Agent Skills",
+            })),
+          ...result.systemPrompts.items
+            .slice(0, 2)
+            .map((item) => ({
+              ...item,
+              itemType: "system-prompt",
+              category: "System Prompts",
+            })),
+          ...result.slashCommands.items
+            .slice(0, 2)
+            .map((item) => ({
+              ...item,
+              itemType: "slash-command",
+              category: "Slash Commands",
+            })),
         ];
         setTrendingItems(allItems);
       }
-      
+
       // Load installed items
       const installed = await CommunityHub.getInstalledItems();
       setInstalledItems(installed);
@@ -39,14 +57,15 @@ export default function HubItems() {
 
   const handleInstallItem = async (item) => {
     try {
-      const importId = item.importId || `allm-community-id:${item.itemType}:${item.id}`;
-      
+      const importId =
+        item.importId || `allm-community-id:${item.itemType}:${item.id}`;
+
       if (item.itemType === "agent-skill") {
         await CommunityHub.importBundleItem(importId);
       } else {
         await CommunityHub.applyItem(importId, {});
       }
-      
+
       // Reload data
       await loadTrendingItems();
     } catch (error) {
@@ -120,30 +139,32 @@ export default function HubItems() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {trendingItems.map((item) => {
-          const isInstalled = installedItems.some(i => i.hubId === item.id);
-          
+          const isInstalled = installedItems.some((i) => i.hubId === item.id);
+
           return (
             <div
               key={`${item.itemType}-${item.id}`}
               className="bg-theme-bg-primary rounded-lg p-4 hover:shadow-lg transition-all duration-200 border border-theme-border"
             >
               <div className="flex items-start justify-between mb-3">
-                <div className={`p-2 rounded-lg ${getCategoryColor(item.itemType)}`}>
+                <div
+                  className={`p-2 rounded-lg ${getCategoryColor(item.itemType)}`}
+                >
                   {getItemIcon(item.itemType)}
                 </div>
                 <span className="text-xs px-2 py-1 bg-orange-500/20 text-orange-500 rounded">
                   Trending
                 </span>
               </div>
-              
+
               <h3 className="font-semibold text-theme-text-primary mb-2 line-clamp-1">
                 {item.name}
               </h3>
-              
+
               <p className="text-sm text-theme-text-secondary mb-3 line-clamp-2">
                 {item.description}
               </p>
-              
+
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs text-theme-text-secondary px-2 py-1 bg-theme-bg-secondary rounded">
                   {item.category}
@@ -154,7 +175,7 @@ export default function HubItems() {
                   </span>
                 )}
               </div>
-              
+
               <button
                 onClick={() => handleInstallItem(item)}
                 disabled={isInstalled}
@@ -195,7 +216,7 @@ function LoadingSkeleton() {
           baseColor="var(--theme-settings-input-bg)"
         />
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {[...Array(6)].map((_, i) => (
           <div key={i} className="bg-theme-bg-primary rounded-lg p-4">

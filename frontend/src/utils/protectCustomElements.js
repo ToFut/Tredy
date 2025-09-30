@@ -1,5 +1,5 @@
 /**
- * Protection against external scripts (like browser extensions) 
+ * Protection against external scripts (like browser extensions)
  * trying to register custom elements that conflict with our app
  */
 
@@ -9,8 +9,8 @@ const originalDefine = window.customElements?.define;
 // Override customElements.define to prevent duplicate registrations
 if (window.customElements && originalDefine) {
   // Pre-register the problematic element to prevent errors
-  const problematicElements = ['mce-autosize-textarea'];
-  problematicElements.forEach(name => {
+  const problematicElements = ["mce-autosize-textarea"];
+  problematicElements.forEach((name) => {
     if (!window.customElements.get(name)) {
       // Register a dummy element to prevent the actual one from being registered
       class DummyElement extends HTMLElement {}
@@ -22,33 +22,30 @@ if (window.customElements && originalDefine) {
     }
   });
 
-  // Also check if the element is already defined and prevent re-registration
-  if (window.customElements.get('mce-autosize-textarea')) {
-    console.warn('mce-autosize-textarea already defined, preventing duplicate registration');
-  }
-
-  window.customElements.define = function(name, constructor, options) {
+  window.customElements.define = function (name, constructor, options) {
     try {
       // Check if element is already defined
       if (window.customElements.get(name)) {
         // Silently skip instead of warning for known extension elements
-        if (!name.includes('mce-') && !name.includes('tinymce')) {
-          console.warn(`Custom element '${name}' is already defined. Skipping duplicate registration.`);
+        if (!name.includes("mce-") && !name.includes("tinymce")) {
+          console.warn(
+            `Custom element '${name}' is already defined. Skipping duplicate registration.`
+          );
         }
         return;
       }
-      
+
       // Prevent TinyMCE or other external scripts from registering elements
-      if (name.includes('mce-') || name.includes('tinymce')) {
+      if (name.includes("mce-") || name.includes("tinymce")) {
         // Silently block without warning to reduce console noise
         return;
       }
-      
+
       // Call original define method
       return originalDefine.call(this, name, constructor, options);
     } catch (error) {
       // Silently handle errors for external scripts
-      if (!name.includes('mce-') && !name.includes('tinymce')) {
+      if (!name.includes("mce-") && !name.includes("tinymce")) {
         console.error(`Error registering custom element '${name}':`, error);
       }
     }
@@ -58,16 +55,16 @@ if (window.customElements && originalDefine) {
 // Prevent external scripts from modifying our app
 export function protectApp() {
   // Block external overlay scripts
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     // Prevent common extension injections
-    const blockedScripts = ['overlay_bundle.js', 'webcomponents-ce.js'];
-    
+    const blockedScripts = ["overlay_bundle.js", "webcomponents-ce.js"];
+
     // Override appendChild to block certain scripts
     const originalAppendChild = Element.prototype.appendChild;
-    Element.prototype.appendChild = function(child) {
-      if (child.tagName === 'SCRIPT' && child.src) {
-        const scriptName = child.src.split('/').pop();
-        if (blockedScripts.some(blocked => scriptName.includes(blocked))) {
+    Element.prototype.appendChild = function (child) {
+      if (child.tagName === "SCRIPT" && child.src) {
+        const scriptName = child.src.split("/").pop();
+        if (blockedScripts.some((blocked) => scriptName.includes(blocked))) {
           console.warn(`Blocked external script injection: ${scriptName}`);
           return child;
         }

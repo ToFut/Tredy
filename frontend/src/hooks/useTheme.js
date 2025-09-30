@@ -29,15 +29,15 @@ export function useTheme() {
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     document.body.classList.toggle("light", theme === "light");
-    
+
     // Add theme-specific body classes for advanced styling
     Object.keys(availableThemes).forEach((themeName) => {
       document.body.classList.toggle(`theme-${themeName}`, theme === themeName);
     });
-    
+
     // Add smooth transition when switching themes
     document.documentElement.style.transition = "background-color 0.3s ease";
-    
+
     localStorage.setItem("theme", theme);
     window.dispatchEvent(new Event(REFETCH_LOGO_EVENT));
   }, [theme]);

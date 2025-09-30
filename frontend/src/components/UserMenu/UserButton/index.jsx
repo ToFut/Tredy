@@ -92,33 +92,33 @@ export default function UserButton() {
             </a>
             <button
               onClick={async () => {
-                console.log('[LOGOUT] Starting logout...');
-                
+                console.log("[LOGOUT] Starting logout...");
+
                 // For Supabase users, sign out from Supabase first
                 const user = userFromStorage();
                 if (user?.supabaseId) {
-                  console.log('[LOGOUT] Signing out from Supabase...');
+                  console.log("[LOGOUT] Signing out from Supabase...");
                   await supabase.auth.signOut();
-                  console.log('[LOGOUT] Supabase signout complete');
+                  console.log("[LOGOUT] Supabase signout complete");
                 }
-                
+
                 // Clear ALL possible auth storage
-                console.log('[LOGOUT] Clearing all storage...');
+                console.log("[LOGOUT] Clearing all storage...");
                 window.localStorage.clear();
                 window.sessionStorage.clear();
-                
+
                 // Clear IndexedDB (where Supabase might store data)
                 if (window.indexedDB) {
                   const databases = await window.indexedDB.databases();
-                  databases.forEach(db => {
-                    if (db.name && db.name.includes('supabase')) {
+                  databases.forEach((db) => {
+                    if (db.name && db.name.includes("supabase")) {
                       window.indexedDB.deleteDatabase(db.name);
                     }
                   });
                 }
-                
-                console.log('[LOGOUT] Redirecting...');
-                window.location.replace('/login');
+
+                console.log("[LOGOUT] Redirecting...");
+                window.location.replace("/login");
               }}
               type="button"
               className="text-white hover:bg-theme-action-menu-item-hover w-full text-left px-4 py-1.5 rounded-md"

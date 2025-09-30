@@ -7,8 +7,7 @@ const TRANSLATIONS = {
     },
     llm: {
       title: "LLM 偏好",
-      description:
-        "Tredy 可以与多家 LLM 提供商合作。这将是处理聊天的服务。",
+      description: "Tredy 可以与多家 LLM 提供商合作。这将是处理聊天的服务。",
     },
     userSetup: {
       title: "用户设置",
@@ -619,8 +618,7 @@ const TRANSLATIONS = {
   },
   privacy: {
     title: "隐私和数据处理",
-    description:
-      "这是你对如何处理连接的第三方提供商和Tredy的数据的配置。",
+    description: "这是你对如何处理连接的第三方提供商和Tredy的数据的配置。",
     llm: "LLM 选择",
     embedding: "嵌入首选项",
     vector: "向量数据库",
@@ -956,8 +954,7 @@ const TRANSLATIONS = {
       generic: {
         unauthenticated: {
           title: "需要验证",
-          description:
-            "在发布项目之前，您需要通过 Tredy 社区中心进行验证。",
+          description: "在发布项目之前，您需要通过 Tredy 社区中心进行验证。",
           button: "连接到社区中心",
         },
       },

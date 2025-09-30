@@ -61,7 +61,7 @@ export default function QuickLinks() {
         <button
           onClick={sendChat}
           className="group h-[60px] text-sm font-semibold glass-effect rounded-2xl text-theme-home-button-secondary-text flex items-center justify-center gap-x-3 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg border border-theme-sidebar-border hover:border-purple-500/30 animate-slideInLeft"
-          style={{ animationDelay: '0.1s' }}
+          style={{ animationDelay: "0.1s" }}
         >
           <ChatCenteredDots size={20} className="group-hover:animate-pulse" />
           {t("main-page.quickLinks.sendChat")}
@@ -69,7 +69,7 @@ export default function QuickLinks() {
         <button
           onClick={embedDocument}
           className="group h-[60px] text-sm font-semibold glass-effect rounded-2xl text-theme-home-button-secondary-text flex items-center justify-center gap-x-3 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg border border-theme-sidebar-border hover:border-blue-500/30 animate-slideInLeft"
-          style={{ animationDelay: '0.2s' }}
+          style={{ animationDelay: "0.2s" }}
         >
           <FileArrowDown size={20} className="group-hover:animate-bounce" />
           {t("main-page.quickLinks.embedDocument")}
@@ -77,9 +77,12 @@ export default function QuickLinks() {
         <button
           onClick={createWorkspace}
           className="group h-[60px] text-sm font-semibold glass-effect rounded-2xl text-theme-home-button-secondary-text flex items-center justify-center gap-x-3 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg border border-theme-sidebar-border hover:border-green-500/30 animate-slideInLeft"
-          style={{ animationDelay: '0.3s' }}
+          style={{ animationDelay: "0.3s" }}
         >
-          <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+          <Plus
+            size={20}
+            className="group-hover:rotate-90 transition-transform duration-300"
+          />
           {t("main-page.quickLinks.createWorkspace")}
         </button>
       </div>

@@ -37,7 +37,7 @@ function agentWebsocket(app) {
 
       // Enhance agent handler with WebSocket tool emissions
       enhanceAgentHandler(agentHandler, socket);
-      
+
       socket.on("message", relayToSocket);
       socket.on("close", () => {
         agentHandler.closeAlert();

@@ -1,5 +1,8 @@
 const { validatedRequest } = require("../utils/middleware/validatedRequest");
-const { flexUserRoleValid, ROLES } = require("../utils/middleware/multiUserProtected");
+const {
+  flexUserRoleValid,
+  ROLES,
+} = require("../utils/middleware/multiUserProtected");
 const { reqBody } = require("../utils/http");
 const { AgentSchedule } = require("../models/agentSchedule");
 const { ScheduleExecution } = require("../models/scheduleExecution");
@@ -17,22 +20,25 @@ function agentScheduleEndpoints(app) {
    */
   app.get(
     "/api/workspace/:slug/agent-schedules",
-    [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default])],
+    [
+      validatedRequest,
+      flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default]),
+    ],
     async (request, response) => {
       try {
         const { slug } = request.params;
         const { Workspace } = require("../models/workspace");
         const workspace = await Workspace.get({ slug });
-        
+
         if (!workspace) {
-          return response.status(404).json({ 
-            success: false, 
-            error: "Workspace not found" 
+          return response.status(404).json({
+            success: false,
+            error: "Workspace not found",
           });
         }
 
-        const schedules = await AgentSchedule.where({ 
-          workspaceId: workspace.id 
+        const schedules = await AgentSchedule.where({
+          workspaceId: workspace.id,
         });
 
         // Add execution stats for each schedule
@@ -41,20 +47,20 @@ function agentScheduleEndpoints(app) {
             const stats = await ScheduleExecution.getStats(schedule.id);
             return {
               ...schedule,
-              stats
+              stats,
             };
           })
         );
 
-        response.status(200).json({ 
-          success: true, 
-          schedules: schedulesWithStats 
+        response.status(200).json({
+          success: true,
+          schedules: schedulesWithStats,
         });
       } catch (error) {
         console.error("Failed to get agent schedules:", error);
-        response.status(500).json({ 
-          success: false, 
-          error: error.message 
+        response.status(500).json({
+          success: false,
+          error: error.message,
         });
       }
     }
@@ -72,11 +78,11 @@ function agentScheduleEndpoints(app) {
         const { slug } = request.params;
         const { Workspace } = require("../models/workspace");
         const workspace = await Workspace.get({ slug });
-        
+
         if (!workspace) {
-          return response.status(404).json({ 
-            success: false, 
-            error: "Workspace not found" 
+          return response.status(404).json({
+            success: false,
+            error: "Workspace not found",
           });
         }
 
@@ -95,19 +101,19 @@ function agentScheduleEndpoints(app) {
         if (!AgentSchedule.validateCronExpression(cronExpression)) {
           return response.status(400).json({
             success: false,
-            error: "Invalid cron expression"
+            error: "Invalid cron expression",
           });
         }
 
         // Create schedulable agent to validate it exists
         try {
           const agent = await SchedulableAgent.fromId(agentId, agentType);
-          
+
           // Check if agent supports scheduling
           if (!agent.supportsScheduling()) {
             return response.status(400).json({
               success: false,
-              error: "This agent does not support scheduling"
+              error: "This agent does not support scheduling",
             });
           }
 
@@ -117,13 +123,14 @@ function agentScheduleEndpoints(app) {
             if (!flowData) {
               return response.status(400).json({
                 success: false,
-                error: "Flow not found or invalid"
+                error: "Flow not found or invalid",
               });
             }
             if (flowData.active === false) {
               return response.status(400).json({
                 success: false,
-                error: "Cannot schedule inactive flow. Please activate the flow first."
+                error:
+                  "Cannot schedule inactive flow. Please activate the flow first.",
               });
             }
           }
@@ -162,21 +169,21 @@ function agentScheduleEndpoints(app) {
             response.locals?.user?.id
           );
 
-          response.status(200).json({ 
-            success: true, 
-            schedule 
+          response.status(200).json({
+            success: true,
+            schedule,
           });
         } catch (agentError) {
           return response.status(400).json({
             success: false,
-            error: `Invalid agent: ${agentError.message}`
+            error: `Invalid agent: ${agentError.message}`,
           });
         }
       } catch (error) {
         console.error("Failed to create agent schedule:", error);
-        response.status(500).json({ 
-          success: false, 
-          error: error.message 
+        response.status(500).json({
+          success: false,
+          error: error.message,
         });
       }
     }
@@ -194,33 +201,36 @@ function agentScheduleEndpoints(app) {
         const { slug, scheduleId } = request.params;
         const { Workspace } = require("../models/workspace");
         const workspace = await Workspace.get({ slug });
-        
+
         if (!workspace) {
-          return response.status(404).json({ 
-            success: false, 
-            error: "Workspace not found" 
+          return response.status(404).json({
+            success: false,
+            error: "Workspace not found",
           });
         }
 
         // Check schedule exists and belongs to workspace
-        const schedule = await AgentSchedule.get({ 
-          id: parseInt(scheduleId) 
+        const schedule = await AgentSchedule.get({
+          id: parseInt(scheduleId),
         });
-        
+
         if (!schedule || schedule.workspace_id !== workspace.id) {
           return response.status(404).json({
             success: false,
-            error: "Schedule not found"
+            error: "Schedule not found",
           });
         }
 
         const updates = reqBody(request);
 
         // Validate cron expression if being updated
-        if (updates.cronExpression && !AgentSchedule.validateCronExpression(updates.cronExpression)) {
+        if (
+          updates.cronExpression &&
+          !AgentSchedule.validateCronExpression(updates.cronExpression)
+        ) {
           return response.status(400).json({
             success: false,
-            error: "Invalid cron expression"
+            error: "Invalid cron expression",
           });
         }
 
@@ -233,7 +243,7 @@ function agentScheduleEndpoints(app) {
         if (error) {
           return response.status(400).json({
             success: false,
-            error
+            error,
           });
         }
 
@@ -250,15 +260,15 @@ function agentScheduleEndpoints(app) {
           response.locals?.user?.id
         );
 
-        response.status(200).json({ 
-          success: true, 
-          schedule: updatedSchedule 
+        response.status(200).json({
+          success: true,
+          schedule: updatedSchedule,
         });
       } catch (error) {
         console.error("Failed to update agent schedule:", error);
-        response.status(500).json({ 
-          success: false, 
-          error: error.message 
+        response.status(500).json({
+          success: false,
+          error: error.message,
         });
       }
     }
@@ -276,23 +286,23 @@ function agentScheduleEndpoints(app) {
         const { slug, scheduleId } = request.params;
         const { Workspace } = require("../models/workspace");
         const workspace = await Workspace.get({ slug });
-        
+
         if (!workspace) {
-          return response.status(404).json({ 
-            success: false, 
-            error: "Workspace not found" 
+          return response.status(404).json({
+            success: false,
+            error: "Workspace not found",
           });
         }
 
         // Check schedule exists and belongs to workspace
-        const schedule = await AgentSchedule.get({ 
-          id: parseInt(scheduleId) 
+        const schedule = await AgentSchedule.get({
+          id: parseInt(scheduleId),
         });
-        
+
         if (!schedule || schedule.workspace_id !== workspace.id) {
           return response.status(404).json({
             success: false,
-            error: "Schedule not found"
+            error: "Schedule not found",
           });
         }
 
@@ -306,7 +316,7 @@ function agentScheduleEndpoints(app) {
         if (!success) {
           return response.status(500).json({
             success: false,
-            error: "Failed to delete schedule"
+            error: "Failed to delete schedule",
           });
         }
 
@@ -319,14 +329,14 @@ function agentScheduleEndpoints(app) {
           response.locals?.user?.id
         );
 
-        response.status(200).json({ 
-          success: true 
+        response.status(200).json({
+          success: true,
         });
       } catch (error) {
         console.error("Failed to delete agent schedule:", error);
-        response.status(500).json({ 
-          success: false, 
-          error: error.message 
+        response.status(500).json({
+          success: false,
+          error: error.message,
         });
       }
     }
@@ -338,31 +348,34 @@ function agentScheduleEndpoints(app) {
    */
   app.get(
     "/api/workspace/:slug/agent-schedules/:scheduleId/executions",
-    [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default])],
+    [
+      validatedRequest,
+      flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default]),
+    ],
     async (request, response) => {
       try {
         const { slug, scheduleId } = request.params;
         const { limit = 20 } = request.query;
-        
+
         const { Workspace } = require("../models/workspace");
         const workspace = await Workspace.get({ slug });
-        
+
         if (!workspace) {
-          return response.status(404).json({ 
-            success: false, 
-            error: "Workspace not found" 
+          return response.status(404).json({
+            success: false,
+            error: "Workspace not found",
           });
         }
 
         // Check schedule exists and belongs to workspace
-        const schedule = await AgentSchedule.get({ 
-          id: parseInt(scheduleId) 
+        const schedule = await AgentSchedule.get({
+          id: parseInt(scheduleId),
         });
-        
+
         if (!schedule || schedule.workspace_id !== workspace.id) {
           return response.status(404).json({
             success: false,
-            error: "Schedule not found"
+            error: "Schedule not found",
           });
         }
 
@@ -371,15 +384,15 @@ function agentScheduleEndpoints(app) {
           parseInt(limit)
         );
 
-        response.status(200).json({ 
-          success: true, 
-          executions 
+        response.status(200).json({
+          success: true,
+          executions,
         });
       } catch (error) {
         console.error("Failed to get schedule executions:", error);
-        response.status(500).json({ 
-          success: false, 
-          error: error.message 
+        response.status(500).json({
+          success: false,
+          error: error.message,
         });
       }
     }
@@ -397,35 +410,38 @@ function agentScheduleEndpoints(app) {
         const { slug, scheduleId } = request.params;
         const { Workspace } = require("../models/workspace");
         const workspace = await Workspace.get({ slug });
-        
+
         if (!workspace) {
-          return response.status(404).json({ 
-            success: false, 
-            error: "Workspace not found" 
+          return response.status(404).json({
+            success: false,
+            error: "Workspace not found",
           });
         }
 
         // Check schedule exists and belongs to workspace
-        const schedule = await AgentSchedule.get({ 
-          id: parseInt(scheduleId) 
+        const schedule = await AgentSchedule.get({
+          id: parseInt(scheduleId),
         });
-        
+
         if (!schedule || schedule.workspace_id !== workspace.id) {
           return response.status(404).json({
             success: false,
-            error: "Schedule not found"
+            error: "Schedule not found",
           });
         }
 
         // Execute the schedule immediately
         const engine = getSchedulingEngine();
-        
+
         // Run in background - don't wait for completion
         setImmediate(async () => {
           try {
             await engine.executeSchedule(schedule);
           } catch (error) {
-            console.error(`Failed to manually execute schedule ${scheduleId}:`, error);
+            console.error(
+              `Failed to manually execute schedule ${scheduleId}:`,
+              error
+            );
           }
         });
 
@@ -438,15 +454,15 @@ function agentScheduleEndpoints(app) {
           response.locals?.user?.id
         );
 
-        response.status(200).json({ 
+        response.status(200).json({
           success: true,
-          message: "Schedule execution started"
+          message: "Schedule execution started",
         });
       } catch (error) {
         console.error("Failed to manually run schedule:", error);
-        response.status(500).json({ 
-          success: false, 
-          error: error.message 
+        response.status(500).json({
+          success: false,
+          error: error.message,
         });
       }
     }
@@ -458,31 +474,34 @@ function agentScheduleEndpoints(app) {
    */
   app.get(
     "/api/workspace/:slug/agent-schedules/stats",
-    [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default])],
+    [
+      validatedRequest,
+      flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default]),
+    ],
     async (request, response) => {
       try {
         const { slug } = request.params;
         const { Workspace } = require("../models/workspace");
         const workspace = await Workspace.get({ slug });
-        
+
         if (!workspace) {
-          return response.status(404).json({ 
-            success: false, 
-            error: "Workspace not found" 
+          return response.status(404).json({
+            success: false,
+            error: "Workspace not found",
           });
         }
 
         const stats = await AgentSchedule.getWorkspaceStats(workspace.id);
 
-        response.status(200).json({ 
-          success: true, 
-          stats 
+        response.status(200).json({
+          success: true,
+          stats,
         });
       } catch (error) {
         console.error("Failed to get schedule stats:", error);
-        response.status(500).json({ 
-          success: false, 
-          error: error.message 
+        response.status(500).json({
+          success: false,
+          error: error.message,
         });
       }
     }
@@ -494,19 +513,22 @@ function agentScheduleEndpoints(app) {
    */
   app.get(
     "/api/workspace/:slug/flows/schedulable",
-    [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default])],
+    [
+      validatedRequest,
+      flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default]),
+    ],
     async (request, response) => {
       try {
         const flows = await SchedulableAgent.getAvailableFlows();
-        response.status(200).json({ 
-          success: true, 
-          flows 
+        response.status(200).json({
+          success: true,
+          flows,
         });
       } catch (error) {
         console.error("Failed to get schedulable flows:", error);
-        response.status(500).json({ 
-          success: false, 
-          error: error.message 
+        response.status(500).json({
+          success: false,
+          error: error.message,
         });
       }
     }

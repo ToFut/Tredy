@@ -17,7 +17,6 @@ function queryParams(request) {
   return request.query;
 }
 
-
 // Note: Only valid for finding users in multi-user mode
 // as single-user mode with password is not a "user"
 async function userFromSession(request, response = null) {
@@ -33,7 +32,8 @@ async function userFromSession(request, response = null) {
   }
 
   // Try Supabase JWT validation first
-  const { user: supabaseUser, error: supabaseError } = await validateSupabaseJWT(token);
+  const { user: supabaseUser, error: supabaseError } =
+    await validateSupabaseJWT(token);
   if (supabaseUser && !supabaseError) {
     // Sync or create local user from Supabase user
     const { user: localUser } = await User.createFromSupabase(supabaseUser);
@@ -51,7 +51,6 @@ async function userFromSession(request, response = null) {
   const user = await User.get({ id: valid.id });
   return user;
 }
-
 
 function multiUserMode(response) {
   return response?.locals?.multiUserMode;

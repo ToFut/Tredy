@@ -89,7 +89,7 @@ export default function AttachItem() {
         onClick={handleClick}
         onPointerEnter={fetchFiles}
         className={`p-2 md:p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation border-none relative flex justify-center items-center opacity-60 hover:opacity-100 light:opacity-100 light:hover:opacity-60 cursor-pointer`}
-        style={{ minWidth: '44px', minHeight: '44px' }}
+        style={{ minWidth: "44px", minHeight: "44px" }}
       >
         <div className="relative">
           <PaperclipHorizontal

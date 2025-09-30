@@ -46,7 +46,8 @@ const ScheduleExecution = {
    */
   fail: async function (executionId, error) {
     try {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       const execution = await prisma.schedule_executions.update({
         where: { id: executionId },
         data: {

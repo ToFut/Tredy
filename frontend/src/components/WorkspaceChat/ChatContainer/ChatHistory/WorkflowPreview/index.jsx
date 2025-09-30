@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { CaretRight, Check, Pencil, X, Copy } from "@phosphor-icons/react";
 
-export default function WorkflowPreview({ 
+export default function WorkflowPreview({
   workflowData = {},
   onSave = () => {},
   onTest = () => {},
   onEdit = () => {},
-  onCancel = () => {}
+  onCancel = () => {},
 }) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [saveName, setSaveName] = useState(workflowData.workflow?.name || "");
@@ -54,7 +54,9 @@ export default function WorkflowPreview({
           className="p-2 hover:bg-theme-sidebar-item-hover rounded-lg transition-colors"
           aria-label={isExpanded ? "Collapse" : "Expand"}
         >
-          <span className={`transform transition-transform ${isExpanded ? 'rotate-90' : ''}`}>
+          <span
+            className={`transform transition-transform ${isExpanded ? "rotate-90" : ""}`}
+          >
             ▶️
           </span>
         </button>
@@ -72,16 +74,21 @@ export default function WorkflowPreview({
           {/* Workflow Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div className="bg-theme-bg-primary rounded-lg p-3 border border-theme-border">
-              <h4 className="text-theme-text-primary font-medium mb-2">Details</h4>
+              <h4 className="text-theme-text-primary font-medium mb-2">
+                Details
+              </h4>
               <div className="space-y-1 text-sm">
                 <p className="text-theme-text-secondary">
-                  <span className="font-medium">Steps:</span> {workflow.stepsCount}
+                  <span className="font-medium">Steps:</span>{" "}
+                  {workflow.stepsCount}
                 </p>
                 <p className="text-theme-text-secondary">
                   <span className="font-medium">Status:</span> Draft
                 </p>
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-theme-text-secondary">ID:</span>
+                  <span className="font-medium text-theme-text-secondary">
+                    ID:
+                  </span>
                   <code className="text-xs bg-theme-bg-secondary px-2 py-1 rounded">
                     {workflowId.substring(0, 8)}...
                   </code>
@@ -97,18 +104,22 @@ export default function WorkflowPreview({
             </div>
 
             <div className="bg-theme-bg-primary rounded-lg p-3 border border-theme-border">
-              <h4 className="text-theme-text-primary font-medium mb-2">Steps Overview</h4>
+              <h4 className="text-theme-text-primary font-medium mb-2">
+                Steps Overview
+              </h4>
               <div className="space-y-1 text-xs">
-                {workflow.steps?.filter(s => s.type !== 'start').map((step, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <span className="w-5 h-5 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs">
-                      {index + 1}
-                    </span>
-                    <span className="text-theme-text-secondary truncate">
-                      {step.title}
-                    </span>
-                  </div>
-                ))}
+                {workflow.steps
+                  ?.filter((s) => s.type !== "start")
+                  .map((step, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <span className="w-5 h-5 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs">
+                        {index + 1}
+                      </span>
+                      <span className="text-theme-text-secondary truncate">
+                        {step.title}
+                      </span>
+                    </div>
+                  ))}
               </div>
             </div>
           </div>
@@ -116,7 +127,9 @@ export default function WorkflowPreview({
           {/* Save Input */}
           {showSaveInput && (
             <div className="bg-theme-bg-primary border border-theme-border rounded-lg p-4 mb-4">
-              <h4 className="text-theme-text-primary font-medium mb-2">Save Workflow</h4>
+              <h4 className="text-theme-text-primary font-medium mb-2">
+                Save Workflow
+              </h4>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -124,7 +137,7 @@ export default function WorkflowPreview({
                   onChange={(e) => setSaveName(e.target.value)}
                   placeholder="Enter workflow name..."
                   className="flex-1 bg-theme-bg-secondary border border-theme-border rounded-lg px-3 py-2 text-theme-text-primary placeholder-theme-text-secondary focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onKeyPress={(e) => e.key === 'Enter' && handleSave()}
+                  onKeyPress={(e) => e.key === "Enter" && handleSave()}
                   autoFocus
                 />
                 <button
@@ -153,7 +166,7 @@ export default function WorkflowPreview({
               <Check className="w-4 h-4" />
               Save Workflow
             </button>
-            
+
             <button
               onClick={() => onTest(workflowId)}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium"
@@ -161,7 +174,7 @@ export default function WorkflowPreview({
               <CaretRight className="w-4 h-4" />
               Test Run
             </button>
-            
+
             <button
               onClick={() => onEdit(workflowId)}
               className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors font-medium"
@@ -169,7 +182,7 @@ export default function WorkflowPreview({
               <Pencil className="w-4 h-4" />
               Edit Steps
             </button>
-            
+
             <button
               onClick={() => onCancel(workflowId)}
               className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium"
@@ -187,7 +200,10 @@ export default function WorkflowPreview({
               </h4>
               <div className="space-y-1">
                 {actions.map((action, index) => (
-                  <code key={index} className="block text-xs text-theme-text-secondary bg-theme-bg-secondary px-2 py-1 rounded">
+                  <code
+                    key={index}
+                    className="block text-xs text-theme-text-secondary bg-theme-bg-secondary px-2 py-1 rounded"
+                  >
                     {action}
                   </code>
                 ))}

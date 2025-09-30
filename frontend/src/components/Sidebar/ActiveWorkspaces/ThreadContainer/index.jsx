@@ -110,7 +110,9 @@ export default function ThreadContainer({ workspace, isExpanded }) {
       showToast(`Could not create Tredy - ${error}`, "error");
       return;
     }
-    window.location.replace(paths.workspace.thread(workspace.slug, thread.slug));
+    window.location.replace(
+      paths.workspace.thread(workspace.slug, thread.slug)
+    );
   };
 
   if (loading) {
@@ -146,17 +148,19 @@ export default function ThreadContainer({ workspace, isExpanded }) {
       </div>
 
       {/* Tredy List */}
-      <div className={`
+      <div
+        className={`
         relative transition-all duration-500
         ${isExpanded ? "max-h-[400px]" : "max-h-[200px]"} 
         overflow-y-auto custom-scrollbar space-y-1
-      `}>
+      `}
+      >
         {threads.map((thread, i) => (
           <div
             key={thread.slug}
             className="transition-all duration-300"
             style={{
-              animation: `fadeIn 0.3s ease-out ${i * 0.05}s both`
+              animation: `fadeIn 0.3s ease-out ${i * 0.05}s both`,
             }}
           >
             <ThreadItem
@@ -172,7 +176,7 @@ export default function ThreadContainer({ workspace, isExpanded }) {
             />
           </div>
         ))}
-        
+
         {threads.length === 0 && (
           <div className="text-center py-4 text-xs text-gray-400">
             No Tredys yet. Click + to create one.

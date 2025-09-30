@@ -1,41 +1,478 @@
-import React, { useState, useEffect } from "react";
-import { 
-  FlowArrow, 
-  CaretDown, 
-  CaretUp, 
-  Plus, 
-  Gear, 
-  Play, 
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
+import {
+  FlowArrow,
+  CaretDown,
+  CaretUp,
+  Plus,
+  Gear,
+  Play,
   Clock,
   CheckCircle,
   X,
-  ArrowsClockwise,
   Wrench,
   CalendarBlank,
   Timer,
   Target,
   DotsThree,
+  MagnifyingGlass,
+  FunnelSimple,
+  SortAscending,
+  SortDescending,
+  List,
+  GridFour,
+  Lightning,
+  ChartBar,
+  Warning,
+  CheckCircle as SuccessIcon,
+  XCircle as ErrorIcon,
+  Clock as PendingIcon,
+  BracketsCurly,
+  Sparkle,
+  Star,
+  Eye,
+  EyeSlash,
+  Copy,
   Trash,
-  Calendar
 } from "@phosphor-icons/react";
 import WorkflowBuilder from "./WorkflowBuilder";
 import AgentFlows from "@/models/agentFlows";
 import showToast from "@/utils/toast";
-import { baseHeaders } from "@/utils/request";
-// import FlowItem from "./FlowItem";
 
-export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpen }) {
+// Workflow Block Component
+function WorkflowBlock({ block, isActive }) {
+  const getBlockStatusColor = () => {
+    switch (block.status) {
+      case 'complete': return 'bg-green-500';
+      case 'running': return 'bg-blue-500 animate-pulse';
+      case 'error': return 'bg-red-500';
+      case 'paused': return 'bg-yellow-500';
+      case 'pending': return 'bg-gray-300';
+      default: return 'bg-gray-200';
+    }
+  };
+
+  return (
+    <div className="relative group">
+      <div className={`
+        w-12 h-12 rounded-lg flex items-center justify-center
+        transition-all duration-200
+        ${isActive ? 'scale-110 shadow-lg' : ''}
+        ${block.status === 'complete' ? 'bg-green-50' : ''}
+        ${block.status === 'running' ? 'bg-blue-50' : ''}
+        ${block.status === 'error' ? 'bg-red-50' : ''}
+        ${block.status === 'pending' ? 'bg-gray-50' : ''}
+        border-2 ${isActive ? 'border-blue-500' : 'border-gray-200'}
+        hover:scale-105 cursor-pointer
+      `}>
+        <span className="text-lg">{block.icon || '📦'}</span>
+      </div>
+
+      {/* Status indicator */}
+      <div className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full ${getBlockStatusColor()}`} />
+
+      {/* Tooltip */}
+      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+        <div className="bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
+          {block.name}
+          {block.status === 'running' && ` (${block.progress || 0}%)`}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Enhanced Workflow Item Component with comprehensive metadata
+function WorkflowItem({
+  flow,
+  isSelected,
+  onSelect,
+  onEdit,
+  onRun,
+  onToggle,
+  onDelete,
+  onDuplicate,
+  onFavorite,
+  onCompare,
+  viewMode = "list", // 'list' or 'grid'
+}) {
+  const [isHovered, setIsHovered] = useState(false);
+  const [showActions, setShowActions] = useState(false);
+  const [stats, setStats] = useState(null);
+  const [loadingStats, setLoadingStats] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [blocks, setBlocks] = useState([]);
+
+  // Load workflow statistics and blocks
+  useEffect(() => {
+    if (flow.uuid) {
+      loadWorkflowStats();
+      loadWorkflowBlocks();
+    }
+  }, [flow.uuid]);
+
+  const loadWorkflowBlocks = async () => {
+    // Parse workflow config to extract blocks
+    if (flow.config && flow.config.steps) {
+      const workflowBlocks = flow.config.steps.map((step, index) => ({
+        id: step.id || `step-${index}`,
+        name: step.name || step.tool || 'Step',
+        icon: getStepIcon(step.tool || step.type),
+        status: getStepStatus(flow, index),
+        progress: getStepProgress(flow, index),
+        type: step.tool || step.type,
+        data: step
+      }));
+      setBlocks(workflowBlocks);
+    } else {
+      // Default blocks for workflows without detailed config
+      setBlocks([
+        { id: 'trigger', name: 'Trigger', icon: '⚡', status: 'complete' },
+        { id: 'process', name: 'Process', icon: '🔄', status: flow.active ? 'running' : 'pending' },
+        { id: 'output', name: 'Output', icon: '📤', status: 'pending' }
+      ]);
+    }
+  };
+
+  const getStepIcon = (type) => {
+    const iconMap = {
+      'web-scraping': '🌐',
+      'database-query': '🗄️',
+      'api-call': '🔌',
+      'data-transform': '✨',
+      'email-send': '📧',
+      'file-process': '📄',
+      'ai-analysis': '🤖',
+      'condition': '🔀',
+      'loop': '🔁',
+      'wait': '⏰',
+      'trigger': '⚡',
+      'output': '📤'
+    };
+    return iconMap[type] || '📦';
+  };
+
+  const getStepStatus = (flow, stepIndex) => {
+    if (!flow.active) return 'pending';
+    if (flow.status === 'error') return stepIndex === 0 ? 'error' : 'pending';
+    if (flow.status === 'building') return stepIndex <= 1 ? 'running' : 'pending';
+    if (flow.status === 'success') return 'complete';
+    return 'pending';
+  };
+
+  const getStepProgress = (flow, stepIndex) => {
+    if (flow.status === 'building' && stepIndex === 0) return 75;
+    if (flow.status === 'running') return Math.min(100, (stepIndex + 1) * 33);
+    return 0;
+  };
+
+  const loadWorkflowStats = async () => {
+    setLoadingStats(true);
+    try {
+      // This would call the existing schedule execution stats
+      const response = await fetch(`/api/workspace/${workspaceSlug}/agent-schedules/stats`);
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data);
+      }
+    } catch (error) {
+      console.error("Failed to load workflow stats:", error);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
+
+  const getStatusIcon = () => {
+    if (flow.status === "building")
+      return <PendingIcon size={14} className="text-amber-500 animate-pulse" />;
+    if (flow.status === "error")
+      return <ErrorIcon size={14} className="text-red-500" />;
+    if (flow.status === "success")
+      return <SuccessIcon size={14} className="text-green-500" />;
+    return flow.active ? (
+      <CheckCircle size={14} className="text-green-500" />
+    ) : (
+      <X size={14} className="text-gray-400" />
+    );
+  };
+
+  const getStatusColor = () => {
+    if (flow.status === "building") return "border-amber-200 bg-amber-50";
+    if (flow.status === "error") return "border-red-200 bg-red-50";
+    if (flow.status === "success") return "border-green-200 bg-green-50";
+    return flow.active
+      ? "border-green-200 bg-green-50"
+      : "border-gray-200 bg-gray-50";
+  };
+
+  const formatNumber = (num) => {
+    if (!num) return "0";
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toString();
+  };
+
+  const formatDuration = (ms) => {
+    if (!ms) return "0s";
+    if (ms < 1000) return `${ms}ms`;
+    if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
+    return `${(ms / 60000).toFixed(1)}m`;
+  };
+
+  const getComplexityLevel = (stepCount) => {
+    if (!stepCount)
+      return { level: "Simple", color: "text-green-600", bg: "bg-green-100" };
+    if (stepCount <= 5)
+      return { level: "Simple", color: "text-green-600", bg: "bg-green-100" };
+    if (stepCount <= 15)
+      return { level: "Medium", color: "text-yellow-600", bg: "bg-yellow-100" };
+    if (stepCount <= 50)
+      return {
+        level: "Complex",
+        color: "text-orange-600",
+        bg: "bg-orange-100",
+      };
+    return { level: "Advanced", color: "text-red-600", bg: "bg-red-100" };
+  };
+
+  const complexity = getComplexityLevel(flow.stepCount || 0);
+  const currentBlockIndex = blocks.findIndex(b => b.status === 'running');
+
+  const formatLastUsed = (dateString) => {
+    if (!dateString) return "Never used";
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString();
+  };
+
+  // Compact workflow card
+  return (
+    <div
+      className={`group relative transition-all duration-200 border rounded-lg hover:shadow-sm ${getStatusColor()}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Compact header row */}
+      <div className="flex items-center gap-3 p-2.5" onClick={() => setIsExpanded(!isExpanded)}>
+        {/* Expand indicator */}
+        <CaretDown
+          size={12}
+          className={`text-gray-400 transition-transform flex-shrink-0 ${isExpanded ? "rotate-180" : ""}`}
+        />
+
+        {/* Status icon */}
+        <div className="flex-shrink-0">
+          {getStatusIcon()}
+        </div>
+
+        {/* Compact flow info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-medium text-gray-900 truncate">{flow.name}</h3>
+            {/* Key metrics inline */}
+            <div className="flex items-center gap-3 ml-auto text-xs text-gray-500">
+              {blocks.length > 0 && (
+                <span>{blocks.filter(b => b.status === 'complete').length}/{blocks.length}</span>
+              )}
+              {stats?.successRate && (
+                <span>{Math.round(stats.successRate)}%</span>
+              )}
+              {flow.status === "running" && (
+                <span className="text-blue-600">Running</span>
+              )}
+            </div>
+          </div>
+
+          {/* Mini block visualization - only show when not expanded */}
+          {!isExpanded && blocks.length > 0 && (
+            <div className="flex items-center gap-1 mt-1">
+              {blocks.slice(0, 6).map((block, idx) => (
+                <div
+                  key={block.id}
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    block.status === 'complete' ? 'bg-green-400' :
+                    block.status === 'running' ? 'bg-blue-400 animate-pulse' :
+                    block.status === 'error' ? 'bg-red-400' :
+                    'bg-gray-300'
+                  }`}
+                  title={block.name}
+                />
+              ))}
+              {blocks.length > 6 && (
+                <span className="text-xs text-gray-400">+{blocks.length - 6}</span>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Compact actions */}
+        <div
+          className={`flex items-center gap-1 transition-opacity ${isHovered ? "opacity-100" : "opacity-0"}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={() => onRun(flow)}
+            className="p-1 hover:bg-gray-100 rounded transition-colors"
+            title="Run"
+          >
+            <Play size={12} className="text-gray-600" weight="fill" />
+          </button>
+          <button
+            onClick={() => onEdit(flow)}
+            className="p-1 hover:bg-gray-100 rounded transition-colors"
+            title="Edit"
+          >
+            <Gear size={12} className="text-gray-600" />
+          </button>
+          <button
+            onClick={() => setShowActions(!showActions)}
+            className="p-1 hover:bg-gray-100 rounded transition-colors"
+            title="More"
+          >
+            <DotsThree size={12} className="text-gray-600" />
+          </button>
+        </div>
+
+        {/* Dropdown menu */}
+        {showActions && (
+          <div className="absolute right-2 top-10 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[120px]">
+            <button
+              onClick={() => {
+                onToggle(flow);
+                setShowActions(false);
+              }}
+              className="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2"
+            >
+              {flow.active ? "Deactivate" : "Activate"}
+            </button>
+            <button
+              onClick={() => {
+                onDuplicate(flow);
+                setShowActions(false);
+              }}
+              className="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2"
+            >
+              Duplicate
+            </button>
+            <hr className="my-0.5" />
+            <button
+              onClick={() => {
+                onDelete(flow);
+                setShowActions(false);
+              }}
+              className="w-full px-3 py-1.5 text-left text-xs hover:bg-red-50 text-red-600"
+            >
+              Delete
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Expandable blocks section */}
+      {isExpanded && (
+        <div className="border-t border-gray-200 bg-gray-50/50 animate-in slide-in-from-top-2 duration-200">
+          {/* Workflow blocks visualization */}
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-medium text-gray-600 uppercase tracking-wider">Workflow Blocks</span>
+              <span className="text-xs text-gray-500">
+                {blocks.filter(b => b.status === 'complete').length}/{blocks.length} completed
+              </span>
+            </div>
+
+            {/* Blocks row with connections */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2">
+              {blocks.map((block, index) => (
+                <React.Fragment key={block.id}>
+                  <WorkflowBlock
+                    block={block}
+                    isActive={index === currentBlockIndex}
+                  />
+                  {index < blocks.length - 1 && (
+                    <div className="flex-shrink-0 w-8 h-0.5 bg-gray-300 relative">
+                      <div
+                        className="absolute inset-0 bg-blue-500 transition-all duration-500"
+                        style={{
+                          width: block.status === 'complete' ? '100%' : '0%'
+                        }}
+                      />
+                    </div>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+
+            {/* Current block details */}
+            {currentBlockIndex >= 0 && (
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-blue-900">
+                    Current: {blocks[currentBlockIndex].name}
+                  </span>
+                  <span className="text-xs text-blue-700">
+                    {blocks[currentBlockIndex].progress}% complete
+                  </span>
+                </div>
+                {stats && (
+                  <div className="grid grid-cols-3 gap-2 text-xs text-blue-700">
+                    <div>Processing: {stats.currentItem || 'N/A'}</div>
+                    <div>Time: {formatDuration(stats.elapsedTime || 0)}</div>
+                    <div>ETA: {formatDuration(stats.estimatedTime || 0)}</div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Quick actions */}
+            <div className="flex gap-2 mt-3">
+              <button
+                onClick={() => onEdit(flow)}
+                className="text-xs text-gray-600 hover:text-gray-900"
+              >
+                View Details →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function FlowPanel({
+  workspace,
+  isVisible,
+  sendCommand,
+  onAutoOpen,
+}) {
   const [flows, setFlows] = useState([]);
   const [isExpanded, setIsExpanded] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showBuilder, setShowBuilder] = useState(false);
   const [selectedFlow, setSelectedFlow] = useState(null);
   const [previousFlowCount, setPreviousFlowCount] = useState(0);
-  const [hasNewFlows, setHasNewFlows] = useState(false);
   const [isCreatingWorkflow, setIsCreatingWorkflow] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [selectedFlowForSchedule, setSelectedFlowForSchedule] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all"); // 'all', 'active', 'inactive', 'building', 'error'
+  const [sortBy, setSortBy] = useState("name"); // 'name', 'created', 'modified', 'status', 'usage', 'tokens', 'success', 'complexity'
+  const [sortOrder, setSortOrder] = useState("asc"); // 'asc', 'desc'
+  const [showFilters, setShowFilters] = useState(false);
+
+  const searchInputRef = useRef(null);
 
   useEffect(() => {
     if (workspace?.slug && isVisible) {
@@ -49,7 +486,7 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
 
     // Refresh more frequently when creating workflows
     const refreshInterval = isCreatingWorkflow ? 1000 : 3000;
-    
+
     const interval = setInterval(() => {
       loadFlows(false); // Silent refresh
     }, refreshInterval);
@@ -59,96 +496,195 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
 
   // Check if any flows are being built or need to auto-open
   useEffect(() => {
-    const buildingFlow = flows.find(f => f.status === 'building');
-    const shouldAutoOpen = flows.find(f => f.openFlowPanel === true);
-    const shouldOpenBuilder = flows.find(f => f.openWorkflowBuilder === true);
-    
+    const buildingFlow = flows.find((f) => f.status === "building");
+    const shouldAutoOpen = flows.find((f) => f.openFlowPanel === true);
+    const shouldOpenBuilder = flows.find((f) => f.openWorkflowBuilder === true);
+
     setIsCreatingWorkflow(!!buildingFlow);
-    
+
     if (buildingFlow) {
       setIsExpanded(true); // Auto-expand when building
-      
+
       // Auto-open panel if a workflow is being built
       if (!isVisible && onAutoOpen) {
-        console.log('[FlowPanel] Auto-opening for building workflow:', buildingFlow.name);
+        console.log(
+          "[FlowPanel] Auto-opening for building workflow:",
+          buildingFlow.name
+        );
         onAutoOpen();
       }
     }
-    
+
     // Trigger auto-open if a flow has the openFlowPanel flag
     if (shouldAutoOpen) {
-      console.log('[FlowPanel] Flow requesting auto-open:', shouldAutoOpen.name);
-      
+      console.log(
+        "[FlowPanel] Flow requesting auto-open:",
+        shouldAutoOpen.name
+      );
+
       // Always expand if we have this flag
       setIsExpanded(true);
-      
+
       // Open panel if not visible
       if (!isVisible && onAutoOpen) {
-        console.log('[FlowPanel] Opening panel for workflow:', shouldAutoOpen.name);
+        console.log(
+          "[FlowPanel] Opening panel for workflow:",
+          shouldAutoOpen.name
+        );
         onAutoOpen();
       }
-      
+
       // Clear the flag after a delay
       setTimeout(() => {
         const updatedFlow = { ...shouldAutoOpen };
         delete updatedFlow.openFlowPanel;
-        AgentFlows.saveFlow(updatedFlow.name, updatedFlow, updatedFlow.workflowUuid).catch(console.error);
+        AgentFlows.saveFlow(
+          updatedFlow.name,
+          updatedFlow,
+          updatedFlow.workflowUuid
+        ).catch(console.error);
       }, 2000);
     }
-    
+
     // Open WorkflowBuilder if flag is set
     if (shouldOpenBuilder) {
-      console.log('[FlowPanel] Opening WorkflowBuilder for:', shouldOpenBuilder.name);
-      
+      console.log(
+        "[FlowPanel] Opening WorkflowBuilder for:",
+        shouldOpenBuilder.name
+      );
+
       // Set the flow data for the builder
       setSelectedFlow({
         workflowData: {
-          agentFlowConfig: shouldOpenBuilder
-        }
+          agentFlowConfig: shouldOpenBuilder,
+        },
       });
       setShowBuilder(true);
-      
+
       // Clear the flag after opening
       setTimeout(() => {
         const updatedFlow = { ...shouldOpenBuilder };
         delete updatedFlow.openWorkflowBuilder;
-        AgentFlows.saveFlow(updatedFlow.name, updatedFlow, updatedFlow.workflowUuid).catch(console.error);
+        AgentFlows.saveFlow(
+          updatedFlow.name,
+          updatedFlow,
+          updatedFlow.workflowUuid
+        ).catch(console.error);
       }, 1000);
     }
   }, [flows, isVisible, onAutoOpen]);
 
-  const loadFlows = async (showLoadingIndicator = true) => {
-    if (showLoadingIndicator) setIsLoading(true);
-    
-    try {
-      const { success, flows: flowList, error } = await AgentFlows.listFlows(workspace?.slug);
-      if (success) {
-        const newFlows = flowList || [];
-        
-        // Check for new flows
-        if (previousFlowCount > 0 && newFlows.length > previousFlowCount) {
-          setHasNewFlows(true);
-          showToast(`${newFlows.length - previousFlowCount} new workflow(s) created!`, "success");
-          
-          // Auto-expand if collapsed and new flows detected
-          if (!isExpanded) {
-            setIsExpanded(true);
+  const loadFlows = useCallback(
+    async (showLoadingIndicator = true) => {
+      if (showLoadingIndicator) setIsLoading(true);
+
+      try {
+        const {
+          success,
+          flows: flowList,
+          error,
+        } = await AgentFlows.listFlows();
+        if (success) {
+          const newFlows = flowList || [];
+
+          // Check for new flows
+          if (previousFlowCount > 0 && newFlows.length > previousFlowCount) {
+            showToast(
+              `${newFlows.length - previousFlowCount} new workflow(s) created!`,
+              "success"
+            );
+
+            // Auto-expand if collapsed and new flows detected
+            if (!isExpanded) {
+              setIsExpanded(true);
+            }
           }
+
+          setFlows(newFlows);
+          setPreviousFlowCount(newFlows.length);
+        } else {
+          console.error("Failed to load flows:", error);
+          if (showLoadingIndicator) showToast("Failed to load flows", "error");
         }
-        
-        setFlows(newFlows);
-        setPreviousFlowCount(newFlows.length);
-      } else {
-        console.error('Failed to load flows:', error);
-        if (showLoadingIndicator) showToast("Failed to load flows", "error");
+      } catch (error) {
+        console.error("Error loading flows:", error);
+        if (showLoadingIndicator) showToast("Error loading flows", "error");
+      } finally {
+        if (showLoadingIndicator) setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Error loading flows:', error);
-      if (showLoadingIndicator) showToast("Error loading flows", "error");
-    } finally {
-      if (showLoadingIndicator) setIsLoading(false);
-    }
-  };
+    },
+    [previousFlowCount, isExpanded]
+  );
+
+  // Simple filtering and sorting
+  const filteredAndSortedFlows = useMemo(() => {
+    let filtered = flows.filter((flow) => {
+      const matchesSearch =
+        flow.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (flow.description &&
+          flow.description.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      const matchesStatusFilter =
+        filterStatus === "all" ||
+        (filterStatus === "active" && flow.active) ||
+        (filterStatus === "inactive" && !flow.active) ||
+        (filterStatus === "building" && flow.status === "building") ||
+        (filterStatus === "error" && flow.status === "error");
+
+      return matchesSearch && matchesStatusFilter;
+    });
+
+    // Enhanced sorting with metadata
+    filtered.sort((a, b) => {
+      let aValue, bValue;
+
+      switch (sortBy) {
+        case "name":
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case "created":
+          aValue = new Date(a.createdAt || 0);
+          bValue = new Date(b.createdAt || 0);
+          break;
+        case "modified":
+          aValue = new Date(a.modifiedAt || 0);
+          bValue = new Date(b.modifiedAt || 0);
+          break;
+        case "status":
+          aValue = a.active ? 1 : 0;
+          bValue = b.active ? 1 : 0;
+          break;
+        case "usage":
+          aValue = a.totalExecutions || 0;
+          bValue = b.totalExecutions || 0;
+          break;
+        case "tokens":
+          aValue = a.totalTokensUsed || 0;
+          bValue = b.totalTokensUsed || 0;
+          break;
+        case "success":
+          aValue = a.successRate || 0;
+          bValue = b.successRate || 0;
+          break;
+        case "complexity":
+          aValue = a.stepCount || 0;
+          bValue = b.stepCount || 0;
+          break;
+        default:
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+      }
+
+      if (sortOrder === "asc") {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    return filtered;
+  }, [flows, searchQuery, filterStatus, sortBy, sortOrder]);
 
   const handleNewFlow = () => {
     setSelectedFlow(null);
@@ -157,19 +693,23 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
 
   const handleEditFlow = async (flow) => {
     try {
-      const { success, flow: fullFlow, error } = await AgentFlows.getFlow(flow.uuid);
+      const {
+        success,
+        flow: fullFlow,
+        error,
+      } = await AgentFlows.getFlow(flow.uuid);
       if (success) {
         setSelectedFlow({
           workflowData: {
-            agentFlowConfig: fullFlow
-          }
+            agentFlowConfig: fullFlow,
+          },
         });
         setShowBuilder(true);
       } else {
         showToast(`Failed to load flow: ${error}`, "error");
       }
     } catch (error) {
-      console.error('Error loading flow:', error);
+      console.error("Error loading flow:", error);
       showToast("Error loading flow", "error");
     }
   };
@@ -185,22 +725,28 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
       await sendCommand({ text: command, autoSubmit: true });
       showToast(`Running "${flow.name}" workflow`, "info");
     } catch (error) {
-      console.error('Error running flow:', error);
+      console.error("Error running flow:", error);
       showToast("Error running flow", "error");
     }
   };
 
   const handleToggleFlow = async (flow) => {
     try {
-      const { success, error } = await AgentFlows.toggleFlow(flow.uuid, !flow.active);
+      const { success, error } = await AgentFlows.toggleFlow(
+        flow.uuid,
+        !flow.active
+      );
       if (success) {
         await loadFlows(); // Reload to get updated status
-        showToast(`Flow ${flow.active ? 'deactivated' : 'activated'}`, "success");
+        showToast(
+          `Flow ${flow.active ? "deactivated" : "activated"}`,
+          "success"
+        );
       } else {
         showToast(`Failed to toggle flow: ${error}`, "error");
       }
     } catch (error) {
-      console.error('Error toggling flow:', error);
+      console.error("Error toggling flow:", error);
       showToast("Error toggling flow", "error");
     }
   };
@@ -217,66 +763,44 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
         showToast(`Failed to delete flow: ${error}`, "error");
       }
     } catch (error) {
-      console.error('Error deleting flow:', error);
+      console.error("Error deleting flow:", error);
       showToast("Error deleting flow", "error");
     }
   };
 
-  const handleScheduleFlow = (flow) => {
-    console.log('handleScheduleFlow called with:', flow);
-    setSelectedFlowForSchedule(flow);
-    setShowScheduleModal(true);
-  };
-
-  const formatLastUsed = (dateString) => {
-    if (!dateString) return "Never used";
-    
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now - date;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays === 1) return "Yesterday";
-    if (diffDays < 7) return `${diffDays} days ago`;
-    
-    return date.toLocaleDateString();
-  };
-
-  const getCategoryColor = (category) => {
-    const colors = {
-      'Communication': 'bg-blue-100 text-blue-700',
-      'Data Processing': 'bg-green-100 text-green-700',
-      'Web Scraping': 'bg-orange-100 text-orange-700',
-      'Automation': 'bg-purple-100 text-purple-700',
-      'Integration': 'bg-indigo-100 text-indigo-700',
-      'Analysis': 'bg-pink-100 text-pink-700',
-      'Scheduled': 'bg-cyan-100 text-cyan-700',
-      'General': 'bg-gray-100 text-gray-700'
-    };
-    return colors[category] || colors['General'];
-  };
-
-  const getAvailableCategories = () => {
-    const categories = ['All', ...new Set(flows.map(flow => flow.category).filter(Boolean))];
-    
-    // Add "Scheduled" category if there are any scheduled flows
-    if (flows.some(flow => flow.scheduled)) {
-      categories.push('Scheduled');
+  const handleDuplicateFlow = async (flow) => {
+    try {
+      const {
+        success,
+        flow: fullFlow,
+        error,
+      } = await AgentFlows.getFlow(flow.uuid);
+      if (success) {
+        const duplicatedFlow = {
+          ...fullFlow,
+          name: `${fullFlow.name} (Copy)`,
+          active: false,
+        };
+        const { success: saveSuccess, error: saveError } =
+          await AgentFlows.saveFlow(duplicatedFlow.name, duplicatedFlow.config);
+        if (saveSuccess) {
+          await loadFlows();
+          showToast("Workflow duplicated", "success");
+        } else {
+          showToast(`Failed to duplicate workflow: ${saveError}`, "error");
+        }
+      } else {
+        showToast(`Failed to load workflow: ${error}`, "error");
+      }
+    } catch (error) {
+      console.error("Error duplicating workflow:", error);
+      showToast("Error duplicating workflow", "error");
     }
-    
-    return categories;
   };
 
-  const getFilteredFlows = () => {
-    if (selectedCategory === 'All') return flows;
-    if (selectedCategory === 'Scheduled') return flows.filter(flow => flow.scheduled);
-    return flows.filter(flow => flow.category === selectedCategory);
-  };
+
+
+
 
   if (showBuilder) {
     return (
@@ -293,268 +817,195 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
   }
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-slate-50/30 via-white/95 to-purple-50/20">
-      {/* Modern Header with Glass Effect */}
-      <div 
-        className="relative flex items-center justify-between p-5 cursor-pointer hover:bg-gradient-to-r hover:from-purple-50/80 hover:to-transparent transition-all duration-300 border-b border-gray-200/30 backdrop-blur-xl group"
-        onClick={() => {
-          setIsExpanded(!isExpanded);
-          setHasNewFlows(false);
-        }}
+    <div className="h-full flex flex-col bg-white overflow-hidden">
+      {/* Compact Header */}
+      <div
+        className="flex items-center justify-between px-3 py-2 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+        onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-t-2xl" />
-        <div className="relative flex items-center gap-4 flex-1">
-          <div className="relative">
-            <div className="p-3 bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700 rounded-2xl shadow-lg group-hover:shadow-xl transition-all">
-              <FlowArrow size={20} className="text-white" />
-              <div className="absolute inset-0 rounded-2xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-            {isCreatingWorkflow && (
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full border-2 border-white animate-bounce">
-                <div className="w-full h-full bg-amber-500 rounded-full animate-pulse" />
-              </div>
-            )}
-          </div>
-          
-          <div className="flex-1 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              {/* Minimal Flow Count */}
-              <span className="flex items-center gap-1">
-                <span className={`w-1 h-1 rounded-full ${
-                  hasNewFlows ? 'bg-green-500' :
-                  isCreatingWorkflow ? 'bg-amber-500 animate-pulse' :
-                  'bg-gray-400'
-                }`} />
-                {flows.length}
-              </span>
-              
-              {/* Building indicator */}
-              {isCreatingWorkflow && (
-                <span className="text-amber-600">building...</span>
-              )}
-            </div>
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700">Workflows</span>
+          {flows.length > 0 && (
+            <span className="text-xs text-gray-500">({flows.length})</span>
+          )}
+          {isCreatingWorkflow && (
+            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+          )}
         </div>
-        <div className="relative flex items-center gap-2">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              loadFlows();
-            }}
-            className="p-2.5 hover:bg-white/80 hover:shadow-sm rounded-xl transition-all group relative"
-            title="Refresh workflows"
-            disabled={isLoading}
-          >
-            <ArrowsClockwise 
-              size={18} 
-              className={`text-gray-600 group-hover:text-purple-600 transition-all ${isLoading ? 'animate-spin' : 'group-hover:rotate-180'} duration-300`}
-            />
-            <div className="absolute inset-0 rounded-xl bg-purple-500/0 group-hover:bg-purple-500/10 transition-colors" />
-          </button>
-          
+        <div className="flex items-center gap-1">
           <button
             onClick={(e) => {
               e.stopPropagation();
               handleNewFlow();
             }}
-            className="p-1.5 hover:bg-purple-100 text-purple-600 hover:text-purple-700 rounded-lg transition-colors group"
-            title="Create new flow"
+            className="p-1 hover:bg-gray-100 rounded transition-colors"
+            title="New workflow"
           >
-            <Plus size={16} className="group-hover:rotate-90 transition-transform duration-200" />
+            <Plus size={14} className="text-gray-600" />
           </button>
-          
-          <div className="p-2">
-            <div className={`transition-all duration-300 ${isExpanded ? 'rotate-180' : 'rotate-0'}`}>
-              <CaretDown size={18} className="text-gray-500 group-hover:text-purple-600 transition-colors" />
-            </div>
-          </div>
+
+          <CaretDown
+            size={14}
+            className={`text-gray-500 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+          />
         </div>
       </div>
 
       {/* Content */}
       {isExpanded && (
-        <div className="flex-1 overflow-hidden flex flex-col">
-          {isLoading ? (
-            <div className="p-4 text-center text-theme-text-secondary">
-              Loading flows...
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          {/* Compact Search Bar */}
+          <div className="px-3 py-2 border-b border-gray-100">
+            <div className="flex items-center gap-2">
+              <MagnifyingGlass size={12} className="text-gray-400" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search workflows..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 text-sm outline-none placeholder-gray-400"
+              />
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`p-1 rounded transition-colors ${
+                  showFilters ? "bg-gray-200" : "hover:bg-gray-100"
+                }`}
+                title="Filters"
+              >
+                <FunnelSimple size={12} className="text-gray-500" />
+              </button>
             </div>
-          ) : flows.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center p-8">
-              <div className="text-center max-w-sm">
-                <div className="relative mb-8">
-                  {/* Animated background circles */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-32 h-32 bg-gradient-to-br from-purple-100/50 to-purple-200/30 rounded-full animate-pulse" />
-                    <div className="absolute w-24 h-24 bg-gradient-to-br from-purple-200/30 to-purple-300/20 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
+
+            {/* Enhanced Filters */}
+            {showFilters && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-4 text-sm flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <label className="text-gray-600 font-medium">Status:</label>
+                    <select
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                      className="px-3 py-1 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    >
+                      <option value="all">All</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="building">Building</option>
+                      <option value="error">Error</option>
+                    </select>
                   </div>
-                  
-                  {/* Main icon */}
-                  <div className="relative w-20 h-20 mx-auto bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700 rounded-3xl flex items-center justify-center shadow-2xl">
-                    <FlowArrow size={36} className="text-white" />
-                    <div className="absolute inset-0 rounded-3xl bg-white/20 animate-pulse" />
+
+
+                  <div className="flex items-center gap-2">
+                    <label className="text-gray-600 font-medium">
+                      Sort by:
+                    </label>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="px-3 py-1 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    >
+                      <option value="name">Name</option>
+                      <option value="created">Created</option>
+                      <option value="modified">Modified</option>
+                      <option value="status">Status</option>
+                      <option value="usage">Usage Count</option>
+                      <option value="tokens">Token Usage</option>
+                      <option value="success">Success Rate</option>
+                      <option value="complexity">Complexity</option>
+                    </select>
                   </div>
+
+                  <button
+                    onClick={() =>
+                      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                    }
+                    className="p-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                    title={`Sort ${sortOrder === "asc" ? "descending" : "ascending"}`}
+                  >
+                    {sortOrder === "asc" ? (
+                      <SortAscending size={14} />
+                    ) : (
+                      <SortDescending size={14} />
+                    )}
+                  </button>
                 </div>
-                
-                <div className="space-y-4 mb-8">
-                  <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-purple-800 to-gray-900 bg-clip-text text-transparent">
-                    Ready to Automate?
-                  </h3>
-                  <div className="space-y-2">
-                    <p className="text-gray-600 font-medium">Create intelligent AI workflows</p>
-                    <p className="text-sm text-gray-500 leading-relaxed">
-                      Connect tools, automate repetitive tasks, and let AI handle the complex logic for you.
-                    </p>
-                  </div>
+
+                {/* Quick filter chips */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs text-gray-500 font-medium">
+                    Quick filters:
+                  </span>
+                  <button
+                    onClick={() => setFilterStatus("active")}
+                    className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors"
+                  >
+                    Active Only
+                  </button>
+                  <button
+                    onClick={() => setFilterStatus("all")}
+                    className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
+                  >
+                    Simple Workflows
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSortBy("usage");
+                      setSortOrder("desc");
+                    }}
+                    className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200 transition-colors"
+                  >
+                    Most Used
+                  </button>
+                  <button
+                    onClick={() => {
+                      setFilterStatus("all");
+                      setSortBy("name");
+                      setSortOrder("asc");
+                    }}
+                    className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
+                  >
+                    Reset
+                  </button>
                 </div>
-                
-                <div className="space-y-4">
+              </div>
+            )}
+          </div>
+
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            {isLoading ? (
+              <div className="p-4 text-center text-gray-500">
+                Loading flows...
+              </div>
+            ) : filteredAndSortedFlows.length === 0 ? (
+              <div className="flex items-center justify-center h-full p-4">
+                <div className="text-center">
+                  <p className="text-sm text-gray-500 mb-2">No workflows found</p>
                   <button
                     onClick={handleNewFlow}
-                    className="w-full px-6 py-4 bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:from-purple-600 hover:via-purple-700 hover:to-purple-800 text-white rounded-2xl font-semibold transition-all shadow-lg hover:shadow-xl group relative overflow-hidden"
+                    className="text-sm text-blue-600 hover:text-blue-700"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                    <div className="relative flex items-center justify-center gap-3">
-                      <Plus size={20} weight="bold" className="group-hover:rotate-180 transition-transform duration-300" />
-                      <span className="text-base">Create Your First Workflow</span>
-                    </div>
+                    + Create workflow
                   </button>
-                  
-                  <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-green-400 rounded-full" />
-                      <span>Templates</span>
-                    </div>
-                    <div className="w-1 h-1 bg-gray-300 rounded-full" />
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-blue-400 rounded-full" />
-                      <span>Drag & Drop</span>
-                    </div>
-                    <div className="w-1 h-1 bg-gray-300 rounded-full" />
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-purple-400 rounded-full" />
-                      <span>AI Powered</span>
-                    </div>
-                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className="flex flex-col h-full">
-              {/* Category Filter */}
-              {flows.length > 0 && (
-                <div className="p-3 border-b border-gray-200/30">
-                  <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-                    {getAvailableCategories().map((category) => (
-                      <button
-                        key={category}
-                        onClick={() => setSelectedCategory(category)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-                          selectedCategory === category
-                            ? 'bg-purple-100 text-purple-700 border border-purple-200'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
-                      >
-                        {category}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              {/* Flows List */}
-              <div className="p-1.5 space-y-1.5 overflow-y-auto flex-1" style={{ maxHeight: 'calc(100vh - 240px)' }}>
-                {getFilteredFlows().map((flow, index) => (
-                <div
-                  key={flow.uuid}
-                  className="group relative"
-                >
-                  {/* Minimal status indicator */}
-                  <div className={`absolute top-0 left-0 right-0 h-0.5 rounded-t-lg ${
-                    flow.status === 'building' ? 'bg-amber-400' :
-                    flow.active ? 'bg-green-400' : 'bg-gray-300'
-                  }`} />
-                  
-                  {/* Inline flow item rendering */}
-                  <div className="bg-white/80 border border-gray-200/60 rounded-lg p-2.5 hover:bg-white hover:border-purple-200/60 transition-all duration-200 group shadow-sm hover:shadow-md">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <button 
-                          onClick={() => handleToggleFlow(flow)} 
-                          className="transition-transform hover:scale-110 flex-shrink-0"
-                        >
-                          {flow.active ? (
-                            <CheckCircle size={16} className="text-green-500" />
-                          ) : (
-                            <div className="w-4 h-4 rounded-full border-2 border-gray-300" />
-                          )}
-                        </button>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <h3 
-                              className="font-medium text-gray-800 hover:text-purple-600 transition-colors cursor-pointer text-sm truncate"
-                              onClick={() => handleEditFlow(flow)}
-                            >
-                              {flow.name}
-                            </h3>
-                            {flow.scheduled && (
-                              <Clock size={12} className="text-blue-500" title="Scheduled Flow" />
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 mt-1">
-                            {flow.category && (
-                              <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(flow.category)}`}>
-                                {flow.category}
-                              </div>
-                            )}
-                            {flow.scheduled && flow.schedule?.nextRun && (
-                              <div className="text-xs text-gray-500">
-                                Next: {new Date(flow.schedule.nextRun).toLocaleDateString()}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                          flow.active ? 'bg-green-400' : 'bg-gray-300'
-                        }`} />
-                      </div>
-                      
-                      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-2">
-                        <button
-                          onClick={() => handleRunFlow(flow)}
-                          className="p-1 bg-green-500 hover:bg-green-600 text-white rounded transition-all"
-                          title="Run"
-                        >
-                          <Play size={12} weight="fill" />
-                        </button>
-                        <button
-                          onClick={() => handleEditFlow(flow)}
-                          className="p-1 bg-purple-50 hover:bg-purple-100 text-purple-600 rounded transition-all"
-                          title="Edit"
-                        >
-                          <Gear size={12} />
-                        </button>
-                        <button
-                          onClick={() => handleScheduleFlow(flow)}
-                          className="p-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded transition-all"
-                          title="Schedule"
-                        >
-                          <Calendar size={12} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteFlow(flow)}
-                          className="p-1 bg-red-50 hover:bg-red-100 text-red-600 rounded transition-all"
-                          title="Delete"
-                        >
-                          <Trash size={12} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            ) : (
+              <div className="p-2 space-y-1">
+                {filteredAndSortedFlows.map((flow) => (
+                  <WorkflowItem
+                    key={flow.uuid}
+                    flow={flow}
+                    onEdit={handleEditFlow}
+                    onRun={handleRunFlow}
+                    onToggle={handleToggleFlow}
+                    onDelete={handleDeleteFlow}
+                    onDuplicate={handleDuplicateFlow}
+                  />
+                ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
 
@@ -581,224 +1032,10 @@ export default function FlowPanel({ workspace, isVisible, sendCommand, onAutoOpe
                 <Play size={12} />
                 <span>Run immediately</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Calendar size={12} />
-                <span>Schedule workflow</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Trash size={12} />
-                <span>Delete workflow</span>
-              </div>
             </div>
           )}
         </div>
       )}
-
-      {/* Schedule Modal */}
-      {showScheduleModal && selectedFlowForSchedule && (
-        <ScheduleModal
-          flow={selectedFlowForSchedule}
-          workspace={workspace}
-          onClose={() => {
-            setShowScheduleModal(false);
-            setSelectedFlowForSchedule(null);
-          }}
-          onSchedule={() => {
-            setShowScheduleModal(false);
-            setSelectedFlowForSchedule(null);
-            loadFlows(); // Refresh to show the new scheduled flow
-          }}
-        />
-      )}
-    </div>
-  );
-}
-
-// Schedule Modal Component
-function ScheduleModal({ flow, workspace, onClose, onSchedule }) {
-  const [scheduleName, setScheduleName] = useState(flow.name);
-  const [cronExpression, setCronExpression] = useState('0 9 * * *'); // Daily at 9 AM
-  const [timezone, setTimezone] = useState('UTC');
-  const [description, setDescription] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
-
-  const commonSchedules = [
-    { label: 'Daily at 9 AM', cron: '0 9 * * *' },
-    { label: 'Daily at 6 PM', cron: '0 18 * * *' },
-    { label: 'Every Monday at 9 AM', cron: '0 9 * * 1' },
-    { label: 'Every hour', cron: '0 * * * *' },
-    { label: 'Every 30 minutes', cron: '*/30 * * * *' },
-    { label: 'Weekly on Sunday at 10 AM', cron: '0 10 * * 0' }
-  ];
-
-  const handleSchedule = async () => {
-    if (!scheduleName.trim()) {
-      showToast("Schedule name is required", "error");
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      const response = await fetch(`/api/workspace/${workspace.slug}/agent-schedules`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...baseHeaders(),
-        },
-        body: JSON.stringify({
-          agentId: flow.uuid,
-          agentType: 'flow',
-          name: scheduleName,
-          description: description || `Scheduled execution of ${flow.name}`,
-          cronExpression: cronExpression,
-          timezone: timezone,
-          enabled: true,
-          context: JSON.stringify({ flowUuid: flow.uuid })
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      
-      if (result.success) {
-        showToast("Flow scheduled successfully!", "success");
-        onSchedule();
-      } else {
-        showToast(`Failed to schedule flow: ${result.error}`, "error");
-      }
-    } catch (error) {
-      console.error('Error scheduling flow:', error);
-      showToast(`Error scheduling flow: ${error.message}`, "error");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Schedule Flow</h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <X size={20} className="text-gray-500" />
-            </button>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Flow Name
-              </label>
-              <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                <FlowArrow size={16} className="text-purple-600" />
-                <span className="text-sm text-gray-600">{flow.name}</span>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Schedule Name *
-              </label>
-              <input
-                type="text"
-                value={scheduleName}
-                onChange={(e) => setScheduleName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="Enter schedule name"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Schedule Pattern
-              </label>
-              <select
-                value={cronExpression}
-                onChange={(e) => setCronExpression(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              >
-                {commonSchedules.map((schedule) => (
-                  <option key={schedule.cron} value={schedule.cron}>
-                    {schedule.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Custom Cron Expression
-              </label>
-              <input
-                type="text"
-                value={cronExpression}
-                onChange={(e) => setCronExpression(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent font-mono text-sm"
-                placeholder="0 9 * * *"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Format: minute hour day month day-of-week
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Timezone
-              </label>
-              <select
-                value={timezone}
-                onChange={(e) => setTimezone(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              >
-                <option value="UTC">UTC</option>
-                <option value="America/New_York">Eastern Time</option>
-                <option value="America/Chicago">Central Time</option>
-                <option value="America/Denver">Mountain Time</option>
-                <option value="America/Los_Angeles">Pacific Time</option>
-                <option value="Europe/London">London</option>
-                <option value="Europe/Paris">Paris</option>
-                <option value="Asia/Tokyo">Tokyo</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description (Optional)
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-                placeholder="Describe this schedule..."
-              />
-            </div>
-          </div>
-
-          <div className="flex gap-3 mt-6">
-            <button
-              onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSchedule}
-              disabled={isSaving || !scheduleName.trim()}
-              className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isSaving ? 'Scheduling...' : 'Schedule Flow'}
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

@@ -40,7 +40,11 @@ export default function ScheduleList({ workspace }) {
 
   const loadExecutions = async (scheduleId) => {
     try {
-      const data = await AgentSchedule.getExecutions(workspace.slug, scheduleId, 10);
+      const data = await AgentSchedule.getExecutions(
+        workspace.slug,
+        scheduleId,
+        10
+      );
       setExecutions((prev) => ({ ...prev, [scheduleId]: data }));
     } catch (error) {
       console.error("Failed to load executions:", error);
@@ -70,7 +74,7 @@ export default function ScheduleList({ workspace }) {
 
   const handleDelete = async (scheduleId) => {
     if (!confirm("Are you sure you want to delete this schedule?")) return;
-    
+
     try {
       await AgentSchedule.delete(workspace.slug, scheduleId);
       await loadSchedules();
@@ -177,7 +181,7 @@ export default function ScheduleList({ workspace }) {
                       </span>
                     )}
                   </div>
-                  
+
                   {schedule.description && (
                     <p className="text-sm text-theme-text-secondary mb-2">
                       {schedule.description}
@@ -187,18 +191,27 @@ export default function ScheduleList({ workspace }) {
                   <div className="flex items-center gap-4 text-xs text-theme-text-secondary">
                     <div className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
-                      {AgentSchedule.describeCronExpression(schedule.cron_expression)}
+                      {AgentSchedule.describeCronExpression(
+                        schedule.cron_expression
+                      )}
                     </div>
                     {schedule.last_run_at && (
                       <div className="flex items-center gap-1">
                         <Timer className="w-3 h-3" />
-                        Last run {formatDistanceToNow(new Date(schedule.last_run_at))} ago
+                        Last run{" "}
+                        {formatDistanceToNow(
+                          new Date(schedule.last_run_at)
+                        )}{" "}
+                        ago
                       </div>
                     )}
                     {schedule.next_run_at && schedule.enabled && (
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
-                        Next run {formatDistanceToNow(new Date(schedule.next_run_at), { addSuffix: true })}
+                        Next run{" "}
+                        {formatDistanceToNow(new Date(schedule.next_run_at), {
+                          addSuffix: true,
+                        })}
                       </div>
                     )}
                   </div>
@@ -207,12 +220,24 @@ export default function ScheduleList({ workspace }) {
                   {schedule.stats && (
                     <div className="flex items-center gap-4 mt-2">
                       <div className="text-xs">
-                        <span className="text-theme-text-secondary">Total runs:</span>{" "}
-                        <span className="text-theme-text-primary">{schedule.stats.totalExecutions}</span>
+                        <span className="text-theme-text-secondary">
+                          Total runs:
+                        </span>{" "}
+                        <span className="text-theme-text-primary">
+                          {schedule.stats.totalExecutions}
+                        </span>
                       </div>
                       <div className="text-xs">
-                        <span className="text-theme-text-secondary">Success rate:</span>{" "}
-                        <span className={schedule.stats.successRate > 80 ? "text-green-500" : "text-yellow-500"}>
+                        <span className="text-theme-text-secondary">
+                          Success rate:
+                        </span>{" "}
+                        <span
+                          className={
+                            schedule.stats.successRate > 80
+                              ? "text-green-500"
+                              : "text-yellow-500"
+                          }
+                        >
                           {schedule.stats.successRate.toFixed(0)}%
                         </span>
                       </div>
@@ -262,7 +287,8 @@ export default function ScheduleList({ workspace }) {
                 onClick={() => toggleExpanded(schedule.id)}
                 className="text-xs text-primary-button hover:underline mt-3"
               >
-                {expandedSchedule === schedule.id ? "Hide" : "Show"} execution history
+                {expandedSchedule === schedule.id ? "Hide" : "Show"} execution
+                history
               </button>
             </div>
 
@@ -288,11 +314,17 @@ export default function ScheduleList({ workspace }) {
                             <Clock className="w-4 h-4 text-yellow-500 animate-spin" />
                           )}
                           <span className="text-xs text-theme-text-secondary">
-                            {formatDistanceToNow(new Date(execution.started_at))} ago
+                            {formatDistanceToNow(
+                              new Date(execution.started_at)
+                            )}{" "}
+                            ago
                           </span>
                         </div>
                         {execution.error && (
-                          <span className="text-xs text-red-500" title={execution.error}>
+                          <span
+                            className="text-xs text-red-500"
+                            title={execution.error}
+                          >
                             Error: {execution.error.substring(0, 50)}...
                           </span>
                         )}

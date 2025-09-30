@@ -135,13 +135,14 @@ class GoogleDriveMCPTools {
         },
         {
           name: 'fetch_gdrive_file_to_local',
-          description: 'Download/fetch a file from Google Drive to local filesystem. Supports all file types including Google Workspace files. Use when user wants to download, save, or copy files locally. IMPORTANT: Requires Google Drive file ID (not filename). Use search_gdrive_files first if you only have a filename.',
+          description: 'Download/fetch files or folders from Google Drive to local filesystem. Supports ALL file types: Google Workspace files (Docs, Sheets, Slides), PDFs with text extraction, DOCX with text extraction, images, videos, and binary files. Can recursively download entire folders with their contents. Use when user wants to download, save, or copy files/folders locally. IMPORTANT: Requires Google Drive file ID (not filename). Use search_gdrive_files first if you only have a filename.',
           inputSchema: {
             type: 'object',
             properties: {
-              fileId: { type: 'string', description: 'Google Drive file ID (long string like 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms) - NOT the filename. Use search_gdrive_files to find the ID.' },
-              localPath: { type: 'string', description: 'Local file path where to save the file' },
-              format: { type: 'string', description: 'Export format for Google Workspace files. Options: txt, html, rtf, pdf, docx, odt, epub, xlsx, ods, csv, pptx, odp, svg, png, jpg', default: 'txt' }
+              fileId: { type: 'string', description: 'Google Drive file or folder ID (long string like 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms) - NOT the filename. Use search_gdrive_files to find the ID.' },
+              localPath: { type: 'string', description: 'Local file or folder path where to save the content. For folders, the folder name will be appended to this path.' },
+              format: { type: 'string', description: 'Export format for Google Workspace files. Options: txt, html, rtf, pdf, docx, odt, epub, xlsx, ods, csv, pptx, odp, svg, png, jpg', default: 'txt' },
+              recursive: { type: 'boolean', description: 'For folders: Set to true to recursively download all folder contents including subfolders (default: false). Ignored for files.', default: false }
             },
             required: ['fileId', 'localPath']
           }
@@ -374,136 +375,109 @@ class GoogleDriveMCPTools {
       // Enhanced PDF and DOCX handling - extract real content using dedicated libraries
       if (file.mimeType === 'application/pdf' || file.mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
         const fileTypeDisplay = file.mimeType === 'application/pdf' ? 'PDF' : 'DOCX';
+        console.log(`[GoogleDrive] ========================================`);
         console.log(`[GoogleDrive] Processing ${fileTypeDisplay}: ${file.name}`);
+        console.log(`[GoogleDrive] File ID: ${file.id}`);
+        console.log(`[GoogleDrive] File size: ${file.size ? this.formatFileSize(file.size) : 'Unknown'}`);
+        console.log(`[GoogleDrive] ========================================`);
 
         let extractedContent = '';
+        let extractionMethod = 'unknown';
 
         try {
-          // Get file buffer for processing - try multiple approaches for binary data
-          let contentResponse;
-          let binaryDataObtained = false;
+          // Use the improved _fetchBinaryFile method
+          console.log(`[GoogleDrive] Fetching binary file for ${fileTypeDisplay} extraction`);
+          const fetchResult = await this._fetchBinaryFile(fileId, connectionId);
+          const fileBuffer = fetchResult.buffer;
 
-          // Method 1: Try with binary headers
-          try {
-            contentResponse = await this.nango.get({
-              endpoint: `/drive/v3/files/${fileId}`,
-              connectionId,
-              providerConfigKey: this.nangoConfig.providerConfigKey,
-              params: { alt: 'media' },
-              headers: {
-                'Accept': 'application/octet-stream'
-              }
-            });
-
-            // Check if we got proper binary data
-            if (Buffer.isBuffer(contentResponse.data)) {
-              binaryDataObtained = true;
-              console.log(`[GoogleDrive] ${fileTypeDisplay} got proper Buffer data, size: ${contentResponse.data.length}`);
-            } else if (typeof contentResponse.data === 'string') {
-              // Check for unicode corruption
-              let unicodeCount = 0;
-              for (let i = 0; i < Math.min(1000, contentResponse.data.length); i++) {
-                if (contentResponse.data.charCodeAt(i) > 255) unicodeCount++;
-              }
-              if (unicodeCount === 0) {
-                binaryDataObtained = true;
-                console.log(`[GoogleDrive] ${fileTypeDisplay} got clean string data, size: ${contentResponse.data.length}`);
-              } else {
-                console.log(`[GoogleDrive] ${fileTypeDisplay} got corrupted string data (${unicodeCount} unicode chars in first 1000), trying fallback`);
-              }
-            }
-          } catch (error) {
-            console.log(`[GoogleDrive] ${fileTypeDisplay} binary request failed: ${error.message}, trying fallback`);
-          }
-
-          // Method 2: Fallback - try without specific headers if binary data was corrupted
-          if (!binaryDataObtained) {
-            try {
-              console.log(`[GoogleDrive] ${fileTypeDisplay} trying fallback request without binary headers`);
-              contentResponse = await this.nango.get({
-                endpoint: `/drive/v3/files/${fileId}`,
-                connectionId,
-                providerConfigKey: this.nangoConfig.providerConfigKey,
-                params: { alt: 'media' }
-              });
-              console.log(`[GoogleDrive] ${fileTypeDisplay} fallback request completed`);
-            } catch (fallbackError) {
-              throw new Error(`Both binary and fallback requests failed: ${fallbackError.message}`);
-            }
-          }
-
-          // Handle binary data properly
-          let fileBuffer;
-          if (Buffer.isBuffer(contentResponse.data)) {
-            fileBuffer = contentResponse.data;
-          } else if (typeof contentResponse.data === 'string') {
-            console.log(`[GoogleDrive] ${fileTypeDisplay} received as string, length: ${contentResponse.data.length}`);
-
-            // Check if this looks like base64 data
-            const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
-            const isBase64Like = base64Regex.test(contentResponse.data.substring(0, 100));
-
-            if (isBase64Like && contentResponse.data.length % 4 === 0) {
-              try {
-                fileBuffer = Buffer.from(contentResponse.data, 'base64');
-                console.log(`[GoogleDrive] ${fileTypeDisplay} decoded as base64, buffer size: ${fileBuffer.length}`);
-              } catch (base64Error) {
-                console.log(`[GoogleDrive] ${fileTypeDisplay} base64 decoding failed, trying latin1 encoding`);
-                fileBuffer = Buffer.from(contentResponse.data, 'latin1');
-              }
-            } else {
-              // Use latin1 encoding for binary string - preserves all 8-bit values correctly
-              fileBuffer = Buffer.from(contentResponse.data, 'latin1');
-              console.log(`[GoogleDrive] ${fileTypeDisplay} using latin1 encoding, buffer size: ${fileBuffer.length}`);
-            }
-          } else {
-            fileBuffer = Buffer.from(contentResponse.data);
-          }
+          console.log(`[GoogleDrive] Binary fetch completed using method: ${fetchResult.method}`);
+          console.log(`[GoogleDrive] Buffer size: ${fileBuffer.length} bytes`);
 
           // Extract content using appropriate library
           if (file.mimeType === 'application/pdf') {
+            console.log(`[GoogleDrive] Attempting PDF text extraction with pdf-parse`);
             extractedContent = await this.extractPdfText(fileBuffer);
-            console.log(`[GoogleDrive] Successfully extracted PDF text using pdf-parse: ${file.name} (${extractedContent.length} characters)`);
+            extractionMethod = 'pdf-parse';
+            console.log(`[GoogleDrive] ✓ Successfully extracted PDF text: ${extractedContent.length} characters`);
           } else {
             // For DOCX files, check if it's a valid ZIP first
+            console.log(`[GoogleDrive] Validating DOCX file (checking ZIP signature)`);
             if (this.isValidZip(fileBuffer)) {
+              console.log(`[GoogleDrive] ✓ Valid DOCX structure detected, attempting mammoth extraction`);
               extractedContent = await this.extractDocxText(fileBuffer);
-              console.log(`[GoogleDrive] Successfully extracted DOCX text using mammoth: ${file.name} (${extractedContent.length} characters)`);
+              extractionMethod = 'mammoth';
+              console.log(`[GoogleDrive] ✓ Successfully extracted DOCX text using mammoth: ${extractedContent.length} characters`);
             } else {
-              console.log(`[GoogleDrive] DOCX file ${file.name} is not a valid ZIP file - skipping mammoth extraction`);
-              throw new Error('DOCX file is not a valid ZIP format');
+              console.log(`[GoogleDrive] ✗ DOCX file ${file.name} is not a valid ZIP file`);
+              throw new Error('DOCX file is not a valid ZIP format - buffer may be corrupted');
             }
           }
 
         } catch (extractionError) {
-          console.error(`[GoogleDrive] ${fileTypeDisplay} extraction failed for ${file.name}: ${extractionError.message}`);
-          // Fallback to Google Drive export
-          try {
-            const exportResponse = await this._exportGoogleWorkspaceFile(fileId, 'txt', connectionId);
-            extractedContent = String(exportResponse.data);
-            console.log(`[GoogleDrive] Used Google Drive export fallback for ${fileTypeDisplay}: ${file.name}`);
-          } catch (fallbackError) {
-            console.error(`[GoogleDrive] Both ${fileTypeDisplay} extraction methods failed: ${extractionError.message}; Fallback: ${fallbackError.message}`);
-            // Use basic file info as last resort
-            extractedContent = `${fileTypeDisplay} File: ${file.name}\n\nContent extraction failed. File ID: ${file.id}`;
+          console.error(`[GoogleDrive] ========================================`);
+          console.error(`[GoogleDrive] ✗ ${fileTypeDisplay} extraction FAILED for ${file.name}`);
+          console.error(`[GoogleDrive] Error: ${extractionError.message}`);
+          console.error(`[GoogleDrive] Stack: ${extractionError.stack}`);
+          console.error(`[GoogleDrive] ========================================`);
+
+          // Try fallback methods based on file type
+          if (file.mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+            // DOCX-specific fallback: Use Google Drive conversion
+            console.log(`[GoogleDrive] Attempting DOCX fallback: Conversion via Google Docs`);
+            try {
+              extractedContent = await this._convertDocxViaGoogleDocs(fileId, file.name, connectionId);
+              extractionMethod = 'google-docs-conversion';
+              console.log(`[GoogleDrive] ✓ DOCX fallback succeeded using Google Docs conversion: ${extractedContent.length} characters`);
+            } catch (conversionError) {
+              console.error(`[GoogleDrive] ✗ DOCX Google Docs conversion also failed: ${conversionError.message}`);
+              // Final fallback: return error message
+              extractedContent = `DOCX File: ${file.name}\n\nContent extraction failed. \n\nAttempted methods:\n1. Direct DOCX parsing (mammoth): ${extractionError.message}\n2. Google Docs conversion: ${conversionError.message}\n\nFile ID: ${file.id}\n\nPlease try downloading the file manually or check if the file is corrupted.`;
+              extractionMethod = 'failed';
+            }
+          } else {
+            // PDF-specific fallback: Try Google Drive export (some PDFs can be exported)
+            console.log(`[GoogleDrive] Attempting PDF fallback: Google Drive export`);
+            try {
+              const exportResponse = await this._exportGoogleWorkspaceFile(fileId, 'txt', connectionId);
+              extractedContent = String(exportResponse.data);
+              extractionMethod = 'google-drive-export';
+              console.log(`[GoogleDrive] ✓ PDF fallback succeeded using Google Drive export: ${extractedContent.length} characters`);
+            } catch (exportError) {
+              console.error(`[GoogleDrive] ✗ PDF Google Drive export also failed: ${exportError.message}`);
+              // Final fallback: return error message
+              extractedContent = `PDF File: ${file.name}\n\nContent extraction failed.\n\nAttempted methods:\n1. Direct PDF parsing (pdf-parse): ${extractionError.message}\n2. Google Drive export: ${exportError.message}\n\nFile ID: ${file.id}\n\nThe PDF may be image-based (scanned) or corrupted. Please try downloading the file manually.`;
+              extractionMethod = 'failed';
+            }
           }
         }
 
         // Clean the extracted content
         const cleanedContent = this.cleanTextContent(extractedContent);
+        console.log(`[GoogleDrive] Cleaned content length: ${cleanedContent.length} characters`);
 
-        // Save as vector embedding locally with real content
-        try {
-          await this._saveFileAsVectorDocument(file, cleanedContent, workspaceId, file.mimeType === 'application/pdf' ? 'pdf' : 'docx');
-          console.log(`[GoogleDrive] Successfully saved ${fileTypeDisplay} content to vector storage: ${file.name}`);
-        } catch (saveError) {
-          console.error(`[GoogleDrive] Failed to save vector document for ${file.name}:`, saveError.message);
+        // Save as vector embedding locally with real content (only if extraction succeeded)
+        if (extractionMethod !== 'failed') {
+          try {
+            console.log(`[GoogleDrive] Saving to vector storage...`);
+            await this._saveFileAsVectorDocument(file, cleanedContent, workspaceId, file.mimeType === 'application/pdf' ? 'pdf' : 'docx');
+            console.log(`[GoogleDrive] ✓ Successfully saved ${fileTypeDisplay} content to vector storage: ${file.name}`);
+          } catch (saveError) {
+            console.error(`[GoogleDrive] ⚠ Failed to save vector document for ${file.name}:`, saveError.message);
+          }
+        } else {
+          console.log(`[GoogleDrive] ⚠ Skipping vector storage save due to extraction failure`);
         }
 
-        const largeContentResponse = this._handleLargeContent(cleanedContent, file.name, maxSize, chunked, `extracted ${fileTypeDisplay.toLowerCase()} content`);
+        console.log(`[GoogleDrive] ========================================`);
+        console.log(`[GoogleDrive] ${fileTypeDisplay} processing completed`);
+        console.log(`[GoogleDrive] Extraction method: ${extractionMethod}`);
+        console.log(`[GoogleDrive] Final content length: ${cleanedContent.length} characters`);
+        console.log(`[GoogleDrive] ========================================`);
+
+        const largeContentResponse = this._handleLargeContent(cleanedContent, file.name, maxSize, chunked, `extracted ${fileTypeDisplay.toLowerCase()} content (${extractionMethod})`);
         if (largeContentResponse) return largeContentResponse;
 
-        return { content: [{ type: 'text', text: `Content of "${file.name}" (${fileTypeDisplay} content extracted):\n\n${cleanedContent}` }] };
+        return { content: [{ type: 'text', text: `Content of "${file.name}" (${fileTypeDisplay} content extracted via ${extractionMethod}):\n\n${cleanedContent}` }] };
       }
 
       // Handle regular text files
@@ -543,43 +517,489 @@ class GoogleDriveMCPTools {
 
   async fetchGoogleDriveFileToLocal(args, workspaceId) {
     const connectionId = this.getConnectionId(workspaceId);
-    const { fileId, localPath, format = 'txt' } = args;
+    const { fileId, localPath, format = 'txt', recursive = false } = args;
 
     try {
-      const metaResponse = await this._getFileMetadata(fileId, connectionId, 'id,name,mimeType,size');
+      const metaResponse = await this._getFileMetadata(fileId, connectionId, 'id,name,mimeType,size,createdTime,modifiedTime');
       const file = metaResponse.data;
 
-      // Check if it's a folder
+      // Handle folder - recursive download
       if (file.mimeType === 'application/vnd.google-apps.folder') {
+        if (!recursive) {
+          return {
+            content: [{ type: 'text', text: `❌ Cannot download "${file.name}" - it is a folder. Set recursive=true to download folder contents, or use list_gdrive_files to see contents.` }],
+            isError: true
+          };
+        }
+
+        // Recursive folder download
+        return await this._fetchFolderToLocal(fileId, localPath, connectionId, workspaceId);
+      }
+
+      // Check file size limit
+      if (file.size && parseInt(file.size) > 100 * 1024 * 1024) {
+        throw new Error(`File size (${this.formatFileSize(file.size)}) exceeds 100MB limit`);
+      }
+
+      // Create directory if needed
+      const dir = path.dirname(localPath);
+      if (!fs.existsSync(dir)) {
+        console.log(`[GoogleDrive] Creating directory: ${dir}`);
+        fs.mkdirSync(dir, { recursive: true });
+      }
+
+      let contentToSave;
+      let savedAs = file.mimeType;
+
+      // Handle Google Workspace files
+      if (file.mimeType.startsWith('application/vnd.google-apps.')) {
+        console.log(`[GoogleDrive] Exporting Google Workspace file: ${file.name} as ${format}`);
+        try {
+          const contentResponse = await this._exportGoogleWorkspaceFile(fileId, format, connectionId);
+          contentToSave = Buffer.isBuffer(contentResponse.data)
+            ? contentResponse.data
+            : Buffer.from(String(contentResponse.data), 'utf8');
+          savedAs = `${file.mimeType} (exported as ${format})`;
+        } catch (exportError) {
+          console.error(`[GoogleDrive] Export failed: ${exportError.message}`);
+          throw new Error(`Failed to export Google Workspace file: ${exportError.message}`);
+        }
+      }
+      // Handle PDF files with text extraction
+      else if (file.mimeType === 'application/pdf') {
+        console.log(`[GoogleDrive] Fetching PDF: ${file.name}`);
+        try {
+          const contentResponse = await this._fetchBinaryFile(fileId, connectionId);
+          const pdfBuffer = contentResponse.buffer;
+
+          // Extract text from PDF
+          const extractedText = await this.extractPdfText(pdfBuffer);
+          const cleanedText = this.cleanTextContent(extractedText);
+
+          // Save extracted text to file
+          contentToSave = Buffer.from(cleanedText, 'utf8');
+          savedAs = 'PDF (extracted text)';
+          console.log(`[GoogleDrive] Successfully extracted PDF text: ${cleanedText.length} characters`);
+        } catch (pdfError) {
+          console.error(`[GoogleDrive] PDF extraction failed: ${pdfError.message}, trying raw download`);
+          // Fallback: save raw PDF
+          const contentResponse = await this._fetchBinaryFile(fileId, connectionId);
+          contentToSave = contentResponse.buffer;
+          savedAs = 'PDF (binary)';
+        }
+      }
+      // Handle DOCX files with text extraction
+      else if (file.mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        console.log(`[GoogleDrive] fetchGoogleDriveFileToLocal: Processing DOCX: ${file.name}`);
+        try {
+          console.log(`[GoogleDrive] Fetching DOCX binary data...`);
+          const contentResponse = await this._fetchBinaryFile(fileId, connectionId);
+          const docxBuffer = contentResponse.buffer;
+
+          console.log(`[GoogleDrive] Binary fetch completed using method: ${contentResponse.method}`);
+          console.log(`[GoogleDrive] Validating DOCX structure...`);
+
+          // Check if valid ZIP (DOCX is ZIP format)
+          if (this.isValidZip(docxBuffer)) {
+            console.log(`[GoogleDrive] ✓ Valid DOCX ZIP structure confirmed`);
+            const extractedText = await this.extractDocxText(docxBuffer);
+            const cleanedText = this.cleanTextContent(extractedText);
+
+            // Save extracted text to file
+            contentToSave = Buffer.from(cleanedText, 'utf8');
+            savedAs = 'DOCX (extracted text)';
+            console.log(`[GoogleDrive] ✓ Successfully extracted DOCX text: ${cleanedText.length} characters`);
+          } else {
+            console.log(`[GoogleDrive] ✗ DOCX is not a valid ZIP, saving as binary`);
+            contentToSave = docxBuffer;
+            savedAs = 'DOCX (binary)';
+          }
+        } catch (docxError) {
+          console.error(`[GoogleDrive] ✗ DOCX extraction failed: ${docxError.message}`);
+          console.log(`[GoogleDrive] Attempting fallback: Google Docs conversion...`);
+          try {
+            // Try Google Docs conversion fallback
+            const extractedText = await this._convertDocxViaGoogleDocs(fileId, file.name, connectionId);
+            const cleanedText = this.cleanTextContent(extractedText);
+            contentToSave = Buffer.from(cleanedText, 'utf8');
+            savedAs = 'DOCX (extracted text via Google Docs)';
+            console.log(`[GoogleDrive] ✓ Google Docs conversion succeeded: ${cleanedText.length} characters`);
+          } catch (conversionError) {
+            console.error(`[GoogleDrive] ✗ Google Docs conversion also failed: ${conversionError.message}`);
+            console.log(`[GoogleDrive] Final fallback: saving raw DOCX binary`);
+            // Final fallback: save raw DOCX
+            const contentResponse = await this._fetchBinaryFile(fileId, connectionId);
+            contentToSave = contentResponse.buffer;
+            savedAs = 'DOCX (binary - extraction failed)';
+          }
+        }
+      }
+      // Handle text files
+      else if (this.isTextMimeType(file.mimeType)) {
+        console.log(`[GoogleDrive] Fetching text file: ${file.name}`);
+        const contentResponse = await this.nango.get({
+          endpoint: `/drive/v3/files/${fileId}`,
+          connectionId,
+          providerConfigKey: this.nangoConfig.providerConfigKey,
+          params: { alt: 'media' }
+        });
+
+        let textContent = String(contentResponse.data);
+        textContent = this.cleanTextContent(textContent);
+        contentToSave = Buffer.from(textContent, 'utf8');
+        savedAs = 'text file';
+      }
+      // Handle all other binary files
+      else {
+        console.log(`[GoogleDrive] Fetching binary file: ${file.name} (${file.mimeType})`);
+        const contentResponse = await this._fetchBinaryFile(fileId, connectionId);
+        contentToSave = contentResponse.buffer;
+        savedAs = 'binary file';
+      }
+
+      // Write to local filesystem
+      fs.writeFileSync(localPath, contentToSave);
+      const stats = fs.statSync(localPath);
+
+      return {
+        content: [{
+          type: 'text',
+          text: `✅ Successfully downloaded "${file.name}" to "${localPath}"
+📏 Size: ${this.formatFileSize(stats.size)}
+📄 Type: ${savedAs}
+📅 Modified: ${file.modifiedTime ? new Date(file.modifiedTime).toLocaleString() : 'Unknown'}
+🆔 File ID: ${file.id}`
+        }]
+      };
+    } catch (error) {
+      return buildNangoError(error, 'download file');
+    }
+  }
+
+  /**
+   * Helper method to fetch binary files from Google Drive with robust handling
+   */
+  async _fetchBinaryFile(fileId, connectionId) {
+    let contentResponse;
+    let binaryDataObtained = false;
+    let responseMethod = 'unknown';
+
+    console.log(`[GoogleDrive] _fetchBinaryFile: Fetching file ${fileId}`);
+
+    // Method 1: Try with binary headers and responseType
+    try {
+      console.log(`[GoogleDrive] Method 1: Trying with binary headers and responseType arraybuffer`);
+      contentResponse = await this.nango.get({
+        endpoint: `/drive/v3/files/${fileId}`,
+        connectionId,
+        providerConfigKey: this.nangoConfig.providerConfigKey,
+        params: { alt: 'media' },
+        headers: {
+          'Accept': 'application/octet-stream'
+        },
+        responseType: 'arraybuffer'
+      });
+
+      // Check if we got proper binary data
+      if (Buffer.isBuffer(contentResponse.data)) {
+        binaryDataObtained = true;
+        responseMethod = 'buffer';
+        console.log(`[GoogleDrive] ✓ Got proper Buffer data, size: ${contentResponse.data.length} bytes`);
+      } else if (contentResponse.data instanceof ArrayBuffer) {
+        contentResponse.data = Buffer.from(contentResponse.data);
+        binaryDataObtained = true;
+        responseMethod = 'arraybuffer';
+        console.log(`[GoogleDrive] ✓ Got ArrayBuffer, converted to Buffer, size: ${contentResponse.data.length} bytes`);
+      } else if (typeof contentResponse.data === 'string') {
+        // Check for unicode corruption
+        let unicodeCount = 0;
+        const sampleSize = Math.min(1000, contentResponse.data.length);
+        for (let i = 0; i < sampleSize; i++) {
+          if (contentResponse.data.charCodeAt(i) > 255) unicodeCount++;
+        }
+        const corruptionRate = unicodeCount / sampleSize;
+
+        if (corruptionRate < 0.01) { // Less than 1% corruption is acceptable
+          binaryDataObtained = true;
+          responseMethod = 'string-clean';
+          console.log(`[GoogleDrive] ✓ Got clean string data, size: ${contentResponse.data.length} chars, corruption: ${(corruptionRate * 100).toFixed(2)}%`);
+        } else {
+          console.log(`[GoogleDrive] ✗ Got corrupted string data (${unicodeCount}/${sampleSize} unicode chars = ${(corruptionRate * 100).toFixed(2)}%), trying fallback`);
+        }
+      }
+
+      if (binaryDataObtained) {
+        console.log(`[GoogleDrive] Response headers:`, JSON.stringify(contentResponse.headers || {}, null, 2));
+      }
+    } catch (error) {
+      console.log(`[GoogleDrive] Method 1 failed: ${error.message}`);
+    }
+
+    // Method 2: Try without responseType specification
+    if (!binaryDataObtained) {
+      try {
+        console.log(`[GoogleDrive] Method 2: Trying with binary headers only`);
+        contentResponse = await this.nango.get({
+          endpoint: `/drive/v3/files/${fileId}`,
+          connectionId,
+          providerConfigKey: this.nangoConfig.providerConfigKey,
+          params: { alt: 'media' },
+          headers: {
+            'Accept': 'application/octet-stream'
+          }
+        });
+
+        if (Buffer.isBuffer(contentResponse.data) || typeof contentResponse.data === 'string') {
+          binaryDataObtained = true;
+          responseMethod = 'binary-headers';
+          console.log(`[GoogleDrive] ✓ Method 2 succeeded, got ${typeof contentResponse.data}`);
+        }
+      } catch (error) {
+        console.log(`[GoogleDrive] Method 2 failed: ${error.message}`);
+      }
+    }
+
+    // Method 3: Fallback - try without specific headers
+    if (!binaryDataObtained) {
+      try {
+        console.log(`[GoogleDrive] Method 3: Trying fallback without binary headers`);
+        contentResponse = await this.nango.get({
+          endpoint: `/drive/v3/files/${fileId}`,
+          connectionId,
+          providerConfigKey: this.nangoConfig.providerConfigKey,
+          params: { alt: 'media' }
+        });
+        responseMethod = 'fallback';
+        console.log(`[GoogleDrive] ✓ Method 3 succeeded`);
+      } catch (fallbackError) {
+        console.error(`[GoogleDrive] ✗ All fetch methods failed. Last error: ${fallbackError.message}`);
+        throw new Error(`Failed to fetch binary file using all methods: ${fallbackError.message}`);
+      }
+    }
+
+    // Convert to Buffer with proper encoding
+    let fileBuffer;
+    if (Buffer.isBuffer(contentResponse.data)) {
+      fileBuffer = contentResponse.data;
+      console.log(`[GoogleDrive] Data is already a Buffer: ${fileBuffer.length} bytes`);
+    } else if (contentResponse.data instanceof ArrayBuffer) {
+      fileBuffer = Buffer.from(contentResponse.data);
+      console.log(`[GoogleDrive] Converted ArrayBuffer to Buffer: ${fileBuffer.length} bytes`);
+    } else if (typeof contentResponse.data === 'string') {
+      console.log(`[GoogleDrive] Converting string to Buffer, length: ${contentResponse.data.length} chars`);
+
+      // Check if this looks like base64 data
+      const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
+      const sample = contentResponse.data.substring(0, Math.min(200, contentResponse.data.length));
+      const isBase64Like = base64Regex.test(sample);
+
+      if (isBase64Like && contentResponse.data.length % 4 === 0) {
+        try {
+          fileBuffer = Buffer.from(contentResponse.data, 'base64');
+          console.log(`[GoogleDrive] ✓ Decoded as base64: ${fileBuffer.length} bytes`);
+        } catch (base64Error) {
+          console.log(`[GoogleDrive] Base64 decoding failed: ${base64Error.message}, trying latin1`);
+          fileBuffer = Buffer.from(contentResponse.data, 'latin1');
+          console.log(`[GoogleDrive] Using latin1 encoding: ${fileBuffer.length} bytes`);
+        }
+      } else {
+        // Use latin1 encoding for binary string - preserves all 8-bit values correctly
+        fileBuffer = Buffer.from(contentResponse.data, 'latin1');
+        console.log(`[GoogleDrive] Using latin1 encoding: ${fileBuffer.length} bytes`);
+      }
+    } else if (contentResponse.data && typeof contentResponse.data === 'object') {
+      // Try to handle other object types
+      try {
+        fileBuffer = Buffer.from(JSON.stringify(contentResponse.data));
+        console.log(`[GoogleDrive] Converted object to JSON Buffer: ${fileBuffer.length} bytes`);
+      } catch (err) {
+        fileBuffer = Buffer.from(String(contentResponse.data));
+        console.log(`[GoogleDrive] Converted object to string Buffer: ${fileBuffer.length} bytes`);
+      }
+    } else {
+      fileBuffer = Buffer.from(String(contentResponse.data));
+      console.log(`[GoogleDrive] Fallback conversion to Buffer: ${fileBuffer.length} bytes`);
+    }
+
+    // Validate buffer integrity
+    if (!fileBuffer || fileBuffer.length === 0) {
+      throw new Error('Fetched file buffer is empty or invalid');
+    }
+
+    // Log first few bytes for debugging
+    const firstBytes = Array.from(fileBuffer.slice(0, 16))
+      .map(b => '0x' + b.toString(16).padStart(2, '0'))
+      .join(' ');
+    console.log(`[GoogleDrive] Buffer first 16 bytes: ${firstBytes}`);
+    console.log(`[GoogleDrive] Successfully fetched binary file using method: ${responseMethod}, size: ${fileBuffer.length} bytes`);
+
+    return { buffer: fileBuffer, method: responseMethod };
+  }
+
+  /**
+   * Convert DOCX file to text by using Google Drive's conversion feature
+   * Creates a temporary Google Doc copy, exports as text, then deletes the copy
+   */
+  async _convertDocxViaGoogleDocs(fileId, fileName, connectionId) {
+    let tempDocId = null;
+
+    try {
+      console.log(`[GoogleDrive] Starting DOCX conversion via Google Docs for: ${fileName}`);
+
+      // Step 1: Create a copy of the DOCX file and convert to Google Doc
+      console.log(`[GoogleDrive] Step 1: Creating Google Doc copy of DOCX file`);
+
+      const copyResponse = await this.nango.post({
+        endpoint: `/drive/v3/files/${fileId}/copy`,
+        connectionId,
+        providerConfigKey: this.nangoConfig.providerConfigKey,
+        data: {
+          name: `temp_conversion_${fileName}`,
+          mimeType: 'application/vnd.google-apps.document' // Convert to Google Doc
+        },
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      tempDocId = copyResponse.data.id;
+      console.log(`[GoogleDrive] ✓ Created temporary Google Doc: ${tempDocId}`);
+
+      // Step 2: Export the Google Doc as plain text
+      console.log(`[GoogleDrive] Step 2: Exporting Google Doc as text`);
+
+      const exportResponse = await this.nango.get({
+        endpoint: `/drive/v3/files/${tempDocId}/export`,
+        connectionId,
+        providerConfigKey: this.nangoConfig.providerConfigKey,
+        params: { mimeType: 'text/plain' }
+      });
+
+      const textContent = String(exportResponse.data);
+      console.log(`[GoogleDrive] ✓ Exported text content: ${textContent.length} characters`);
+
+      // Step 3: Delete the temporary Google Doc
+      console.log(`[GoogleDrive] Step 3: Deleting temporary Google Doc`);
+
+      try {
+        await this.nango.delete({
+          endpoint: `/drive/v3/files/${tempDocId}`,
+          connectionId,
+          providerConfigKey: this.nangoConfig.providerConfigKey
+        });
+        console.log(`[GoogleDrive] ✓ Deleted temporary Google Doc: ${tempDocId}`);
+        tempDocId = null; // Mark as cleaned up
+      } catch (deleteError) {
+        console.error(`[GoogleDrive] ⚠ Failed to delete temporary Google Doc ${tempDocId}: ${deleteError.message}`);
+        // Don't throw - we got the content, deletion is cleanup
+      }
+
+      console.log(`[GoogleDrive] ✓ Successfully converted DOCX to text via Google Docs`);
+      return textContent;
+
+    } catch (error) {
+      console.error(`[GoogleDrive] ✗ DOCX conversion via Google Docs failed: ${error.message}`);
+
+      // Cleanup: Try to delete temporary file if it was created
+      if (tempDocId) {
+        try {
+          console.log(`[GoogleDrive] Cleaning up temporary Google Doc: ${tempDocId}`);
+          await this.nango.delete({
+            endpoint: `/drive/v3/files/${tempDocId}`,
+            connectionId,
+            providerConfigKey: this.nangoConfig.providerConfigKey
+          });
+          console.log(`[GoogleDrive] ✓ Cleanup successful`);
+        } catch (cleanupError) {
+          console.error(`[GoogleDrive] ⚠ Cleanup failed for ${tempDocId}: ${cleanupError.message}`);
+          // Don't throw - just log
+        }
+      }
+
+      throw new Error(`Failed to convert DOCX via Google Docs: ${error.message}`);
+    }
+  }
+
+  /**
+   * Helper method to recursively download folder contents
+   */
+  async _fetchFolderToLocal(folderId, localPath, connectionId, workspaceId) {
+    try {
+      const metaResponse = await this._getFileMetadata(folderId, connectionId, 'id,name,mimeType');
+      const folderName = metaResponse.data.name;
+
+      // Create folder locally
+      const folderPath = path.join(localPath, folderName);
+      if (!fs.existsSync(folderPath)) {
+        console.log(`[GoogleDrive] Creating folder: ${folderPath}`);
+        fs.mkdirSync(folderPath, { recursive: true });
+      }
+
+      // List all files in the folder
+      const query = `'${folderId}' in parents and trashed = false`;
+      const response = await this.nango.get({
+        endpoint: '/drive/v3/files',
+        connectionId,
+        providerConfigKey: this.nangoConfig.providerConfigKey,
+        params: {
+          q: query,
+          fields: 'files(id,name,mimeType,size)',
+          pageSize: 100
+        }
+      });
+
+      const items = response.data?.files || [];
+
+      if (items.length === 0) {
         return {
-          content: [{ type: 'text', text: `❌ Cannot download "${file.name}" - it is a folder, not a file. Use list_gdrive_files to see folder contents.` }],
-          isError: true
+          content: [{
+            type: 'text',
+            text: `📁 Folder "${folderName}" is empty\n📂 Created local folder: ${folderPath}`
+          }]
         };
       }
 
-      if (file.size && file.size > 50 * 1024 * 1024) {
-        throw new Error(`File size (${this.formatFileSize(file.size)}) exceeds 50MB limit`);
+      const results = [];
+      let fileCount = 0;
+      let folderCount = 0;
+
+      for (const item of items) {
+        const itemPath = path.join(folderPath, item.name);
+
+        if (item.mimeType === 'application/vnd.google-apps.folder') {
+          // Recursive folder download
+          folderCount++;
+          const subFolderResult = await this._fetchFolderToLocal(item.id, folderPath, connectionId, workspaceId);
+          results.push(`📁 ${item.name} (subfolder processed)`);
+        } else {
+          // Download file
+          fileCount++;
+          try {
+            await this.fetchGoogleDriveFileToLocal(
+              { fileId: item.id, localPath: itemPath },
+              workspaceId
+            );
+            results.push(`✅ ${item.name}`);
+          } catch (fileError) {
+            console.error(`[GoogleDrive] Failed to download ${item.name}: ${fileError.message}`);
+            results.push(`❌ ${item.name} (failed: ${fileError.message})`);
+          }
+        }
       }
 
-      const dir = path.dirname(localPath);
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      return {
+        content: [{
+          type: 'text',
+          text: `✅ Successfully downloaded folder "${folderName}" to "${folderPath}"
+📊 Summary:
+  📄 Files: ${fileCount}
+  📁 Subfolders: ${folderCount}
+  📋 Total Items: ${items.length}
 
-      let contentResponse;
-      if (file.mimeType.startsWith('application/vnd.google-apps.')) {
-        contentResponse = await this._exportGoogleWorkspaceFile(fileId, format, connectionId);
-      } else {
-        contentResponse = await this.nango.get({
-          endpoint: `/drive/v3/files/${fileId}`, connectionId, providerConfigKey: this.nangoConfig.providerConfigKey, params: { alt: 'media' }
-        });
-      }
-
-      const buffer = Buffer.isBuffer(contentResponse.data) ? contentResponse.data : Buffer.from(contentResponse.data);
-      fs.writeFileSync(localPath, buffer);
-
-      const stats = fs.statSync(localPath);
-      return { content: [{ type: 'text', text: `✓ Successfully downloaded "${file.name}" to "${localPath}" (${this.formatFileSize(stats.size)})` }] };
+📋 Downloaded Items:
+${results.join('\n')}`
+        }]
+      };
     } catch (error) {
-      return buildNangoError(error, 'download file');
+      return buildNangoError(error, 'download folder');
     }
   }
 
@@ -735,55 +1155,34 @@ class GoogleDriveMCPTools {
         }
       } else if (file.mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
         // Use dedicated DOCX extraction with mammoth library
+        console.log(`[GoogleDrive] convertDocumentToText: Processing DOCX file: ${file.name}`);
         try {
-          const contentResponse = await this.nango.get({
-            endpoint: `/drive/v3/files/${fileId}`,
-            connectionId,
-            providerConfigKey: this.nangoConfig.providerConfigKey,
-            params: { alt: 'media' },
-            headers: {
-              'Accept': 'application/octet-stream'
-            }
-          });
+          // Use improved _fetchBinaryFile method
+          console.log(`[GoogleDrive] Fetching DOCX binary data...`);
+          const fetchResult = await this._fetchBinaryFile(fileId, connectionId);
+          const docxBuffer = fetchResult.buffer;
 
-          // Handle binary data properly for DOCX files
-          let docxBuffer;
-          if (Buffer.isBuffer(contentResponse.data)) {
-            docxBuffer = contentResponse.data;
-          } else if (typeof contentResponse.data === 'string') {
-            console.log(`[GoogleDrive] DOCX received as string, length: ${contentResponse.data.length}`);
+          console.log(`[GoogleDrive] Binary fetch completed, buffer size: ${docxBuffer.length} bytes`);
+          console.log(`[GoogleDrive] Validating DOCX structure...`);
 
-            // Check if this looks like base64 data
-            const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
-            const isBase64Like = base64Regex.test(contentResponse.data.substring(0, 100));
-
-            if (isBase64Like && contentResponse.data.length % 4 === 0) {
-              try {
-                docxBuffer = Buffer.from(contentResponse.data, 'base64');
-                console.log(`[GoogleDrive] DOCX decoded as base64, buffer size: ${docxBuffer.length}`);
-              } catch (base64Error) {
-                console.log(`[GoogleDrive] DOCX base64 decoding failed, trying latin1 encoding`);
-                docxBuffer = Buffer.from(contentResponse.data, 'latin1');
-              }
-            } else {
-              // Use latin1 encoding for binary string - preserves all 8-bit values correctly
-              docxBuffer = Buffer.from(contentResponse.data, 'latin1');
-              console.log(`[GoogleDrive] DOCX using latin1 encoding, buffer size: ${docxBuffer.length}`);
-            }
+          if (this.isValidZip(docxBuffer)) {
+            console.log(`[GoogleDrive] ✓ Valid DOCX ZIP structure confirmed`);
+            textContent = await this.extractDocxText(docxBuffer);
+            console.log(`[GoogleDrive] ✓ Successfully extracted DOCX text using mammoth: ${file.name} (${textContent.length} chars)`);
           } else {
-            docxBuffer = Buffer.from(contentResponse.data);
+            console.log(`[GoogleDrive] ✗ Invalid DOCX ZIP structure detected`);
+            throw new Error('DOCX file is not a valid ZIP format');
           }
-          textContent = await this.extractDocxText(docxBuffer);
-          console.log(`[GoogleDrive] Successfully extracted DOCX text using mammoth: ${file.name}`);
         } catch (docxError) {
-          console.error(`[GoogleDrive] DOCX extraction failed for ${file.name}: ${docxError.message}`);
-          // Fallback to Google Drive export
+          console.error(`[GoogleDrive] ✗ DOCX extraction failed for ${file.name}: ${docxError.message}`);
+          // Fallback to Google Drive conversion
+          console.log(`[GoogleDrive] Attempting DOCX fallback: Google Docs conversion...`);
           try {
-            const exportResponse = await this._exportGoogleWorkspaceFile(fileId, 'txt', connectionId);
-            textContent = String(exportResponse.data);
-            console.log(`[GoogleDrive] Used Google Drive export fallback for DOCX: ${file.name}`);
-          } catch (fallbackError) {
-            throw new Error(`Both DOCX extraction methods failed: ${docxError.message}; Fallback: ${fallbackError.message}`);
+            textContent = await this._convertDocxViaGoogleDocs(fileId, file.name, connectionId);
+            console.log(`[GoogleDrive] ✓ DOCX Google Docs conversion succeeded: ${file.name} (${textContent.length} chars)`);
+          } catch (conversionError) {
+            console.error(`[GoogleDrive] ✗ DOCX Google Docs conversion also failed: ${conversionError.message}`);
+            throw new Error(`Both DOCX extraction methods failed: ${docxError.message}; Conversion: ${conversionError.message}`);
           }
         }
       } else if (this.isTextMimeType(file.mimeType)) {

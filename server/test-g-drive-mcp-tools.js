@@ -22,7 +22,7 @@ const TEST_CONFIG = {
     secretKey: process.env.NANGO_SECRET_KEY,
     host: process.env.NANGO_HOST || 'https://api.nango.dev',
     providerConfigKey: process.env.NANGO_PROVIDER_CONFIG_KEY || 'google-drive',
-    connectionId: process.env.NANGO_CONNECTION_ID || 'workspace_137'
+    connectionId: process.env.NANGO_CONNECTION_ID || 'workspace_150'
   },
   testDir: './test-gdrive-mcp',
   testFile: 'test-upload.txt'

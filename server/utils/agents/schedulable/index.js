@@ -3,7 +3,7 @@ const {
   WorkspaceAgentInvocation,
 } = require("../../../models/workspaceAgentInvocation");
 const ImportedPlugin = require("../imported");
-const AgentHandler = require("../index");
+const { AgentHandler } = require("../index");
 const { safeJsonParse } = require("../../http");
 
 /**
@@ -91,11 +91,24 @@ class SchedulableAgent {
     const { User } = require("../../../models/user");
     const user = schedule.created_by ? await User.get({ id: schedule.created_by }) : null;
 
-    const invocation = await WorkspaceAgentInvocation.new({
+    // Build the prompt based on agent type
+    let prompt;
+    if (this.agentType === "flow") {
+      const flowName = this.agent.name || this.agent.flowData?.name || `flow_${this.agent.uuid}`;
+      prompt = `@agent Execute the "${flowName}" workflow`;
+    } else {
+      prompt = context.prompt || `[Scheduled Execution: ${schedule.name}]`;
+    }
+
+    const { invocation, message } = await WorkspaceAgentInvocation.new({
       workspace,
       user,
-      prompt: context.prompt || `[Scheduled Execution: ${schedule.name}]`,
+      prompt,
     });
+
+    if (!invocation) {
+      throw new Error(`Failed to create invocation: ${message}`);
+    }
 
     try {
       // Execute based on agent type
@@ -111,34 +124,22 @@ class SchedulableAgent {
         });
       } else if (this.agentType === "system") {
         // For system agents - create handler and execute
-        const handler = new AgentHandler({ uuid: invocation.uuid });
-        await handler.init({
-          workspace: { id: schedule.workspace_id },
-          prompt: context.prompt || "",
-          userId: schedule.created_by,
-        });
-        result = await handler.chat(context.prompt || "", context);
-      } else if (this.agentType === "flow") {
-        // For flows - use FlowExecutor
-        const { FlowExecutor } = require("../../agentFlows/executor");
         const { Workspace } = require("../../../models/workspace");
-
         const workspace = await Workspace.get({ id: schedule.workspace_id });
         if (!workspace) {
           throw new Error(`Workspace not found: ${schedule.workspace_id}`);
         }
 
-        const executor = new FlowExecutor(this.agent.flowData, {
-          workspaceSlug: workspace.slug,
-          userId: schedule.created_by,
-        });
+        const handler = new AgentHandler({ uuid: invocation.uuid });
+        await handler.init();
+        result = await handler.chat(context.prompt || "", context);
+      } else if (this.agentType === "flow") {
+        // For flows - execute via agent like the flow panel does (but without socket)
+        const handler = new AgentHandler({ uuid: invocation.uuid });
+        await handler.init();
+        await handler.createAIbitat({ socket: null }); // No socket for scheduled execution
 
-        result = await executor.execute({
-          ...context,
-          isScheduled: true,
-          scheduleId,
-          executedAt: new Date(),
-        });
+        result = await handler.startAgentCluster();
       } else {
         throw new Error(`Unknown agent type: ${this.agentType}`);
       }
@@ -146,6 +147,8 @@ class SchedulableAgent {
       // Update last run time
       await AgentSchedule.updateLastRun(scheduleId);
 
+      // Always return the invocation UUID for chat posting
+      console.log(`[SchedulableAgent] Returning result with invocationId: ${invocation.uuid}`);
       return {
         success: true,
         output: result,
@@ -410,6 +413,7 @@ class SchedulableAgent {
       }
       agent = {
         id: agentId,
+        uuid: agentId, // Flow UUID for plugin name lookup
         name: flowData.name,
         description: flowData.description,
         type: "flow",

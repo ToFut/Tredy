@@ -186,6 +186,64 @@ class AgentSchedulingEngine {
       // Update schedule's last run time
       await AgentSchedule.updateLastRun(schedule.id);
 
+      // Post result to workspace chat if invocation exists
+      console.log(`[AgentScheduler] Checking if should post to chat. InvocationId: ${result.invocationId}, Output type: ${typeof result.output}`);
+
+      if (result.invocationId) {
+        try {
+          const { WorkspaceChats } = require("../../../models/workspaceChats");
+          const { Workspace } = require("../../../models/workspace");
+
+          const workspace = await Workspace.get({ id: schedule.workspace_id });
+          if (workspace) {
+            // Format the result message
+            let resultMessage;
+            if (typeof result.output === 'string') {
+              resultMessage = result.output;
+            } else if (result.output && typeof result.output === 'object') {
+              // Extract meaningful content from output
+              if (result.output.output) {
+                resultMessage = typeof result.output.output === 'string'
+                  ? result.output.output
+                  : JSON.stringify(result.output.output, null, 2);
+              } else {
+                resultMessage = JSON.stringify(result.output, null, 2);
+              }
+            } else {
+              resultMessage = 'Workflow completed successfully';
+            }
+
+            console.log(`[AgentScheduler] Posting to chat. Message length: ${resultMessage.length}`);
+
+            await WorkspaceChats.new({
+              workspaceId: schedule.workspace_id,
+              prompt: `[Scheduled: ${schedule.name}]`,
+              response: {
+                text: resultMessage,
+                sources: [],
+                type: "scheduled_execution",
+              },
+              user: null, // Scheduled execution has no user
+              invocationUuid: result.invocationId,
+            });
+
+            console.log(
+              `[AgentScheduler] Posted result to workspace chat for schedule ${schedule.id}`
+            );
+          } else {
+            console.log(`[AgentScheduler] Workspace not found for posting result`);
+          }
+        } catch (chatError) {
+          console.error(
+            `[AgentScheduler] Failed to post result to chat for schedule ${schedule.id}:`,
+            chatError
+          );
+          // Don't fail the execution just because chat posting failed
+        }
+      } else {
+        console.log(`[AgentScheduler] No invocationId in result, skipping chat post`);
+      }
+
       console.log(
         `[AgentScheduler] Successfully executed schedule ${schedule.id}`
       );

@@ -48,6 +48,14 @@ const websocket = {
       name: this.name,
       toolCalls: [], // Track all tool calls for this session
       setup(aibitat) {
+        // Skip socket setup if socket is null (scheduled/background execution)
+        if (!socket) {
+          // Set a no-op introspect function for background execution
+          aibitat.introspect = (messageText) => {
+            console.log(`[introspect] ${messageText}`);
+          };
+          return;
+        }
         aibitat.onError(async (error) => {
           let errorMessage =
             error?.message || "An error occurred while running the agent.";

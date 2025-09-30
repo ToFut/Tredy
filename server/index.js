@@ -195,6 +195,12 @@ app.all("*", function (_, response) {
       } = require("./utils/MCP/railway-startup");
       await startMCPServersForProduction();
     }
+
+    // Start the agent scheduling engine
+    const { getSchedulingEngine } = require("./utils/agents/scheduler/engine");
+    const schedulingEngine = getSchedulingEngine();
+    await schedulingEngine.start();
+    console.log("[Server] Agent scheduling engine started");
   } catch (error) {
     console.error("Failed to initialize application:", error);
   }

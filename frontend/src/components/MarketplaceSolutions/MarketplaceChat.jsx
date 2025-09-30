@@ -143,7 +143,13 @@ export default function MarketplaceChat({
 
   const handleToggle = async (item) => {
     try {
-      await CommunityHub.toggleItem(item.id, !item.active);
+      // Use hubId if id is undefined, as imported plugins use hubId as their identifier
+      const itemId = item.id || item.hubId;
+      if (!itemId) {
+        console.error("No valid ID found for item:", item);
+        return;
+      }
+      await CommunityHub.toggleItem(itemId, !item.active);
       if (onRefresh) {
         await onRefresh();
       }
@@ -158,7 +164,13 @@ export default function MarketplaceChat({
     }
 
     try {
-      await CommunityHub.uninstallItem(item.id);
+      // Use hubId if id is undefined, as imported plugins use hubId as their identifier
+      const itemId = item.id || item.hubId;
+      if (!itemId) {
+        console.error("No valid ID found for item:", item);
+        return;
+      }
+      await CommunityHub.uninstallItem(itemId);
       if (onRefresh) {
         await onRefresh();
       }
@@ -219,7 +231,7 @@ export default function MarketplaceChat({
   };
 
   const isItemInstalled = (item) => {
-    return items.some((i) => i.hubId === item.id);
+    return items.some((i) => (i.hubId === item.id) || (i.id === item.id) || (i.hubId === item.hubId));
   };
 
   if (!isOpen) return null;
@@ -437,7 +449,7 @@ export default function MarketplaceChat({
                     const installed = isItemInstalled(item);
                     return (
                       <div
-                        key={`${item.itemType}-${item.id}`}
+                        key={`${item.itemType}-${item.id || item.hubId || Math.random()}`}
                         className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 transition-colors"
                       >
                         <div className="flex items-start justify-between gap-3">
@@ -504,7 +516,7 @@ export default function MarketplaceChat({
                   )
                   .map((item) => (
                     <div
-                      key={`${item.itemType}-${item.id}`}
+                      key={`${item.itemType}-${item.id || item.hubId || Math.random()}`}
                       className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700"
                     >
                       <div className="flex items-start justify-between gap-3">

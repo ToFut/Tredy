@@ -82,10 +82,19 @@ class SchedulableAgent {
     const context = safeJsonParse(schedule.context, {});
 
     // Create a special invocation for scheduled execution
-    const invocation = await WorkspaceAgentInvocation.create({
-      workspaceId: schedule.workspace_id,
+    const { Workspace } = require("../../../models/workspace");
+    const workspace = await Workspace.get({ id: schedule.workspace_id });
+    if (!workspace) {
+      throw new Error(`Workspace not found: ${schedule.workspace_id}`);
+    }
+
+    const { User } = require("../../../models/user");
+    const user = schedule.created_by ? await User.get({ id: schedule.created_by }) : null;
+
+    const invocation = await WorkspaceAgentInvocation.new({
+      workspace,
+      user,
       prompt: context.prompt || `[Scheduled Execution: ${schedule.name}]`,
-      userId: schedule.created_by,
     });
 
     try {

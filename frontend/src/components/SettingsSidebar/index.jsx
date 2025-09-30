@@ -12,6 +12,7 @@ import {
   Nut,
   Toolbox,
   Globe,
+  Calendar,
 } from "@phosphor-icons/react";
 import useUser from "@/hooks/useUser";
 import { isMobile } from "react-device-detect";
@@ -291,6 +292,14 @@ const SidebarOptions = ({ user = null, t }) => (
           btnText={t("settings.agent-skills")}
           icon={<Robot className="h-5 w-5 flex-shrink-0" />}
           href={paths.settings.agentSkills()}
+          user={user}
+          flex={true}
+          roles={["admin"]}
+        />
+        <Option
+          btnText="Schedules"
+          icon={<Calendar className="h-5 w-5 flex-shrink-0" />}
+          href={paths.schedules.index()}
           user={user}
           flex={true}
           roles={["admin"]}

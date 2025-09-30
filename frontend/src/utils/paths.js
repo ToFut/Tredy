@@ -182,6 +182,11 @@ export default {
       return `/settings/agents/builder/${uuid}`;
     },
   },
+  schedules: {
+    index: () => {
+      return `/settings/schedules`;
+    },
+  },
   communityHub: {
     website: () => {
       return import.meta.env.DEV

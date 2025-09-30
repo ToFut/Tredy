@@ -15,6 +15,7 @@ import {
   ArrowClockwise,
   Check,
   ChartBar,
+  Calendar,
 } from "@phosphor-icons/react";
 import { isMobile } from "react-device-detect";
 import Admin from "@/models/admin";
@@ -1218,6 +1219,15 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
                 title="Dashboard"
               >
                 <ChartBar className="w-3.5 h-3.5" weight="fill" />
+              </button>
+
+              {/* Schedules */}
+              <button
+                onClick={() => window.location.href = '/settings/schedules'}
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg shadow-sm hover:shadow-md transition-all"
+                title="Schedules"
+              >
+                <Calendar className="w-3.5 h-3.5" weight="fill" />
               </button>
 
               {/* Team */}

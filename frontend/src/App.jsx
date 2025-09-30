@@ -30,6 +30,7 @@ const AdminInvites = lazy(() => import("@/pages/Admin/Invitations"));
 const AdminWorkspaces = lazy(() => import("@/pages/Admin/Workspaces"));
 const AdminLogs = lazy(() => import("@/pages/Admin/Logging"));
 const AdminAgents = lazy(() => import("@/pages/Admin/Agents"));
+const AdminSchedules = lazy(() => import("@/pages/Admin/Schedules"));
 const GeneralChats = lazy(() => import("@/pages/GeneralSettings/Chats"));
 const InterfaceSettings = lazy(
   () => import("@/pages/GeneralSettings/Settings/Interface")
@@ -190,6 +191,10 @@ export default function App() {
                         hideUserMenu={true}
                       />
                     }
+                  />
+                  <Route
+                    path="/settings/schedules"
+                    element={<AdminRoute Component={AdminSchedules} />}
                   />
                   <Route
                     path="/settings/event-logs"

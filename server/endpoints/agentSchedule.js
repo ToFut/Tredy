@@ -15,11 +15,11 @@ function agentScheduleEndpoints(app) {
   if (!app) return;
 
   /**
-   * GET /api/workspace/:slug/agent-schedules
+   * GET /workspace/:slug/agent-schedules
    * Get all schedules for a workspace
    */
   app.get(
-    "/api/workspace/:slug/agent-schedules",
+    "/workspace/:slug/agent-schedules",
     [
       validatedRequest,
       flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default]),
@@ -67,13 +67,15 @@ function agentScheduleEndpoints(app) {
   );
 
   /**
-   * POST /api/workspace/:slug/agent-schedules
+   * POST /workspace/:slug/agent-schedules
    * Create a new agent schedule
    */
   app.post(
-    "/api/workspace/:slug/agent-schedules",
+    "/workspace/:slug/agent-schedules",
     [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default])],
     async (request, response) => {
+      console.log("[AgentSchedule] POST /api/workspace/:slug/agent-schedules called");
+      console.log("[AgentSchedule] Workspace slug:", request.params.slug);
       try {
         const { slug } = request.params;
         const { Workspace } = require("../models/workspace");
@@ -174,6 +176,8 @@ function agentScheduleEndpoints(app) {
             schedule,
           });
         } catch (agentError) {
+          console.error("[AgentSchedule] Error creating schedule:", agentError);
+          console.error("[AgentSchedule] Stack trace:", agentError.stack);
           return response.status(400).json({
             success: false,
             error: `Invalid agent: ${agentError.message}`,
@@ -190,11 +194,11 @@ function agentScheduleEndpoints(app) {
   );
 
   /**
-   * PUT /api/workspace/:slug/agent-schedules/:scheduleId
+   * PUT /workspace/:slug/agent-schedules/:scheduleId
    * Update an agent schedule
    */
   app.put(
-    "/api/workspace/:slug/agent-schedules/:scheduleId",
+    "/workspace/:slug/agent-schedules/:scheduleId",
     [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager])],
     async (request, response) => {
       try {
@@ -275,11 +279,11 @@ function agentScheduleEndpoints(app) {
   );
 
   /**
-   * DELETE /api/workspace/:slug/agent-schedules/:scheduleId
+   * DELETE /workspace/:slug/agent-schedules/:scheduleId
    * Delete an agent schedule
    */
   app.delete(
-    "/api/workspace/:slug/agent-schedules/:scheduleId",
+    "/workspace/:slug/agent-schedules/:scheduleId",
     [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager])],
     async (request, response) => {
       try {
@@ -343,11 +347,11 @@ function agentScheduleEndpoints(app) {
   );
 
   /**
-   * GET /api/workspace/:slug/agent-schedules/:scheduleId/executions
+   * GET /workspace/:slug/agent-schedules/:scheduleId/executions
    * Get execution history for a schedule
    */
   app.get(
-    "/api/workspace/:slug/agent-schedules/:scheduleId/executions",
+    "/workspace/:slug/agent-schedules/:scheduleId/executions",
     [
       validatedRequest,
       flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default]),
@@ -399,11 +403,11 @@ function agentScheduleEndpoints(app) {
   );
 
   /**
-   * POST /api/workspace/:slug/agent-schedules/:scheduleId/run
+   * POST /workspace/:slug/agent-schedules/:scheduleId/run
    * Manually trigger a scheduled agent execution
    */
   app.post(
-    "/api/workspace/:slug/agent-schedules/:scheduleId/run",
+    "/workspace/:slug/agent-schedules/:scheduleId/run",
     [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager])],
     async (request, response) => {
       try {
@@ -469,11 +473,11 @@ function agentScheduleEndpoints(app) {
   );
 
   /**
-   * GET /api/workspace/:slug/agent-schedules/stats
+   * GET /workspace/:slug/agent-schedules/stats
    * Get scheduling statistics for a workspace
    */
   app.get(
-    "/api/workspace/:slug/agent-schedules/stats",
+    "/workspace/:slug/agent-schedules/stats",
     [
       validatedRequest,
       flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default]),
@@ -508,11 +512,11 @@ function agentScheduleEndpoints(app) {
   );
 
   /**
-   * GET /api/workspace/:slug/flows/schedulable
+   * GET /workspace/:slug/flows/schedulable
    * Get all available flows that can be scheduled
    */
   app.get(
-    "/api/workspace/:slug/flows/schedulable",
+    "/workspace/:slug/flows/schedulable",
     [
       validatedRequest,
       flexUserRoleValid([ROLES.admin, ROLES.manager, ROLES.default]),

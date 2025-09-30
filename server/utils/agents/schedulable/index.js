@@ -47,8 +47,8 @@ class SchedulableAgent {
     }
 
     // Calculate next run time
-    const parser = require("cron-parser");
-    const interval = parser.parseExpression(cronExpression, {
+    const { parseExpression } = require("cron-parser");
+    const interval = parseExpression(cronExpression, {
       tz: timezone,
     });
     const nextRunAt = interval.next().toDate();
@@ -175,8 +175,8 @@ class SchedulableAgent {
   async updateSchedule(scheduleId, updates) {
     // If cron expression is being updated, recalculate next run time
     if (updates.cronExpression) {
-      const parser = require("cron-parser");
-      const interval = parser.parseExpression(updates.cronExpression, {
+      const { parseExpression } = require("cron-parser");
+      const interval = parseExpression(updates.cronExpression, {
         tz: updates.timezone || "UTC",
       });
       updates.nextRunAt = interval.next().toDate();

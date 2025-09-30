@@ -188,8 +188,8 @@ const AgentSchedule = {
       if (!schedule) return false;
 
       // Calculate next run time based on cron expression
-      const parser = require("cron-parser");
-      const interval = parser.parseExpression(schedule.cron_expression, {
+      const { parseExpression } = require("cron-parser");
+      const interval = parseExpression(schedule.cron_expression, {
         tz: schedule.timezone,
       });
       const nextRunAt = interval.next().toDate();

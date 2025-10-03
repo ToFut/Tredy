@@ -30,39 +30,126 @@ const CommunityHub = {
 
   /**
    * Fetch the explore items from the community hub that are publicly available.
+   * Merges both Community Hub (free) and Tredy Marketplace (paid) items.
    * @param {Object} params - Pagination parameters
    * @param {number} params.limit - Number of items to fetch per category (default: all)
    * @param {number} params.offset - Offset for pagination
+   * @param {Object} params.user - User object (for checking purchases)
    * @returns {Promise<{agentSkills: {items: [], hasMore: boolean, totalCount: number}, systemPrompts: {items: [], hasMore: boolean, totalCount: number}, slashCommands: {items: [], hasMore: boolean, totalCount: number}}>}
    */
   fetchExploreItems: async function (params = {}) {
-    const { limit = 1000, offset = 0 } = params;
+    const { limit = 1000, offset = 0, user = null } = params;
     const queryParams = new URLSearchParams({ limit: limit.toString(), offset: offset.toString() });
 
-    return await fetch(`${this.apiBase}/explore?${queryParams}`, {
+    // Fetch Community Hub items (free)
+    const communityItems = await fetch(`${this.apiBase}/explore?${queryParams}`, {
       method: "GET",
     })
       .then((response) => response.json())
       .catch((error) => {
-        console.error("Error fetching explore items:", error);
+        console.error("Error fetching community hub items:", error);
         return {
-          agentSkills: {
-            items: [],
-            hasMore: false,
-            totalCount: 0,
-          },
-          systemPrompts: {
-            items: [],
-            hasMore: false,
-            totalCount: 0,
-          },
-          slashCommands: {
-            items: [],
-            hasMore: false,
-            totalCount: 0,
-          },
+          agentSkills: { items: [], hasMore: false, totalCount: 0 },
+          systemPrompts: { items: [], hasMore: false, totalCount: 0 },
+          slashCommands: { items: [], hasMore: false, totalCount: 0 },
         };
       });
+
+    // Fetch Tredy Marketplace items (paid)
+    const TredyMarketplace = require("./tredyMarketplace");
+    const marketplace = new TredyMarketplace();
+    const tredyItems = {
+      agentSkills: { items: [], hasMore: false, totalCount: 0 },
+      systemPrompts: { items: [], hasMore: false, totalCount: 0 },
+      slashCommands: { items: [], hasMore: false, totalCount: 0 },
+      agentFlows: { items: [], hasMore: false, totalCount: 0 },
+    };
+
+    if (marketplace.isEnabled()) {
+      try {
+        // Fetch each item type from Tredy
+        const [skills, prompts, commands, workflows] = await Promise.all([
+          marketplace.fetchItems({ limit, offset, itemType: "agent-skill", visibility: "public" }),
+          marketplace.fetchItems({ limit, offset, itemType: "system-prompt", visibility: "public" }),
+          marketplace.fetchItems({ limit, offset, itemType: "slash-command", visibility: "public" }),
+          marketplace.fetchItems({ limit, offset, itemType: "agent-flow", visibility: "public" }),
+        ]);
+
+        // Check if user has purchased each item
+        const { getTenancyProvider } = require("../utils/tenancy");
+        const tenancy = getTenancyProvider();
+
+        // Helper to check purchase and add metadata
+        const enrichWithPurchaseInfo = async (items, itemType) => {
+          if (!items || items.length === 0) return [];
+
+          return await Promise.all(
+            items.map(async (item) => {
+              const hasPurchased = user
+                ? await tenancy.hasMarketplacePurchase(user, item.id, itemType)
+                : false;
+
+              return {
+                ...item,
+                source: "tredy", // Mark as Tredy item
+                isPaid: item.price_cents > 0,
+                hasPurchased,
+              };
+            })
+          );
+        };
+
+        tredyItems.agentSkills = {
+          items: await enrichWithPurchaseInfo(skills.items, "agent-skill"),
+          hasMore: skills.items.length >= limit,
+          totalCount: skills.total,
+        };
+
+        tredyItems.systemPrompts = {
+          items: await enrichWithPurchaseInfo(prompts.items, "system-prompt"),
+          hasMore: prompts.items.length >= limit,
+          totalCount: prompts.total,
+        };
+
+        tredyItems.slashCommands = {
+          items: await enrichWithPurchaseInfo(commands.items, "slash-command"),
+          hasMore: commands.items.length >= limit,
+          totalCount: commands.total,
+        };
+
+        tredyItems.agentFlows = {
+          items: await enrichWithPurchaseInfo(workflows.items, "agent-flow"),
+          hasMore: workflows.items.length >= limit,
+          totalCount: workflows.total,
+        };
+      } catch (error) {
+        console.error("Error fetching Tredy marketplace items:", error);
+      }
+    }
+
+    // Merge results (Tredy items first, then Community Hub)
+    return {
+      agentSkills: {
+        items: [...tredyItems.agentSkills.items, ...communityItems.agentSkills.items],
+        hasMore: tredyItems.agentSkills.hasMore || communityItems.agentSkills.hasMore,
+        totalCount: tredyItems.agentSkills.totalCount + communityItems.agentSkills.totalCount,
+      },
+      systemPrompts: {
+        items: [...tredyItems.systemPrompts.items, ...communityItems.systemPrompts.items],
+        hasMore: tredyItems.systemPrompts.hasMore || communityItems.systemPrompts.hasMore,
+        totalCount: tredyItems.systemPrompts.totalCount + communityItems.systemPrompts.totalCount,
+      },
+      slashCommands: {
+        items: [...tredyItems.slashCommands.items, ...communityItems.slashCommands.items],
+        hasMore: tredyItems.slashCommands.hasMore || communityItems.slashCommands.hasMore,
+        totalCount: tredyItems.slashCommands.totalCount + communityItems.slashCommands.totalCount,
+      },
+      agentFlows: {
+        items: [...tredyItems.agentFlows.items, ...(communityItems.agentFlows?.items || [])],
+        hasMore: tredyItems.agentFlows.hasMore || (communityItems.agentFlows?.hasMore || false),
+        totalCount: tredyItems.agentFlows.totalCount + (communityItems.agentFlows?.totalCount || 0),
+      },
+    };
   },
 
   /**

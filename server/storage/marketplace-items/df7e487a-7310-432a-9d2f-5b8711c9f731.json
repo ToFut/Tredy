@@ -1,0 +1,25 @@
+{
+  "id": "df7e487a-7310-432a-9d2f-5b8711c9f731",
+  "name": "Workflow 1759290321812",
+  "description": "Created: i want you to make fantastic comments about garage door in general (more than 50 words). its for google review send it to segev@sinosciences.com and djgenos1@gmail.com make every time completely different sentence",
+  "item_type": "agent-flow",
+  "price_cents": 50000,
+  "visibility": "public",
+  "author": "Tredy",
+  "version": "1.0.0",
+  "file_path": null,
+  "metadata": {
+    "category": "By MintplexLabs",
+    "tags": [],
+    "stripe_product_id": null,
+    "stripe_price_id": null
+  },
+  "content": {
+    "workflow": "",
+    "isScheduled": true,
+    "cronExpression": "* * * * *",
+    "steps": []
+  },
+  "created_at": "2025-10-01T04:24:33.344Z",
+  "updated_at": "2025-10-01T04:24:33.344Z"
+}

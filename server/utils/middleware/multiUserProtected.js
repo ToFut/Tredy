@@ -2,7 +2,8 @@ const { SystemSettings } = require("../../models/systemSettings");
 const { userFromSession } = require("../http");
 const ROLES = {
   all: "<all>",
-  admin: "admin",
+  super_admin: "super_admin", // Tredy team - manages all organizations
+  admin: "admin", // Organization admin - manages org users and purchases
   manager: "manager",
   default: "default",
 };
@@ -29,6 +30,13 @@ function strictMultiUserRoleValid(allowedRoles = DEFAULT_ROLES) {
 
     const user =
       response.locals?.user ?? (await userFromSession(request, response));
+
+    // Super admin has access to everything
+    if (user?.role === ROLES.super_admin) {
+      next();
+      return;
+    }
+
     if (allowedRoles.includes(user?.role)) {
       next();
       return;
@@ -63,6 +71,13 @@ function flexUserRoleValid(allowedRoles = DEFAULT_ROLES) {
 
     const user =
       response.locals?.user ?? (await userFromSession(request, response));
+
+    // Super admin has access to everything
+    if (user?.role === ROLES.super_admin) {
+      next();
+      return;
+    }
+
     if (allowedRoles.includes(user?.role)) {
       next();
       return;

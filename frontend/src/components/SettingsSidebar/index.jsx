@@ -225,37 +225,37 @@ const SidebarOptions = ({ user = null, t }) => (
               btnText: t("settings.llm"),
               href: paths.settings.llmPreference(),
               flex: true,
-              roles: ["admin"],
+              roles: ["admin", "super_admin"],
             },
             {
               btnText: t("settings.vector-database"),
               href: paths.settings.vectorDatabase(),
               flex: true,
-              roles: ["admin"],
+              roles: ["admin", "super_admin"],
             },
             {
               btnText: t("settings.embedder"),
               href: paths.settings.embedder.modelPreference(),
               flex: true,
-              roles: ["admin"],
+              roles: ["admin", "super_admin"],
             },
             {
               btnText: t("settings.text-splitting"),
               href: paths.settings.embedder.chunkingPreference(),
               flex: true,
-              roles: ["admin"],
+              roles: ["admin", "super_admin"],
             },
             {
               btnText: t("settings.voice-speech"),
               href: paths.settings.audioPreference(),
               flex: true,
-              roles: ["admin"],
+              roles: ["admin", "super_admin"],
             },
             {
               btnText: t("settings.transcription"),
               href: paths.settings.transcriptionPreference(),
               flex: true,
-              roles: ["admin"],
+              roles: ["admin", "super_admin"],
             },
           ]}
         />
@@ -267,24 +267,24 @@ const SidebarOptions = ({ user = null, t }) => (
             {
               btnText: t("settings.users"),
               href: paths.settings.users(),
-              roles: ["admin", "manager"],
+              roles: ["admin", "super_admin", "manager"],
             },
             {
               btnText: t("settings.workspaces"),
               href: paths.settings.workspaces(),
-              roles: ["admin", "manager"],
+              roles: ["admin", "super_admin", "manager"],
             },
             {
               hidden: !canViewChatHistory,
               btnText: t("settings.workspace-chats"),
               href: paths.settings.chats(),
               flex: true,
-              roles: ["admin", "manager"],
+              roles: ["admin", "super_admin", "manager"],
             },
             {
               btnText: t("settings.invites"),
               href: paths.settings.invites(),
-              roles: ["admin", "manager"],
+              roles: ["admin", "super_admin", "manager"],
             },
           ]}
         />
@@ -294,7 +294,7 @@ const SidebarOptions = ({ user = null, t }) => (
           href={paths.settings.agentSkills()}
           user={user}
           flex={true}
-          roles={["admin"]}
+          roles={["admin", "super_admin"]}
         />
         <Option
           btnText="Schedules"
@@ -302,7 +302,7 @@ const SidebarOptions = ({ user = null, t }) => (
           href={paths.schedules.index()}
           user={user}
           flex={true}
-          roles={["admin"]}
+          roles={["admin", "super_admin"]}
         />
         <Option
           btnText="Community Hub"
@@ -312,25 +312,37 @@ const SidebarOptions = ({ user = null, t }) => (
               btnText: "Explore Trending",
               href: paths.communityHub.trending(),
               flex: true,
-              roles: ["admin"],
+              roles: ["admin", "super_admin"],
             },
             {
               btnText: "Marketplace",
               href: paths.communityHub.marketplace(),
               flex: true,
-              roles: ["admin"],
+              roles: ["admin", "super_admin"],
             },
             {
               btnText: "Your Account",
               href: paths.communityHub.authentication(),
               flex: true,
-              roles: ["admin"],
+              roles: ["admin", "super_admin"],
             },
             {
               btnText: "Import Item",
               href: paths.communityHub.importItem(),
               flex: true,
-              roles: ["admin"],
+              roles: ["admin", "super_admin"],
+            },
+            {
+              btnText: "🔐 Super Admin",
+              href: "/settings/super-admin",
+              flex: true,
+              roles: ["super_admin"], // Only super_admin can see this
+            },
+            {
+              btnText: "🛒 Tredy Marketplace",
+              href: "/settings/tredy-marketplace",
+              flex: true,
+              roles: ["super_admin"], // Only super_admin can manage marketplace
             },
           ]}
         />
@@ -343,19 +355,19 @@ const SidebarOptions = ({ user = null, t }) => (
               btnText: t("settings.interface"),
               href: paths.settings.interface(),
               flex: true,
-              roles: ["admin", "manager"],
+              roles: ["admin", "super_admin", "manager"],
             },
             {
               btnText: t("settings.branding"),
               href: paths.settings.branding(),
               flex: true,
-              roles: ["admin", "manager"],
+              roles: ["admin", "super_admin", "manager"],
             },
             {
               btnText: t("settings.chat"),
               href: paths.settings.chat(),
               flex: true,
-              roles: ["admin", "manager"],
+              roles: ["admin", "super_admin", "manager"],
             },
           ]}
         />
@@ -368,38 +380,38 @@ const SidebarOptions = ({ user = null, t }) => (
               btnText: "User Connectors",
               href: paths.settings.userConnectors(),
               flex: true,
-              roles: ["admin", "manager"],
+              roles: ["admin", "super_admin", "manager"],
             },
             {
               hidden: !canViewChatHistory,
               btnText: t("settings.embeds"),
               href: paths.settings.embedChatWidgets(),
               flex: true,
-              roles: ["admin"],
+              roles: ["admin", "super_admin"],
             },
             {
               btnText: t("settings.event-logs"),
               href: paths.settings.logs(),
               flex: true,
-              roles: ["admin"],
+              roles: ["admin", "super_admin"],
             },
             {
               btnText: t("settings.api-keys"),
               href: paths.settings.apiKeys(),
               flex: true,
-              roles: ["admin"],
+              roles: ["admin", "super_admin"],
             },
             {
               btnText: t("settings.system-prompt-variables"),
               href: paths.settings.systemPromptVariables(),
               flex: true,
-              roles: ["admin"],
+              roles: ["admin", "super_admin"],
             },
             {
               btnText: t("settings.browser-extension"),
               href: paths.settings.browserExtension(),
               flex: true,
-              roles: ["admin", "manager"],
+              roles: ["admin", "super_admin", "manager"],
             },
           ]}
         />
@@ -409,7 +421,7 @@ const SidebarOptions = ({ user = null, t }) => (
           href={paths.settings.security()}
           user={user}
           flex={true}
-          roles={["admin", "manager"]}
+          roles={["admin", "super_admin", "manager"]}
           hidden={user?.role}
         />
         <HoldToReveal key="exp_features">
@@ -419,7 +431,7 @@ const SidebarOptions = ({ user = null, t }) => (
             href={paths.settings.experimental()}
             user={user}
             flex={true}
-            roles={["admin"]}
+            roles={["admin", "super_admin"]}
           />
         </HoldToReveal>
       </>

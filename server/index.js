@@ -57,6 +57,10 @@ const {
   apiWorkspaceConnectorEndpoints,
 } = require("./endpoints/api/workspace/connectors");
 const { waitlistEndpoints } = require("./endpoints/waitlist");
+const { marketplaceEndpoints } = require("./endpoints/marketplace");
+const { organizationEndpoints } = require("./endpoints/organizations");
+const { superAdminEndpoints } = require("./endpoints/superAdmin");
+const { tredyAdminEndpoints } = require("./endpoints/tredyAdmin");
 const { WelcomeMessages } = require("./models/welcomeMessages");
 const { initializeDatabase } = require("./utils/database/init");
 const app = express();
@@ -105,6 +109,10 @@ threadSharingEndpoints(apiRouter);
 userConnectorEndpoints(apiRouter);
 apiWorkspaceConnectorEndpoints(apiRouter);
 waitlistEndpoints(app);
+marketplaceEndpoints(apiRouter);
+organizationEndpoints(apiRouter);
+superAdminEndpoints(apiRouter);
+tredyAdminEndpoints(apiRouter);
 
 // Externally facing embedder endpoints
 embeddedEndpoints(apiRouter);

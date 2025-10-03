@@ -454,13 +454,29 @@ export default function MarketplaceChat({
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
+                            <div className="flex items-center gap-2 mb-2 flex-wrap">
                               <h4 className="font-semibold text-gray-900 dark:text-white">
                                 {item.name}
                               </h4>
                               <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs rounded-full">
                                 {item.category}
                               </span>
+                              {/* Pricing Badge */}
+                              {item.price_cents !== undefined && (
+                                <span className={`px-2 py-0.5 text-xs rounded-full font-semibold ${
+                                  item.price_cents > 0
+                                    ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                                    : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                                }`}>
+                                  {item.price_cents > 0 ? `$${(item.price_cents / 100).toFixed(2)}` : "Free"}
+                                </span>
+                              )}
+                              {/* Tredy Source Badge */}
+                              {item.source === "tredy" && (
+                                <span className="px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs rounded-full">
+                                  Tredy
+                                </span>
+                              )}
                               {installed && (
                                 <Check className="w-4 h-4 text-green-500" />
                               )}
@@ -521,7 +537,7 @@ export default function MarketplaceChat({
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
+                          <div className="flex items-center gap-2 mb-2 flex-wrap">
                             <h4 className="font-semibold text-gray-900 dark:text-white">
                               {item.name}
                             </h4>
@@ -534,6 +550,26 @@ export default function MarketplaceChat({
                             >
                               {item.active ? "Active" : "Inactive"}
                             </span>
+                            {/* Pricing Badge */}
+                            {item.price_cents !== undefined && (
+                              <span
+                                className={`px-2 py-0.5 text-xs rounded-full font-semibold ${
+                                  item.price_cents > 0
+                                    ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                                    : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                                }`}
+                              >
+                                {item.price_cents > 0
+                                  ? `$${(item.price_cents / 100).toFixed(2)}`
+                                  : "Free"}
+                              </span>
+                            )}
+                            {/* Tredy Source Badge */}
+                            {item.source === "tredy" && (
+                              <span className="px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs rounded-full">
+                                Tredy
+                              </span>
+                            )}
                           </div>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
                             Type: {item.itemType}

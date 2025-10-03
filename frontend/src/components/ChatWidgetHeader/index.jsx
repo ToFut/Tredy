@@ -26,6 +26,7 @@ import nangoService from "@/services/NangoService";
 import BackgroundTasksBubble from "../WorkspaceChat/BackgroundTasksBubble";
 import MarketplaceSolutions from "../MarketplaceSolutions";
 import BusinessChat from "../IndustrySolutions/BusinessChat";
+import SchedulesModal from "../SchedulesModal";
 
 // Avatar Component - Google-style circular avatars
 function Avatar({
@@ -1095,6 +1096,7 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
   const [showConnectorModal, setShowConnectorModal] = useState(false);
   const [showExpanded, setShowExpanded] = useState(false);
   const [showBusinessChat, setShowBusinessChat] = useState(false);
+  const [showSchedules, setShowSchedules] = useState(false);
   const avatarSize = isMobile ? 40 : 40; // Consistent size for better layout
 
   // Check for openConnectors query parameter on mount
@@ -1223,7 +1225,7 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
 
               {/* Schedules */}
               <button
-                onClick={() => window.location.href = '/settings/schedules'}
+                onClick={() => setShowSchedules(true)}
                 className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg shadow-sm hover:shadow-md transition-all"
                 title="Schedules"
               >
@@ -1328,6 +1330,12 @@ export default function ChatWidgetHeader({ workspace, connectors = [] }) {
         onConnectorAction={(connector) => {
           console.log("Connector action:", connector);
         }}
+      />
+
+      {/* Schedules Modal */}
+      <SchedulesModal
+        isOpen={showSchedules}
+        onClose={() => setShowSchedules(false)}
       />
     </>
   );

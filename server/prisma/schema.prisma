@@ -66,10 +66,12 @@ model users {
   suspended                   Int                           @default(0)
   seen_recovery_codes         Boolean?                      @default(false)
   supabase_id                 String?                       @unique
+  organizationId              Int?
   createdAt                   DateTime                      @default(now())
   lastUpdatedAt               DateTime                      @default(now())
   dailyMessageLimit           Int?
   bio                         String?                       @default("")
+  organization                organizations?                @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   workspace_chats             workspace_chats[]
   workspace_users             workspace_users[]
   embed_configs               embed_configs[]
@@ -88,6 +90,11 @@ model users {
   agent_schedules             agent_schedules[]
   thread_participants         thread_participants[]
   connector_tokens            connector_tokens[]
+  marketplace_installations   marketplace_installations[]
+  marketplace_purchases       marketplace_purchases[]       @relation("UserPurchases")
+  purchases_made              marketplace_purchases[]       @relation("PurchasedBy")
+
+  @@index([organizationId])
 }
 
 model recovery_codes {
@@ -505,4 +512,62 @@ model waitlist {
 
   @@index([email])
   @@index([joinedAt])
+}
+
+// Multi-tenant organizations (only used when TENANCY_MODE=multi)
+model organizations {
+  id                    Int                     @id @default(autoincrement())
+  name                  String
+  slug                  String                  @unique
+  tier                  String                  @default("internal") // internal, agency, startup
+  stripeCustomerId      String?                 @unique
+  subscriptionTier      String?                 @default("free") // free, pro, enterprise
+  customDomain          String?                 @unique // For white-label startups
+  logoFilename          String?
+  settings              String? // JSON blob for org-specific settings
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @default(now())
+  users                 users[]
+  marketplace_purchases marketplace_purchases[]
+
+  @@index([slug])
+}
+
+// Marketplace purchases (supports both single and multi-tenant modes)
+model marketplace_purchases {
+  id                     Int            @id @default(autoincrement())
+  userId                 Int? // Single mode: user who purchased
+  organizationId         Int? // Multi mode: organization who purchased
+  hubId                  String // Item UUID from Supabase
+  itemType               String // agent-skill, system-prompt, slash-command
+  stripePaymentIntentId  String?        @unique
+  amountPaidCents        Int? // Price in cents
+  purchasedBy            Int? // User who initiated purchase
+  status                 String         @default("completed") // pending, completed, refunded
+  purchasedAt            DateTime       @default(now())
+  user                   users?         @relation("UserPurchases", fields: [userId], references: [id], onDelete: Cascade)
+  organization           organizations? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  purchaser              users?         @relation("PurchasedBy", fields: [purchasedBy], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([hubId])
+  @@index([status])
+}
+
+// Marketplace installations (tracks which users have installed purchased items)
+model marketplace_installations {
+  id          Int      @id @default(autoincrement())
+  hubId       String // Item UUID from Supabase
+  itemType    String // agent-skill, system-prompt, slash-command
+  workspaceId Int? // Optional workspace-specific installation
+  userId      Int // User who installed
+  active      Boolean  @default(true)
+  installedAt DateTime @default(now())
+  user        users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([hubId, userId, workspaceId])
+  @@index([userId])
+  @@index([workspaceId])
+  @@index([hubId])
 }

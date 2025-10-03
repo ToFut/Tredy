@@ -102,6 +102,15 @@ const MobileConnections = lazy(
 const UserConnectors = lazy(
   () => import("@/pages/GeneralSettings/UserConnectors")
 );
+const SuperAdminDashboard = lazy(
+  () => import("@/pages/Admin/SuperAdmin")
+);
+const OrganizationDetail = lazy(
+  () => import("@/pages/Admin/OrganizationDetail")
+);
+const TredyMarketplaceAdmin = lazy(
+  () => import("@/pages/Admin/TredyMarketplace")
+);
 
 export default function App() {
   return (
@@ -195,6 +204,18 @@ export default function App() {
                   <Route
                     path="/settings/schedules"
                     element={<AdminRoute Component={AdminSchedules} />}
+                  />
+                  <Route
+                    path="/settings/super-admin"
+                    element={<AdminRoute Component={SuperAdminDashboard} />}
+                  />
+                  <Route
+                    path="/settings/organizations/:id"
+                    element={<AdminRoute Component={OrganizationDetail} />}
+                  />
+                  <Route
+                    path="/settings/tredy-marketplace"
+                    element={<AdminRoute Component={TredyMarketplaceAdmin} />}
                   />
                   <Route
                     path="/settings/event-logs"

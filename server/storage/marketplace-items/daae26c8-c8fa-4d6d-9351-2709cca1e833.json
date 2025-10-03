@@ -1,0 +1,23 @@
+{
+  "id": "daae26c8-c8fa-4d6d-9351-2709cca1e833",
+  "name": "Test",
+  "description": "Check out",
+  "item_type": "system-prompt",
+  "price_cents": 0,
+  "visibility": "public",
+  "author": "Tredy",
+  "version": "1.0.0",
+  "file_path": null,
+  "metadata": {
+    "category": "General",
+    "tags": [],
+    "stripe_product_id": null,
+    "stripe_price_id": null
+  },
+  "content": {
+    "prompt": "Check out",
+    "command": "Check out"
+  },
+  "created_at": "2025-10-01T03:14:35.692Z",
+  "updated_at": "2025-10-01T03:14:35.692Z"
+}
